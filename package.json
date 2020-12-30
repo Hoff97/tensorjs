@@ -4,6 +4,9 @@
   "version": "0.1.0",
   "scripts": {
     "build": "wasm-pack build && webpack",
+    "build:wasm": "wasm-pack build",
+    "build:js": "webpack",
+    "test": "npm run test:rust && npm run test:integration",
     "test:integration": "karma start karma.conf.js",
     "test:rust": "wasm-pack test --firefox --headless"
   },

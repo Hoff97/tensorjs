@@ -90,7 +90,7 @@ impl Tensor {
     pub fn create(shape: Uint32Array, values: Float32Array) -> Tensor {
         let mut _shape: Vec<usize> = vec![0; shape.length() as usize];
         for i in 0.._shape.len() {
-            _shape.push(shape.get_index(i as u32) as usize);
+            _shape[i] = shape.get_index(i as u32) as usize;
         }
 
         let strides = compute_strides(&_shape);
@@ -98,7 +98,7 @@ impl Tensor {
 
         let mut _values: Vec<f32> = vec![0.; values.length() as usize];
         for i in 0.._values.len() {
-            _values.push(values.get_index(i as u32));
+            _values[i] = values.get_index(i as u32);
         }
 
         Tensor {
@@ -112,7 +112,7 @@ impl Tensor {
     pub fn create_constant(shape: Uint32Array, value: f32) -> Tensor {
         let mut _shape: Vec<usize> = vec![0; shape.length() as usize];
         for i in 0.._shape.len() {
-            _shape.push(shape.get_index(i as u32) as usize);
+            _shape[i] = shape.get_index(i as u32) as usize;
         }
 
         let strides = compute_strides(&_shape);

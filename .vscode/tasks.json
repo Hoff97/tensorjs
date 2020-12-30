@@ -1,0 +1,20 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "npm",
+			"script": "test:integration",
+			"problemMatcher": [],
+			"label": "npm: test:integration",
+			"detail": "karma start karma.conf.js"
+		},
+		{
+			"type": "npm",
+			"script": "build:wasm",
+			"group": "build",
+			"problemMatcher": [],
+			"label": "npm: build:wasm",
+			"detail": "wasm-pack build"
+		}
+	]
+}

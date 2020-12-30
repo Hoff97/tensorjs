@@ -29,11 +29,23 @@ module.exports = function(config) {
         // enable / disable watching file and executing tests whenever any file changes
         autoWatch: true,
 
-        browsers: ['ChromeHeadless'],
+        browsers: [
+            'ChromeDebugging'
+        ],
+
+        customLaunchers: {
+            ChromeDebugging: {
+                base: 'ChromeHeadless',
+                flags: ['--remote-debugging-port=9333']
+            }
+        },
 
         // Continuous Integration mode
         // if true, Karma captures browsers, runs the tests and exits
         singleRun: false,
-        concurrency: 2,
+        concurrency: 1,
+        client: {
+            captureConsole: true,
+        }
     });
 };
