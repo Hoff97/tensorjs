@@ -1,0 +1,26 @@
+name: Test
+
+on: push
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v2-beta
+      with:
+        node-version: '12'
+    - uses: jetli/wasm-pack-action@v0.3.0
+      with:
+        version: 'latest'
+    - name: Build wasm
+      run: |
+        npm run build:wasm
+    - name: Install wasm and dev dependencies
+      run: |
+        npm install
+    - name: Run tests
+      run: |
+        npm run test
