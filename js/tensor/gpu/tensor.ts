@@ -31,19 +31,19 @@ export default class GPUTensor extends Tensor {
     this.shape = shape;
 
     if (values instanceof Float32Array) {
-      // TODO: Store values in a float32 array
-      // with length = ((this.size//4)+1)*4
-      // and init the residual values with 0
-      const vals = new Float32Array(this.size*4);
+      const textureSize = Math.ceil(this.size / 4)
+      const arraySize = textureSize*4;
+
+      const vals = new Float32Array(arraySize);
       for (let i = 0; i < this.size; i++) {
         vals[i] = values[i];
-        vals[i + this.size] = 0;
-        vals[i + this.size*2] = 0;
-        vals[i + this.size*3] = 0;
+      }
+      for (let i = this.size; i < arraySize; i++) {
+        vals[i] = 0;
       }
 
       const texture = gl.texture({
-        width: this.size,
+        width: textureSize,
         height: 1,
         format: 'rgba',
         type: 'float',
@@ -52,7 +52,7 @@ export default class GPUTensor extends Tensor {
 
       this.framebuffer = gl.framebuffer({
         color: texture,
-        width: this.size,
+        width: textureSize,
         height: 1,
         depthStencil: false
       });

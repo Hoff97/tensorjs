@@ -7,7 +7,6 @@ export function buildComp(inputTextures: string[], fragmentShader: string) {
   for (let inputTexture of inputTextures) {
     uniforms[inputTexture] = gl.prop(inputTexture as never);
   }
-  console.log(uniforms);
 
   const result = gl({
     frag: fragmentShader,
@@ -37,12 +36,13 @@ export function compute(op: DrawCommand, resultShape: readonly number[], inputs:
     inputTextures[name] = inputs[name].framebuffer
   }
 
-  console.log(inputTextures);
-
   const resultSize = getSize(resultShape);
 
+  const textureSize = Math.ceil(resultSize / 4)
+  //const arraySize = textureSize*4;
+
   const result = gl.framebuffer({
-    width: resultSize,
+    width: textureSize,
     height: 1,
     depthStencil: false,
     colorFormat: 'rgba',
