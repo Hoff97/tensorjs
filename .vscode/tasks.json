@@ -29,7 +29,7 @@
 			"script": "test:rust",
 			"problemMatcher": [],
 			"label": "npm: test:rust",
-			"detail": "cargo test"
+			"detail": "cargo test --tests"
 		}
 	]
 }
