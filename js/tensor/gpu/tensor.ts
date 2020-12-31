@@ -10,6 +10,7 @@ import { add } from '../../ops/gpu/add';
 import { subtract } from '../../ops/gpu/subtract';
 import { multiply } from '../../ops/gpu/multiply';
 import { divide } from '../../ops/gpu/divide';
+import { matmul } from '../../ops/gpu/matmul';
 
 let glContext = document.createElement("canvas").getContext("webgl");
 export let gl = REGL({
@@ -21,6 +22,8 @@ export default class GPUTensor extends Tensor {
   public framebuffer: Framebuffer2D;
 
   public size: number;
+  public textureSize: number;
+  public arraySize: number;
 
   private shape: readonly number[];
 
@@ -30,20 +33,20 @@ export default class GPUTensor extends Tensor {
     this.size = getSize(shape);
     this.shape = shape;
 
-    if (values instanceof Float32Array) {
-      const textureSize = Math.ceil(this.size / 4)
-      const arraySize = textureSize*4;
+    this.textureSize = Math.ceil(this.size / 4)
+    this.arraySize = this.textureSize*4;
 
-      const vals = new Float32Array(arraySize);
+    if (values instanceof Float32Array) {
+      const vals = new Float32Array(this.arraySize);
       for (let i = 0; i < this.size; i++) {
         vals[i] = values[i];
       }
-      for (let i = this.size; i < arraySize; i++) {
+      for (let i = this.size; i < this.arraySize; i++) {
         vals[i] = 0;
       }
 
       const texture = gl.texture({
-        width: textureSize,
+        width: this.textureSize,
         height: 1,
         format: 'rgba',
         type: 'float',
@@ -52,7 +55,7 @@ export default class GPUTensor extends Tensor {
 
       this.framebuffer = gl.framebuffer({
         color: texture,
-        width: textureSize,
+        width: this.textureSize,
         height: 1,
         depthStencil: false
       });
@@ -64,8 +67,8 @@ export default class GPUTensor extends Tensor {
   getValues(): Promise<Float32Array> {
     return new Promise((resolve, reject) => {
       gl({framebuffer: this.framebuffer})(() => {
-        const result = new Float32Array(this.size*4);
-        gl.read(result)
+        let result = new Float32Array(this.arraySize);
+        result = gl.read(result);
         resolve(result.subarray(0, this.size));
       });
     });
@@ -119,6 +122,6 @@ export default class GPUTensor extends Tensor {
     if (!(tensor instanceof GPUTensor)) {
       throw new Error('Can only add GPU tensor to GPU tensor');
     }
-    throw new Error('Not implemented');
+    return matmul(this, tensor);
   }
 }

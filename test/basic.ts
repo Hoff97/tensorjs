@@ -15,7 +15,7 @@ export default function testBasic(name: string, constructor: TensorConstructor, 
       const input = constructor([2, 2], [-1, 0, 1, 2]);
       const expected = constructor([2, 2], [0.367879441, 1, 2.718281828, 7.389056099]);
 
-      expect(input.exp().compare(expected, epsilon)).toBeTruthy();
+      expect(await input.exp().compare(expected, epsilon)).toBeTruthy();
     });
   });
 
@@ -28,74 +28,74 @@ export default function testBasic(name: string, constructor: TensorConstructor, 
       const input = constructor([2, 2], [0.367879441, 1, 2.718281828, 7.389056099]);
       const expected = constructor([2, 2], [-1, 0, 1, 2]);
 
-      expect(input.log().compare(expected, epsilon)).toBeTruthy();
+      expect(await input.log().compare(expected, epsilon)).toBeTruthy();
     });
   });
 
   describe(`${name} sqrt`, () => {
-    it('should compute the sqrt', () => {
+    it('should compute the sqrt', async () => {
       const input = constructor([2, 2], [1, 4, 9, 16]);
       const expected = constructor([2, 2], [1, 2, 3, 4]);
 
-      expect(input.sqrt().compare(expected, epsilon)).toBeTruthy();
+      expect(await input.sqrt().compare(expected, epsilon)).toBeTruthy();
     });
   });
 
   describe(`${name} add`, () => {
-    it('should compute the pointwise addition', () => {
+    it('should compute the pointwise addition', async () => {
       const a = constructor([2, 2], [1, 4, 9, 16]);
       const b = constructor([2, 2], [1, 2, 3, 4]);
       const expected = constructor([2, 2], [2, 6, 12, 20]);
 
-      expect(a.add(b).compare(expected, epsilon)).toBeTruthy();
+      expect(await a.add(b).compare(expected, epsilon)).toBeTruthy();
     });
   });
 
   describe(`${name} subtract`, () => {
-    it('should compute the pointwise subtraction', () => {
+    it('should compute the pointwise subtraction', async () => {
       const a = constructor([2, 2], [1, 4, 9, 16]);
       const b = constructor([2, 2], [1, 2, 3, 4]);
       const expected = constructor([2, 2], [0, 2, 6, 12]);
 
-      expect(a.subtract(b).compare(expected, epsilon)).toBeTruthy();
+      expect(await a.subtract(b).compare(expected, epsilon)).toBeTruthy();
     });
   });
 
   describe(`${name} divide`, () => {
-    it('should compute the pointwise division', () => {
+    it('should compute the pointwise division', async () => {
       const a = constructor([2, 3], [1, 4, 9, 16, 21, 28]);
       const b = constructor([2, 3], [1, 2, 3, 4, 7, 7]);
       const expected = constructor([2, 3], [1, 2, 3, 4, 3, 4]);
 
-      expect(a.divide(b).compare(expected, epsilon)).toBeTruthy();
+      expect(await a.divide(b).compare(expected, epsilon)).toBeTruthy();
     });
   });
 
   describe(`${name} multiply`, () => {
-    it('should compute the pointwise division', () => {
+    it('should compute the pointwise division', async () => {
       const a = constructor([2, 2], [1, 2, 3, 4]);
       const b = constructor([2, 2], [5, 6, 7, 8]);
       const expected = constructor([2, 2], [5, 12, 21, 32]);
 
-      expect(a.multiply(b).compare(expected, epsilon)).toBeTruthy();
+      expect(await a.multiply(b).compare(expected, epsilon)).toBeTruthy();
     });
   });
 
   describe(`${name} matMul`, () => {
-    it('should compute the matrix product', () => {
+    it('should compute the matrix product', async () => {
       const a = constructor([2, 2], [1, 2, 3, 4]);
       const b = constructor([2, 2], [5, 6, 7, 8]);
       const expected = constructor([2, 2], [19, 22, 43, 50]);
 
-      expect(a.matMul(b).compare(expected, epsilon)).toBeTruthy();
+      expect(await a.matMul(b).compare(expected, epsilon)).toBeTruthy();
     });
 
-    it('should be the dot product for row/column vectors', () => {
+    it('should be the dot product for row/column vectors', async () => {
       const a = constructor([1, 3], [1, 2, 3]);
       const b = constructor([3, 1], [4, 5, 6]);
       const expected = constructor([1, 1], [32]);
 
-      expect(a.matMul(b).compare(expected, epsilon)).toBeTruthy();
+      expect(await a.matMul(b).compare(expected, epsilon)).toBeTruthy();
     });
   });
 }
