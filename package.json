@@ -8,7 +8,7 @@
     "build:js": "webpack",
     "test": "npm run test:rust && npm run test:integration",
     "test:integration": "karma start karma.conf.js",
-    "test:rust": "wasm-pack test --firefox --headless"
+    "test:rust": "cargo test"
   },
   "devDependencies": {
     "@wasm-tool/wasm-pack-plugin": "^1.1.0",

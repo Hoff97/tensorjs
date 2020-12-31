@@ -1,18 +1,8 @@
-//! Test suite for the Web and headless browsers.
-
-#![cfg(target_arch = "wasm32")]
-
-extern crate wasm_bindgen_test;
-use wasm_bindgen_test::*;
-
-use rust_wasm_tensor::shape::*;
-use rust_wasm_tensor::tensor::*;
+use crate::tensor::*;
 
 use std::cmp::Ordering;
 
-wasm_bindgen_test_configure!(run_in_browser);
-
-#[wasm_bindgen_test]
+#[test]
 fn test_tensor_get_rank_1() {
     let a = Tensor::new(&vec![5], &vec![1.,2.,3.,4.,5.]);
 
@@ -22,7 +12,7 @@ fn test_tensor_get_rank_1() {
     assert_eq!(a.get(&vec![4]), 5.);
 }
 
-#[wasm_bindgen_test]
+#[test]
 fn test_tensor_get_rank_2() {
     let a = Tensor::new(&vec![2,3], &vec![1.,2.,3.,4.,5.,6.]);
 
@@ -32,7 +22,7 @@ fn test_tensor_get_rank_2() {
     assert_eq!(a.get(&vec![1,1]), 5.);
 }
 
-#[wasm_bindgen_test]
+#[test]
 fn test_tensor_get_rank_3() {
     let a = Tensor::new(&vec![2,3,4], &vec![1.,2.,3.,4.,5.,6.,7.,8.,9.,10.,11.,12.,13.,14.,15.,16.,17.,18.,19.,20.,21.,22.,23.,24.]);
 
@@ -42,7 +32,7 @@ fn test_tensor_get_rank_3() {
     assert_eq!(a.get(&vec![1,2,3]), 24.);
 }
 
-#[wasm_bindgen_test]
+#[test]
 fn test_tensor_cmp_eq() {
     let a = Tensor::new(&vec![2,3], &vec![1.,2.,3.,4.,5.,6.]);
     let b = Tensor::new(&vec![2,3], &vec![1.,2.,3.,4.,5.,6.]);
@@ -53,7 +43,7 @@ fn test_tensor_cmp_eq() {
     assert_ne!(b,c);
 }
 
-#[wasm_bindgen_test]
+#[test]
 fn test_tensor_cmp_ordering_rank_0() {
     let a = Tensor::new(&vec![], &vec![]);
     let b = Tensor::new(&vec![], &vec![]);
@@ -61,7 +51,7 @@ fn test_tensor_cmp_ordering_rank_0() {
     assert_eq!(a.partial_cmp(&b), Some(Ordering::Equal));
 }
 
-#[wasm_bindgen_test]
+#[test]
 fn test_tensor_cmp_ordering_rank_1() {
     let a = Tensor::new(&vec![1], &vec![1.]);
     let b = Tensor::new(&vec![1], &vec![1.]);
@@ -73,7 +63,7 @@ fn test_tensor_cmp_ordering_rank_1() {
     assert_eq!(a.partial_cmp(&d), Some(Ordering::Greater));
 }
 
-#[wasm_bindgen_test]
+#[test]
 fn test_tensor_cmp_ordering() {
     let a = Tensor::new(&vec![2,3], &vec![1.,2.,3.,4.,5.,6.]);
     let b = Tensor::new(&vec![2,3], &vec![1.,2.,3.,4.,5.,6.]);

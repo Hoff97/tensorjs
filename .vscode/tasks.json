@@ -15,6 +15,21 @@
 			"problemMatcher": [],
 			"label": "npm: build:wasm",
 			"detail": "wasm-pack build"
+		},
+		{
+			"type": "npm",
+			"script": "build",
+			"group": "build",
+			"problemMatcher": [],
+			"label": "npm: build",
+			"detail": "wasm-pack build && webpack"
+		},
+		{
+			"type": "npm",
+			"script": "test:rust",
+			"problemMatcher": [],
+			"label": "npm: test:rust",
+			"detail": "cargo test"
 		}
 	]
 }
