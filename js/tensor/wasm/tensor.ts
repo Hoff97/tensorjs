@@ -28,7 +28,7 @@ export default class WASMTensor extends Tensor {
   }
 
   getValues() {
-    return this.wasmTensor.get_vals();
+    return Promise.resolve(this.wasmTensor.get_vals());
   }
 
   getShape(): readonly number[] {

@@ -11,8 +11,15 @@
     "test:rust": "cargo test --tests"
   },
   "devDependencies": {
+    "@types/jasmine": "^3.3.13",
     "@wasm-tool/wasm-pack-plugin": "^1.1.0",
     "copy-webpack-plugin": "^5.0.3",
+    "karma": "^4.1.0",
+    "karma-chrome-launcher": "^2.2.0",
+    "karma-cli": "^2.0.0",
+    "karma-jasmine": "^2.0.1",
+    "karma-spec-reporter": "0.0.32",
+    "karma-webpack": "^4.0.2",
     "rimraf": "^3.0.0",
     "ts-loader": "^8.0.12",
     "ts-node": "^9.1.1",
@@ -21,16 +28,10 @@
     "webpack": "^4.42.0",
     "webpack-cli": "^3.3.3",
     "webpack-dev-server": "^3.7.1",
-    "@types/jasmine": "^3.3.13",
-    "karma": "^4.1.0",
-    "karma-chrome-launcher": "^2.2.0",
-    "karma-cli": "^2.0.0",
-    "karma-jasmine": "^2.0.1",
-    "karma-spec-reporter": "0.0.32",
-    "karma-webpack": "^4.0.2"
+    "puppeteer": "^5.5.0"
   },
   "dependencies": {
-    "puppeteer": "^5.5.0",
+    "regl": "^2.0.1",
     "rust-wasm-tensor": "file:pkg"
   }
 }

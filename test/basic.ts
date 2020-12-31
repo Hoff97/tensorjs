@@ -33,7 +33,7 @@ export default function testBasic(name: string, constructor: TensorConstructor, 
   });
 
   describe(`${name} sqrt`, () => {
-    it('should compute the log', () => {
+    it('should compute the sqrt', () => {
       const input = constructor([2, 2], [1, 4, 9, 16]);
       const expected = constructor([2, 2], [1, 2, 3, 4]);
 

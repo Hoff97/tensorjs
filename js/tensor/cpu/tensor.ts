@@ -32,7 +32,7 @@ export default class CPUTensor extends Tensor {
   }
 
   getValues() {
-    return this.values;
+    return Promise.resolve(this.values);
   }
 
   getShape() {

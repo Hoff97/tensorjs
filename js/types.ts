@@ -1,17 +1,17 @@
 import { compareShapes } from './util/shape';
 
 export default abstract class Tensor {
-  abstract getValues(): Float32Array;
+  abstract getValues(): Promise<Float32Array>;
 
   abstract getShape(): ReadonlyArray<number>;
 
-  compare(tensor: Tensor, epsilon?: number): boolean {
+  async compare(tensor: Tensor, epsilon?: number): Promise<boolean> {
     if (!compareShapes(this.getShape(), tensor.getShape())) {
       return false;
     }
 
-    const arrA = this.getValues();
-    const arrB = tensor.getValues();
+    const arrA = await this.getValues();
+    const arrB = await tensor.getValues();
 
     if (epsilon !== undefined) {
       for (let i = 0; i < arrA.length; i += 1) {
