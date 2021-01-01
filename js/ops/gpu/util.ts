@@ -71,6 +71,36 @@ export function posToIndex(strides: string, result: string, pos: string) {
   }`
 }
 
+export function initIndex(index: string) {
+  return `
+  for (int i = 0; i < ${maxRank}; i++) {
+    ${index}[i] = -1;
+  }`
+}
+
+export const defaultMain = `
+void main() {
+  int pos = coordinateToPos(uv.x, sizeOutput);
+
+  int index[${maxRank}];
+  ${posToIndex('stridesOutput', 'index', 'pos')}
+  float a = process(index);
+
+  pos++;
+  ${posToIndex('stridesOutput', 'index', 'pos')}
+  float b = process(index);
+
+  pos++;
+  ${posToIndex('stridesOutput', 'index', 'pos')}
+  float c = process(index);
+
+  pos++;
+  ${posToIndex('stridesOutput', 'index', 'pos')}
+  float d = process(index);
+
+  gl_FragColor = vec4(a, b, c, d);
+}`;
+
 function buildCompleteFragmentShader(fragmentShader: string, inputTextures: string[]) {
   return `
   precision highp float;
@@ -153,10 +183,10 @@ export function compute(op: DrawCommand,
     inputs = {};
   }
   for (let name in inputTensors) {
-    inputs[`size${name}`] = getSize(inputTensors[name].getShape());
+    inputs[`size${name}`] = inputTensors[name].size;
     inputs[`strides${name}`] = pad(computeStrides(inputTensors[name].getShape()));
   }
-  inputs['sizeOutput'] = getSize(resultShape);
+  inputs['sizeOutput'] = Math.ceil(getSize(resultShape) / 4)*4;
   inputs['stridesOutput'] = pad(computeStrides(resultShape));
 
   const resultSize = getSize(resultShape);

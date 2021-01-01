@@ -1,41 +1,43 @@
 import { DrawCommand } from "regl";
 import GPUTensor from "../../tensor/gpu/tensor";
-import { computeStrides, getSize } from "../../util/shape";
-import { buildComp, compute, maxRank, utilFunctions, pad, posToIndex } from "./util";
+import { buildComp, compute, maxRank, defaultMain, initIndex } from "./util";
 
 let comp: DrawCommand;
 
 const fragmentShader = `
+uniform int k;
+
 float process(int index[${maxRank}]) {
-  //return getValueAt(index, stridesOutput, sizeOutput, inputTensor2);
-  return 1.0;
+  int ix1[${maxRank}];
+  ${initIndex('ix1')}
+  ix1[0] = index[0];
+
+  int ix2[${maxRank}];
+  ${initIndex('ix2')}
+  ix2[1] = index[1];
+
+  float res = 0.0;
+
+  for (int i = 0; i < 10000000; i++) {
+    if (i >= k) {
+      break;
+    }
+    ix1[1] = i;
+    ix2[0] = i;
+
+    float v1 = getValueAt(ix1, stridesinput1, sizeinput1, input1);
+    float v2 = getValueAt(ix2, stridesinput2, sizeinput2, input2);
+    res += v1*v2;
+  }
+
+  return res;
 }
 
-void main() {
-  int pos = coordinateToPos(uv.x, sizeOutput);
-
-  int index[${maxRank}];
-  ${posToIndex('stridesOutput', 'index', 'pos')}
-  float a = process(index);
-
-  pos++;
-  ${posToIndex('stridesOutput', 'index', 'pos')}
-  float b = process(index);
-
-  pos++;
-  ${posToIndex('stridesOutput', 'index', 'pos')}
-  float c = process(index);
-
-  pos++;
-  ${posToIndex('stridesOutput', 'index', 'pos')}
-  float d = process(index);
-
-  gl_FragColor = vec4(a, b, c, d);
-}
+${defaultMain}
 `;
 
 function initComp() {
-  comp = buildComp(['input1', 'input2'], fragmentShader);
+  comp = buildComp(['input1', 'input2'], fragmentShader, [{name: 'k'}]);
 }
 
 export function matmul(tensor1: GPUTensor, tensor2: GPUTensor) {
@@ -43,8 +45,12 @@ export function matmul(tensor1: GPUTensor, tensor2: GPUTensor) {
     initComp();
   }
 
-  return compute(comp, tensor1.getShape(), {
-    inputTensor1: tensor1,
-    inputTensor2: tensor2
+  const outputShape = [tensor1.getShape()[0], tensor2.getShape()[1]]
+
+  return compute(comp, outputShape, {
+    input1: tensor1,
+    input2: tensor2
+  }, {
+    k: tensor1.getShape()[1]
   });
 }
