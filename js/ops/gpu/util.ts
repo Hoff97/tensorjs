@@ -1,17 +1,127 @@
 import { DrawCommand, Framebuffer2D } from "regl";
 import GPUTensor, { gl } from "../../tensor/gpu/tensor";
-import { getSize } from "../../util/shape";
+import { getSize, computeStrides } from "../../util/shape";
 
-export function buildComp(inputTextures: string[], fragmentShader: string) {
+export interface Input {
+  name: string,
+  length?: number
+}
+
+export const maxRank = 10;
+
+export function pad(arr: number[]) {
+  while (arr.length < maxRank) {
+    arr.push(-1);
+  }
+  return arr;
+}
+
+export const utilFunctions = `
+int coordinateToPos(float coordinate, int size) {
+  return int(coordinate*float(size)) - 2;
+}
+
+float posToCoordinate(int pos, int size) {
+  // 4 positions map to the same coordinate
+  pos = (pos/4)*4+2;
+  float coordinate = float(pos)/float(size);
+  return coordinate;
+}
+
+int indexToPos(int index[${maxRank}], int strides[${maxRank}]) {
+  int pos = 0;
+  for (int i = 0; i < ${maxRank}; i++) {
+    if (strides[i] == -1) {
+      break;
+    }
+    pos += index[i]*strides[i];
+  }
+  return pos;
+}
+
+float getValueAt(int index[${maxRank}], int strides[${maxRank}], int size, sampler2D tex) {
+  int pos = indexToPos(index, strides);
+  float coord = posToCoordinate(pos, size);
+  int res = pos - (pos/4)*4;
+  vec4 val = texture2D(tex, vec2(coord, 0.5));
+  if (res == 0) {
+    return val.r;
+  } else if (res == 1) {
+    return val.g;
+  } else if (res == 2) {
+    return val.b;
+  } else {
+    return val.a;
+  }
+}`;
+
+let copyCounter = 0;
+
+export function posToIndex(strides: string, result: string, pos: string) {
+  const name = `${pos}_${copyCounter++}`;
+  return `
+  int ${name} = ${pos};
+  for (int i = 0; i < ${maxRank}; i++) {
+    if (${strides}[i] == -1) {
+      ${result}[i] = -1;
+    } else {
+      ${result}[i] = ${name}/${strides}[i];
+      ${name} = ${name} - ${strides}[i]*${result}[i]; // Stupid modulo hack
+    }
+  }`
+}
+
+function buildCompleteFragmentShader(fragmentShader: string, inputTextures: string[]) {
+  return `
+  precision highp float;
+  ${inputTextures.map(x => {
+    return `
+    uniform sampler2D ${x};
+    uniform int size${x};
+    uniform int strides${x}[${maxRank}];
+    `;
+  }).join('\n')}
+  uniform int sizeOutput;
+  uniform int stridesOutput[${maxRank}];
+  varying vec2 uv;
+
+  ${utilFunctions}
+
+  ${fragmentShader}
+  `
+}
+
+export function buildComp(inputTextures: string[], fragmentShader: string,
+                          uniform_attrs?: Input[]) {
+  if (uniform_attrs === undefined) {
+    uniform_attrs = [];
+  }
+
   const uniforms: any = {};
   for (let inputTexture of inputTextures) {
     uniforms[inputTexture] = gl.prop(inputTexture as never);
+
+    uniform_attrs.push({name: `size${inputTexture}`});
+    uniform_attrs.push({name: `strides${inputTexture}`, length: maxRank});
+  }
+  uniform_attrs.push({name: `sizeOutput`});
+  uniform_attrs.push({name: `stridesOutput`, length: maxRank});
+
+  for (let uniform_attr of uniform_attrs) {
+    if (uniform_attr.length !== undefined) {
+      for (let i = 0; i < uniform_attr.length; i++) {
+        const name = `${uniform_attr.name}[${i}]`
+        uniforms[name] = gl.prop(name as never);
+      }
+    } else {
+      uniforms[uniform_attr.name] = gl.prop(uniform_attr.name as never);
+    }
   }
 
   const result = gl({
-    frag: fragmentShader,
+    frag: buildCompleteFragmentShader(fragmentShader, inputTextures),
     vert: `
-      precision mediump float;
+      precision highp float;
       attribute vec2 position;
       varying vec2 uv;
       void main() {
@@ -31,16 +141,26 @@ export function buildComp(inputTextures: string[], fragmentShader: string) {
   return result;
 }
 
-export function compute(op: DrawCommand, resultShape: readonly number[], inputs: {[name: string]: GPUTensor}) {
+export function compute(op: DrawCommand,
+                        resultShape: readonly number[],
+                        inputTensors: {[name: string]: GPUTensor},
+                        inputs?: {[name: string]: any}) {
   const inputTextures: {[name: string]: Framebuffer2D} = {};
-  for (let name in inputs) {
-    inputTextures[name] = inputs[name].framebuffer
+  for (let name in inputTensors) {
+    inputTextures[name] = inputTensors[name].framebuffer
   }
+  if (inputs === undefined) {
+    inputs = {};
+  }
+  for (let name in inputTensors) {
+    inputs[`size${name}`] = getSize(inputTensors[name].getShape());
+    inputs[`strides${name}`] = pad(computeStrides(inputTensors[name].getShape()));
+  }
+  inputs['sizeOutput'] = getSize(resultShape);
+  inputs['stridesOutput'] = pad(computeStrides(resultShape));
 
   const resultSize = getSize(resultShape);
-
   const textureSize = Math.ceil(resultSize / 4);
-
   const result = gl.framebuffer({
     width: textureSize,
     height: 1,
@@ -51,7 +171,8 @@ export function compute(op: DrawCommand, resultShape: readonly number[], inputs:
 
   op({
     framebuffer: result,
-    ...inputTextures
+    ...inputTextures,
+    ...inputs
   });
 
   return new GPUTensor(result, resultShape);

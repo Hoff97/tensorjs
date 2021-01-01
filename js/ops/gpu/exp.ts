@@ -5,9 +5,6 @@ import { buildComp, compute } from "./util";
 let comp: DrawCommand;
 
 const fragmentShader = `
-precision mediump float;
-uniform sampler2D inputTensor;
-varying vec2 uv;
 void main() {
   gl_FragColor = exp(texture2D(inputTensor, uv));
 }`;
