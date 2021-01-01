@@ -9,6 +9,8 @@ export interface Input {
 
 export const maxRank = 10;
 
+export const maxIterations = 10000000;
+
 export function pad(arr: number[]) {
   while (arr.length < maxRank) {
     arr.push(-1);

@@ -1,6 +1,6 @@
 import { DrawCommand } from "regl";
 import GPUTensor from "../../tensor/gpu/tensor";
-import { buildComp, compute, maxRank, defaultMain, initIndex } from "./util";
+import { buildComp, compute, maxRank, defaultMain, initIndex, maxIterations } from "./util";
 
 let comp: DrawCommand;
 
@@ -18,7 +18,7 @@ float process(int index[${maxRank}]) {
 
   float res = 0.0;
 
-  for (int i = 0; i < 10000000; i++) {
+  for (int i = 0; i < ${maxIterations}; i++) {
     if (i >= k) {
       break;
     }
