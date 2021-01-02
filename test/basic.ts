@@ -99,12 +99,10 @@ export default function testBasic(name: string, constructor: TensorConstructor, 
     });
   });
 
-  fdescribe(`${name} sum`, () => {
+  describe(`${name} sum`, () => {
     it('should compute the sum of the whole matrix without axes', async () => {
       const a = constructor([2, 2], [1, 2, 3, 4]);
       const expected = constructor([1], [10]);
-
-      console.log('Result', await a.sum().getValues());
 
       expect(await a.sum().compare(expected, epsilon)).toBeTruthy();
     });

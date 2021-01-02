@@ -56,6 +56,20 @@ impl Tensor {
         return &self.values;
     }
 
+    pub fn compare(&self, other: &Self, delta: f32) -> bool {
+        if !compare_shapes(&self.shape, &other.shape) {
+            return false;
+        }
+
+        for i in 0..self.size {
+            if (self.values[i] - other.get_values()[i]).abs() > delta {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     fn unary_op<F>(&self, op: F) -> Tensor where F: Fn(f32) -> f32 {
         let mut values: Vec<f32> = vec![0.0; self.size];
         for i in 0..self.size {
@@ -81,6 +95,59 @@ impl Tensor {
             shape: self.shape.to_vec(),
             size: self.size,
             strides: self.strides.to_vec()
+        }
+    }
+
+    pub fn _sum(&self, axes: &Vec<usize>) -> Tensor {
+        let result_rank = self.shape.len() - axes.len() as usize;
+        if result_rank == 0 {
+            let mut value = 0.0;
+            for i in 0..self.size {
+                value += self.values[i];
+            }
+
+            return Tensor {
+                values: vec![value],
+                shape: vec![1],
+                size: 1,
+                strides: vec![1]
+            }
+        }
+
+        let mut result_shape = vec![0; result_rank];
+        let mut result_size = 1;
+        let mut axes_ix = 0;
+        let mut result_ix = 0;
+        let mut res_ix_map = vec![0; result_rank];
+        for i in 0..self.shape.len() {
+            if axes_ix < axes.len() && axes[axes_ix] as usize == i {
+                axes_ix += 1;
+            } else {
+                result_shape[result_ix] = self.shape[i];
+                res_ix_map[result_ix] = i;
+                result_ix += 1;
+                result_size *= self.shape[i];
+            }
+        }
+        let result_strides = compute_strides(&result_shape);
+        let mut values = vec![0.0; result_size];
+
+        let mut input_index = vec![0; self.shape.len()];
+        for i in 0..self.size {
+            let mut res_ix = 0;
+            for j in 0..result_rank {
+                res_ix += result_strides[j] * input_index[res_ix_map[j]];
+            }
+            values[res_ix] += self.values[i];
+
+            increment_index(&mut input_index, &self.shape);
+        }
+
+        Tensor {
+            values,
+            shape: result_shape,
+            size: result_size,
+            strides: result_strides
         }
     }
 }
@@ -198,6 +265,14 @@ impl Tensor {
         }
 
         return arr;
+    }
+
+    pub fn sum(&self, axes: Uint32Array) -> Tensor {
+        let mut ax: Vec<usize> = vec![0; axes.length() as usize];
+        for i in 0..axes.length() {
+            ax[i as usize] = axes.get_index(i) as usize;
+        }
+        return self._sum(&ax);
     }
 }
 

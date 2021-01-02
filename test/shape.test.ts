@@ -1,5 +1,5 @@
 import {
-  getSize, computeStrides, indexToPos, posToIndex
+  getSize, computeStrides, indexToPos, posToIndex, incrementIndex, decrementIndex
 } from '../js/util/shape';
 
 describe('Get size', () => {
@@ -95,5 +95,107 @@ describe('Pos to index', () => {
     expect(posToIndex(7, strides)).toEqual([1, 0, 1]);
     expect(posToIndex(17, strides)).toEqual([2, 2, 1]);
     expect(posToIndex(23, strides)).toEqual([3, 2, 1]);
+  });
+});
+
+describe('Increment index', () => {
+  it('should return the pos for rank 1', () => {
+    const shape = [22];
+    const strides = computeStrides(shape);
+
+    const ix1 = posToIndex(1, strides);
+    incrementIndex(ix1, shape);
+
+    const ix2 = posToIndex(5, strides);
+    incrementIndex(ix2, shape);
+
+    const ix3 = posToIndex(6, strides);
+    incrementIndex(ix3, shape);
+
+    expect(indexToPos(ix1, strides)).toEqual(2);
+    expect(indexToPos(ix2, strides)).toEqual(6);
+    expect(indexToPos(ix3, strides)).toEqual(7);
+  });
+
+  it('should work for higher ranks', () => {
+    const shape = [2,3,4];
+    const strides = computeStrides(shape);
+
+    const ix1 = posToIndex(1, strides);
+    incrementIndex(ix1, shape);
+    expect(indexToPos(ix1, strides)).toEqual(2);
+
+    const ix2 = posToIndex(3, strides);
+    incrementIndex(ix2, shape);
+    expect(indexToPos(ix2, strides)).toEqual(4);
+    incrementIndex(ix2, shape);
+    expect(indexToPos(ix2, strides)).toEqual(5);
+    incrementIndex(ix2, shape);
+    expect(indexToPos(ix2, strides)).toEqual(6);
+    incrementIndex(ix2, shape);
+    expect(indexToPos(ix2, strides)).toEqual(7);
+    incrementIndex(ix2, shape);
+    expect(indexToPos(ix2, strides)).toEqual(8);
+    incrementIndex(ix2, shape);
+    expect(indexToPos(ix2, strides)).toEqual(9);
+    incrementIndex(ix2, shape);
+    expect(indexToPos(ix2, strides)).toEqual(10);
+    incrementIndex(ix2, shape);
+    expect(indexToPos(ix2, strides)).toEqual(11);
+    incrementIndex(ix2, shape);
+    expect(indexToPos(ix2, strides)).toEqual(12);
+    incrementIndex(ix2, shape);
+    expect(indexToPos(ix2, strides)).toEqual(13);
+  });
+});
+
+describe('Decrement index', () => {
+  it('should return the pos for rank 1', () => {
+    const shape = [22];
+    const strides = computeStrides(shape);
+
+    const ix1 = posToIndex(1, strides);
+    decrementIndex(ix1, shape);
+
+    const ix2 = posToIndex(5, strides);
+    decrementIndex(ix2, shape);
+
+    const ix3 = posToIndex(6, strides);
+    decrementIndex(ix3, shape);
+
+    expect(indexToPos(ix1, strides)).toEqual(0);
+    expect(indexToPos(ix2, strides)).toEqual(4);
+    expect(indexToPos(ix3, strides)).toEqual(5);
+  });
+
+  it('should work for higher ranks', () => {
+    const shape = [2,3,4];
+    const strides = computeStrides(shape);
+
+    const ix1 = posToIndex(1, strides);
+    decrementIndex(ix1, shape);
+    expect(indexToPos(ix1, strides)).toEqual(0);
+
+    const ix2 = posToIndex(13, strides);
+    decrementIndex(ix2, shape);
+    expect(indexToPos(ix2, strides)).toEqual(12);
+    decrementIndex(ix2, shape);
+    expect(indexToPos(ix2, strides)).toEqual(11);
+    decrementIndex(ix2, shape);
+    expect(indexToPos(ix2, strides)).toEqual(10);
+    decrementIndex(ix2, shape);
+    expect(indexToPos(ix2, strides)).toEqual(9);
+    decrementIndex(ix2, shape);
+    expect(indexToPos(ix2, strides)).toEqual(8);
+    decrementIndex(ix2, shape);
+    expect(indexToPos(ix2, strides)).toEqual(7);
+    decrementIndex(ix2, shape);
+    expect(indexToPos(ix2, strides)).toEqual(6);
+    decrementIndex(ix2, shape);
+    expect(indexToPos(ix2, strides)).toEqual(5);
+    decrementIndex(ix2, shape);
+    expect(indexToPos(ix2, strides)).toEqual(4);
+    decrementIndex(ix2, shape);
+    expect(indexToPos(ix2, strides)).toEqual(3);
   });
 });

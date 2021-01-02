@@ -63,3 +63,25 @@ pub fn pos_to_index(pos: usize, strides: &Vec<usize>) -> Vec<usize> {
     }
     return ix;
 }
+
+pub fn increment_index(index: &mut Vec<usize>, shape: &Vec<usize>) {
+    for i in (0..index.len()).rev() {
+        index[i] += 1;
+        if index[i] >= shape[i] {
+            index[i] = 0;
+        } else {
+            return;
+        }
+    }
+}
+
+pub fn decrement_index(index: &mut Vec<usize>, shape: &Vec<usize>) {
+    for i in (0..index.len()).rev() {
+        if index[i] == 0 {
+            index[i] = shape[i] - 1;
+        } else {
+            index[i] -= 1;
+            return;
+        }
+    }
+}
