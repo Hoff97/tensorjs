@@ -30,6 +30,47 @@ export default abstract class Tensor {
     return true;
   }
 
+  getAxes(axes?: number | number[]) {
+    let ax: number[];
+
+    const sh = this.getShape();
+    if (axes === undefined) {
+      ax = [];
+      for (let i = 0; i < sh.length; i++) {
+        ax.push(i);
+      }
+    } else if (!(axes instanceof Array)) {
+      ax = [axes];
+    } else {
+      ax = axes;
+    }
+    return ax;
+  }
+
+  sum(axes?: number | number[]): Tensor {
+    let ax = this.getAxes(axes);
+
+    return this.sum_impl(ax);
+  }
+
+  product(axes?: number | number[]): Tensor {
+    let ax = this.getAxes(axes);
+
+    return this.product_impl(ax);
+  }
+
+  max(axes?: number | number[]): Tensor {
+    let ax = this.getAxes(axes);
+
+    return this.max_impl(ax);
+  }
+
+  min(axes?: number | number[]): Tensor {
+    let ax = this.getAxes(axes);
+
+    return this.min_impl(ax);
+  }
+
   abstract exp(): Tensor;
 
   abstract log(): Tensor;
@@ -46,23 +87,11 @@ export default abstract class Tensor {
 
   abstract matMul(tensor: Tensor): Tensor;
 
-  sum(axes?: number | number[]): Tensor {
-    let ax: number[];
-
-    const sh = this.getShape();
-    if (axes === undefined) {
-      ax = [];
-      for (let i = 0; i < sh.length; i++) {
-        ax.push(i);
-      }
-    } else if (!(axes instanceof Array)) {
-      ax = [axes];
-    } else {
-      ax = axes;
-    }
-
-    return this.sum_impl(ax);
-  };
-
   abstract sum_impl(axes: number[]): Tensor;
+
+  abstract product_impl(axes: number[]): Tensor;
+
+  abstract max_impl(axes: number[]): Tensor;
+
+  abstract min_impl(axes: number[]): Tensor;
 }

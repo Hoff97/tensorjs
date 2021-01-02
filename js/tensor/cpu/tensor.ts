@@ -2,6 +2,9 @@ import {
   add, divide, exp, log, multiply, sqrt, subtract
 } from '../../ops/cpu/basic';
 import { matMul } from '../../ops/cpu/matMul';
+import { max } from '../../ops/cpu/max';
+import { min } from '../../ops/cpu/min';
+import { product } from '../../ops/cpu/product';
 import { sum } from '../../ops/cpu/sum';
 import Tensor from '../../types';
 import { computeStrides, getSize, indexToPos } from '../../util/shape';
@@ -115,5 +118,17 @@ export default class CPUTensor extends Tensor {
 
   sum_impl(axes: number[]): Tensor {
     return sum(this, axes);
+  }
+
+  product_impl(axes: number[]): Tensor {
+    return product(this, axes);
+  }
+
+  max_impl(axes: number[]): Tensor {
+    return max(this, axes);
+  }
+
+  min_impl(axes: number[]): Tensor {
+    return min(this, axes);
   }
 }

@@ -1,7 +1,7 @@
 import { DrawCommand } from "regl";
 import GPUTensor from "../../tensor/gpu/tensor";
 import { computeStrides } from "../../util/shape";
-import { sumResultShape } from "../util/sum";
+import { poolResultShape } from "../util/pool";
 import { buildComp, compute, maxRank, defaultMain, initIndex, maxIterations, pad, posToIndex, incrementIndex, incrementConditional } from "./util";
 
 let comp: DrawCommand;
@@ -55,7 +55,7 @@ export function sum(tensor1: GPUTensor, axes: number[]) {
     initComp();
   }
 
-  const [outputShape, ixMap] = sumResultShape(tensor1.getShape(), axes);
+  const [outputShape, ixMap] = poolResultShape(tensor1.getShape(), axes);
 
   const inputStrides = computeStrides(tensor1.shape);
   const mappedInputStrides = [];

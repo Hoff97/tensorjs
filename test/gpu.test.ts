@@ -1,5 +1,6 @@
 import GPUTensor from "../js/tensor/gpu/tensor";
 import testBasic from './basic';
+import testPool from './pool';
 
 describe(`GPU create tensor`, () => {
   it('should get the same values back', async () => {
@@ -10,7 +11,10 @@ describe(`GPU create tensor`, () => {
   });
 });
 
-testBasic('GPU', (shape: ReadonlyArray<number>, values: number[]) => {
+const constructor = (shape: ReadonlyArray<number>, values: number[]) => {
   const vals = Float32Array.from(values);
   return new GPUTensor(vals, shape);
-});
+};
+
+testBasic('GPU', constructor);
+testPool('GPU', constructor);

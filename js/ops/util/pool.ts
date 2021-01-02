@@ -1,4 +1,4 @@
-export function sumResultShape(inputShape: readonly number[], axes: number[]) {
+export function poolResultShape(inputShape: readonly number[], axes: number[]) {
   const resultShape = [];
   const sumShape = [];
   const ixMap: number[] = [];

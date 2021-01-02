@@ -129,4 +129,16 @@ export default class GPUTensor extends Tensor {
   sum_impl(axes: number[]): Tensor {
     return sum(this, axes);
   }
+
+  product_impl(axes: number[]): Tensor {
+    throw new Error('Method not implemented.');
+  }
+
+  max_impl(axes: number[]): Tensor {
+    throw new Error('Method not implemented.');
+  }
+
+  min_impl(axes: number[]): Tensor {
+    throw new Error('Method not implemented.');
+  }
 }
