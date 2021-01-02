@@ -34,6 +34,10 @@ export default function testBasic(name: string, constructor: TensorConstructor, 
 
   describe(`${name} sqrt`, () => {
     it('should compute the sqrt', async () => {
+      if (wait) {
+        await wait;
+      }
+
       const input = constructor([2, 2], [1, 4, 9, 16]);
       const expected = constructor([2, 2], [1, 2, 3, 4]);
 
@@ -43,6 +47,10 @@ export default function testBasic(name: string, constructor: TensorConstructor, 
 
   describe(`${name} add`, () => {
     it('should compute the pointwise addition', async () => {
+      if (wait) {
+        await wait;
+      }
+
       const a = constructor([2, 2], [1, 4, 9, 16]);
       const b = constructor([2, 2], [1, 2, 3, 4]);
       const expected = constructor([2, 2], [2, 6, 12, 20]);
@@ -53,6 +61,10 @@ export default function testBasic(name: string, constructor: TensorConstructor, 
 
   describe(`${name} subtract`, () => {
     it('should compute the pointwise subtraction', async () => {
+      if (wait) {
+        await wait;
+      }
+
       const a = constructor([2, 2], [1, 4, 9, 16]);
       const b = constructor([2, 2], [1, 2, 3, 4]);
       const expected = constructor([2, 2], [0, 2, 6, 12]);
@@ -63,6 +75,10 @@ export default function testBasic(name: string, constructor: TensorConstructor, 
 
   describe(`${name} divide`, () => {
     it('should compute the pointwise division', async () => {
+      if (wait) {
+        await wait;
+      }
+
       const a = constructor([2, 3], [1, 4, 9, 16, 21, 28]);
       const b = constructor([2, 3], [1, 2, 3, 4, 7, 7]);
       const expected = constructor([2, 3], [1, 2, 3, 4, 3, 4]);
@@ -73,6 +89,10 @@ export default function testBasic(name: string, constructor: TensorConstructor, 
 
   describe(`${name} multiply`, () => {
     it('should compute the pointwise division', async () => {
+      if (wait) {
+        await wait;
+      }
+
       const a = constructor([2, 2], [1, 2, 3, 4]);
       const b = constructor([2, 2], [5, 6, 7, 8]);
       const expected = constructor([2, 2], [5, 12, 21, 32]);
@@ -83,6 +103,10 @@ export default function testBasic(name: string, constructor: TensorConstructor, 
 
   describe(`${name} matMul`, () => {
     it('should compute the matrix product', async () => {
+      if (wait) {
+        await wait;
+      }
+
       const a = constructor([2, 2], [1, 2, 3, 4]);
       const b = constructor([2, 2], [5, 6, 7, 8]);
       const expected = constructor([2, 2], [19, 22, 43, 50]);
@@ -91,6 +115,10 @@ export default function testBasic(name: string, constructor: TensorConstructor, 
     });
 
     it('should be the dot product for row/column vectors', async () => {
+      if (wait) {
+        await wait;
+      }
+
       const a = constructor([1, 3], [1, 2, 3]);
       const b = constructor([3, 1], [4, 5, 6]);
       const expected = constructor([1, 1], [32]);
@@ -101,6 +129,10 @@ export default function testBasic(name: string, constructor: TensorConstructor, 
 
   describe(`${name} sum`, () => {
     it('should compute the sum of the whole matrix without axes', async () => {
+      if (wait) {
+        await wait;
+      }
+
       const a = constructor([2, 2], [1, 2, 3, 4]);
       const expected = constructor([1], [10]);
 
@@ -108,6 +140,10 @@ export default function testBasic(name: string, constructor: TensorConstructor, 
     });
 
     it('should compute the column wise sum with axes=0', async () => {
+      if (wait) {
+        await wait;
+      }
+
       const a = constructor([2, 3], [1, 2, 3, 4, 5, 6]);
       const expected = constructor([3], [5, 7, 9]);
 
@@ -115,6 +151,10 @@ export default function testBasic(name: string, constructor: TensorConstructor, 
     });
 
     it('should compute the row wise sum with axes=1', async () => {
+      if (wait) {
+        await wait;
+      }
+
       const a = constructor([2, 3], [1, 2, 3, 4, 5, 6]);
       const expected = constructor([2], [6, 15]);
 
@@ -122,6 +162,10 @@ export default function testBasic(name: string, constructor: TensorConstructor, 
     });
 
     it('should work with multiple summation axes', async () => {
+      if (wait) {
+        await wait;
+      }
+
       const a = constructor([2, 3, 4], [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]);
       const expected1 = constructor([2], [78, 222]);
       const expected2 = constructor([3], [68, 100, 132]);
