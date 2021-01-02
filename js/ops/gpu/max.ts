@@ -4,13 +4,13 @@ import { fragmentShader, initComputation, performComputation } from './pool';
 
 let comp: DrawCommand;
 
-const fragShader = fragmentShader((a, b) => `${a} + ${b}`);
+const fragShader = fragmentShader((a, b) => `max(${a}, ${b})`);
 
 function initComp() {
   comp = initComputation(fragShader);
 }
 
-export function sum(tensor1: GPUTensor, axes: number[]) {
+export function max(tensor1: GPUTensor, axes: number[]) {
   if (comp === undefined) {
     initComp();
   }

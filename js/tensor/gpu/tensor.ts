@@ -12,6 +12,9 @@ import { multiply } from '../../ops/gpu/multiply';
 import { divide } from '../../ops/gpu/divide';
 import { matmul } from '../../ops/gpu/matmul';
 import { sum } from '../../ops/gpu/sum';
+import { product } from '../../ops/gpu/product';
+import { max } from '../../ops/gpu/max';
+import { min } from '../../ops/gpu/min';
 
 let glContext = document.createElement("canvas").getContext("webgl");
 export let gl = REGL({
@@ -131,14 +134,14 @@ export default class GPUTensor extends Tensor {
   }
 
   product_impl(axes: number[]): Tensor {
-    throw new Error('Method not implemented.');
+    return product(this, axes);
   }
 
   max_impl(axes: number[]): Tensor {
-    throw new Error('Method not implemented.');
+    return max(this, axes);
   }
 
   min_impl(axes: number[]): Tensor {
-    throw new Error('Method not implemented.');
+    return min(this, axes);
   }
 }
