@@ -1,0 +1,9 @@
+{
+    "[typescript]": {
+        "editor.tabSize": 2
+    },
+    "[rust]": {
+        "editor.tabSize": 4
+    },
+    "cmake.configureOnOpen": false
+}

@@ -18,6 +18,14 @@ export function pad(arr: number[]) {
   return arr;
 }
 
+export function copyPad(arr: readonly number[]) {
+  const result = Array.from(arr);
+  while (result.length < maxRank) {
+    result.push(-1);
+  }
+  return result;
+}
+
 export const utilFunctions = `
 int coordinateToPos(float coordinate, int size) {
   return int(coordinate*float(size)) - 2;
@@ -73,11 +81,52 @@ export function posToIndex(strides: string, result: string, pos: string) {
   }`
 }
 
-export function initIndex(index: string) {
+export function initIndex(index: string, rank?: string) {
+  if (rank === undefined) {
+    return `
+      for (int i = 0; i < ${maxRank}; i++) {
+        ${index}[i] = -1;
+      }`;
+  } else {
+    return `
+      for (int i = 0; i < ${maxRank}; i++) {
+        if (i < ${rank}) {
+          ${index}[i] = 0;
+        } else {
+          ${index}[i] = -1;
+        }
+      }`;
+  }
+}
+
+export function incrementIndex(index: string, shape: string) {
   return `
   for (int i = 0; i < ${maxRank}; i++) {
-    ${index}[i] = -1;
-  }`
+    ${index}[i] += 1;
+    if (${index}[i] >= ${shape}[i]) {
+      ${index}[i] = 0;
+    } else {
+      break;
+    }
+  }
+  `;
+}
+
+export function incrementConditional(index: string, shape: string, cond: string) {
+  return `
+  for (int i = 0; i < ${maxRank}; i++) {
+    if (${cond}[i] == 1) {
+      ${index}[i] += 1;
+      if (${index}[i] >= ${shape}[i]) {
+        ${index}[i] = 0;
+      } else {
+        break;
+      }
+    } else if (${cond}[i] == -1) {
+      break;
+    }
+  }
+  `;
 }
 
 export const defaultMain = `
@@ -88,15 +137,15 @@ void main() {
   ${posToIndex('stridesOutput', 'index', 'pos')}
   float a = process(index);
 
-  pos++;
+  pos += 1;
   ${posToIndex('stridesOutput', 'index', 'pos')}
   float b = process(index);
 
-  pos++;
+  pos += 1;
   ${posToIndex('stridesOutput', 'index', 'pos')}
   float c = process(index);
 
-  pos++;
+  pos += 1;
   ${posToIndex('stridesOutput', 'index', 'pos')}
   float d = process(index);
 
@@ -111,10 +160,14 @@ function buildCompleteFragmentShader(fragmentShader: string, inputTextures: stri
     uniform sampler2D ${x};
     uniform int size${x};
     uniform int strides${x}[${maxRank}];
+    uniform int shape${x}[${maxRank}];
+    uniform int rank${x};
     `;
   }).join('\n')}
   uniform int sizeOutput;
   uniform int stridesOutput[${maxRank}];
+  uniform int shapeOutput[${maxRank}];
+  uniform int rankOutput;
   varying vec2 uv;
 
   ${utilFunctions}
@@ -135,9 +188,13 @@ export function buildComp(inputTextures: string[], fragmentShader: string,
 
     uniform_attrs.push({name: `size${inputTexture}`});
     uniform_attrs.push({name: `strides${inputTexture}`, length: maxRank});
+    uniform_attrs.push({name: `shape${inputTexture}`, length: maxRank});
+    uniform_attrs.push({name: `rank${inputTexture}`});
   }
   uniform_attrs.push({name: `sizeOutput`});
   uniform_attrs.push({name: `stridesOutput`, length: maxRank});
+  uniform_attrs.push({name: `shapeOutput`, length: maxRank});
+  uniform_attrs.push({name: `rankOutput`});
 
   for (let uniform_attr of uniform_attrs) {
     if (uniform_attr.length !== undefined) {
@@ -187,9 +244,13 @@ export function compute(op: DrawCommand,
   for (let name in inputTensors) {
     inputs[`size${name}`] = inputTensors[name].size;
     inputs[`strides${name}`] = pad(computeStrides(inputTensors[name].getShape()));
+    inputs[`shape${name}`] = copyPad(inputTensors[name].getShape());
+    inputs[`rank${name}`] = inputTensors[name].getShape().length;
   }
   inputs['sizeOutput'] = Math.ceil(getSize(resultShape) / 4)*4;
   inputs['stridesOutput'] = pad(computeStrides(resultShape));
+  inputs['shapeOutput'] = copyPad(resultShape);
+  inputs['rankOutput'] = resultShape.length;
 
   const resultSize = getSize(resultShape);
   const textureSize = Math.ceil(resultSize / 4);

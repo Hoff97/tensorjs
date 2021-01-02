@@ -11,6 +11,7 @@ import { subtract } from '../../ops/gpu/subtract';
 import { multiply } from '../../ops/gpu/multiply';
 import { divide } from '../../ops/gpu/divide';
 import { matmul } from '../../ops/gpu/matmul';
+import { sum } from '../../ops/gpu/sum';
 
 let glContext = document.createElement("canvas").getContext("webgl");
 export let gl = REGL({
@@ -25,7 +26,7 @@ export default class GPUTensor extends Tensor {
   public textureSize: number;
   public arraySize: number;
 
-  private shape: readonly number[];
+  public shape: readonly number[];
 
   constructor(values: Float32Array | Framebuffer2D, shape: readonly number[]) {
     super();
@@ -123,5 +124,21 @@ export default class GPUTensor extends Tensor {
       throw new Error('Can only add GPU tensor to GPU tensor');
     }
     return matmul(this, tensor);
+  }
+
+  sum(axes?: number | number[], keepDims?: boolean): Tensor {
+    let ax: number[];
+
+    if (axes === undefined) {
+      ax = [];
+      for (let i = 0; i < this.shape.length; i++) {
+        ax.push(i);
+      }
+    } else if (!(axes instanceof Array)) {
+      ax = [axes];
+    } else {
+      ax = axes;
+    }
+    return sum(this, ax);
   }
 }

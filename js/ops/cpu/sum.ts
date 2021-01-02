@@ -1,24 +1,12 @@
 import CPUTensor from '../../tensor/cpu/tensor';
 import { getSize, incrementIndex } from '../../util/shape';
 
+import { sumResultShape } from '../util/sum';
+
 export function sum(a: CPUTensor, axes: number[]): CPUTensor {
   const inputShape = a.getShape();
   const inputSize = getSize(inputShape);
-  const resultShape = [];
-  const sumShape = [];
-  const ixMap: number[] = [];
-  for (let i = 0; i < inputShape.length; i++) {
-    if (!axes.includes(i)) {
-      resultShape.push(inputShape[i]);
-      ixMap.push(i);
-    } else {
-      sumShape.push(inputShape[i]);
-    }
-  }
-
-  if (resultShape.length === 0) {
-    resultShape.push(1);
-  }
+  const [resultShape, ixMap] = sumResultShape(inputShape, axes);
 
   const result = new CPUTensor(resultShape);
 

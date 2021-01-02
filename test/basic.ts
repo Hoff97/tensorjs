@@ -109,7 +109,7 @@ export default function testBasic(name: string, constructor: TensorConstructor, 
 
     it('should compute the column wise sum with axes=0', async () => {
       const a = constructor([2, 3], [1, 2, 3, 4, 5, 6]);
-      const expected = constructor([3], [5, 7, 9]); //yay
+      const expected = constructor([3], [5, 7, 9]);
 
       expect(await a.sum(0).compare(expected, epsilon)).toBeTruthy();
     });
