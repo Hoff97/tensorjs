@@ -1,6 +1,8 @@
 import {
-  add, divide, exp, log, matMul, multiply, sqrt, subtract
+  add, divide, exp, log, multiply, sqrt, subtract
 } from '../../ops/cpu/basic';
+import { matMul } from '../../ops/cpu/matMul';
+import { sum } from '../../ops/cpu/sum';
 import Tensor from '../../types';
 import { computeStrides, getSize, indexToPos } from '../../util/shape';
 
@@ -109,5 +111,21 @@ export default class CPUTensor extends Tensor {
     }
 
     return matMul(this, tensor);
+  }
+
+  sum(axes?: number | number[]): Tensor {
+    let ax: number[];
+
+    if (axes === undefined) {
+      ax = new Array(this.shape.length);
+      for (let i = 0; i < this.shape.length; i++) {
+        ax.push(i);
+      }
+    } else if (!(axes instanceof Array)) {
+      ax = [axes];
+    } else {
+      ax = axes;
+    }
+    return sum(this, ax);
   }
 }

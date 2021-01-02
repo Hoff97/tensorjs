@@ -45,4 +45,6 @@ export default abstract class Tensor {
   abstract divide(tensor: Tensor): Tensor;
 
   abstract matMul(tensor: Tensor): Tensor;
+
+  abstract sum(axes?: number | number[]): Tensor;
 }

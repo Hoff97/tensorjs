@@ -37,7 +37,7 @@ export function indexToPos(index: ReadonlyArray<number>, strides: ReadonlyArray<
   return ix;
 }
 
-export function posToIndex(pos: number, strides: ReadonlyArray<number>) {
+export function posToIndex(pos: number, strides: ReadonlyArray<number>): number[] {
   let res = pos;
   const rank = strides.length;
   const index = new Array(rank);
@@ -62,4 +62,26 @@ export function compareShapes(a: ReadonlyArray<number>, b: ReadonlyArray<number>
   }
 
   return true;
+}
+
+export function incrementIndex(index: number[], shape: readonly number[]) {
+  for (let i = index.length - 1; i >= 0; i--) {
+    index[i] += 1;
+    if (index[i] >= shape[i]) {
+      index[i] = 0;
+    } else {
+      break;
+    }
+  }
+}
+
+export function decrementIndex(index: number[], shape: readonly number[]) {
+  for (let i = index.length - 1; i >= 0; i--) {
+    index[i] -= 1;
+    if (index[i] < 0) {
+      index[i] = shape[i] - 1;
+    } else {
+      break;
+    }
+  }
 }
