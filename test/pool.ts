@@ -152,7 +152,7 @@ export default function testPool(name: string, constructor: TensorConstructor, w
     });
   });
 
-  fdescribe(`${name} min`, () => {
+  describe(`${name} min`, () => {
     it('should compute the min of the whole matrix without axes', async () => {
       if (wait) {
         await wait;

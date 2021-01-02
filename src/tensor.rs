@@ -98,12 +98,12 @@ impl Tensor {
         }
     }
 
-    pub fn _sum(&self, axes: &Vec<usize>) -> Tensor {
+    pub fn _pool<F>(&self, axes: &Vec<usize>, op: F) -> Tensor where F: Fn(f32,f32) -> f32 {
         let result_rank = self.shape.len() - axes.len() as usize;
         if result_rank == 0 {
-            let mut value = 0.0;
-            for i in 0..self.size {
-                value += self.values[i];
+            let mut value = self.values[0];
+            for i in 1..self.size {
+                value = op(value, self.values[i]);
             }
 
             return Tensor {
@@ -131,6 +131,7 @@ impl Tensor {
         }
         let result_strides = compute_strides(&result_shape);
         let mut values = vec![0.0; result_size];
+        let mut initialized = vec![false; result_size];
 
         let mut input_index = vec![0; self.shape.len()];
         for i in 0..self.size {
@@ -138,7 +139,12 @@ impl Tensor {
             for j in 0..result_rank {
                 res_ix += result_strides[j] * input_index[res_ix_map[j]];
             }
-            values[res_ix] += self.values[i];
+            if !initialized[res_ix] {
+                values[res_ix] = self.values[i];
+                initialized[res_ix] = true;
+            } else {
+                values[res_ix] = op(self.values[i], values[res_ix]);
+            }
 
             increment_index(&mut input_index, &self.shape);
         }
@@ -149,6 +155,22 @@ impl Tensor {
             size: result_size,
             strides: result_strides
         }
+    }
+
+    pub fn _sum(&self, axes: &Vec<usize>) -> Tensor {
+        return self._pool(axes, |x: f32, y: f32| x+y)
+    }
+
+    pub fn _product(&self, axes: &Vec<usize>) -> Tensor {
+        return self._pool(axes, |x: f32, y: f32| x*y)
+    }
+
+    pub fn _max(&self, axes: &Vec<usize>) -> Tensor {
+        return self._pool(axes, |x: f32, y: f32| x.max(y))
+    }
+
+    pub fn _min(&self, axes: &Vec<usize>) -> Tensor {
+        return self._pool(axes, |x: f32, y: f32| x.min(y))
     }
 }
 
@@ -273,6 +295,30 @@ impl Tensor {
             ax[i as usize] = axes.get_index(i) as usize;
         }
         return self._sum(&ax);
+    }
+
+    pub fn product(&self, axes: Uint32Array) -> Tensor {
+        let mut ax: Vec<usize> = vec![0; axes.length() as usize];
+        for i in 0..axes.length() {
+            ax[i as usize] = axes.get_index(i) as usize;
+        }
+        return self._product(&ax);
+    }
+
+    pub fn max(&self, axes: Uint32Array) -> Tensor {
+        let mut ax: Vec<usize> = vec![0; axes.length() as usize];
+        for i in 0..axes.length() {
+            ax[i as usize] = axes.get_index(i) as usize;
+        }
+        return self._max(&ax);
+    }
+
+    pub fn min(&self, axes: Uint32Array) -> Tensor {
+        let mut ax: Vec<usize> = vec![0; axes.length() as usize];
+        for i in 0..axes.length() {
+            ax[i as usize] = axes.get_index(i) as usize;
+        }
+        return self._min(&ax);
     }
 }
 

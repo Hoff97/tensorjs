@@ -87,14 +87,14 @@ export default class WASMTensor extends Tensor {
   }
 
   product_impl(axes: number[]): Tensor {
-    throw new Error('Method not implemented.');
+    return new WASMTensor(this.wasmTensor.product(new Uint32Array(axes)));
   }
 
   max_impl(axes: number[]): Tensor {
-    throw new Error('Method not implemented.');
+    return new WASMTensor(this.wasmTensor.max(new Uint32Array(axes)));
   }
 
   min_impl(axes: number[]): Tensor {
-    throw new Error('Method not implemented.');
+    return new WASMTensor(this.wasmTensor.min(new Uint32Array(axes)));
   }
 }
