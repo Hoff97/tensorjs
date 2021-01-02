@@ -126,19 +126,7 @@ export default class GPUTensor extends Tensor {
     return matmul(this, tensor);
   }
 
-  sum(axes?: number | number[], keepDims?: boolean): Tensor {
-    let ax: number[];
-
-    if (axes === undefined) {
-      ax = [];
-      for (let i = 0; i < this.shape.length; i++) {
-        ax.push(i);
-      }
-    } else if (!(axes instanceof Array)) {
-      ax = [axes];
-    } else {
-      ax = axes;
-    }
-    return sum(this, ax);
+  sum_impl(axes: number[]): Tensor {
+    return sum(this, axes);
   }
 }

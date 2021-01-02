@@ -113,19 +113,7 @@ export default class CPUTensor extends Tensor {
     return matMul(this, tensor);
   }
 
-  sum(axes?: number | number[]): Tensor {
-    let ax: number[];
-
-    if (axes === undefined) {
-      ax = new Array(this.shape.length);
-      for (let i = 0; i < this.shape.length; i++) {
-        ax.push(i);
-      }
-    } else if (!(axes instanceof Array)) {
-      ax = [axes];
-    } else {
-      ax = axes;
-    }
-    return sum(this, ax);
+  sum_impl(axes: number[]): Tensor {
+    return sum(this, axes);
   }
 }

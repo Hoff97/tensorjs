@@ -82,20 +82,7 @@ export default class WASMTensor extends Tensor {
     return new WASMTensor(this.wasmTensor.matmul(tensor.wasmTensor));
   }
 
-  sum(axes?: number | number[]): Tensor {
-    let ax: number[];
-
-    const sh = this.getShape();
-    if (axes === undefined) {
-      ax = new Array(sh.length);
-      for (let i = 0; i < sh.length; i++) {
-        ax.push(i);
-      }
-    } else if (!(axes instanceof Array)) {
-      ax = [axes];
-    } else {
-      ax = axes;
-    }
-    return new WASMTensor(this.wasmTensor.sum(new Uint32Array(ax)));
+  sum_impl(axes: number[]): Tensor {
+    return new WASMTensor(this.wasmTensor.sum(new Uint32Array(axes)));
   }
 }

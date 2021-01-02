@@ -46,5 +46,23 @@ export default abstract class Tensor {
 
   abstract matMul(tensor: Tensor): Tensor;
 
-  abstract sum(axes?: number | number[]): Tensor;
+  sum(axes?: number | number[]): Tensor {
+    let ax: number[];
+
+    const sh = this.getShape();
+    if (axes === undefined) {
+      ax = [];
+      for (let i = 0; i < sh.length; i++) {
+        ax.push(i);
+      }
+    } else if (!(axes instanceof Array)) {
+      ax = [axes];
+    } else {
+      ax = axes;
+    }
+
+    return this.sum_impl(ax);
+  };
+
+  abstract sum_impl(axes: number[]): Tensor;
 }
