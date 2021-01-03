@@ -70,6 +70,7 @@ impl Tensor {
         return true;
     }
 
+    #[inline]
     fn unary_op<F>(&self, op: F) -> Tensor where F: Fn(f32) -> f32 {
         let mut values: Vec<f32> = vec![0.0; self.size];
         for i in 0..self.size {
@@ -84,6 +85,7 @@ impl Tensor {
         }
     }
 
+    #[inline]
     fn binary_op<F>(&self, other: &Tensor, op: F) -> Tensor where F: Fn(f32, f32) -> f32 {
         let mut values: Vec<f32> = vec![0.0; self.size];
         for i in 0..self.size {
@@ -98,6 +100,7 @@ impl Tensor {
         }
     }
 
+    #[inline]
     pub fn _pool<F>(&self, axes: &Vec<usize>, op: F) -> Tensor where F: Fn(f32,f32) -> f32 {
         let result_rank = self.shape.len() - axes.len() as usize;
         if result_rank == 0 {

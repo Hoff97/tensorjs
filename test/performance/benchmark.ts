@@ -277,68 +277,74 @@ for (let axis of [[1,2],[0,1,2,3]]) {
   });
 }
 
-suite("Tensor product", () => {
-  for (let backend of backends) {
-    benchmark(backend.name, () => {
-      const tensor: Tensor = (utility as any).tensors[backend.name];
-      const result = tensor.product([1,2])
-      result.delete();
-    });
-  }
-}, {
-  onStart() {
-    const size = 10;
-    
-    const values1 = randomValues(size*size*size*size);
-
-    const tensors: {[name: string]: Tensor} = {};
+for (let axis of [[1,2],[0,1,2,3]]) {
+  suite(`Tensor product ${axis}`, () => {
     for (let backend of backends) {
-      tensors[backend.name] = backend.constructor([size,size,size,size], values1);
+      benchmark(backend.name, () => {
+        const tensor: Tensor = (utility as any).tensors[backend.name];
+        const result = tensor.product(axis)
+        result.delete();
+      });
     }
-    (utility as any).tensors = tensors;
-  }
-});
+  }, {
+    onStart() {
+      const size = 10;
+      
+      const values1 = randomValues(size*size*size*size);
+  
+      const tensors: {[name: string]: Tensor} = {};
+      for (let backend of backends) {
+        tensors[backend.name] = backend.constructor([size,size,size,size], values1);
+      }
+      (utility as any).tensors = tensors;
+    }
+  });
+}
 
-suite("Tensor max", () => {
-  for (let backend of backends) {
-    benchmark(backend.name, () => {
-      const tensor: Tensor = (utility as any).tensors[backend.name];
-      const result = tensor.max([1,2])
-      result.delete();
-    });
-  }
-}, {
-  onStart() {
-    const size = 10;
-    
-    const values1 = randomValues(size*size*size*size);
-
-    const tensors: {[name: string]: Tensor} = {};
+for (let axis of [[1,2],[0,1,2,3]]) {
+  suite(`Tensor max ${axis}`, () => {
     for (let backend of backends) {
-      tensors[backend.name] = backend.constructor([size,size,size,size], values1);
+      benchmark(backend.name, () => {
+        const tensor: Tensor = (utility as any).tensors[backend.name];
+        const result = tensor.max(axis)
+        result.delete();
+      });
     }
-    (utility as any).tensors = tensors;
-  }
-});
+  }, {
+    onStart() {
+      const size = 10;
+      
+      const values1 = randomValues(size*size*size*size);
+  
+      const tensors: {[name: string]: Tensor} = {};
+      for (let backend of backends) {
+        tensors[backend.name] = backend.constructor([size,size,size,size], values1);
+      }
+      (utility as any).tensors = tensors;
+    }
+  });
+}
 
-suite("Tensor min", () => {
-  for (let backend of backends) {
-    benchmark(backend.name, () => {
-      const tensor: Tensor = (utility as any).tensors[backend.name];
-      const result = tensor.min([1,2])
-      result.delete();
-    });
-  }
-}, {
-  onStart() {
-    const size = 10;
-    
-    const values1 = randomValues(size*size*size*size);
-
-    const tensors: {[name: string]: Tensor} = {};
+for (let axis of [[1,2],[0,1,2,3]]) {
+  suite(`Tensor min ${axis}`, () => {
     for (let backend of backends) {
-      tensors[backend.name] = backend.constructor([size,size,size,size], values1);
+      benchmark(backend.name, () => {
+        const tensor: Tensor = (utility as any).tensors[backend.name];
+        const result = tensor.min(axis)
+        result.delete();
+      });
     }
-    (utility as any).tensors = tensors;
-  }
-});
+  }, {
+    onStart() {
+      const size = 10;
+      
+      const values1 = randomValues(size*size*size*size);
+  
+      const tensors: {[name: string]: Tensor} = {};
+      for (let backend of backends) {
+        tensors[backend.name] = backend.constructor([size,size,size,size], values1);
+      }
+      (utility as any).tensors = tensors;
+    }
+  });
+}
