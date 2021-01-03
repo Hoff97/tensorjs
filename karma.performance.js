@@ -31,7 +31,7 @@ module.exports = function(config) {
         
         customLaunchers: {
             ChromeGPU: {
-                base: 'Chrome',
+                base: 'ChromeHeadless',
                 flags: ['--use-gl=desktop', '--enable-webgl', '--disable-swiftshader']
             }
         },
