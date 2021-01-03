@@ -48,7 +48,10 @@ suite("Tensor exp", () => {
   for (let backend of backends) {
     benchmark(backend.name, () => {
       const result = (utility as any).tensors[backend.name].exp();
-      result.delete();
+      
+      if (backend.name !== 'GPU') {
+        result.delete();
+      }
     });
   }
 }, {
@@ -71,7 +74,9 @@ suite("Tensor log", () => {
   for (let backend of backends) {
     benchmark(backend.name, () => {
       const result = (utility as any).tensors[backend.name].log();
-      result.delete();
+      if (backend.name !== 'GPU') {
+        result.delete();
+      }
     });
   }
 }, {
@@ -94,7 +99,9 @@ suite("Tensor sqrt", () => {
   for (let backend of backends) {
     benchmark(backend.name, () => {
       const result = (utility as any).tensors[backend.name].sqrt();
-      result.delete();
+      if (backend.name !== 'GPU') {
+        result.delete();
+      }
     });
   }
 }, {
@@ -120,7 +127,9 @@ suite("Tensor add", () => {
       const t2: Tensor = (utility as any).tensors[backend.name][1];
 
       const result = t1.add(t2);
-      result.delete();
+      if (backend.name !== 'GPU') {
+        result.delete();
+      }
     });
   }
 }, {
@@ -149,7 +158,9 @@ suite("Tensor subtract", () => {
       const t2: Tensor = (utility as any).tensors[backend.name][1];
 
       const result = t1.subtract(t2);
-      result.delete();
+      if (backend.name !== 'GPU') {
+        result.delete();
+      }
     });
   }
 }, {
@@ -178,7 +189,9 @@ suite("Tensor divide", () => {
       const t2: Tensor = (utility as any).tensors[backend.name][1];
 
       const result = t1.divide(t2);
-      result.delete();
+      if (backend.name !== 'GPU') {
+        result.delete();
+      }
     });
   }
 }, {
@@ -207,7 +220,9 @@ suite("Tensor multiply", () => {
       const t2: Tensor = (utility as any).tensors[backend.name][1];
 
       const result = t1.multiply(t2);
-      result.delete();
+      if (backend.name !== 'GPU') {
+        result.delete();
+      }
     });
   }
 }, {
@@ -233,7 +248,9 @@ suite("Tensor matmul", () => {
   for (let backend of backends) {
     benchmark(backend.name, () => {
       const result = (utility as any).tensors[backend.name][0].matMul((utility as any).tensors[backend.name][1]);
-      result.delete();
+      if (backend.name !== 'GPU') {
+        result.delete();
+      }
     });
   }
 }, {
@@ -259,7 +276,9 @@ for (let axis of [[1,2],[0,1,2,3]]) {
       benchmark(backend.name, () => {
         const tensor: Tensor = (utility as any).tensors[backend.name];
         const result = tensor.sum(axis)
-        result.delete();
+        if (backend.name !== 'GPU') {
+          result.delete();
+        }
       });
     }
   }, {
@@ -283,7 +302,9 @@ for (let axis of [[1,2],[0,1,2,3]]) {
       benchmark(backend.name, () => {
         const tensor: Tensor = (utility as any).tensors[backend.name];
         const result = tensor.product(axis)
-        result.delete();
+        if (backend.name !== 'GPU') {
+          result.delete();
+        }
       });
     }
   }, {
@@ -307,7 +328,9 @@ for (let axis of [[1,2],[0,1,2,3]]) {
       benchmark(backend.name, () => {
         const tensor: Tensor = (utility as any).tensors[backend.name];
         const result = tensor.max(axis)
-        result.delete();
+        if (backend.name !== 'GPU') {
+          result.delete();
+        }
       });
     }
   }, {
@@ -331,7 +354,9 @@ for (let axis of [[1,2],[0,1,2,3]]) {
       benchmark(backend.name, () => {
         const tensor: Tensor = (utility as any).tensors[backend.name];
         const result = tensor.min(axis)
-        result.delete();
+        if (backend.name !== 'GPU') {
+          result.delete();
+        }
       });
     }
   }, {

@@ -58,7 +58,8 @@ export function initComputation(fragShader: string) {
 
 export function performComputation(tensor1: GPUTensor,
                                    axes: number[],
-                                   comp: any) {
+                                   comp: any,
+                                   dest?: GPUTensor) {
   const [outputShape, ixMap] = poolResultShape(tensor1.getShape(), axes);
 
   const inputStrides = computeStrides(tensor1.shape);
@@ -80,5 +81,5 @@ export function performComputation(tensor1: GPUTensor,
     mappedInputStrides: pad(mappedInputStrides),
     sumDims: pad(sumDims),
     sumSize
-  });
+  }, dest);
 }

@@ -16,11 +16,16 @@ import { product } from '../../ops/gpu/product';
 import { max } from '../../ops/gpu/max';
 import { min } from '../../ops/gpu/min';
 
-let glContext = document.createElement("canvas").getContext("webgl");
+let glContext = document.createElement("canvas").getContext("webgl", {
+  preserveDrawingBuffer: true,
+  failIfMajorPerformanceCaveat: true
+});
 export let gl = REGL({
   gl: glContext,
   extensions: ['OES_texture_float']
 });
+
+let tensorID = 0;
 
 export default class GPUTensor extends Tensor {
   public framebuffer: Framebuffer2D;
@@ -31,6 +36,9 @@ export default class GPUTensor extends Tensor {
 
   public shape: readonly number[];
 
+  public id: number;
+  public deleted: boolean = false;
+
   constructor(values: Float32Array | Framebuffer2D, shape: readonly number[]) {
     super();
 
@@ -39,6 +47,8 @@ export default class GPUTensor extends Tensor {
 
     this.textureSize = Math.ceil(this.size / 4)
     this.arraySize = this.textureSize*4;
+
+    this.id = tensorID++;
 
     if (values instanceof Float32Array) {
       const vals = new Float32Array(this.arraySize);
@@ -87,68 +97,145 @@ export default class GPUTensor extends Tensor {
 
   delete(): void {
     this.framebuffer.destroy();
+    this.deleted = true;
   }
 
+  private expDest?: GPUTensor;
   exp(): Tensor {
-    return exp(this);
+    if (this.expDest && !this.expDest.deleted) {
+      return exp(this, this.expDest);
+    }
+    const result = exp(this);
+    this.expDest = result;
+    return result;
   }
 
+  private logDest?: GPUTensor;
   log(): Tensor {
-    return log(this);
+    if (this.logDest && !this.logDest.deleted) {
+      return log(this, this.logDest);
+    }
+    const result = log(this);
+    this.logDest = result;
+    return result;
   }
 
+  private sqrtDest?: GPUTensor;
   sqrt(): Tensor {
-    return sqrt(this);
+    if (this.sqrtDest && !this.sqrtDest.deleted) {
+      return sqrt(this, this.sqrtDest);
+    }
+    const result = sqrt(this);
+    this.sqrtDest = result;
+    return result;
   }
 
+  private addDest: {[id: number]: GPUTensor} = {};
   add(tensor: Tensor): Tensor {
     if (!(tensor instanceof GPUTensor)) {
       throw new Error('Can only add GPU tensor to GPU tensor');
     }
-    return add(this, tensor);
+    if (this.addDest[tensor.id] && !this.addDest[tensor.id].deleted) {
+      return add(this, tensor, this.addDest[tensor.id]);
+    }
+    const result = add(this, tensor);
+    this.addDest[tensor.id] = result;
+    return result;
   }
 
+  private subtractDest: {[id: number]: GPUTensor} = {};
   subtract(tensor: Tensor): Tensor {
     if (!(tensor instanceof GPUTensor)) {
       throw new Error('Can only add GPU tensor to GPU tensor');
     }
-    return subtract(this, tensor);
+    if (this.subtractDest[tensor.id] && !this.subtractDest[tensor.id].deleted) {
+      return subtract(this, tensor, this.subtractDest[tensor.id]);
+    }
+    const result = subtract(this, tensor);
+    this.subtractDest[tensor.id] = result;
+    return result;
   }
 
+  private multiplyDest: {[id: number]: GPUTensor} = {};
   multiply(tensor: Tensor): Tensor {
     if (!(tensor instanceof GPUTensor)) {
       throw new Error('Can only add GPU tensor to GPU tensor');
     }
-    return multiply(this, tensor);
+    if (this.multiplyDest[tensor.id] && !this.multiplyDest[tensor.id].deleted) {
+      return multiply(this, tensor, this.multiplyDest[tensor.id]);
+    }
+    const result = multiply(this, tensor);
+    this.multiplyDest[tensor.id] = result;
+    return result;
   }
 
+  private divideDest: {[id: number]: GPUTensor} = {};
   divide(tensor: Tensor): Tensor {
     if (!(tensor instanceof GPUTensor)) {
       throw new Error('Can only add GPU tensor to GPU tensor');
     }
-    return divide(this, tensor);
+    if (this.divideDest[tensor.id] && !this.divideDest[tensor.id].deleted) {
+      return divide(this, tensor, this.divideDest[tensor.id]);
+    }
+    const result = divide(this, tensor);
+    this.divideDest[tensor.id] = result;
+    return result;
   }
 
+  private matMulDest: {[id: number]: GPUTensor} = {};
   matMul(tensor: Tensor): Tensor {
     if (!(tensor instanceof GPUTensor)) {
       throw new Error('Can only add GPU tensor to GPU tensor');
     }
-    return matmul(this, tensor);
+    if (this.matMulDest[tensor.id] && !this.matMulDest[tensor.id].deleted) {
+      return matmul(this, tensor, this.matMulDest[tensor.id]);
+    }
+    const result = matmul(this, tensor);
+    this.matMulDest[tensor.id] = result;
+    return result;
   }
 
+  private sumDest: {[axes: string]: GPUTensor} = {};
   sum_impl(axes: number[]): Tensor {
-    return sum(this, axes);
+    const key = `${axes}`;
+    if (this.sumDest[key] && !this.sumDest[key].deleted) {
+      return sum(this, axes, this.sumDest[key]);
+    }
+    const result = sum(this, axes);
+    this.sumDest[key] = result;
+    return result;
   }
 
+  private productDest: {[axes: string]: GPUTensor} = {};
   product_impl(axes: number[]): Tensor {
-    return product(this, axes);
+    const key = `${axes}`;
+    if (this.productDest[key] && !this.productDest[key].deleted) {
+      return product(this, axes, this.productDest[key]);
+    }
+    const result = product(this, axes);
+    this.productDest[key] = result;
+    return result;
   }
 
+  private maxDest: {[axes: string]: GPUTensor} = {};
   max_impl(axes: number[]): Tensor {
-    return max(this, axes);
+    const key = `${axes}`;
+    if (this.maxDest[key] && !this.maxDest[key].deleted) {
+      return max(this, axes, this.maxDest[key]);
+    }
+    const result = max(this, axes);
+    this.maxDest[key] = result;
+    return result;
   }
 
+  private minDest: {[axes: string]: GPUTensor} = {};
   min_impl(axes: number[]): Tensor {
-    return min(this, axes);
+    const key = `${axes}`;
+    if (this.minDest[key] && !this.minDest[key].deleted) {
+      return min(this, axes, this.minDest[key]);
+    }
+    const result = min(this, axes);
+    this.minDest[key] = result;
+    return result;
   }
 }

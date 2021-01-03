@@ -30,6 +30,12 @@
 			"problemMatcher": [],
 			"label": "npm: test:rust",
 			"detail": "cargo test --tests"
+		},
+		{
+			"label": "Run Xvfb",
+			"type": "shell",
+			"command": "Xvfb -ac :0 -screen 0 1280x1024x16 & export DISPLAY=:0",
+			"problemMatcher": []
 		}
 	]
 }

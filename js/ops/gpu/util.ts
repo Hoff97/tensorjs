@@ -233,7 +233,8 @@ export function buildComp(inputTextures: string[], fragmentShader: string,
 export function compute(op: DrawCommand,
                         resultShape: readonly number[],
                         inputTensors: {[name: string]: GPUTensor},
-                        inputs?: {[name: string]: any}) {
+                        inputs?: {[name: string]: any},
+                        dest?: GPUTensor) {
   const inputTextures: {[name: string]: Framebuffer2D} = {};
   for (let name in inputTensors) {
     inputTextures[name] = inputTensors[name].framebuffer
@@ -254,13 +255,18 @@ export function compute(op: DrawCommand,
 
   const resultSize = getSize(resultShape);
   const textureSize = Math.ceil(resultSize / 4);
-  const result = gl.framebuffer({
-    width: textureSize,
-    height: 1,
-    depthStencil: false,
-    colorFormat: 'rgba',
-    colorType: 'float'
-  });
+  let result;
+  if (dest) {
+    result = dest.framebuffer;
+  } else {
+    result = gl.framebuffer({
+      width: textureSize,
+      height: 1,
+      depthStencil: false,
+      colorFormat: 'rgba',
+      colorType: 'float'
+    });
+  }
 
   op({
     framebuffer: result,
@@ -268,5 +274,9 @@ export function compute(op: DrawCommand,
     ...inputs
   });
 
-  return new GPUTensor(result, resultShape);
+  if (dest) {
+    return dest;
+  } else {
+    return new GPUTensor(result, resultShape);
+  }
 }

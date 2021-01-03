@@ -10,10 +10,10 @@ function initComp() {
   comp = initComputation(fragShader);
 }
 
-export function product(tensor1: GPUTensor, axes: number[]) {
+export function product(tensor1: GPUTensor, axes: number[], dest?: GPUTensor) {
   if (comp === undefined) {
     initComp();
   }
 
-  return performComputation(tensor1, axes, comp);
+  return performComputation(tensor1, axes, comp, dest);
 }

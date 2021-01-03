@@ -13,12 +13,12 @@ function initComp() {
   comp = buildComp(['inputTensor'], fragmentShader);
 }
 
-export function exp(tensor: GPUTensor) {
+export function exp(tensor: GPUTensor, dest?: GPUTensor) {
   if (comp === undefined) {
     initComp();
   }
 
   return compute(comp, tensor.getShape(), {
     inputTensor: tensor
-  });
+  }, {}, dest);
 }

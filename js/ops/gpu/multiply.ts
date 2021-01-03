@@ -13,7 +13,7 @@ function initComp() {
   comp = buildComp(['inputTensor1', 'inputTensor2'], fragmentShader);
 }
 
-export function multiply(tensor1: GPUTensor, tensor2: GPUTensor) {
+export function multiply(tensor1: GPUTensor, tensor2: GPUTensor, dest?: GPUTensor) {
   if (comp === undefined) {
     initComp();
   }
@@ -21,5 +21,5 @@ export function multiply(tensor1: GPUTensor, tensor2: GPUTensor) {
   return compute(comp, tensor1.getShape(), {
     inputTensor1: tensor1,
     inputTensor2: tensor2
-  });
+  }, {}, dest);
 }

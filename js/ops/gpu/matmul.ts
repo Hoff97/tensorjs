@@ -40,7 +40,7 @@ function initComp() {
   comp = buildComp(['input1', 'input2'], fragmentShader, [{name: 'k'}]);
 }
 
-export function matmul(tensor1: GPUTensor, tensor2: GPUTensor) {
+export function matmul(tensor1: GPUTensor, tensor2: GPUTensor, dest?: GPUTensor) {
   if (comp === undefined) {
     initComp();
   }
@@ -52,5 +52,5 @@ export function matmul(tensor1: GPUTensor, tensor2: GPUTensor) {
     input2: tensor2
   }, {
     k: tensor1.getShape()[1]
-  });
+  }, dest);
 }
