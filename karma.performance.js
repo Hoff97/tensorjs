@@ -26,8 +26,16 @@ module.exports = function(config) {
         logLevel: config.LOG_INFO,
         autoWatch: false,
         browsers: [
-            'ChromeHeadless'
+            'ChromeGPU'
         ],
+        
+        customLaunchers: {
+            ChromeGPU: {
+                base: 'ChromeHeadless',
+                flags: ['--use-gl=egl', '--enable-webgl', '--disable-swiftshader']
+            }
+        },
+
         singleRun: true,
         concurrency: 1,
         client: {
