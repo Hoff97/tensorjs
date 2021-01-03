@@ -44,6 +44,10 @@ export default class CPUTensor extends Tensor {
     return this.shape;
   }
 
+  delete(): void {
+    // TODO: Maybe set values to empty array?
+  }
+
   get(index: number[] | number): number {
     let pos: number;
     if (Array.isArray(index)) {

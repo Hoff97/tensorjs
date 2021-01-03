@@ -35,6 +35,10 @@ export default class WASMTensor extends Tensor {
     return Array.from(this.wasmTensor.get_shape());
   }
 
+  delete(): void {
+    this.wasmTensor.free();
+  }
+
   exp(): Tensor {
     return new WASMTensor(this.wasmTensor.exp());
   }

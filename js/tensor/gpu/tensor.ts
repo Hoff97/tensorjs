@@ -49,6 +49,9 @@ export default class GPUTensor extends Tensor {
         vals[i] = 0;
       }
 
+      // TODO: Actually use the height of the texture
+      // Large tensors can otherwise not be stored effectively
+
       const texture = gl.texture({
         width: this.textureSize,
         height: 1,
@@ -80,6 +83,10 @@ export default class GPUTensor extends Tensor {
 
   getShape(): readonly number[] {
     return this.shape;
+  }
+
+  delete(): void {
+    this.framebuffer.destroy();
   }
 
   exp(): Tensor {

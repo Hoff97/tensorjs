@@ -5,6 +5,8 @@ export default abstract class Tensor {
 
   abstract getShape(): ReadonlyArray<number>;
 
+  abstract delete(): void;
+
   async compare(tensor: Tensor, epsilon?: number): Promise<boolean> {
     if (!compareShapes(this.getShape(), tensor.getShape())) {
       return false;
