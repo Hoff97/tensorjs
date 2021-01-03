@@ -100,6 +100,70 @@ impl Tensor {
         }
     }
 
+    pub fn axes_continuous(&self, axes: &Vec<usize>) -> bool {
+        let mut last_ax = axes[0];
+        for i in 1..axes.len() {
+            if axes[i] > last_ax + 1 {
+                return false;
+            }
+            last_ax = axes[i];
+        }
+        return true;
+    }
+
+    #[inline]
+    pub fn pool_continuous<F>(&self, axes: &Vec<usize>, op: F) -> Tensor where F: Fn(f32,f32) -> f32 {
+        let result_rank = self.shape.len() - axes.len() as usize;
+        
+        let mut result_shape = vec![0; result_rank];
+        let mut result_size = 1;
+        let mut sum_size = 1;
+        let mut axes_ix = 0;
+        let mut result_ix = 0;
+        for i in 0..self.shape.len() {
+            if axes_ix < axes.len() && axes[axes_ix] as usize == i {
+                axes_ix += 1;
+                sum_size *= self.shape[i];
+            } else {
+                result_shape[result_ix] = self.shape[i];
+                result_ix += 1;
+                result_size *= self.shape[i];
+            }
+        }
+        let result_strides = compute_strides(&result_shape);
+        let mut values = vec![0.0; result_size];
+
+
+        let step_size = self.strides[axes[axes.len() - 1]];
+        let cont_size = step_size;
+
+
+        let input_ix_step_size = if axes[0] > 0 { self.strides[axes[0]-1] } else { self.size };
+        let num_input_steps = self.size/input_ix_step_size;
+
+        let mut input_start_ix;
+        let mut output_ix;
+        for i in 0..num_input_steps {
+            input_start_ix = i*input_ix_step_size;
+            output_ix = i*cont_size;
+
+            for j in 0..cont_size {
+                let mut res = self.values[input_start_ix + j];
+                for k in 1..sum_size {
+                    res = op(self.values[input_start_ix + j + k*step_size], res);
+                }
+                values[output_ix+j] = res;
+            }
+        }
+
+        Tensor {
+            values,
+            shape: result_shape,
+            size: result_size,
+            strides: result_strides
+        }
+    }
+
     #[inline]
     pub fn _pool<F>(&self, axes: &Vec<usize>, op: F) -> Tensor where F: Fn(f32,f32) -> f32 {
         let result_rank = self.shape.len() - axes.len() as usize;
@@ -115,6 +179,10 @@ impl Tensor {
                 size: 1,
                 strides: vec![1]
             }
+        }
+
+        if self.axes_continuous(axes) {
+            return self.pool_continuous(axes, op);
         }
 
         let mut result_shape = vec![0; result_rank];
