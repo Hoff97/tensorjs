@@ -18,9 +18,6 @@ import { defaultAllocator, gl } from './gl';
 import { MemoryEntry } from './memory';
 
 
-
-let tensorID = 0;
-
 export default class GPUTensor extends Tensor {
   public memory: MemoryEntry;
 
@@ -28,7 +25,6 @@ export default class GPUTensor extends Tensor {
 
   public shape: readonly number[];
 
-  public id: number;
   public deleted: boolean = false;
 
   constructor(values: Float32Array | MemoryEntry, shape: readonly number[]) {
@@ -36,8 +32,6 @@ export default class GPUTensor extends Tensor {
 
     this.size = getSize(shape);
     this.shape = shape;
-
-    this.id = tensorID++;
 
     if (values instanceof Float32Array) {
       this.memory = defaultAllocator.allocateTexture(values);

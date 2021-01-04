@@ -1,5 +1,6 @@
 import { Framebuffer2D, Regl } from "regl";
 import { AVLTree } from "../../util/avl";
+import { primeFactors } from "../../util/math";
 
 export interface MemoryEntry {
   width: number;
@@ -54,7 +55,7 @@ export class GPUMemoryAllocator {
       const memoryEntry: MemoryEntry = {
         width: width,
         height: height,
-        size: textureSize*4,
+        size: width*height*4,
         frameBuffer: framebuffer,
         id: this.entryId++
       };
@@ -75,7 +76,7 @@ export class GPUMemoryAllocator {
   allocateTexture(values: Float32Array): MemoryEntry {
     const textureSize = Math.ceil(values.length/4);
     const {width, height} = this.getTextureDims(textureSize);
-    const arraySize = textureSize*4;
+    const arraySize = width*height*4;
 
     const vals = new Float32Array(arraySize);
     for (let i = 0; i < values.length; i++) {
@@ -110,6 +111,16 @@ export class GPUMemoryAllocator {
   }
 
   private getTextureDims(size: number) {
-    return {width: size, height: 1}
+    const factors = primeFactors(size);
+    let width = 1;
+    let height = 1;
+    for (let i = 0; i < factors.length; i+=2) {
+      width *= factors[i];
+      if (i + 1 < factors.length) {
+        height *= factors[i+1];
+      }
+    }
+
+    return {width, height};
   }
 }

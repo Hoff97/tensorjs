@@ -29,15 +29,23 @@ export function copyPad(arr: readonly number[]) {
 }
 
 export const utilFunctions = `
-int coordinateToPos(float coordinate, int textureSize) {
-  return int(coordinate*float(textureSize)) - 2;
+int coordinateToPos(vec2 coordinate, int textureWidth, int textureHeight) {
+  int x = (int(coordinate.x*float(textureWidth*2))-1)/2;
+  int y = (int(coordinate.y*float(textureHeight*2))-1)/2;
+
+  int pos = x + y*textureWidth;
+
+  return pos*4;
 }
 
-float posToCoordinate(int pos, int textureSize) {
+vec2 posToCoordinate(int pos, int textureWidth, int textureHeight) {
   // 4 positions map to the same coordinate
-  pos = (pos/4)*4+2;
-  float coordinate = float(pos)/float(textureSize);
-  return coordinate;
+  pos = pos/4;
+
+  int y = pos/textureWidth;
+  int x = pos - y*textureWidth;
+
+  return vec2(float(x*2+1)/float(textureWidth*2), float(y*2+1)/float(textureHeight*2));
 }
 
 int indexToPos(int index[${maxRank}], int strides[${maxRank}]) {
@@ -51,11 +59,11 @@ int indexToPos(int index[${maxRank}], int strides[${maxRank}]) {
   return pos;
 }
 
-float getValueAt(int index[${maxRank}], int strides[${maxRank}], int textureSize, sampler2D tex) {
+float getValueAt(int index[${maxRank}], int strides[${maxRank}], int textureWidth, int textureHeight, sampler2D tex) {
   int pos = indexToPos(index, strides);
-  float coord = posToCoordinate(pos, textureSize);
+  vec2 coord = posToCoordinate(pos, textureWidth, textureHeight);
   int res = pos - (pos/4)*4;
-  vec4 val = texture2D(tex, vec2(coord, 0.5));
+  vec4 val = texture2D(tex, coord);
   if (res == 0) {
     return val.r;
   } else if (res == 1) {
@@ -133,7 +141,7 @@ export function incrementConditional(index: string, shape: string, cond: string)
 
 export const defaultMain = `
 void main() {
-  int pos = coordinateToPos(uv.x, textureSizeOutput);
+  int pos = coordinateToPos(uv, widthOutput, heightOutput);
 
   vec4 result = vec4(0,0,0,0);
 
@@ -174,14 +182,16 @@ function buildCompleteFragmentShader(fragmentShader: string, inputTextures: stri
     return `
     uniform sampler2D ${x};
     uniform int size${x};
-    uniform int textureSize${x};
+    uniform int width${x};
+    uniform int height${x};
     uniform int strides${x}[${maxRank}];
     uniform int shape${x}[${maxRank}];
     uniform int rank${x};
     `;
   }).join('\n')}
   uniform int sizeOutput;
-  uniform int textureSizeOutput;
+  uniform int widthOutput;
+  uniform int heightOutput;
   uniform int stridesOutput[${maxRank}];
   uniform int shapeOutput[${maxRank}];
   uniform int rankOutput;
@@ -204,13 +214,15 @@ export function buildComp(inputTextures: string[], fragmentShader: string,
     uniforms[inputTexture] = gl.prop(inputTexture as never);
 
     uniform_attrs.push({name: `size${inputTexture}`});
-    uniform_attrs.push({name: `textureSize${inputTexture}`});
+    uniform_attrs.push({name: `width${inputTexture}`});
+    uniform_attrs.push({name: `height${inputTexture}`});
     uniform_attrs.push({name: `strides${inputTexture}`, length: maxRank});
     uniform_attrs.push({name: `shape${inputTexture}`, length: maxRank});
     uniform_attrs.push({name: `rank${inputTexture}`});
   }
   uniform_attrs.push({name: `sizeOutput`});
-  uniform_attrs.push({name: `textureSizeOutput`});
+  uniform_attrs.push({name: `widthOutput`});
+  uniform_attrs.push({name: `heightOutput`});
   uniform_attrs.push({name: `stridesOutput`, length: maxRank});
   uniform_attrs.push({name: `shapeOutput`, length: maxRank});
   uniform_attrs.push({name: `rankOutput`});
@@ -265,13 +277,15 @@ export function compute(op: DrawCommand,
   }
   for (let name in inputTensors) {
     inputs[`size${name}`] = inputTensors[name].size;
-    inputs[`textureSize${name}`] = inputTensors[name].memory.size;
+    inputs[`width${name}`] = inputTensors[name].memory.width;
+    inputs[`height${name}`] = inputTensors[name].memory.height;
     inputs[`strides${name}`] = pad(computeStrides(inputTensors[name].getShape()));
     inputs[`shape${name}`] = copyPad(inputTensors[name].getShape());
     inputs[`rank${name}`] = inputTensors[name].getShape().length;
   }
   inputs['sizeOutput'] = resultSize;
-  inputs['textureSizeOutput'] = result.size;
+  inputs['widthOutput'] = result.width;
+  inputs['heightOutput'] = result.height;
   inputs['stridesOutput'] = pad(computeStrides(resultShape));
   inputs['shapeOutput'] = copyPad(resultShape);
   inputs['rankOutput'] = resultShape.length;

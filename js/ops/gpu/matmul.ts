@@ -25,8 +25,8 @@ float process(int index[${maxRank}]) {
     ix1[1] = i;
     ix2[0] = i;
 
-    float v1 = getValueAt(ix1, stridesinput1, textureSizeinput1, input1);
-    float v2 = getValueAt(ix2, stridesinput2, textureSizeinput2, input2);
+    float v1 = getValueAt(ix1, stridesinput1, widthinput1, heightinput1, input1);
+    float v2 = getValueAt(ix2, stridesinput2, widthinput2, heightinput2, input2);
     res += v1*v2;
   }
 
