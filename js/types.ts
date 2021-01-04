@@ -73,6 +73,22 @@ export default abstract class Tensor {
     return this.min_impl(ax);
   }
 
+  conv(kernel: Tensor,
+       bias?: Tensor,
+       dilations?: number[],
+       group?: number,
+       pads?: number[],
+       strides?: number[]): Tensor {
+    const sh = this.getShape();
+    
+    dilations = dilations || new Array(sh.length).fill(1);
+    group = group || 1;
+    pads = pads || new Array(sh.length * 2).fill(0);
+    strides = strides || new Array(sh.length).fill(1);
+
+    return this.conv_impl(kernel, dilations, group, pads, strides, bias);
+  }
+
   abstract exp(): Tensor;
 
   abstract log(): Tensor;
@@ -96,4 +112,11 @@ export default abstract class Tensor {
   abstract max_impl(axes: number[]): Tensor;
 
   abstract min_impl(axes: number[]): Tensor;
+
+  abstract conv_impl(kernel: Tensor,
+                     dilations: number[],
+                     group: number,
+                     pads: number[],
+                     strides: number[],
+                     bias?: Tensor): Tensor;
 }

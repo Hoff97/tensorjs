@@ -1,6 +1,7 @@
 import {
   add, divide, exp, log, multiply, sqrt, subtract
 } from '../../ops/cpu/basic';
+import { conv } from '../../ops/cpu/conv';
 import { matMul } from '../../ops/cpu/matMul';
 import { max } from '../../ops/cpu/max';
 import { min } from '../../ops/cpu/min';
@@ -134,5 +135,12 @@ export default class CPUTensor extends Tensor {
 
   min_impl(axes: number[]): Tensor {
     return min(this, axes);
+  }
+
+  conv_impl(kernel: Tensor, dilations: number[], group: number, pads: number[], strides: number[], bias?: Tensor): Tensor {
+    if (!(kernel instanceof CPUTensor) || (bias !== undefined && !(bias instanceof CPUTensor))) {
+      throw new Error('Can only do convolution of CPU tensor with CPU tensor');
+    }
+    return conv(this, kernel, dilations, group, pads, strides, bias as CPUTensor);
   }
 }
