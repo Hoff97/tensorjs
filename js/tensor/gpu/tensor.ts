@@ -121,4 +121,8 @@ export default class GPUTensor extends Tensor {
   min_impl(axes: number[]): Tensor {
     return min(this, axes);
   }
+
+  conv_impl(kernel: Tensor, dilations: number[], group: number, pads: number[], strides: number[], bias?: Tensor): Tensor {
+    throw new Error('Method not implemented.');
+  }
 }

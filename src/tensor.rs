@@ -6,6 +6,7 @@ use wasm_bindgen::prelude::*;
 use js_sys::{Uint32Array, Float32Array};
 
 use crate::shape::*;
+use crate::utils::*;
 
 #[wasm_bindgen]
 #[derive(Debug, Clone)]

@@ -80,11 +80,12 @@ export default abstract class Tensor {
        pads?: number[],
        strides?: number[]): Tensor {
     const sh = this.getShape();
+    const dataRank = sh.length - 2;
     
-    dilations = dilations || new Array(sh.length).fill(1);
+    dilations = dilations || new Array(dataRank).fill(1);
     group = group || 1;
-    pads = pads || new Array(sh.length * 2).fill(0);
-    strides = strides || new Array(sh.length).fill(1);
+    pads = pads || new Array(dataRank * 2).fill(0);
+    strides = strides || new Array(dataRank).fill(1);
 
     return this.conv_impl(kernel, dilations, group, pads, strides, bias);
   }

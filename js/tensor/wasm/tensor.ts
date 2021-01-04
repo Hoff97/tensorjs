@@ -101,4 +101,15 @@ export default class WASMTensor extends Tensor {
   min_impl(axes: number[]): Tensor {
     return new WASMTensor(this.wasmTensor.min(new Uint32Array(axes)));
   }
+
+  conv_impl(kernel: Tensor, dilations: number[], group: number, pads: number[], strides: number[], bias?: Tensor): Tensor {
+    if (!(kernel instanceof WASMTensor) || (bias !== undefined && !(bias instanceof WASMTensor))) {
+      throw new Error('Can only do convolution of CPU tensor with CPU tensor');
+    }
+    if (bias !== undefined) {
+      return new WASMTensor(this.wasmTensor.conv_with_bias(kernel.wasmTensor, (bias as WASMTensor).wasmTensor, new Uint32Array(dilations), group, new Uint32Array(pads), new Uint32Array(strides)));
+    } else {
+      return new WASMTensor(this.wasmTensor.conv(kernel.wasmTensor, new Uint32Array(dilations), group, new Uint32Array(pads), new Uint32Array(strides)));
+    }
+  }
 }
