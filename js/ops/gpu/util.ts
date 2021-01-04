@@ -1,5 +1,7 @@
 import { DrawCommand, Framebuffer2D } from "regl";
-import GPUTensor, { gl } from "../../tensor/gpu/tensor";
+import { defaultAllocator, gl } from "../../tensor/gpu/gl";
+import { MemoryEntry } from "../../tensor/gpu/memory";
+import GPUTensor from "../../tensor/gpu/tensor";
 import { getSize, computeStrides } from "../../util/shape";
 
 export interface Input {
@@ -27,14 +29,14 @@ export function copyPad(arr: readonly number[]) {
 }
 
 export const utilFunctions = `
-int coordinateToPos(float coordinate, int size) {
-  return int(coordinate*float(size)) - 2;
+int coordinateToPos(float coordinate, int textureSize) {
+  return int(coordinate*float(textureSize)) - 2;
 }
 
-float posToCoordinate(int pos, int size) {
+float posToCoordinate(int pos, int textureSize) {
   // 4 positions map to the same coordinate
   pos = (pos/4)*4+2;
-  float coordinate = float(pos)/float(size);
+  float coordinate = float(pos)/float(textureSize);
   return coordinate;
 }
 
@@ -49,9 +51,9 @@ int indexToPos(int index[${maxRank}], int strides[${maxRank}]) {
   return pos;
 }
 
-float getValueAt(int index[${maxRank}], int strides[${maxRank}], int size, sampler2D tex) {
+float getValueAt(int index[${maxRank}], int strides[${maxRank}], int textureSize, sampler2D tex) {
   int pos = indexToPos(index, strides);
-  float coord = posToCoordinate(pos, size);
+  float coord = posToCoordinate(pos, textureSize);
   int res = pos - (pos/4)*4;
   vec4 val = texture2D(tex, vec2(coord, 0.5));
   if (res == 0) {
@@ -131,25 +133,38 @@ export function incrementConditional(index: string, shape: string, cond: string)
 
 export const defaultMain = `
 void main() {
-  int pos = coordinateToPos(uv.x, sizeOutput);
+  int pos = coordinateToPos(uv.x, textureSizeOutput);
 
-  int index[${maxRank}];
-  ${posToIndex('stridesOutput', 'index', 'pos')}
-  float a = process(index);
+  vec4 result = vec4(0,0,0,0);
 
-  pos += 1;
-  ${posToIndex('stridesOutput', 'index', 'pos')}
-  float b = process(index);
+  if (pos < sizeOutput) {
+    int index[${maxRank}];
+    ${posToIndex('stridesOutput', 'index', 'pos')}
+    result.r = process(index);
 
-  pos += 1;
-  ${posToIndex('stridesOutput', 'index', 'pos')}
-  float c = process(index);
+    pos += 1;
 
-  pos += 1;
-  ${posToIndex('stridesOutput', 'index', 'pos')}
-  float d = process(index);
+    if (pos < sizeOutput) {
+      ${posToIndex('stridesOutput', 'index', 'pos')}
+      result.g = process(index);
 
-  gl_FragColor = vec4(a, b, c, d);
+      pos += 1;
+
+      if (pos < sizeOutput) {
+        ${posToIndex('stridesOutput', 'index', 'pos')}
+        result.b = process(index);
+
+        pos += 1;
+
+        if (pos < sizeOutput) {
+          ${posToIndex('stridesOutput', 'index', 'pos')}
+          result.a = process(index);
+        }
+      }
+    }
+  }
+
+  gl_FragColor = result;
 }`;
 
 function buildCompleteFragmentShader(fragmentShader: string, inputTextures: string[]) {
@@ -159,12 +174,14 @@ function buildCompleteFragmentShader(fragmentShader: string, inputTextures: stri
     return `
     uniform sampler2D ${x};
     uniform int size${x};
+    uniform int textureSize${x};
     uniform int strides${x}[${maxRank}];
     uniform int shape${x}[${maxRank}];
     uniform int rank${x};
     `;
   }).join('\n')}
   uniform int sizeOutput;
+  uniform int textureSizeOutput;
   uniform int stridesOutput[${maxRank}];
   uniform int shapeOutput[${maxRank}];
   uniform int rankOutput;
@@ -187,11 +204,13 @@ export function buildComp(inputTextures: string[], fragmentShader: string,
     uniforms[inputTexture] = gl.prop(inputTexture as never);
 
     uniform_attrs.push({name: `size${inputTexture}`});
+    uniform_attrs.push({name: `textureSize${inputTexture}`});
     uniform_attrs.push({name: `strides${inputTexture}`, length: maxRank});
     uniform_attrs.push({name: `shape${inputTexture}`, length: maxRank});
     uniform_attrs.push({name: `rank${inputTexture}`});
   }
   uniform_attrs.push({name: `sizeOutput`});
+  uniform_attrs.push({name: `textureSizeOutput`});
   uniform_attrs.push({name: `stridesOutput`, length: maxRank});
   uniform_attrs.push({name: `shapeOutput`, length: maxRank});
   uniform_attrs.push({name: `rankOutput`});
@@ -233,50 +252,35 @@ export function buildComp(inputTextures: string[], fragmentShader: string,
 export function compute(op: DrawCommand,
                         resultShape: readonly number[],
                         inputTensors: {[name: string]: GPUTensor},
-                        inputs?: {[name: string]: any},
-                        dest?: GPUTensor) {
+                        inputs?: {[name: string]: any}) {
+  const resultSize = getSize(resultShape);
+  let result = defaultAllocator.allocate(resultSize);
+
   const inputTextures: {[name: string]: Framebuffer2D} = {};
   for (let name in inputTensors) {
-    inputTextures[name] = inputTensors[name].framebuffer
+    inputTextures[name] = inputTensors[name].memory.frameBuffer
   }
   if (inputs === undefined) {
     inputs = {};
   }
   for (let name in inputTensors) {
     inputs[`size${name}`] = inputTensors[name].size;
+    inputs[`textureSize${name}`] = inputTensors[name].memory.size;
     inputs[`strides${name}`] = pad(computeStrides(inputTensors[name].getShape()));
     inputs[`shape${name}`] = copyPad(inputTensors[name].getShape());
     inputs[`rank${name}`] = inputTensors[name].getShape().length;
   }
-  inputs['sizeOutput'] = Math.ceil(getSize(resultShape) / 4)*4;
+  inputs['sizeOutput'] = resultSize;
+  inputs['textureSizeOutput'] = result.size;
   inputs['stridesOutput'] = pad(computeStrides(resultShape));
   inputs['shapeOutput'] = copyPad(resultShape);
   inputs['rankOutput'] = resultShape.length;
 
-  const resultSize = getSize(resultShape);
-  const textureSize = Math.ceil(resultSize / 4);
-  let result;
-  if (dest) {
-    result = dest.framebuffer;
-  } else {
-    result = gl.framebuffer({
-      width: textureSize,
-      height: 1,
-      depthStencil: false,
-      colorFormat: 'rgba',
-      colorType: 'float'
-    });
-  }
-
   op({
-    framebuffer: result,
+    framebuffer: result.frameBuffer,
     ...inputTextures,
     ...inputs
   });
 
-  if (dest) {
-    return dest;
-  } else {
-    return new GPUTensor(result, resultShape);
-  }
+  return new GPUTensor(result, resultShape);
 }
