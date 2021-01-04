@@ -8,6 +8,7 @@ pub mod tests {
         pub mod basic;
         pub mod pool;
         pub mod tensor;
+        pub mod conv;
     }
 }
 

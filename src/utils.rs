@@ -23,5 +23,18 @@ pub fn uint32_array(vec: &Vec<usize>) -> Uint32Array {
     for i in 0..vec.len() {
         result.set_index(i as u32, vec[i] as u32);
     }
-    return result;
+    result
+}
+
+pub fn conv_output_size(in_sizes: &Vec<usize>,
+                        kernels: &Vec<usize>,
+                        pads: &Vec<usize>,
+                        dilations: &Vec<usize>,
+                        strides: &Vec<usize>) -> Vec<usize> {
+    let mut result = vec![0; dilations.len()];
+    for i in 0..dilations.len() {
+        let dkernel = dilations[i] * (kernels[i+2] - 1) + 1;
+        result[i] =  ((in_sizes[i+2] + pads[i] + pads[i + dilations.len()] - dkernel) / strides[i]) + 1
+    }
+    result
 }

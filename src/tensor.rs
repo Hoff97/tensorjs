@@ -1,3 +1,4 @@
+use crate::utils::conv_output_size;
 use std::cmp::Ordering;
 use std::ops::{Add, Sub};
 use wasm_bindgen::prelude::*;
@@ -243,6 +244,114 @@ impl Tensor {
     pub fn _min(&self, axes: &Vec<usize>) -> Tensor {
         return self._pool(axes, |x: f32, y: f32| x.min(y))
     }
+
+    pub fn _conv(&self,
+                 kernel: &Tensor,
+                 bias: Option<&Tensor>,
+                 _dilations: &Vec<usize>,
+                 group: usize,
+                 _pads: &Vec<usize>,
+                 _strides: &Vec<usize>
+                 ) -> Tensor {
+        let N = self.shape[0];
+        let C = self.shape[1];
+        let D = &self.shape;
+        let W = &kernel.shape;
+        let M = kernel.shape[0];
+        let CG = C/group;
+                  
+        let kernel_size = get_size_from(W, 2);
+
+        let data_rank = self.shape.len() - 2;
+                  
+        let R = conv_output_size(D, W, _pads, _dilations, _strides);
+        let output_size = get_size(&R);
+        
+        let mut output_shape = vec![0; data_rank + 2];
+        output_shape[0] = N;
+        output_shape[1] = M;
+        for i in 0..data_rank {
+            output_shape[i+2] = R[i];
+        }
+        
+        let output_strides = compute_strides(&output_shape);
+        let o_size = get_size(&output_shape);
+        let mut values = vec![0.0; o_size];
+
+        // Iterate over all batches
+        for n in 0..N {
+            // Iterate over all output channels
+            for m in 0..M {
+                let basis = output_strides[0] * n + output_strides[1] * m;
+
+                match bias {
+                    None => {},
+                    Some(bi) => {
+                        let b = bi.values[m];
+
+                        for o in 0..output_size {
+                            values[basis + o] = b;
+                        }
+                    }
+                }
+        
+
+                for cg in 0..CG {
+                    let c = m * CG + cg;
+
+                    let mut output_indices = vec![0; data_rank + 2];
+                    output_indices[0] = n;
+                    output_indices[1] = m;
+                
+                    for o_ix in 0..output_size {
+                        let mut result = values[basis + o_ix];
+
+                        let mut kernel_indices = vec![0; data_rank + 2];
+                        kernel_indices[0] = m;
+                        kernel_indices[1] = cg;
+                        let kernel_base = m*kernel.strides[0] + cg*kernel.strides[1];
+          
+                        for kernel_ix in 0..kernel_size {
+                            let mut input_ix = vec![0; data_rank + 2];
+                            input_ix[0] = n;
+                            input_ix[1] = c;
+
+                            let mut skip = false;
+                            for axis in 0..data_rank {
+                                let ix = (output_indices[axis + 2] * _strides[axis]) as i32 + (kernel_indices[axis + 2] * _dilations[axis]) as i32 - (_pads[axis] as i32);
+
+                                if ix < 0 || ix >= D[axis + 2] as i32 {
+                                    skip = true;
+                                    break;
+                                }
+
+                                input_ix[axis + 2] = ix as usize;
+                            }
+
+                            if !skip {
+                                let w_i = kernel.values[kernel_base + kernel_ix];
+                                let x_i = self.get(&input_ix);
+                                result += w_i * x_i;
+                            }
+
+                            increment_index(&mut kernel_indices, &kernel.shape);
+                        }
+
+                        values[basis + o_ix] = result;
+
+                        increment_index(&mut output_indices, &output_shape);
+                    }
+                }
+            }
+        }
+
+        Tensor {
+            values,
+            size: o_size,
+            shape: output_shape,
+            strides: output_strides
+        }
+    }
 }
 
 #[wasm_bindgen]
@@ -390,6 +499,45 @@ impl Tensor {
             ax[i as usize] = axes.get_index(i) as usize;
         }
         return self._min(&ax);
+    }
+
+    pub fn conv(&self,
+                kernel: &Tensor,
+                dilations: Uint32Array,
+                group: u32,
+                pads: Uint32Array,
+                strides: Uint32Array) -> Tensor {
+        let mut _dilations: Vec<usize> = vec![0; dilations.length() as usize];
+        let mut _pads: Vec<usize> = vec![0; pads.length() as usize];
+        let mut _strides: Vec<usize> = vec![0; strides.length() as usize];
+        for i in 0..dilations.length() {
+            _dilations[i as usize] = dilations.get_index(i) as usize;
+            _pads[i as usize] = pads.get_index(i) as usize;
+            _pads[(i + dilations.length()) as usize] = pads.get_index(i + dilations.length()) as usize;
+            _strides[i as usize] = strides.get_index(i) as usize;
+        }
+
+        return self._conv(kernel, None, &_dilations, group as usize, &_pads, &_strides);
+    }
+
+    pub fn conv_with_bias(&self,
+        kernel: &Tensor,
+        bias: &Tensor,
+        dilations: Uint32Array,
+        group: u32,
+        pads: Uint32Array,
+        strides: Uint32Array) -> Tensor {
+        let mut _dilations: Vec<usize> = vec![0; dilations.length() as usize];
+        let mut _pads: Vec<usize> = vec![0; pads.length() as usize];
+        let mut _strides: Vec<usize> = vec![0; strides.length() as usize];
+        for i in 0..dilations.length() {
+            _dilations[i as usize] = dilations.get_index(i) as usize;
+            _pads[i as usize] = pads.get_index(i) as usize;
+            _pads[(i + dilations.length()) as usize] = pads.get_index(i + dilations.length()) as usize;
+            _strides[i as usize] = strides.get_index(i) as usize;
+        }
+
+        return self._conv(kernel, Some(bias), &_dilations, group as usize, &_pads, &_strides);
     }
 }
 

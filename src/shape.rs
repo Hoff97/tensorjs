@@ -10,6 +10,18 @@ pub fn get_size(shape: &Vec<usize>) -> usize {
     return size;
 }
 
+pub fn get_size_from(shape: &Vec<usize>, start_ix: usize) -> usize {
+    if shape.len() == 0 {
+        return 0;
+    }
+
+    let mut size: usize = 1;
+    for i in start_ix..shape.len() {
+        size *= shape[i];
+    }
+    return size;
+}
+
 pub fn compute_strides(shape: &Vec<usize>) -> Vec<usize> {
     let rank = shape.len();
 
