@@ -31,7 +31,7 @@ float process(int index[${maxRank}]) {
     if (i >= sumSize) {
       break;
     }
-    float curr = getValueAt(inputIx, stridesinput1, sizeinput1, input1);
+    float curr = getValueAt(inputIx, stridesinput1, textureSizeinput1, input1);
     if (i == 0) {
       res = curr;
     } else {
@@ -58,8 +58,7 @@ export function initComputation(fragShader: string) {
 
 export function performComputation(tensor1: GPUTensor,
                                    axes: number[],
-                                   comp: any,
-                                   dest?: GPUTensor) {
+                                   comp: any) {
   const [outputShape, ixMap] = poolResultShape(tensor1.getShape(), axes);
 
   const inputStrides = computeStrides(tensor1.shape);
@@ -81,5 +80,5 @@ export function performComputation(tensor1: GPUTensor,
     mappedInputStrides: pad(mappedInputStrides),
     sumDims: pad(sumDims),
     sumSize
-  }, dest);
+  });
 }

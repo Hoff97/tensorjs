@@ -25,8 +25,8 @@ float process(int index[${maxRank}]) {
     ix1[1] = i;
     ix2[0] = i;
 
-    float v1 = getValueAt(ix1, stridesinput1, sizeinput1, input1);
-    float v2 = getValueAt(ix2, stridesinput2, sizeinput2, input2);
+    float v1 = getValueAt(ix1, stridesinput1, textureSizeinput1, input1);
+    float v2 = getValueAt(ix2, stridesinput2, textureSizeinput2, input2);
     res += v1*v2;
   }
 
@@ -40,7 +40,7 @@ function initComp() {
   comp = buildComp(['input1', 'input2'], fragmentShader, [{name: 'k'}]);
 }
 
-export function matmul(tensor1: GPUTensor, tensor2: GPUTensor, dest?: GPUTensor) {
+export function matmul(tensor1: GPUTensor, tensor2: GPUTensor) {
   if (comp === undefined) {
     initComp();
   }
@@ -52,5 +52,5 @@ export function matmul(tensor1: GPUTensor, tensor2: GPUTensor, dest?: GPUTensor)
     input2: tensor2
   }, {
     k: tensor1.getShape()[1]
-  }, dest);
+  });
 }
