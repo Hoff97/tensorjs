@@ -31,7 +31,7 @@ float process(int index[${maxRank}]) {
     if (i >= sumSize) {
       break;
     }
-    float curr = getValueAt(inputIx, stridesinput1, widthinput1, heightinput1, input1);
+    float curr = _input1(inputIx);
     if (i == 0) {
       res = curr;
     } else {

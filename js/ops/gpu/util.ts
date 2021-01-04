@@ -199,6 +199,14 @@ function buildCompleteFragmentShader(fragmentShader: string, inputTextures: stri
 
   ${utilFunctions}
 
+  ${inputTextures.map(x => {
+    return `
+    float _${x}(int indices[${maxRank}]) {
+      return getValueAt(indices, strides${x}, width${x}, height${x}, ${x});
+    }
+    `;
+  }).join('\n')}
+
   ${fragmentShader}
   `
 }
