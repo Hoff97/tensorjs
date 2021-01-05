@@ -27,8 +27,16 @@ export default function testConv(name: string, constructor: TensorConstructor, w
           const output = constructor(cas.outputs[0].dims, cas.outputs[0].data);
 
           const result = x.conv(w, b, args['dilations'], args['group'], args['pads'], args['strides']);
-          
+
           expect(await result.compare(output, DELTA)).toBeTruthy();
+
+          x.delete();
+          w.delete();
+          if (b) {
+            b.delete();
+          }
+          output.delete();
+          result.delete();
         });
       }
     });

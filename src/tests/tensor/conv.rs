@@ -128,3 +128,19 @@ fn test_conv_padded() {
 
     assert!(result.compare(&expected, DELTA));
 }
+
+#[test]
+fn test_conv_multiple_filters() {
+    let strides: Vec<usize> = vec![1; 1];
+    let pads: Vec<usize> = vec![0; 2];
+    let dilations: Vec<usize> = vec![1; 1];
+
+    let x = Tensor::new(&vec![1,2,3], &vec![1.,2.,3.,4.,5.,6.]);
+    let w = Tensor::new(&vec![3,2,2], &vec![1.,2.,3.,4.,5.,6.,7.,8.,9.,10.,11.,12.]);
+
+    let expected = Tensor::new(&vec![1,3,2], &vec![5.+12.+20., 2.+6.+15.+24., 5.+12.+28.+40., 10.+18.+35.+48., 9.+20.+44.+60., 175.]);
+
+    let result = x._conv(&w, None, &dilations, 1, &pads, &strides);
+
+    assert!(result.compare(&expected, DELTA));
+}

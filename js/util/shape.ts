@@ -29,9 +29,14 @@ export function computeStrides(shape: ReadonlyArray<number>) {
   return strides;
 }
 
-export function indexToPos(index: ReadonlyArray<number>, strides: ReadonlyArray<number>) {
+export function indexToPos(index: ReadonlyArray<number>, strides: ReadonlyArray<number>, shape?: ReadonlyArray<number>) {
   let ix = 0;
   for (let i = 0; i < index.length; i += 1) {
+    if (shape) {
+      if (index[i] < 0 || index[i] >= shape[i]) {
+        throw new Error('Invalid index');
+      }
+    }
     ix += index[i] * strides[i];
   }
   return ix;

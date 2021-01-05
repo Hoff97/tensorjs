@@ -28,13 +28,14 @@ const variables = `
 uniform int CG;
 uniform int kernelSize;
 uniform int dataRank;
+uniform int C;
 uniform int dilations[${maxRank}];
 uniform int pads[${maxRank}];
 uniform int strides[${maxRank}];
 `;
 
 const mainBody = `
-int n = index[0];
+  int n = index[0];
   int m = index[1];
 
   int kernelIx[${maxRank}];
@@ -55,6 +56,8 @@ int n = index[0];
       break;
     }
     int c = m * CG + cg;
+    int d = c/C;
+    c = c - d*C;
     inputIx[1] = c;
     kernelIx[1] = cg;
     for (int kIx = 0; kIx < ${maxIterations}; kIx++) {
@@ -111,6 +114,7 @@ function initComp() {
     {name: 'CG'},
     {name: 'kernelSize'},
     {name: 'dataRank'},
+    {name: 'C'},
     {name: 'dilations', length: maxRank},
     {name: 'pads', length: maxRank},
     {name: 'strides', length: maxRank}
@@ -153,6 +157,7 @@ export function conv(x: GPUTensor,
     kernelSize,
     CG: CG,
     dataRank: D.length,
+    C: C,
     dilations: pad(dilations),
     pads: pad(pads.slice(0, pads.length/2)),
     strides: pad(strides)

@@ -29,9 +29,13 @@ export function copyPad(arr: readonly number[]) {
 }
 
 export const utilFunctions = `
+int fromFloat(float f) {
+  return int(floor(f+0.5));
+}
+
 int coordinateToPos(vec2 coordinate, int textureWidth, int textureHeight) {
-  int x = (int(coordinate.x*float(textureWidth*2))-1)/2;
-  int y = (int(coordinate.y*float(textureHeight*2))-1)/2;
+  int x = (fromFloat(coordinate.x*float(textureWidth*2))-1)/2;
+  int y = (fromFloat(coordinate.y*float(textureHeight*2))-1)/2;
 
   int pos = x + y*textureWidth;
 

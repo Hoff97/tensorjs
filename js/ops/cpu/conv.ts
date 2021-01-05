@@ -45,7 +45,7 @@ export function conv(x: CPUTensor,
       }
 
       for (let cg = 0; cg < CG; cg++) {
-        const c = m * CG + cg;
+        const c = (m * CG + cg)%C;
 
         const outputIndices = new Array(R.length).fill(0);
         outputIndices.unshift(n, m);

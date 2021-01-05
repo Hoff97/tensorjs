@@ -259,7 +259,7 @@ impl Tensor {
         let D = &self.shape;
         let W = &kernel.shape;
         let M = kernel.shape[0];
-        let CG = C/group;
+        let CG = kernel.shape[1];
                   
         let kernel_size = get_size_from(W, 2);
 
@@ -298,7 +298,7 @@ impl Tensor {
         
 
                 for cg in 0..CG {
-                    let c = m * CG + cg;
+                    let c = (m * CG + cg)%C;
 
                     let mut output_indices = vec![0; data_rank + 2];
                     output_indices[0] = n;

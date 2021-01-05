@@ -52,7 +52,7 @@ export default class CPUTensor extends Tensor {
   get(index: number[] | number): number {
     let pos: number;
     if (Array.isArray(index)) {
-      pos = indexToPos(index, this.strides);
+      pos = indexToPos(index, this.strides, this.shape);
     } else {
       pos = index;
     }
