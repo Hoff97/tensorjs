@@ -55,7 +55,6 @@ export default class WASMTensor extends Tensor {
     if (!(tensor instanceof WASMTensor) || !(th instanceof WASMTensor)) {
       throw new Error('Can only add WASM tensor to WASM tensor');
     }
-    console.log(th.getShape(), tensor.getShape());
     return new WASMTensor(th.wasmTensor.addition(tensor.wasmTensor));
   }
 

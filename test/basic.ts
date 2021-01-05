@@ -82,8 +82,6 @@ export default function testBasic(name: string, constructor: TensorConstructor, 
       const b = constructor([2,3,1,1], [1,2,3,4,5,6]);
       const expected1 = constructor([2,3,3,2], [2,3,4,5,6,7,3,4,5,6,7,8,4,5,6,7,8,9,5,6,7,8,9,10,6,7,8,9,10,11,7,8,9,10,11,12]);
 
-      console.log(await a.add(b).getValues());
-
       expect(await a.add(b).compare(expected1, epsilon)).toBeTruthy();
     });
   });

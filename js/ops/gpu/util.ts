@@ -89,8 +89,12 @@ export function posToIndex(strides: string, result: string, pos: string) {
     if (${strides}[i] == -1) {
       ${result}[i] = -1;
     } else {
-      ${result}[i] = ${name}/${strides}[i];
-      ${name} = ${name} - ${strides}[i]*${result}[i]; // Stupid modulo hack
+      if (${strides}[i] == 0) {
+        ${result}[i] = 0;
+      } else {
+        ${result}[i] = ${name}/${strides}[i];
+        ${name} = ${name} - ${strides}[i]*${result}[i]; // Stupid modulo hack
+      }
     }
   }`
 }

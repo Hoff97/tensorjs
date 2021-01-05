@@ -87,7 +87,6 @@ export default class CPUTensor extends Tensor {
     if (!(tensor instanceof CPUTensor) || !(th instanceof CPUTensor)) {
       throw new Error('Can only add CPU tensor to CPU tensor');
     }
-    console.log(th, tensor, resultShape);
     return add(th, tensor, resultShape);
   }
 
