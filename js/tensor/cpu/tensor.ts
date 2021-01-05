@@ -46,6 +46,10 @@ export default class CPUTensor extends Tensor {
     return this.shape;
   }
 
+  async cpu(): Promise<CPUTensor> {
+    return this;
+  }
+
   delete(): void {
     // TODO: Maybe set values to empty array?
   }

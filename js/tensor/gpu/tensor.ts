@@ -56,6 +56,10 @@ export default class GPUTensor extends Tensor {
     return this.shape;
   }
 
+  async gpu(): Promise<GPUTensor> {
+    return this;
+  }
+
   delete(): void {
     this.deleted = true;
     defaultAllocator.deallocate(this.memory);

@@ -1,3 +1,6 @@
+import CPUTensor from './tensor/cpu/tensor';
+import GPUTensor from './tensor/gpu/tensor';
+import WASMTensor from './tensor/wasm/tensor';
 import { compareShapes } from './util/shape';
 
 export default abstract class Tensor {
@@ -32,6 +35,21 @@ export default abstract class Tensor {
     return true;
   }
 
+  async wasm(): Promise<WASMTensor> {
+    const values = await this.getValues();
+    return new WASMTensor(values, new Uint32Array(this.getShape()));
+  }
+
+  async gpu(): Promise<GPUTensor> {
+    const values = await this.getValues();
+    return new GPUTensor(values, this.getShape());
+  }
+
+  async cpu(): Promise<CPUTensor> {
+    const values = await this.getValues();
+    return new CPUTensor(this.getShape(), values);
+  }
+ 
   getAxes(axes?: number | number[]) {
     let ax: number[];
 

@@ -1,14 +1,24 @@
 import REGL from 'regl';
 import { GPUMemoryAllocator } from './memory';
 
-let glContext = document.createElement("canvas").getContext("webgl", {
-  preserveDrawingBuffer: true,
-  failIfMajorPerformanceCaveat: true
-});
+const canvas = document.createElement("canvas");
 
-export let gl = REGL({
-  gl: glContext,
-  extensions: ['OES_texture_float']
-});
+let glContext: WebGLRenderingContext;
+export let gl: REGL.Regl;
+export let defaultAllocator: GPUMemoryAllocator;
 
-export const defaultAllocator = new GPUMemoryAllocator(gl);
+function setup() {
+  glContext = canvas.getContext("webgl", {
+    preserveDrawingBuffer: true,
+    failIfMajorPerformanceCaveat: true
+  });
+
+  gl = REGL({
+    gl: glContext,
+    extensions: ['OES_texture_float']
+  });
+
+  defaultAllocator = new GPUMemoryAllocator(gl);
+}
+
+setup();
