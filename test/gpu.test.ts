@@ -1,5 +1,6 @@
 import GPUTensor from "../js/tensor/gpu/tensor";
 import testBasic from './basic';
+import testConv from "./conv";
 import testPool from './pool';
 
 describe(`GPU create tensor`, () => {
@@ -18,3 +19,4 @@ const constructor = (shape: ReadonlyArray<number>, values: number[]) => {
 
 testBasic('GPU', constructor);
 testPool('GPU', constructor);
+testConv('GPU', constructor);

@@ -10,7 +10,7 @@ type TensorConstructor = (shape: ReadonlyArray<number>, values: number[]) => Ten
 export default function testConv(name: string, constructor: TensorConstructor, wait?: Promise<void>) {
   for (let i = 0; i < data.length; i++) {
     const dat = data[i];
-    fdescribe(`${name} ${data[i].name}`, () => {
+    describe(`${name} ${data[i].name}`, () => {
       for (let j = 0; j < dat.cases.length; j++) {
         const cas = dat.cases[j];
 

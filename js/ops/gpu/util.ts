@@ -13,8 +13,8 @@ export const maxRank = 10;
 
 export const maxIterations = 10000000;
 
-export function pad(arr: number[]) {
-  while (arr.length < maxRank) {
+export function pad(arr: number[], len=maxRank) {
+  while (arr.length < len) {
     arr.push(-1);
   }
   return arr;
@@ -111,12 +111,14 @@ export function initIndex(index: string, rank?: string) {
 
 export function incrementIndex(index: string, shape: string) {
   return `
-  for (int i = 0; i < ${maxRank}; i++) {
-    ${index}[i] += 1;
-    if (${index}[i] >= ${shape}[i]) {
-      ${index}[i] = 0;
-    } else {
-      break;
+  for (int i = ${maxRank} - 1; i >= 0; i--) {
+    if (${shape}[i] != -1) {
+      ${index}[i] += 1;
+      if (${index}[i] >= ${shape}[i]) {
+        ${index}[i] = 0;
+      } else {
+        break;
+      }
     }
   }
   `;

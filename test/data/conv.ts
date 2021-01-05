@@ -26,6 +26,29 @@ export const data = [
           ]
         },
         {
+          "name": "Bias only",
+          "inputs": [
+            {
+              "data": [1, 2, 3, 4],
+              "dims": [1, 1, 2, 2],
+            },
+            {
+              "data": [0, 0, 0, 0],
+              "dims": [1, 1, 2, 2],
+            },
+            {
+              "data": [5],
+              "dims": [1],
+            }
+          ],
+          "outputs": [
+            {
+              "data": [5],
+              "dims": [1, 1, 1, 1],
+            }
+          ]
+        },
+        {
           "name": "T[1]",
           "inputs": [
             {

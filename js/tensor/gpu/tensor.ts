@@ -16,6 +16,7 @@ import { max } from '../../ops/gpu/max';
 import { min } from '../../ops/gpu/min';
 import { defaultAllocator, gl } from './gl';
 import { MemoryEntry } from './memory';
+import { conv } from '../../ops/gpu/conv';
 
 
 export default class GPUTensor extends Tensor {
@@ -123,6 +124,9 @@ export default class GPUTensor extends Tensor {
   }
 
   conv_impl(kernel: Tensor, dilations: number[], group: number, pads: number[], strides: number[], bias?: Tensor): Tensor {
-    throw new Error('Method not implemented.');
+    if (!(kernel instanceof GPUTensor) || (bias !== undefined && !(bias instanceof GPUTensor))) {
+      throw new Error('Can only do convolution of GPU tensor with GPU tensor');
+    }
+    return conv(this, kernel, dilations, group, pads, strides, bias as GPUTensor);
   }
 }
