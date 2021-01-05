@@ -198,4 +198,26 @@ export default function testBasic(name: string, constructor: TensorConstructor, 
       expect(await a.matMul(b).compare(expected, epsilon)).toBeTruthy();
     });
   });
+
+  describe(`${name} concat`, () => {
+    it('should work on all axis', async () => {
+      if (wait) {
+        await wait;
+      }
+
+      const a = constructor([2,3,4], [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24]);
+
+      const b = constructor([1,3,4], [1,2,3,4,5,6,7,8,9,10,11,12]);
+      const c = constructor([2,1,4], [1,2,3,4,5,6,7,8]);
+      const d = constructor([2,3,1], [1,2,3,4,5,6]);
+
+      const expected1 = constructor([3,3,4], [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24, 1,2,3,4,5,6,7,8,9,10,11,12]);
+      const expected2 = constructor([2,4,4], [1,2,3,4,5,6,7,8,9,10,11,12, 1,2,3,4, 13,14,15,16,17,18,19,20,21,22,23,24, 5,6,7,8]);
+      const expected3 = constructor([2,3,5], [1,2,3,4, 1, 5,6,7,8, 2, 9,10,11,12, 3, 13,14,15,16, 4, 17,18,19,20, 5, 21,22,23,24, 6]);
+
+      expect(await a.concat(b, 0).compare(expected1, epsilon)).toBeTruthy();
+      expect(await a.concat(c, 1).compare(expected2, epsilon)).toBeTruthy();
+      expect(await a.concat(d, 2).compare(expected3, epsilon)).toBeTruthy();
+    });
+  });
 }

@@ -578,6 +578,47 @@ impl Tensor {
         }
         return self._reshape(&sh);
     }
+
+    pub fn concat(&self, other: &Tensor, axes: u32) -> Tensor {
+        let ax = axes as usize;
+        let mut output_shape = vec![0; self.shape.len()];
+        for i in 0..self.shape.len() {
+            output_shape[i] = self.shape[i];
+        }
+        output_shape[ax] += other.shape[ax];
+
+        let output_strides = compute_strides(&output_shape);
+        let output_size = get_size(&output_shape);
+
+        let mut values = vec![0.0; output_size];
+
+        let mut index_x = 0;
+        let mut index_y = 0;
+        let mut index_out = 0;
+        let iter_x_size = output_strides[ax] * self.shape[ax];
+        let iter_y_size = output_strides[ax] * other.shape[ax];
+        let outer_iters = output_size / (if ax > 0 { output_strides[ax - 1] } else { output_size });
+        for _ in 0..outer_iters {
+            for _ in 0..iter_x_size {
+                values[index_out] = self.values[index_x];
+                index_x += 1;
+                index_out += 1;
+            }
+
+            for _ in 0..iter_y_size {
+                values[index_out] = other.values[index_y];
+                index_y += 1;
+                index_out += 1;
+            }
+        }
+
+        Tensor {
+            shape: output_shape,
+            strides: output_strides,
+            size: output_size,
+            values
+        }
+    }
 }
 
 impl Add for Tensor {

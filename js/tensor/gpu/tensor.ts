@@ -17,6 +17,7 @@ import { min } from '../../ops/gpu/min';
 import { defaultAllocator, gl } from './gl';
 import { MemoryEntry } from './memory';
 import { conv } from '../../ops/gpu/conv';
+import { concat } from '../../ops/gpu/concat';
 
 
 export default class GPUTensor extends Tensor {
@@ -132,5 +133,12 @@ export default class GPUTensor extends Tensor {
 
   reshape(shape: number[]): Tensor {
     return new GPUTensor(this.memory, shape);
+  }
+
+  concat(tensor: Tensor, axis: number): Tensor {
+    if (!(tensor instanceof GPUTensor)) {
+      throw new Error('Can only concat GPU tensor to GPU tensor');
+    }
+    return concat(this, tensor, axis);
   }
 }

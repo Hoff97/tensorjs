@@ -117,4 +117,11 @@ export default class WASMTensor extends Tensor {
     const sh = new Uint32Array(shape);
     return new WASMTensor(this.wasmTensor.reshape(sh), sh);
   }
+
+  concat(tensor: Tensor, axis: number): Tensor {
+    if (!(tensor instanceof WASMTensor)) {
+      throw new Error('Can only concat WASM tensor to WASM tensor');
+    }
+    return new WASMTensor(this.wasmTensor.concat(tensor.wasmTensor, axis));
+  }
 }

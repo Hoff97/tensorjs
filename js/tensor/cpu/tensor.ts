@@ -1,6 +1,7 @@
 import {
   add, divide, exp, log, multiply, sqrt, subtract
 } from '../../ops/cpu/basic';
+import { concat } from '../../ops/cpu/concat';
 import { conv } from '../../ops/cpu/conv';
 import { matMul } from '../../ops/cpu/matMul';
 import { max } from '../../ops/cpu/max';
@@ -144,5 +145,12 @@ export default class CPUTensor extends Tensor {
 
   reshape(shape: number[]): Tensor {
     return new CPUTensor(shape, this.values);
+  }
+
+  concat(tensor: Tensor, axis: number): Tensor {
+    if (!(tensor instanceof CPUTensor)) {
+      throw new Error('Can only concat CPU tensor to CPU tensor');
+    }
+    return concat(this, tensor, axis);
   }
 }

@@ -168,4 +168,6 @@ export default abstract class Tensor {
                      pads: number[],
                      strides: number[],
                      bias?: Tensor): Tensor;
+  
+  abstract concat(tensor: Tensor, axis: number): Tensor;
 }
