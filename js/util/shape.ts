@@ -22,8 +22,17 @@ export function computeStrides(shape: ReadonlyArray<number>) {
 
   const strides = new Array(rank);
   strides[rank - 1] = 1;
+  if (shape[rank - 1] === 1) {
+    strides[rank - 1] = 0;
+  }
+  let lastStride = 1;
   for (let i = rank - 2; i >= 0; i -= 1) {
-    strides[i] = shape[i + 1] * strides[i + 1];
+    lastStride = shape[i + 1] * lastStride;
+    if (shape[i] === 1) {
+      strides[i] = 0;
+    } else {
+      strides[i] = lastStride;
+    }
   }
 
   return strides;
@@ -33,7 +42,7 @@ export function indexToPos(index: ReadonlyArray<number>, strides: ReadonlyArray<
   let ix = 0;
   for (let i = 0; i < index.length; i += 1) {
     if (shape) {
-      if (index[i] < 0 || index[i] >= shape[i]) {
+      if (index[i] < 0 || (index[i] >= shape[i] && shape[i] !== 1)) {
         throw new Error('Invalid index');
       }
     }
@@ -62,6 +71,20 @@ export function compareShapes(a: ReadonlyArray<number>, b: ReadonlyArray<number>
 
   for (let i = 0; i < a.length; i += 1) {
     if (a[i] !== b[i]) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+export function checkEquivShapes(a: ReadonlyArray<number>, b: ReadonlyArray<number>) {
+  if (a.length !== b.length) {
+    return false;
+  }
+
+  for (let i = 0; i < a.length; i += 1) {
+    if (a[i] !== b[i] && a[i] !== 1 && b[i] !== 1) {
       return false;
     }
   }

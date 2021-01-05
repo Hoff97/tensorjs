@@ -83,34 +83,33 @@ export default class CPUTensor extends Tensor {
     return sqrt(this);
   }
 
-  add(tensor: Tensor): Tensor {
-    if (!(tensor instanceof CPUTensor)) {
+  add_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor {
+    if (!(tensor instanceof CPUTensor) || !(th instanceof CPUTensor)) {
       throw new Error('Can only add CPU tensor to CPU tensor');
     }
-    return add(this, tensor);
+    console.log(th, tensor, resultShape);
+    return add(th, tensor, resultShape);
   }
 
-  subtract(tensor: Tensor): Tensor {
-    if (!(tensor instanceof CPUTensor)) {
-      throw new Error('Can only add CPU tensor to CPU tensor');
+  subtract_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor {
+    if (!(tensor instanceof CPUTensor) || !(th instanceof CPUTensor)) {
+      throw new Error('Can only subtract CPU tensor to CPU tensor');
     }
-    return subtract(this, tensor);
+    return subtract(th, tensor, resultShape);
   }
 
-  multiply(tensor: Tensor): Tensor {
-    if (!(tensor instanceof CPUTensor)) {
+  multiply_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor {
+    if (!(tensor instanceof CPUTensor) || !(th instanceof CPUTensor)) {
       throw new Error('Can only add CPU tensor to CPU tensor');
     }
-
-    return multiply(this, tensor);
+    return multiply(th, tensor, resultShape);
   }
 
-  divide(tensor: Tensor): Tensor {
-    if (!(tensor instanceof CPUTensor)) {
+  divide_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor {
+    if (!(tensor instanceof CPUTensor) || !(th instanceof CPUTensor)) {
       throw new Error('Can only add CPU tensor to CPU tensor');
     }
-
-    return divide(this, tensor);
+    return divide(th, tensor, resultShape);
   }
 
   matMul(tensor: Tensor): Tensor {
@@ -142,5 +141,9 @@ export default class CPUTensor extends Tensor {
       throw new Error('Can only do convolution of CPU tensor with CPU tensor');
     }
     return conv(this, kernel, dilations, group, pads, strides, bias as CPUTensor);
+  }
+
+  reshape(shape: number[]): Tensor {
+    return new CPUTensor(shape, this.values);
   }
 }

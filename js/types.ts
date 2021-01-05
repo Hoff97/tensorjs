@@ -90,19 +90,67 @@ export default abstract class Tensor {
     return this.conv_impl(kernel, dilations, group, pads, strides, bias);
   }
 
+  abstract reshape(shape: readonly number[]): Tensor;
+
   abstract exp(): Tensor;
 
   abstract log(): Tensor;
 
   abstract sqrt(): Tensor;
 
-  abstract add(tensor: Tensor): Tensor;
+  alignTensor(tensor: Tensor) {
+    let thisShape = this.getShape();
+    let thatShape = tensor.getShape();
+    if (compareShapes(thisShape, thatShape)) {
+      return [this, tensor, thisShape];
+    }
+    let th: Tensor = this;
+    if (thisShape.length < thatShape.length) {
+      thisShape = [...thisShape];
+      const prepend = thatShape.length - thisShape.length;
+      (thisShape as number[]).unshift(...new Array(prepend).fill(1));
+      th = this.reshape(thisShape);
+    } else if (thatShape.length < thisShape.length) {
+      thatShape = [...thatShape];
+      const prepend = thisShape.length - thatShape.length;
+      (thatShape as number[]).unshift(...new Array(prepend).fill(1));
+      tensor = tensor.reshape(thatShape);
+    }
 
-  abstract subtract(tensor: Tensor): Tensor;
+    const resultShape = new Array(thisShape.length).fill(1);
+    for (let i = 0; i < thisShape.length; i++) {
+      resultShape[i] = Math.max(thisShape[i], thatShape[i]);
+    }
+    return [th, tensor, resultShape];
+  }
 
-  abstract multiply(tensor: Tensor): Tensor;
+  add(tensor: Tensor) {
+    const [th, tens, resultShape] = this.alignTensor(tensor);
+    return this.add_impl(th as Tensor, tens as Tensor, resultShape as number[]);
+  }
 
-  abstract divide(tensor: Tensor): Tensor;
+  subtract(tensor: Tensor) {
+    const [th, tens, resultShape] = this.alignTensor(tensor);
+    return this.subtract_impl(th as Tensor, tens as Tensor, resultShape as number[]);
+  }
+
+  multiply(tensor: Tensor) {
+    const [th, tens, resultShape] = this.alignTensor(tensor);
+    return this.multiply_impl(th as Tensor, tens as Tensor, resultShape as number[]);
+  }
+
+  divide(tensor: Tensor) {
+    const [th, tens, resultShape] = this.alignTensor(tensor);
+    return this.divide_impl(th as Tensor, tens as Tensor, resultShape as number[]);
+  }
+
+  abstract add_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor;
+
+  abstract subtract_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor;
+
+  abstract multiply_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor;
+
+  abstract divide_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor;
 
   abstract matMul(tensor: Tensor): Tensor;
 

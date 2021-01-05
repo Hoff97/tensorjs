@@ -1,5 +1,5 @@
 import CPUTensor from '../../tensor/cpu/tensor';
-import { compareShapes } from '../../util/shape';
+import { checkEquivShapes, compareShapes, incrementIndex } from '../../util/shape';
 
 // eslint-disable-next-line no-unused-vars
 type UnaryOperator = (o: number) => number;
@@ -16,15 +16,19 @@ export function positionWiseUnaryOp(a: CPUTensor, op: UnaryOperator) {
   return result;
 }
 
-export function positionWiseBinaryOp(a: CPUTensor, b: CPUTensor, op: BinaryOperator) {
-  if (!compareShapes(a.shape, b.shape)) {
+export function positionWiseBinaryOp(a: CPUTensor, b: CPUTensor, op: BinaryOperator, resultShape: readonly number[]) {
+  if (!checkEquivShapes(a.shape, b.shape)) {
     throw new Error('The shapes of the two tensors should be the same for a binary operation');
   }
 
-  const result = new CPUTensor(a.shape);
+  const result = new CPUTensor(resultShape);
+
+  const index = new Array(resultShape.length).fill(0);
 
   for (let i = 0; i < result.size; i += 1) {
-    result.set(i, op(a.get(i), b.get(i)));
+    result.set(index, op(a.get(index), b.get(index)));
+
+    incrementIndex(index, resultShape);
   }
 
   return result;
@@ -42,19 +46,19 @@ export function sqrt(a: CPUTensor) {
   return positionWiseUnaryOp(a, (o1) => Math.sqrt(o1));
 }
 
-export function add(a: CPUTensor, b: CPUTensor) {
-  return positionWiseBinaryOp(a, b, (o1, o2) => o1 + o2);
+export function add(a: CPUTensor, b: CPUTensor, resultShape: readonly number[]) {
+  return positionWiseBinaryOp(a, b, (o1, o2) => o1 + o2, resultShape);
 }
 
-export function subtract(a: CPUTensor, b: CPUTensor) {
-  return positionWiseBinaryOp(a, b, (o1, o2) => o1 - o2);
+export function subtract(a: CPUTensor, b: CPUTensor, resultShape: readonly number[]) {
+  return positionWiseBinaryOp(a, b, (o1, o2) => o1 - o2, resultShape);
 }
 
-export function multiply(a: CPUTensor, b: CPUTensor) {
-  return positionWiseBinaryOp(a, b, (o1, o2) => o1 * o2);
+export function multiply(a: CPUTensor, b: CPUTensor, resultShape: readonly number[]) {
+  return positionWiseBinaryOp(a, b, (o1, o2) => o1 * o2, resultShape);
 }
 
-export function divide(a: CPUTensor, b: CPUTensor) {
-  return positionWiseBinaryOp(a, b, (o1, o2) => o1 / o2);
+export function divide(a: CPUTensor, b: CPUTensor, resultShape: readonly number[]) {
+  return positionWiseBinaryOp(a, b, (o1, o2) => o1 / o2, resultShape);
 }
 
