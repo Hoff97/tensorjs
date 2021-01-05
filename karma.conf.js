@@ -37,6 +37,10 @@ module.exports = function(config) {
             ChromeDebugging: {
                 base: 'ChromeHeadless',
                 flags: ['--remote-debugging-port=9333']
+            },
+            ChromeGPU: {
+                base: 'Chrome',
+                flags: ['--use-gl=desktop', '--enable-webgl', '--disable-swiftshader']
             }
         },
 
