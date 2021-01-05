@@ -33,10 +33,20 @@ pub fn compute_strides(shape: &Vec<usize>) -> Vec<usize> {
     }
 
     let mut res: Vec<usize> = vec![1; rank];
-    res[rank - 1] = 1;
+    if shape[rank - 1] == 1 {
+        res[rank - 1] = 0;
+    } else {
+        res[rank - 1] = 1;
+    }
+    let mut last_stride = 1;
 
     for i in (0..(shape.len()-1)).rev() {
-        res[i] = res[i+1] * shape[i+1];
+        last_stride = last_stride * shape[i+1];
+        if shape[i] == 1 {
+            res[i] = 0;
+        } else {
+            res[i] = last_stride;
+        }
     }
 
     return res;

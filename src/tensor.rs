@@ -8,6 +8,8 @@ use js_sys::{Uint32Array, Float32Array};
 use crate::shape::*;
 use crate::utils::*;
 
+use std::cmp;
+
 #[wasm_bindgen]
 #[derive(Debug, Clone)]
 pub struct Tensor {
@@ -89,16 +91,28 @@ impl Tensor {
 
     #[inline]
     fn binary_op<F>(&self, other: &Tensor, op: F) -> Tensor where F: Fn(f32, f32) -> f32 {
-        let mut values: Vec<f32> = vec![0.0; self.size];
-        for i in 0..self.size {
-            values[i] = op(self.values[i], other.values[i]);
+        let mut result_shape = vec![0; self.shape.len()];
+        for i in 0..self.shape.len() {
+            result_shape[i] = cmp::max(self.shape[i], other.shape[i]);
+        }
+        let result_size = get_size(&result_shape);
+        let result_strides = compute_strides(&result_shape);
+        
+        let mut values: Vec<f32> = vec![0.0; result_size];
+
+        let mut ix = vec![0; self.shape.len()];
+
+        for i in 0..result_size {
+            values[i] = op(self.get(&ix), other.get(&ix));
+
+            increment_index(&mut ix, &result_shape);
         }
 
         Tensor {
             values,
-            shape: self.shape.to_vec(),
-            size: self.size,
-            strides: self.strides.to_vec()
+            shape: result_shape,
+            size: result_size,
+            strides: result_strides
         }
     }
 
@@ -353,6 +367,22 @@ impl Tensor {
             strides: output_strides
         }
     }
+
+    pub fn _reshape(&self, shape: &Vec<usize>) -> Tensor {
+        let strides = compute_strides(shape);
+
+        let mut values = vec![0.0; self.size];
+        for i in 0..self.size {
+            values[i] = self.values[i];
+        }
+
+        Tensor {
+            values,
+            size: self.size,
+            shape: shape.to_vec(),
+            strides: strides
+        }
+    }
 }
 
 #[wasm_bindgen]
@@ -539,6 +569,14 @@ impl Tensor {
         }
 
         return self._conv(kernel, Some(bias), &_dilations, group as usize, &_pads, &_strides);
+    }
+
+    pub fn reshape(&self, shape: Uint32Array) -> Tensor {
+        let mut sh: Vec<usize> = vec![0; shape.length() as usize];
+        for i in 0..shape.length() {
+            sh[i as usize] = shape.get_index(i) as usize;
+        }
+        return self._reshape(&sh);
     }
 }
 

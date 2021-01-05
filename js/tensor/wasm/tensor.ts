@@ -51,32 +51,33 @@ export default class WASMTensor extends Tensor {
     return new WASMTensor(this.wasmTensor.sqrt());
   }
 
-  add(tensor: Tensor): Tensor {
-    if (!(tensor instanceof WASMTensor)) {
+  add_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor {
+    if (!(tensor instanceof WASMTensor) || !(th instanceof WASMTensor)) {
       throw new Error('Can only add WASM tensor to WASM tensor');
     }
-    return new WASMTensor(this.wasmTensor.addition(tensor.wasmTensor));
+    console.log(th.getShape(), tensor.getShape());
+    return new WASMTensor(th.wasmTensor.addition(tensor.wasmTensor));
   }
 
-  subtract(tensor: Tensor): Tensor {
-    if (!(tensor instanceof WASMTensor)) {
-      throw new Error('Can only add WASM tensor to WASM tensor');
+  subtract_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor {
+    if (!(tensor instanceof WASMTensor) || !(th instanceof WASMTensor)) {
+      throw new Error('Can only subtract WASM tensor from WASM tensor');
     }
-    return new WASMTensor(this.wasmTensor.subtraction(tensor.wasmTensor));
+    return new WASMTensor(th.wasmTensor.subtraction(tensor.wasmTensor));
   }
 
-  multiply(tensor: Tensor): Tensor {
-    if (!(tensor instanceof WASMTensor)) {
-      throw new Error('Can only add WASM tensor to WASM tensor');
+  multiply_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor {
+    if (!(tensor instanceof WASMTensor) || !(th instanceof WASMTensor)) {
+      throw new Error('Can only multiply WASM tensor with WASM tensor');
     }
-    return new WASMTensor(this.wasmTensor.multiply(tensor.wasmTensor));
+    return new WASMTensor(th.wasmTensor.multiply(tensor.wasmTensor));
   }
 
-  divide(tensor: Tensor): Tensor {
-    if (!(tensor instanceof WASMTensor)) {
-      throw new Error('Can only add WASM tensor to WASM tensor');
+  divide_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor {
+    if (!(tensor instanceof WASMTensor) || !(th instanceof WASMTensor)) {
+      throw new Error('Can only divide WASM tensor by WASM tensor');
     }
-    return new WASMTensor(this.wasmTensor.divide(tensor.wasmTensor));
+    return new WASMTensor(th.wasmTensor.divide(tensor.wasmTensor));
   }
 
   matMul(tensor: Tensor): Tensor {
@@ -111,5 +112,10 @@ export default class WASMTensor extends Tensor {
     } else {
       return new WASMTensor(this.wasmTensor.conv(kernel.wasmTensor, new Uint32Array(dilations), group, new Uint32Array(pads), new Uint32Array(strides)));
     }
+  }
+
+  reshape(shape: number[]): Tensor {
+    const sh = new Uint32Array(shape);
+    return new WASMTensor(this.wasmTensor.reshape(sh), sh);
   }
 }
