@@ -1,24 +1,27 @@
 import { DrawCommand } from "regl";
 import GPUTensor from "../../tensor/gpu/tensor";
-import { buildComp, compute } from "./util";
+import { buildComp, compute, defaultMain, maxRank } from "./util";
 
 let comp: DrawCommand;
 
 const fragmentShader = `
-void main() {
-  gl_FragColor = texture2D(inputTensor1, uv) - texture2D(inputTensor2, uv);
-}`;
+float process(int index[${maxRank}]) {
+  return _inputTensor1(index) - _inputTensor2(index);
+}
+
+${defaultMain}
+`;
 
 function initComp() {
   comp = buildComp(['inputTensor1', 'inputTensor2'], fragmentShader);
 }
 
-export function subtract(tensor1: GPUTensor, tensor2: GPUTensor) {
+export function subtract(tensor1: GPUTensor, tensor2: GPUTensor, resultShape: readonly number[]) {
   if (comp === undefined) {
     initComp();
   }
 
-  return compute(comp, tensor1.getShape(), {
+  return compute(comp, resultShape, {
     inputTensor1: tensor1,
     inputTensor2: tensor2
   });

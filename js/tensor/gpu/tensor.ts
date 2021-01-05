@@ -72,32 +72,32 @@ export default class GPUTensor extends Tensor {
     return sqrt(this);
   }
 
-  add(tensor: Tensor): Tensor {
-    if (!(tensor instanceof GPUTensor)) {
+  add_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor {
+    if (!(tensor instanceof GPUTensor) || !(th instanceof GPUTensor)) {
       throw new Error('Can only add GPU tensor to GPU tensor');
     }
-    return add(this, tensor);
+    return add(th, tensor, resultShape);
   }
 
-  subtract(tensor: Tensor): Tensor {
-    if (!(tensor instanceof GPUTensor)) {
-      throw new Error('Can only subtract GPU tensor to GPU tensor');
+  subtract_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor {
+    if (!(tensor instanceof GPUTensor) || !(th instanceof GPUTensor)) {
+      throw new Error('Can only subtract GPU tensor from GPU tensor');
     }
-    return subtract(this, tensor);
+    return subtract(th, tensor, resultShape);
   }
 
-  multiply(tensor: Tensor): Tensor {
-    if (!(tensor instanceof GPUTensor)) {
-      throw new Error('Can only multiply GPU tensor to GPU tensor');
+  multiply_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor {
+    if (!(tensor instanceof GPUTensor) || !(th instanceof GPUTensor)) {
+      throw new Error('Can only multiply GPU tensor with GPU tensor');
     }
-    return multiply(this, tensor);
+    return multiply(th, tensor, resultShape);
   }
 
-  divide(tensor: Tensor): Tensor {
-    if (!(tensor instanceof GPUTensor)) {
-      throw new Error('Can only divide GPU tensor to GPU tensor');
+  divide_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor {
+    if (!(tensor instanceof GPUTensor) || !(th instanceof GPUTensor)) {
+      throw new Error('Can only divide GPU tensor by GPU tensor');
     }
-    return divide(this, tensor);
+    return divide(th, tensor, resultShape);
   }
 
   matMul(tensor: Tensor): Tensor {
@@ -128,5 +128,9 @@ export default class GPUTensor extends Tensor {
       throw new Error('Can only do convolution of GPU tensor with GPU tensor');
     }
     return conv(this, kernel, dilations, group, pads, strides, bias as GPUTensor);
+  }
+
+  reshape(shape: number[]): Tensor {
+    return new GPUTensor(this.memory, shape);
   }
 }
