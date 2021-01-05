@@ -90,20 +90,20 @@ export default class WASMTensor extends Tensor {
     return new WASMTensor(this.wasmTensor.matmul(tensor.wasmTensor));
   }
 
-  sum_impl(axes: number[]): Tensor {
-    return new WASMTensor(this.wasmTensor.sum(new Uint32Array(axes)));
+  sum_impl(axes: number[], keepDims: boolean): Tensor {
+    return new WASMTensor(this.wasmTensor.sum(new Uint32Array(axes), keepDims));
   }
 
-  product_impl(axes: number[]): Tensor {
-    return new WASMTensor(this.wasmTensor.product(new Uint32Array(axes)));
+  product_impl(axes: number[], keepDims: boolean): Tensor {
+    return new WASMTensor(this.wasmTensor.product(new Uint32Array(axes), keepDims));
   }
 
-  max_impl(axes: number[]): Tensor {
-    return new WASMTensor(this.wasmTensor.max(new Uint32Array(axes)));
+  max_impl(axes: number[], keepDims: boolean): Tensor {
+    return new WASMTensor(this.wasmTensor.max(new Uint32Array(axes), keepDims));
   }
 
-  min_impl(axes: number[]): Tensor {
-    return new WASMTensor(this.wasmTensor.min(new Uint32Array(axes)));
+  min_impl(axes: number[], keepDims: boolean): Tensor {
+    return new WASMTensor(this.wasmTensor.min(new Uint32Array(axes), keepDims));
   }
 
   conv_impl(kernel: Tensor, dilations: number[], group: number, pads: number[], strides: number[], bias?: Tensor): Tensor {

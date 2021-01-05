@@ -1,4 +1,4 @@
-export function poolResultShape(inputShape: readonly number[], axes: number[]) {
+export function poolResultShape(inputShape: readonly number[], axes: number[], keepDims: boolean) {
   const resultShape = [];
   const sumShape = [];
   const ixMap: number[] = [];
@@ -7,6 +7,10 @@ export function poolResultShape(inputShape: readonly number[], axes: number[]) {
       resultShape.push(inputShape[i]);
       ixMap.push(i);
     } else {
+      if (keepDims) {
+        resultShape.push(1);
+        ixMap.push(i);
+      }
       sumShape.push(inputShape[i]);
     }
   }

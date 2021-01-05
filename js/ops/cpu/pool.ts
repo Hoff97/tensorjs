@@ -5,24 +5,19 @@ import { poolResultShape } from '../util/pool';
 
 export function pool(a: CPUTensor,
                      axes: number[],
-                     operation: (a: number, b?: number) => number): CPUTensor {
+                     operation: (a: number, b?: number) => number,
+                     keepDims: boolean): CPUTensor {
   const inputShape = a.getShape();
   const inputSize = getSize(inputShape);
-  const [resultShape, ixMap] = poolResultShape(inputShape, axes);
+  const [resultShape, ixMap] = poolResultShape(inputShape, axes, keepDims);
   const resultSize = getSize(resultShape);
   const resultStrides = computeStrides(resultShape);
 
   const result = new CPUTensor(resultShape);
   const initialized = new Array(resultSize).fill(false);
 
-  const index = new Array(inputShape.length);
-  for (let i = 0; i < inputShape.length; i++) {
-    index[i] = 0;
-  }
-  const outIndex = new Array(resultShape.length);
-  for (let i = 0; i < resultShape.length; i++) {
-    outIndex[i] = 0;
-  }
+  const index: number[] = new Array(inputShape.length).fill(0);
+  const outIndex: number[] = new Array(resultShape.length).fill(0);
   for (let i = 0; i < inputSize; i++) {
     for (let j = 0; j < ixMap.length; j++) {
       outIndex[j] = index[ixMap[j]];

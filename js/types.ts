@@ -34,21 +34,6 @@ export default abstract class Tensor {
 
     return true;
   }
-
-  async wasm(): Promise<WASMTensor> {
-    const values = await this.getValues();
-    return new WASMTensor(values, new Uint32Array(this.getShape()));
-  }
-
-  async gpu(): Promise<GPUTensor> {
-    const values = await this.getValues();
-    return new GPUTensor(values, this.getShape());
-  }
-
-  async cpu(): Promise<CPUTensor> {
-    const values = await this.getValues();
-    return new CPUTensor(this.getShape(), values);
-  }
  
   getAxes(axes?: number | number[]) {
     let ax: number[];
@@ -67,28 +52,28 @@ export default abstract class Tensor {
     return ax;
   }
 
-  sum(axes?: number | number[]): Tensor {
+  sum(axes?: number | number[], keepDims?: boolean): Tensor {
     let ax = this.getAxes(axes);
-
-    return this.sum_impl(ax);
+    keepDims = keepDims || false;
+    return this.sum_impl(ax, keepDims);
   }
 
-  product(axes?: number | number[]): Tensor {
+  product(axes?: number | number[], keepDims?: boolean): Tensor {
     let ax = this.getAxes(axes);
-
-    return this.product_impl(ax);
+    keepDims = keepDims || false;
+    return this.product_impl(ax, keepDims);
   }
 
-  max(axes?: number | number[]): Tensor {
+  max(axes?: number | number[], keepDims?: boolean): Tensor {
     let ax = this.getAxes(axes);
-
-    return this.max_impl(ax);
+    keepDims = keepDims || false;
+    return this.max_impl(ax, keepDims);
   }
 
-  min(axes?: number | number[]): Tensor {
+  min(axes?: number | number[], keepDims?: boolean): Tensor {
     let ax = this.getAxes(axes);
-
-    return this.min_impl(ax);
+    keepDims = keepDims || false;
+    return this.min_impl(ax, keepDims);
   }
 
   conv(kernel: Tensor,
@@ -172,13 +157,13 @@ export default abstract class Tensor {
 
   abstract matMul(tensor: Tensor): Tensor;
 
-  abstract sum_impl(axes: number[]): Tensor;
+  abstract sum_impl(axes: number[], keepDims: boolean): Tensor;
 
-  abstract product_impl(axes: number[]): Tensor;
+  abstract product_impl(axes: number[], keepDims: boolean): Tensor;
 
-  abstract max_impl(axes: number[]): Tensor;
+  abstract max_impl(axes: number[], keepDims: boolean): Tensor;
 
-  abstract min_impl(axes: number[]): Tensor;
+  abstract min_impl(axes: number[], keepDims: boolean): Tensor;
 
   abstract conv_impl(kernel: Tensor,
                      dilations: number[],

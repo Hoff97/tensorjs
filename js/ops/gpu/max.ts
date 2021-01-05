@@ -10,10 +10,10 @@ function initComp() {
   comp = initComputation(fragShader);
 }
 
-export function max(tensor1: GPUTensor, axes: number[]) {
+export function max(tensor1: GPUTensor, axes: number[], keepDims: boolean) {
   if (comp === undefined) {
     initComp();
   }
 
-  return performComputation(tensor1, axes, comp);
+  return performComputation(tensor1, axes, keepDims, comp);
 }

@@ -124,20 +124,20 @@ export default class CPUTensor extends Tensor {
     return matMul(this, tensor);
   }
 
-  sum_impl(axes: number[]): Tensor {
-    return sum(this, axes);
+  sum_impl(axes: number[], keepDims: boolean): Tensor {
+    return sum(this, axes, keepDims);
   }
 
-  product_impl(axes: number[]): Tensor {
-    return product(this, axes);
+  product_impl(axes: number[], keepDims: boolean): Tensor {
+    return product(this, axes, keepDims);
   }
 
-  max_impl(axes: number[]): Tensor {
-    return max(this, axes);
+  max_impl(axes: number[], keepDims: boolean): Tensor {
+    return max(this, axes, keepDims);
   }
 
-  min_impl(axes: number[]): Tensor {
-    return min(this, axes);
+  min_impl(axes: number[], keepDims: boolean): Tensor {
+    return min(this, axes, keepDims);
   }
 
   conv_impl(kernel: Tensor, dilations: number[], group: number, pads: number[], strides: number[], bias?: Tensor): Tensor {
