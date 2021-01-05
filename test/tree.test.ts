@@ -60,7 +60,7 @@ describe('Create and insert', () => {
     expect(tree.getNumberOfKeys()).toBe(5);
   });
 
-  for (let i = 0; i < 300; i++) {
+  for (let i = 0; i < 5; i++) {
     it(`should have keys after insertions ${i}`, () => {
       const tree = new AVLTree<number, number>({});
   
