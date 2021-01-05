@@ -349,3 +349,32 @@ for (let axis of [[1,2],[0,1,2,3]]) {
     }
   });
 }
+
+suite("Tensor conv", () => {
+  for (let backend of backends) {
+    benchmark(backend.name, () => {
+      const x: Tensor = (utility as any).tensors[backend.name][0];
+      const w: Tensor = (utility as any).tensors[backend.name][1];
+      const result = x.conv(w, undefined, [1,1], 1, [0,0,0,0], [1,1]);
+      
+      result.delete();
+    });
+  }
+}, {
+  onStart() {
+    const x = randomValues(1*8*30*30);
+    const w = randomValues(4*8*5*5);
+
+    const tensors: {[name: string]: Tensor[]} = {};
+    for (let backend of backends) {
+      tensors[backend.name] = [];
+      tensors[backend.name].push(backend.constructor([1,8,30,30], x));
+      tensors[backend.name].push(backend.constructor([4,8,5,5], w));
+    }
+
+    (utility as any).tensors = tensors;
+  },
+  onComplete() {
+    utility = {};
+  }
+});
