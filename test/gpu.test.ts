@@ -17,6 +17,6 @@ const constructor = (shape: ReadonlyArray<number>, values: number[]) => {
   return new GPUTensor(vals, shape);
 };
 
-testBasic('GPU', constructor);
+/*testBasic('GPU', constructor);
 testPool('GPU', constructor);
-testConv('GPU', constructor);
+testConv('GPU', constructor);*/
