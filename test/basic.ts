@@ -491,4 +491,54 @@ export default function testBasic(name: string, constructor: TensorConstructor, 
       expected2.delete();
     });
   });
+
+  describe(`${name} transpose`, () => {
+    it('should reverse the axis by default', async () => {
+      if (wait) {
+        await wait;
+      }
+
+      const a = constructor([2,3,4], [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24]);
+
+      const expected = constructor([4,3,2], [1,13,5,17,9,21,2,14,6,18,10,22,3,15,7,19,11,23,4,16,8,20,12,24]);
+
+      expect(await a.transpose().compare(expected, epsilon)).toBeTruthy();
+
+      a.delete();
+      expected.delete();
+    });
+
+    it('should work for 2 swapped axis', async () => {
+      if (wait) {
+        await wait;
+      }
+
+      const a = constructor([2,3,4], [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24]);
+
+      const expected1 = constructor([2,4,3], [1,5,9,2,6,10,3,7,11,4,8,12,13,17,21,14,18,22,15,19,23,16,20,24]);
+      const expected2 = constructor([3,2,4], [1,2,3,4,13,14,15,16,5,6,7,8,17,18,19,20,9,10,11,12,21,22,23,24]);
+
+      expect(await a.transpose([0,2,1]).compare(expected1, epsilon)).toBeTruthy();
+      expect(await a.transpose([1,0,2]).compare(expected2, epsilon)).toBeTruthy();
+
+      a.delete();
+      expected1.delete();
+      expected2.delete();
+    });
+
+    it('should work for circular transpose', async () => {
+      if (wait) {
+        await wait;
+      }
+
+      const a = constructor([2,3,4], [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24]);
+
+      const expected1 = constructor([3,4,2], [1,13,2,14,3,15,4,16,5,17,6,18,7,19,8,20,9,21,10,22,11,23,12,24]);
+
+      expect(await a.transpose([1,2,0]).compare(expected1, epsilon)).toBeTruthy();
+
+      a.delete();
+      expected1.delete();
+    });
+  });
 }

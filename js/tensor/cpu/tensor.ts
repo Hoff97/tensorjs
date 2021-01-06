@@ -10,6 +10,7 @@ import { max } from '../../ops/cpu/max';
 import { min } from '../../ops/cpu/min';
 import { product } from '../../ops/cpu/product';
 import { sum } from '../../ops/cpu/sum';
+import { transpose } from '../../ops/cpu/transpose';
 import Tensor from '../../types';
 import { computeStrides, getSize, indexToPos } from '../../util/shape';
 
@@ -169,5 +170,9 @@ export default class CPUTensor extends Tensor {
       throw new Error('Can only concat CPU tensor to CPU tensor');
     }
     return concat(this, tensor, axis);
+  }
+
+  transpose_impl(permutation?: number[]): Tensor {
+    return transpose(this, permutation);
   }
 }

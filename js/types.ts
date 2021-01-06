@@ -149,6 +149,18 @@ export default abstract class Tensor {
     return this.divide_impl(th as Tensor, tens as Tensor, resultShape as number[]);
   }
 
+  transpose(permutation?: number[]): Tensor {
+    if (permutation === undefined) {
+      const shape = this.getShape();
+      const rank = shape.length;
+      permutation = [];
+      for (let i = 0; i < rank; i++) {
+        permutation.push(rank - i - 1)
+      }
+    }
+    return this.transpose_impl(permutation);
+  }
+
   softmax(axis: number) {
     const max = this.max(axis, true);
     const normalized = this.subtract(max);
@@ -214,4 +226,6 @@ export default abstract class Tensor {
                      bias?: Tensor): Tensor;
 
   abstract concat(tensor: Tensor, axis: number): Tensor;
+
+  abstract transpose_impl(permutation?: number[]): Tensor;
 }
