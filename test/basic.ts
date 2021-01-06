@@ -260,6 +260,172 @@ export default function testBasic(name: string, constructor: TensorConstructor, 
     });
   });
 
+  describe(`${name} gemm`, () => {
+    it('should compute the matrix product', async () => {
+      if (wait) {
+        await wait;
+      }
+
+      const a = constructor([2, 2], [1, 2, 3, 4]);
+      const b = constructor([2, 2], [5, 6, 7, 8]);
+      const expected = constructor([2, 2], [19, 22, 43, 50]);
+
+      expect(await a.gemm(b).compare(expected, epsilon)).toBeTruthy();
+
+      a.delete();
+      b.delete();
+      expected.delete();
+    });
+
+    it('should work with non-square matrices', async () => {
+      if (wait) {
+        await wait;
+      }
+
+      const a = constructor([2, 3], [1, 2, 3, 4, 5, 6]);
+      const b = constructor([3, 2], [7,8,9,10,11,12]);
+      const expected = constructor([2, 2], [58, 64, 139, 154]);
+
+      expect(await a.gemm(b).compare(expected, epsilon)).toBeTruthy();
+
+      a.delete();
+      b.delete();
+      expected.delete();
+    });
+
+    it('should work with a transposed', async () => {
+      if (wait) {
+        await wait;
+      }
+
+      const a = constructor([3,2], [1,4,2,5,3,6]);
+      const b = constructor([3, 2], [7,8,9,10,11,12]);
+      const expected = constructor([2, 2], [58, 64, 139, 154]);
+
+      expect(await a.gemm(b, true).compare(expected, epsilon)).toBeTruthy();
+
+      a.delete();
+      b.delete();
+      expected.delete();
+    });
+
+    it('should work with a and b transposed', async () => {
+      if (wait) {
+        await wait;
+      }
+
+      const a = constructor([3,2], [1,4,2,5,3,6]);
+      const b = constructor([2,3], [7,9,11,8,10,12]);
+      const expected = constructor([2, 2], [58, 64, 139, 154]);
+
+      expect(await a.gemm(b, true, true).compare(expected, epsilon)).toBeTruthy();
+
+      a.delete();
+      b.delete();
+      expected.delete();
+    });
+
+    it('should work with b transposed', async () => {
+      if (wait) {
+        await wait;
+      }
+
+      const a = constructor([2,3], [1,2,3,4,5,6]);
+      const b = constructor([2,3], [7,9,11,8,10,12]);
+      const expected = constructor([2, 2], [58, 64, 139, 154]);
+
+      expect(await a.gemm(b, false, true).compare(expected, epsilon)).toBeTruthy();
+
+      a.delete();
+      b.delete();
+      expected.delete();
+    });
+
+    it('should work with batches', async () => {
+      if (wait) {
+        await wait;
+      }
+
+      const a = constructor([2,2,3], [1,2,3,4,5,6,7,8,9,10,11,12]);
+      const b = constructor([2,3,2], [7,8,9,10,11,12,13,14,15,16,17,18]);
+      const expected = constructor([2, 2, 2], [58, 64, 139, 154, 364, 388, 499, 532]);
+
+      expect(await a.gemm(b).compare(expected, epsilon)).toBeTruthy();
+
+      a.delete();
+      b.delete();
+      expected.delete();
+    });
+
+    it('should work with batches and a transposed', async () => {
+      if (wait) {
+        await wait;
+      }
+
+      const a = constructor([2,3,2], [1,4,2,5,3,6,7,10,8,11,9,12]);
+      const b = constructor([2,3,2], [7,8,9,10,11,12,13,14,15,16,17,18]);
+      const expected = constructor([2, 2, 2], [58, 64, 139, 154, 364, 388, 499, 532]);
+
+      expect(await a.gemm(b, true).compare(expected, epsilon)).toBeTruthy();
+
+      a.delete();
+      b.delete();
+      expected.delete();
+    });
+
+    it('should work with batches and a and b transposed', async () => {
+      if (wait) {
+        await wait;
+      }
+
+      const a = constructor([2,3,2], [1,4,2,5,3,6,7,10,8,11,9,12]);
+      const b = constructor([2,2,3], [7,9,11,8,10,12,13,15,17,14,16,18]);
+      const expected = constructor([2, 2, 2], [58, 64, 139, 154, 364, 388, 499, 532]);
+
+      expect(await a.gemm(b, true, true).compare(expected, epsilon)).toBeTruthy();
+
+      a.delete();
+      b.delete();
+      expected.delete();
+    });
+
+    fit('should work with batches and a and b transposed and c', async () => {
+      if (wait) {
+        await wait;
+      }
+
+      const a = constructor([2,3,2], [1,4,2,5,3,6,7,10,8,11,9,12]);
+      const b = constructor([2,2,3], [7,9,11,8,10,12,13,15,17,14,16,18]);
+
+      const alpha = 0.5;
+      const c1 = constructor([1], [1]);
+      const c2 = constructor([2], [1,2]);
+      const c3 = constructor([2,2], [1,2,3,4]);
+      const c4 = constructor([2,2,2], [1,2,3,4,5,6,7,8]);
+
+      const expected1 = constructor([2, 2, 2], [29 + 1,32 + 1,69.5 + 1,77 + 1,182 + 1,194 + 1,249.5 + 1,266 + 1]);
+      const expected2 = constructor([2, 2, 2], [29 + 1,32 + 2,69.5 + 1,77 + 2,182 + 1,194 + 2,249.5 + 1,266 + 2]);
+      const expected3 = constructor([2, 2, 2], [29 + 1,32 + 2,69.5 + 3,77 + 4,182 + 1,194 + 2,249.5 + 3,266 + 4]);
+      const expected4 = constructor([2, 2, 2], [29 + 1,32 + 2,69.5 + 3,77 + 4,182 + 5,194 + 6,249.5 + 7,266 + 8]);
+
+      expect(await a.gemm(b, true, true, alpha, c1).compare(expected1, epsilon)).toBeTruthy();
+      expect(await a.gemm(b, true, true, alpha, c2).compare(expected2, epsilon)).toBeTruthy();
+      expect(await a.gemm(b, true, true, alpha, c3).compare(expected3, epsilon)).toBeTruthy();
+      expect(await a.gemm(b, true, true, alpha, c4).compare(expected4, epsilon)).toBeTruthy();
+
+      a.delete();
+      b.delete();
+      c1.delete();
+      c2.delete();
+      c3.delete();
+      c4.delete();
+      expected1.delete();
+      expected2.delete();
+      expected3.delete();
+      expected4.delete();
+    });
+  });
+
   describe(`${name} concat`, () => {
     it('should work on all axis', async () => {
       if (wait) {

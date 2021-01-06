@@ -163,6 +163,26 @@ export default abstract class Tensor {
     return result;
   }
 
+  gemm(b: Tensor, aTranspose?: boolean, bTranspose?: boolean,
+       alpha?: number, c?: Tensor, beta?: number): Tensor {
+    aTranspose = aTranspose || false;
+    bTranspose = bTranspose || false;
+    alpha = alpha !== undefined ? alpha : 1;
+    beta = beta !== undefined ? beta : 1;
+
+    if (c !== undefined) {
+      const aShape = this.getShape();
+      let cShape = c.getShape();
+      const aRank = aShape.length;
+      const cRank = cShape.length;
+
+      cShape = [...new Array(aRank - cRank).fill(1), ...cShape];
+      c = c.reshape(cShape);
+    }
+
+    return this.gemm_impl(this, b, aTranspose, bTranspose, alpha, beta, c);
+  }
+
   abstract add_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor;
 
   abstract subtract_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor;
@@ -172,6 +192,9 @@ export default abstract class Tensor {
   abstract divide_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor;
 
   abstract matMul(tensor: Tensor): Tensor;
+
+  abstract gemm_impl(a: Tensor, b: Tensor, aTranspose: boolean, bTranspose: boolean,
+                     alpha: number, beta: number, C?: Tensor): Tensor;
 
   abstract sum_impl(axes: number[], keepDims: boolean): Tensor;
 

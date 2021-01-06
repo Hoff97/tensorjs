@@ -3,6 +3,7 @@ import {
 } from '../../ops/cpu/basic';
 import { concat } from '../../ops/cpu/concat';
 import { conv } from '../../ops/cpu/conv';
+import { gemm } from '../../ops/cpu/gemm';
 import { matMul } from '../../ops/cpu/matMul';
 import { max } from '../../ops/cpu/max';
 import { min } from '../../ops/cpu/min';
@@ -122,6 +123,13 @@ export default class CPUTensor extends Tensor {
     }
 
     return matMul(this, tensor);
+  }
+
+  gemm_impl(a: Tensor, b: Tensor, aTranspose: boolean, bTranspose: boolean, alpha: number, beta: number, c?: Tensor): Tensor {
+    if (!(a instanceof CPUTensor && b instanceof CPUTensor && (c === undefined || c instanceof CPUTensor))) {
+      throw new Error('Can only do gemm with CPU tensors');
+    }
+    return gemm(a, b, aTranspose, bTranspose, alpha, beta, c as CPUTensor);
   }
 
   sum_impl(axes: number[], keepDims: boolean): Tensor {
