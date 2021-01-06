@@ -97,7 +97,7 @@ impl Tensor {
         }
         let result_size = get_size(&result_shape);
         let result_strides = compute_strides(&result_shape);
-        
+
         let mut values: Vec<f32> = vec![0.0; result_size];
 
         let mut ix = vec![0; self.shape.len()];
@@ -327,7 +327,7 @@ impl Tensor {
                         }
                     }
                 }
-        
+
 
                 for cg in 0..CG {
                     let c = (m * CG + cg)%C;
@@ -335,7 +335,7 @@ impl Tensor {
                     let mut output_indices = vec![0; data_rank + 2];
                     output_indices[0] = n;
                     output_indices[1] = m;
-                
+
                     for o_ix in 0..output_size {
                         let mut result = values[basis + o_ix];
 
@@ -343,7 +343,7 @@ impl Tensor {
                         kernel_indices[0] = m;
                         kernel_indices[1] = cg;
                         let kernel_base = m*kernel.strides[0] + cg*kernel.strides[1];
-          
+
                         for kernel_ix in 0..kernel_size {
                             let mut input_ix = vec![0; data_rank + 2];
                             input_ix[0] = n;
@@ -399,6 +399,94 @@ impl Tensor {
             size: self.size,
             shape: shape.to_vec(),
             strides: strides
+        }
+    }
+
+    pub fn _gemm(&self, b: &Tensor, a_transpose: bool, b_transpose: bool, alpha: f32, c: Option<&Tensor>, beta: f32) -> Tensor {
+        let rank = self.shape.len();
+
+        let M = if a_transpose { self.shape[rank - 1] } else { self.shape[rank - 2]};
+        let N = if a_transpose { self.shape[rank - 2] } else { self.shape[rank - 1]};
+        let O = if b_transpose { b.shape[rank - 2] } else { b.shape[rank - 1]};
+
+        let a_batch_mult = M*N;
+        let b_batch_mult = N*O;
+        let y_batch_mult = M*O;
+
+        let a_n_mult = if a_transpose { M } else { 1 };
+        let a_m_mult = if a_transpose { 1 } else { N };
+        let b_n_mult = if b_transpose { 1 } else { O };
+        let b_o_mult = if b_transpose { N } else { 1 };
+
+        let mut c_m_mult = 0;
+        let mut c_o_mult = 0;
+        let mut c_batch_mult = 0;
+        match c {
+            None => {},
+            Some(c_) => {
+                let c_batch_size = get_size_from_to(&c_.shape, 0, rank-2);
+
+                c_m_mult = c_.strides[rank - 2];
+                c_o_mult = c_.strides[rank - 1];
+                if c_batch_size > 1 {
+                    c_batch_mult = c_.shape[rank-2]*c_.shape[rank-1];
+
+                    if c_batch_mult == 1 {
+                        c_batch_mult = 0;
+                    }
+                } else {
+                    c_batch_mult = 0;
+                }
+            }
+        }
+
+        let mut batch_size = get_size_from_to(&self.shape, 0, rank-2);
+        if batch_size == 0 {
+            batch_size = 1;
+        }
+        let mut result_shape = vec![0; rank];
+        result_shape[rank - 1] = O;
+        result_shape[rank - 2] = M;
+        for i in 0..(rank-2) {
+            result_shape[i] = self.shape[i];
+        }
+        let result_size = get_size(&result_shape);
+        let result_strides = compute_strides(&result_shape);
+
+        let mut values = vec![0.0; result_size];
+
+        for i in 0..batch_size {
+            let a_base = i*a_batch_mult;
+            let b_base = i*b_batch_mult;
+            let y_base = i*y_batch_mult;
+            let c_base = i*c_batch_mult;
+
+            for m in 0..M {
+                for o in 0..O {
+                    let mut result = 0.0;
+
+                    for n in 0..N {
+                        result += self.values[a_base + m*a_m_mult + n*a_n_mult] * b.values[b_base + n*b_n_mult + o*b_o_mult];
+                    }
+
+                    result = alpha*result;
+                    match c {
+                        None => {},
+                        Some(c_) => {
+                            let ix = c_base + m*c_m_mult + o*c_o_mult;
+                            result += beta*c_.values[ix];
+                        }
+                    }
+                    values[y_base + m*O + o] = result;
+                }
+            }
+        }
+
+        Tensor {
+            shape: result_shape,
+            size: result_size,
+            values,
+            strides: result_strides
         }
     }
 }
@@ -496,6 +584,14 @@ impl Tensor {
             size: m*o,
             strides: vec![o, 1]
         }
+    }
+
+    pub fn gemm(&self, other: &Tensor, a_transpose: bool, b_transpose: bool, alpha: f32) -> Tensor {
+        return self._gemm(other, a_transpose, b_transpose, alpha, None, 1.0);
+    }
+
+    pub fn gemm_with_c(&self, other: &Tensor, a_transpose: bool, b_transpose: bool, alpha: f32, c: &Tensor, beta: f32) -> Tensor {
+        return self._gemm(other, a_transpose, b_transpose, alpha, Some(c), beta);
     }
 
     pub fn get_vals(&self) -> Float32Array {

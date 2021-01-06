@@ -6,8 +6,6 @@ export function gemm(a: CPUTensor, b: CPUTensor, aTranspose: boolean,
                      c?: CPUTensor) {
   const rank = a.shape.length;
 
-
-
   const M = aTranspose ? a.shape[rank - 1] : a.shape[rank - 2];
   const N = aTranspose ? a.shape[rank - 2] : a.shape[rank - 1];
   const O = bTranspose ? b.shape[rank - 2] : b.shape[rank - 1];

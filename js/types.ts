@@ -180,7 +180,7 @@ export default abstract class Tensor {
       c = c.reshape(cShape);
     }
 
-    return this.gemm_impl(this, b, aTranspose, bTranspose, alpha, beta, c);
+    return this.gemm_impl(b, aTranspose, bTranspose, alpha, beta, c);
   }
 
   abstract add_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor;
@@ -193,7 +193,7 @@ export default abstract class Tensor {
 
   abstract matMul(tensor: Tensor): Tensor;
 
-  abstract gemm_impl(a: Tensor, b: Tensor, aTranspose: boolean, bTranspose: boolean,
+  abstract gemm_impl(b: Tensor, aTranspose: boolean, bTranspose: boolean,
                      alpha: number, beta: number, C?: Tensor): Tensor;
 
   abstract sum_impl(axes: number[], keepDims: boolean): Tensor;

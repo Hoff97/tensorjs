@@ -81,3 +81,34 @@ fn test_tensor_matmul_dot_product() {
 
     assert!(a.matmul(&b).compare(&expected, DELTA));
 }
+
+#[test]
+fn test_tensor_gemm() {
+    let a = Tensor::new(&vec![2,2], &vec![1.,2.,3.,4.]);
+    let b = Tensor::new(&vec![2,2], &vec![5.,6.,7.,8.]);
+    let expected = Tensor::new(&vec![2,2], &vec![19., 22., 43., 50.]);
+
+    assert!(a._gemm(&b, false, false, 1.0, None, 1.0).compare(&expected, DELTA));
+}
+
+#[test]
+fn test_tensor_gemm_a_b_transposed_and_c() {
+    let a = Tensor::new(&vec![2,3,2], &vec![1.,4.,2.,5.,3.,6.,7.,10.,8.,11.,9.,12.]);
+    let b = Tensor::new(&vec![2,2,3], &vec![7.,9.,11.,8.,10.,12.,13.,15.,17.,14.,16.,18.]);
+
+    let expected1 = Tensor::new(&vec![2,2,2], &vec![29. + 1.,32. + 1.,69.5 + 1.,77. + 1.,182. + 1.,194. + 1.,249.5 + 1.,266. + 1.]);
+    let expected2 = Tensor::new(&vec![2,2,2], &vec![29. + 1.,32. + 2.,69.5 + 1.,77. + 2.,182. + 1.,194. + 2.,249.5 + 1.,266. + 2.]);
+    let expected3 = Tensor::new(&vec![2,2,2], &vec![29. + 1.,32. + 2.,69.5 + 3.,77. + 4.,182. + 1.,194. + 2.,249.5 + 3.,266. + 4.]);
+    let expected4 = Tensor::new(&vec![2,2,2], &vec![29. + 1.,32. + 2.,69.5 + 3.,77. + 4.,182. + 5.,194. + 6.,249.5 + 7.,266. + 8.]);
+
+    let c1 = Tensor::new(&vec![1,1,1], &vec![1.]);
+    let c2 = Tensor::new(&vec![1,1,2], &vec![1.,2.]);
+    let c3 = Tensor::new(&vec![1,2,2], &vec![1.,2.,3.,4.]);
+    let c4 = Tensor::new(&vec![2,2,2], &vec![1.,2.,3.,4.,5.,6.,7.,8.]);
+    let alpha = 0.5;
+
+    assert!(a._gemm(&b, true, true, alpha, Some(&c1), 1.0).compare(&expected1, DELTA));
+    assert!(a._gemm(&b, true, true, alpha, Some(&c2), 1.0).compare(&expected2, DELTA));
+    assert!(a._gemm(&b, true, true, alpha, Some(&c3), 1.0).compare(&expected3, DELTA));
+    assert!(a._gemm(&b, true, true, alpha, Some(&c4), 1.0).compare(&expected4, DELTA));
+}

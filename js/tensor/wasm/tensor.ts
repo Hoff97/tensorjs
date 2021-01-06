@@ -90,6 +90,17 @@ export default class WASMTensor extends Tensor {
     return new WASMTensor(this.wasmTensor.matmul(tensor.wasmTensor));
   }
 
+  gemm_impl(b: Tensor, aTranspose: boolean, bTranspose: boolean, alpha: number, beta: number, c?: Tensor): Tensor {
+    if (!(b instanceof WASMTensor && (c === undefined || c instanceof WASMTensor))) {
+      throw new Error('Can only do gemm with CPU tensors');
+    }
+    if (c !== undefined) {
+      return new WASMTensor(this.wasmTensor.gemm_with_c(b.wasmTensor, aTranspose, bTranspose, alpha, (c as WASMTensor).wasmTensor, beta));
+    } else {
+      return new WASMTensor(this.wasmTensor.gemm(b.wasmTensor, aTranspose, bTranspose, alpha));
+    }
+  }
+
   sum_impl(axes: number[], keepDims: boolean): Tensor {
     return new WASMTensor(this.wasmTensor.sum(new Uint32Array(axes), keepDims));
   }

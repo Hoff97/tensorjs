@@ -125,11 +125,11 @@ export default class CPUTensor extends Tensor {
     return matMul(this, tensor);
   }
 
-  gemm_impl(a: Tensor, b: Tensor, aTranspose: boolean, bTranspose: boolean, alpha: number, beta: number, c?: Tensor): Tensor {
-    if (!(a instanceof CPUTensor && b instanceof CPUTensor && (c === undefined || c instanceof CPUTensor))) {
+  gemm_impl(b: Tensor, aTranspose: boolean, bTranspose: boolean, alpha: number, beta: number, c?: Tensor): Tensor {
+    if (!(b instanceof CPUTensor && (c === undefined || c instanceof CPUTensor))) {
       throw new Error('Can only do gemm with CPU tensors');
     }
-    return gemm(a, b, aTranspose, bTranspose, alpha, beta, c as CPUTensor);
+    return gemm(this, b, aTranspose, bTranspose, alpha, beta, c as CPUTensor);
   }
 
   sum_impl(axes: number[], keepDims: boolean): Tensor {
