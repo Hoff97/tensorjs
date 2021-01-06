@@ -404,3 +404,35 @@ suite("Tensor softmax", () => {
     utility = {};
   }
 });
+
+suite("Tensor gemm", () => {
+  for (let backend of backends) {
+    benchmark(backend.name, () => {
+      const a: Tensor = (utility as any).tensors[backend.name][0];
+      const b: Tensor = (utility as any).tensors[backend.name][0];
+      const c: Tensor = (utility as any).tensors[backend.name][0];
+      const result = a.gemm(b, false, false, 1, c, 1);
+
+      result.delete();
+    });
+  }
+}, {
+  onStart() {
+    const a = randomValues(2*100*100);
+    const b = randomValues(2*100*50);
+    const c = randomValues(100*50);
+
+    const tensors: {[name: string]: Tensor[]} = {};
+    for (let backend of backends) {
+      tensors[backend.name] = [];
+      tensors[backend.name].push(backend.constructor([2,100,100], a));
+      tensors[backend.name].push(backend.constructor([2,100,50], b));
+      tensors[backend.name].push(backend.constructor([100,50], c));
+    }
+
+    (utility as any).tensors = tensors;
+  },
+  onComplete() {
+    utility = {};
+  }
+});
