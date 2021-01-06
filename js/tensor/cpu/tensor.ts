@@ -172,7 +172,7 @@ export default class CPUTensor extends Tensor {
     return concat(this, tensor, axis);
   }
 
-  transpose_impl(permutation?: number[]): Tensor {
+  transpose_impl(permutation: number[]): Tensor {
     return transpose(this, permutation);
   }
 }

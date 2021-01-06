@@ -227,5 +227,5 @@ export default abstract class Tensor {
 
   abstract concat(tensor: Tensor, axis: number): Tensor;
 
-  abstract transpose_impl(permutation?: number[]): Tensor;
+  abstract transpose_impl(permutation: number[]): Tensor;
 }

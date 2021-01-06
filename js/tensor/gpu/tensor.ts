@@ -20,6 +20,7 @@ import { conv } from '../../ops/gpu/conv';
 import { concat } from '../../ops/gpu/concat';
 import { gemm } from '../../ops/gpu/gemm';
 import { abs } from '../../ops/gpu/abs';
+import { transpose } from '../../ops/gpu/transpose';
 
 
 export default class GPUTensor extends Tensor {
@@ -157,5 +158,9 @@ export default class GPUTensor extends Tensor {
       throw new Error('Can only concat GPU tensor to GPU tensor');
     }
     return concat(this, tensor, axis);
+  }
+
+  transpose_impl(permutation: number[]): Tensor {
+    return transpose(this, permutation);
   }
 }
