@@ -289,4 +289,24 @@ export default function testBasic(name: string, constructor: TensorConstructor, 
       expected3.delete();
     });
   });
+
+  describe(`${name} softmax`, () => {
+    it('should work on all axis', async () => {
+      if (wait) {
+        await wait;
+      }
+
+      const a = constructor([2,3], [1,2,3,4,5,6]);
+
+      const expected1 = constructor([2,3], [0.0474258736, 0.0474258736, 0.0474258736, 0.9525741339, 0.9525741339, 0.9525741339]);
+      const expected2 = constructor([2,3], [0.0900305733, 0.2447284758, 0.6652409434, 0.0900305733, 0.2447284758, 0.6652409434]);
+
+      expect(await a.softmax(0).compare(expected1, epsilon)).toBeTruthy();
+      expect(await a.softmax(1).compare(expected2, epsilon)).toBeTruthy();
+
+      a.delete();
+      expected1.delete();
+      expected2.delete();
+    });
+  });
 }

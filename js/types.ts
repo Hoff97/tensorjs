@@ -84,7 +84,7 @@ export default abstract class Tensor {
        strides?: number[]): Tensor {
     const sh = this.getShape();
     const dataRank = sh.length - 2;
-    
+
     dilations = dilations || new Array(dataRank).fill(1);
     group = group || 1;
     pads = pads || new Array(dataRank * 2).fill(0);
@@ -147,6 +147,22 @@ export default abstract class Tensor {
     return this.divide_impl(th as Tensor, tens as Tensor, resultShape as number[]);
   }
 
+  softmax(axis: number) {
+    const max = this.max(axis, true);
+    const normalized = this.subtract(max);
+    const exp = normalized.exp();
+
+    const sum = exp.sum(axis, true);
+    const result = exp.divide(sum);
+
+    max.delete();
+    normalized.delete();
+    exp.delete();
+    sum.delete();
+
+    return result;
+  }
+
   abstract add_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor;
 
   abstract subtract_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor;
@@ -171,6 +187,6 @@ export default abstract class Tensor {
                      pads: number[],
                      strides: number[],
                      bias?: Tensor): Tensor;
-  
+
   abstract concat(tensor: Tensor, axis: number): Tensor;
 }

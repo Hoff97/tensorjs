@@ -378,3 +378,29 @@ suite("Tensor conv", () => {
     utility = {};
   }
 });
+
+suite("Tensor softmax", () => {
+  for (let backend of backends) {
+    benchmark(backend.name, () => {
+      const x: Tensor = (utility as any).tensors[backend.name][0];
+      const result = x.softmax(1);
+
+      result.delete();
+    });
+  }
+}, {
+  onStart() {
+    const x = randomValues(100*100);
+
+    const tensors: {[name: string]: Tensor[]} = {};
+    for (let backend of backends) {
+      tensors[backend.name] = [];
+      tensors[backend.name].push(backend.constructor([100,100], x));
+    }
+
+    (utility as any).tensors = tensors;
+  },
+  onComplete() {
+    utility = {};
+  }
+});
