@@ -489,6 +489,44 @@ impl Tensor {
             strides: result_strides
         }
     }
+
+    pub fn _transpose(&self, permutation: &Vec<usize>) -> Tensor {
+        let rank = self.shape.len();
+
+        let mut output_shape = vec![0; rank];
+        let mut reverse_perm = vec![0; rank];
+        for i in 0..rank {
+            output_shape[i] = self.shape[permutation[i]];
+            reverse_perm[permutation[i]] = i;
+        }
+
+        let output_strides = compute_strides(&output_shape);
+        let mut mapped_strides = vec![0; rank];
+        for i in 0..rank {
+            mapped_strides[i] = output_strides[reverse_perm[i]];
+        }
+
+        let mut values = vec![0.0; self.size];
+
+        let mut index = vec![0; rank];
+        for i in 0..self.size {
+            let mut out_ix = 0;
+            for j in 0..rank {
+                out_ix += index[j]*mapped_strides[j];
+            }
+
+            values[out_ix] = self.values[i];
+
+            increment_index(&mut index, &self.shape);
+        }
+
+        Tensor {
+            shape: output_shape,
+            strides: output_strides,
+            size: self.size,
+            values
+        }
+    }
 }
 
 #[wasm_bindgen]
@@ -736,6 +774,14 @@ impl Tensor {
             size: output_size,
             values
         }
+    }
+
+    pub fn transpose(&self, permutation: Uint32Array) -> Tensor {
+        let mut perm: Vec<usize> = vec![0; permutation.length() as usize];
+        for i in 0..permutation.length() {
+            perm[i as usize] = permutation.get_index(i) as usize;
+        }
+        return self._transpose(&perm);
     }
 }
 

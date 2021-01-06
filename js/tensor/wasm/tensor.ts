@@ -143,4 +143,8 @@ export default class WASMTensor extends Tensor {
     }
     return new WASMTensor(this.wasmTensor.concat(tensor.wasmTensor, axis));
   }
+
+  transpose_impl(permutation?: number[]): Tensor {
+    return new WASMTensor(this.wasmTensor.transpose(new Uint32Array(permutation)));
+  }
 }
