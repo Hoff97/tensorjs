@@ -25,8 +25,15 @@ export function gemm(a: CPUTensor, b: CPUTensor, aTranspose: boolean,
   if (c !== undefined) {
     cMMult = c.strides[rank - 2];
     cOMult = c.strides[rank - 1];
-    cBatchMult = c.shape[rank-2]*c.shape[rank-1];
-    if (cBatchMult === 1) {
+
+    let cBatchSize = getSize(c.shape.slice(0, rank-2));
+    if (cBatchSize > 1) {
+      cBatchMult = c.shape[rank-2]*c.shape[rank-1];
+
+      if (cBatchMult === 1) {
+        cBatchMult = 0;
+      }
+    } else {
       cBatchMult = 0;
     }
   }
