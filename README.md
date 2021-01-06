@@ -1,8 +1,8 @@
 # TensorJS
 
 This is a JS/TS library for accelerated tensor computation intended to be
-run in the browser. It contains an implementation for numpy-style 
-multidimensional arrays and their respective implementation.
+run in the browser. It contains an implementation for numpy-style
+multidimensional arrays and their operators.
 
 There are three execution backends available:
 - **CPU:** This is implemented in plain javascript and thus
@@ -57,7 +57,7 @@ Unfortunately headless chrome relies on a software
 implementation for WebGL (instead of Hardware support).
 For this reason the GPU backend is not tested by default.
 
-To run GPU tests, uncomment the lines in `./test/gpu.test.ts`,
+To run GPU tests, uncomment the lines in `./test/gpu.test.ts` and
 change the `browsers` field in `karma.conf.js` to `ChromeGPU`.
 If Chrome still doesnt use the GPU, you can try something
 like
@@ -74,6 +74,6 @@ on Linux.
 
 Performance tests can be run with `npm run test:performance`.
 As in the unit tests, Chrome doesnt use the GPU by default.
-If you want to run performance tests with the GPU, 
-change the `browsers` field in `karma.performance.js` to `ChromeGPU` and optionally follow the instructions of the
-paragraph above.
+If you want to run performance tests with the GPU,
+change the `browsers` field in `karma.performance.js` to `ChromeGPU` and
+optionally follow the instructions of the paragraph above.
