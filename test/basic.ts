@@ -16,6 +16,9 @@ export default function testBasic(name: string, constructor: TensorConstructor, 
       const expected = constructor([2, 2], [0.367879441, 1, 2.718281828, 7.389056099]);
 
       expect(await input.exp().compare(expected, epsilon)).toBeTruthy();
+
+      input.delete();
+      expected.delete();
     });
   });
 
@@ -29,6 +32,9 @@ export default function testBasic(name: string, constructor: TensorConstructor, 
       const expected = constructor([2, 2], [-1, 0, 1, 2]);
 
       expect(await input.log().compare(expected, epsilon)).toBeTruthy();
+
+      input.delete();
+      expected.delete();
     });
   });
 
@@ -42,6 +48,9 @@ export default function testBasic(name: string, constructor: TensorConstructor, 
       const expected = constructor([2, 2], [1, 2, 3, 4]);
 
       expect(await input.sqrt().compare(expected, epsilon)).toBeTruthy();
+
+      input.delete();
+      expected.delete();
     });
   });
 
@@ -56,6 +65,10 @@ export default function testBasic(name: string, constructor: TensorConstructor, 
       const expected = constructor([2, 2], [2, 6, 12, 20]);
 
       expect(await a.add(b).compare(expected, epsilon)).toBeTruthy();
+
+      a.delete();
+      b.delete();
+      expected.delete();
     });
 
     it('Should work with broadcasting', async () => {
@@ -71,6 +84,12 @@ export default function testBasic(name: string, constructor: TensorConstructor, 
 
       expect(await a.add(b).compare(expected1, epsilon)).toBeTruthy();
       expect(await a.add(c).compare(expected2, epsilon)).toBeTruthy();
+
+      a.delete();
+      b.delete();
+      c.delete();
+      expected1.delete();
+      expected2.delete();
     });
 
     it('Should work with broadcasting with both tensors', async () => {
@@ -83,6 +102,10 @@ export default function testBasic(name: string, constructor: TensorConstructor, 
       const expected1 = constructor([2,3,3,2], [2,3,4,5,6,7,3,4,5,6,7,8,4,5,6,7,8,9,5,6,7,8,9,10,6,7,8,9,10,11,7,8,9,10,11,12]);
 
       expect(await a.add(b).compare(expected1, epsilon)).toBeTruthy();
+
+      a.delete();
+      b.delete();
+      expected1.delete();
     });
   });
 
@@ -97,6 +120,10 @@ export default function testBasic(name: string, constructor: TensorConstructor, 
       const expected = constructor([2, 2], [0, 2, 6, 12]);
 
       expect(await a.subtract(b).compare(expected, epsilon)).toBeTruthy();
+
+      a.delete();
+      b.delete();
+      expected.delete();
     });
 
     it('Should work with broadcasting', async () => {
@@ -112,6 +139,12 @@ export default function testBasic(name: string, constructor: TensorConstructor, 
 
       expect(await a.subtract(b).compare(expected1, epsilon)).toBeTruthy();
       expect(await a.subtract(c).compare(expected2, epsilon)).toBeTruthy();
+
+      a.delete();
+      b.delete();
+      c.delete();
+      expected1.delete();
+      expected2.delete();
     });
   });
 
@@ -126,6 +159,10 @@ export default function testBasic(name: string, constructor: TensorConstructor, 
       const expected = constructor([2, 3], [1, 2, 3, 4, 3, 4]);
 
       expect(await a.divide(b).compare(expected, epsilon)).toBeTruthy();
+
+      a.delete();
+      b.delete();
+      expected.delete();
     });
 
     it('Should work with broadcasting', async () => {
@@ -141,6 +178,12 @@ export default function testBasic(name: string, constructor: TensorConstructor, 
 
       expect(await a.divide(b).compare(expected1, epsilon)).toBeTruthy();
       expect(await a.divide(c).compare(expected2, epsilon)).toBeTruthy();
+
+      a.delete();
+      b.delete();
+      c.delete();
+      expected1.delete();
+      expected2.delete();
     });
   });
 
@@ -155,6 +198,10 @@ export default function testBasic(name: string, constructor: TensorConstructor, 
       const expected = constructor([2, 2], [5, 12, 21, 32]);
 
       expect(await a.multiply(b).compare(expected, epsilon)).toBeTruthy();
+
+      a.delete();
+      b.delete();
+      expected.delete();
     });
 
     it('Should work with broadcasting', async () => {
@@ -170,6 +217,12 @@ export default function testBasic(name: string, constructor: TensorConstructor, 
 
       expect(await a.multiply(b).compare(expected1, epsilon)).toBeTruthy();
       expect(await a.multiply(c).compare(expected2, epsilon)).toBeTruthy();
+
+      a.delete();
+      b.delete();
+      c.delete();
+      expected1.delete();
+      expected2.delete();
     });
   });
 
@@ -184,6 +237,10 @@ export default function testBasic(name: string, constructor: TensorConstructor, 
       const expected = constructor([2, 2], [19, 22, 43, 50]);
 
       expect(await a.matMul(b).compare(expected, epsilon)).toBeTruthy();
+
+      a.delete();
+      b.delete();
+      expected.delete();
     });
 
     it('should be the dot product for row/column vectors', async () => {
@@ -196,6 +253,10 @@ export default function testBasic(name: string, constructor: TensorConstructor, 
       const expected = constructor([1, 1], [32]);
 
       expect(await a.matMul(b).compare(expected, epsilon)).toBeTruthy();
+
+      a.delete();
+      b.delete();
+      expected.delete();
     });
   });
 
@@ -218,6 +279,14 @@ export default function testBasic(name: string, constructor: TensorConstructor, 
       expect(await a.concat(b, 0).compare(expected1, epsilon)).toBeTruthy();
       expect(await a.concat(c, 1).compare(expected2, epsilon)).toBeTruthy();
       expect(await a.concat(d, 2).compare(expected3, epsilon)).toBeTruthy();
+
+      a.delete();
+      b.delete();
+      c.delete();
+      d.delete();
+      expected1.delete();
+      expected2.delete();
+      expected3.delete();
     });
   });
 }

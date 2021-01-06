@@ -16,6 +16,9 @@ export default function testPool(name: string, constructor: TensorConstructor, w
       const expected = constructor([1], [10]);
 
       expect(await a.sum().compare(expected, DELTA)).toBeTruthy();
+
+      a.delete();
+      expected.delete();
     });
 
     it('should compute the column wise sum with axes=0', async () => {
@@ -29,6 +32,10 @@ export default function testPool(name: string, constructor: TensorConstructor, w
 
       expect(await a.sum(0).compare(expected1, DELTA)).toBeTruthy();
       expect(await a.sum(0, true).compare(expected2, DELTA)).toBeTruthy();
+
+      a.delete();
+      expected1.delete();
+      expected2.delete();
     });
 
     it('should compute the row wise sum with axes=1', async () => {
@@ -42,6 +49,10 @@ export default function testPool(name: string, constructor: TensorConstructor, w
 
       expect(await a.sum(1).compare(expected1, DELTA)).toBeTruthy();
       expect(await a.sum(1, true).compare(expected2, DELTA)).toBeTruthy();
+
+      a.delete();
+      expected1.delete();
+      expected2.delete();
     });
 
     it('should work with multiple summation axes', async () => {
@@ -63,6 +74,14 @@ export default function testPool(name: string, constructor: TensorConstructor, w
       expect(await a.sum([0,2], true).compare(expected21, DELTA)).toBeTruthy();
       expect(await a.sum([0,1]).compare(expected3, DELTA)).toBeTruthy();
       expect(await a.sum([0,1], true).compare(expected31, DELTA)).toBeTruthy();
+
+      a.delete();
+      expected1.delete();
+      expected11.delete();
+      expected2.delete();
+      expected21.delete();
+      expected3.delete();
+      expected31.delete();
     });
   });
 
@@ -76,6 +95,9 @@ export default function testPool(name: string, constructor: TensorConstructor, w
       const expected = constructor([1], [24]);
 
       expect(await a.product().compare(expected, DELTA)).toBeTruthy();
+
+      a.delete();
+      expected.delete();
     });
 
     it('should compute the column wise product with axes=0', async () => {
@@ -89,6 +111,10 @@ export default function testPool(name: string, constructor: TensorConstructor, w
 
       expect(await a.product(0).compare(expected1, DELTA)).toBeTruthy();
       expect(await a.product(0, true).compare(expected2, DELTA)).toBeTruthy();
+
+      a.delete();
+      expected1.delete();
+      expected2.delete();
     });
 
     it('should compute the row wise product with axes=1', async () => {
@@ -102,6 +128,10 @@ export default function testPool(name: string, constructor: TensorConstructor, w
 
       expect(await a.product(1).compare(expected1, DELTA)).toBeTruthy();
       expect(await a.product(1, true).compare(expected2, DELTA)).toBeTruthy();
+
+      a.delete();
+      expected1.delete();
+      expected2.delete();
     });
 
     it('should work with multiple product axes', async () => {
@@ -115,6 +145,10 @@ export default function testPool(name: string, constructor: TensorConstructor, w
 
       expect(await a.product([0,2]).compare(expected1, DELTA)).toBeTruthy();
       expect(await a.product([0,2], true).compare(expected2, DELTA)).toBeTruthy();
+
+      a.delete();
+      expected1.delete();
+      expected2.delete();
     });
   });
 
@@ -128,6 +162,9 @@ export default function testPool(name: string, constructor: TensorConstructor, w
       const expected = constructor([1], [4]);
 
       expect(await a.max().compare(expected, DELTA)).toBeTruthy();
+
+      a.delete();
+      expected.delete();
     });
 
     it('should compute the column wise max with axes=0', async () => {
@@ -141,6 +178,10 @@ export default function testPool(name: string, constructor: TensorConstructor, w
 
       expect(await a.max(0).compare(expected1, DELTA)).toBeTruthy();
       expect(await a.max(0, true).compare(expected2, DELTA)).toBeTruthy();
+
+      a.delete();
+      expected1.delete();
+      expected2.delete();
     });
 
     it('should compute the row wise max with axes=1', async () => {
@@ -154,6 +195,10 @@ export default function testPool(name: string, constructor: TensorConstructor, w
 
       expect(await a.max(1).compare(expected1, DELTA)).toBeTruthy();
       expect(await a.max(1, true).compare(expected2, DELTA)).toBeTruthy();
+
+      a.delete();
+      expected1.delete();
+      expected2.delete();
     });
 
     it('should work with multiple max axes', async () => {
@@ -175,6 +220,14 @@ export default function testPool(name: string, constructor: TensorConstructor, w
       expect(await a.max([0,2], true).compare(expected21, DELTA)).toBeTruthy();
       expect(await a.max([0,1]).compare(expected3, DELTA)).toBeTruthy();
       expect(await a.max([0,1], true).compare(expected31, DELTA)).toBeTruthy();
+
+      a.delete();
+      expected1.delete();
+      expected2.delete();
+      expected3.delete();
+      expected11.delete();
+      expected21.delete();
+      expected31.delete();
     });
   });
 
@@ -188,6 +241,9 @@ export default function testPool(name: string, constructor: TensorConstructor, w
       const expected = constructor([1], [1]);
 
       expect(await a.min().compare(expected, DELTA)).toBeTruthy();
+
+      a.delete();
+      expected.delete();
     });
 
     it('should compute the column wise min with axes=0', async () => {
@@ -201,6 +257,10 @@ export default function testPool(name: string, constructor: TensorConstructor, w
 
       expect(await a.min(0).compare(expected1, DELTA)).toBeTruthy();
       expect(await a.min(0, true).compare(expected2, DELTA)).toBeTruthy();
+
+      a.delete();
+      expected1.delete();
+      expected2.delete();
     });
 
     it('should compute the row wise min with axes=1', async () => {
@@ -214,6 +274,10 @@ export default function testPool(name: string, constructor: TensorConstructor, w
 
       expect(await a.min(1).compare(expected1, DELTA)).toBeTruthy();
       expect(await a.min(1, true).compare(expected2, DELTA)).toBeTruthy();
+
+      a.delete();
+      expected1.delete();
+      expected2.delete();
     });
 
     it('should work with multiple min axes', async () => {
@@ -232,10 +296,18 @@ export default function testPool(name: string, constructor: TensorConstructor, w
       expect(await a.min([1,2]).compare(expected1, DELTA)).toBeTruthy();
       expect(await a.min([0,2]).compare(expected2, DELTA)).toBeTruthy();
       expect(await a.min([0,1]).compare(expected3, DELTA)).toBeTruthy();
-      
+
       expect(await a.min([1,2], true).compare(expected11, DELTA)).toBeTruthy();
       expect(await a.min([0,2], true).compare(expected21, DELTA)).toBeTruthy();
       expect(await a.min([0,1], true).compare(expected31, DELTA)).toBeTruthy();
+
+      a.delete();
+      expected1.delete();
+      expected2.delete();
+      expected3.delete();
+      expected11.delete();
+      expected21.delete();
+      expected31.delete();
     });
   });
 }
