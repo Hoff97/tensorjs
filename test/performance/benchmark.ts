@@ -149,6 +149,32 @@ suite("Tensor abs", () => {
   }
 });
 
+suite("Tensor transpose", () => {
+  for (let backend of backends) {
+    benchmark(backend.name, () => {
+      const result = (utility as any).tensors[backend.name].transpose();
+      result.delete();
+    });
+  }
+}, {
+  onStart() {
+    const values = randomValues(20*30*40);
+
+    const tensors: {[name: string]: Tensor} = {};
+    for (let backend of backends) {
+      tensors[backend.name] = backend.constructor([20,30,40], values);
+    }
+
+    (utility as any).tensors = tensors;
+  },
+  onComplete() {
+    for (let backend of backends) {
+      (utility as any).tensors[backend.name].delete();
+    }
+    utility = {};
+  }
+});
+
 suite("Tensor add", () => {
   for (let backend of backends) {
     benchmark(backend.name, () => {
