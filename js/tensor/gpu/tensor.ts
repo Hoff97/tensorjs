@@ -19,6 +19,7 @@ import { MemoryEntry } from './memory';
 import { conv } from '../../ops/gpu/conv';
 import { concat } from '../../ops/gpu/concat';
 import { gemm } from '../../ops/gpu/gemm';
+import { abs } from '../../ops/gpu/abs';
 
 
 export default class GPUTensor extends Tensor {
@@ -76,6 +77,10 @@ export default class GPUTensor extends Tensor {
 
   sqrt(): Tensor {
     return sqrt(this);
+  }
+
+  abs(): Tensor {
+    return abs(this);
   }
 
   add_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor {

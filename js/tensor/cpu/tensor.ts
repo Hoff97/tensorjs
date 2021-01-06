@@ -1,4 +1,5 @@
 import {
+  abs,
   add, divide, exp, log, multiply, sqrt, subtract
 } from '../../ops/cpu/basic';
 import { concat } from '../../ops/cpu/concat';
@@ -87,6 +88,10 @@ export default class CPUTensor extends Tensor {
 
   sqrt(): Tensor {
     return sqrt(this);
+  }
+
+  abs(): Tensor {
+    return abs(this);
   }
 
   add_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor {

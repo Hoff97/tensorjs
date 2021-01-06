@@ -546,6 +546,10 @@ impl Tensor {
         self.unary_op(|x: f32| x.sqrt())
     }
 
+    pub fn abs(&self) -> Tensor {
+        self.unary_op(|x: f32| x.abs())
+    }
+
     pub fn addition(&self, other: &Tensor) -> Tensor {
         return self.binary_op(other, |x: f32, y: f32| x + y);
     }

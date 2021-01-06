@@ -48,7 +48,7 @@ suite("Tensor exp", () => {
   for (let backend of backends) {
     benchmark(backend.name, () => {
       const result = (utility as any).tensors[backend.name].exp();
-      
+
       result.delete();
     });
   }
@@ -64,6 +64,9 @@ suite("Tensor exp", () => {
     (utility as any).tensors = tensors;
   },
   onComplete() {
+    for (let backend of backends) {
+      (utility as any).tensors[backend.name].delete();
+    }
     utility = {};
   }
 });
@@ -87,6 +90,9 @@ suite("Tensor log", () => {
     (utility as any).tensors = tensors;
   },
   onComplete() {
+    for (let backend of backends) {
+      (utility as any).tensors[backend.name].delete();
+    }
     utility = {};
   }
 });
@@ -110,6 +116,35 @@ suite("Tensor sqrt", () => {
     (utility as any).tensors = tensors;
   },
   onComplete() {
+    for (let backend of backends) {
+      (utility as any).tensors[backend.name].delete();
+    }
+    utility = {};
+  }
+});
+
+suite("Tensor abs", () => {
+  for (let backend of backends) {
+    benchmark(backend.name, () => {
+      const result = (utility as any).tensors[backend.name].abs();
+      result.delete();
+    });
+  }
+}, {
+  onStart() {
+    const values = randomValues(100*100);
+
+    const tensors: {[name: string]: Tensor} = {};
+    for (let backend of backends) {
+      tensors[backend.name] = backend.constructor([100,100], values);
+    }
+
+    (utility as any).tensors = tensors;
+  },
+  onComplete() {
+    for (let backend of backends) {
+      (utility as any).tensors[backend.name].delete();
+    }
     utility = {};
   }
 });
@@ -139,6 +174,11 @@ suite("Tensor add", () => {
     (utility as any).tensors = tensors;
   },
   onComplete() {
+    for (let backend of backends) {
+      for (let tensor of (utility as any).tensors[backend.name]) {
+        tensor.delete();
+      }
+    }
     utility = {};
   }
 });
@@ -168,6 +208,11 @@ suite("Tensor subtract", () => {
     (utility as any).tensors = tensors;
   },
   onComplete() {
+    for (let backend of backends) {
+      for (let tensor of (utility as any).tensors[backend.name]) {
+        tensor.delete();
+      }
+    }
     utility = {};
   }
 });
@@ -197,6 +242,11 @@ suite("Tensor divide", () => {
     (utility as any).tensors = tensors;
   },
   onComplete() {
+    for (let backend of backends) {
+      for (let tensor of (utility as any).tensors[backend.name]) {
+        tensor.delete();
+      }
+    }
     utility = {};
   }
 });
@@ -226,6 +276,11 @@ suite("Tensor multiply", () => {
     (utility as any).tensors = tensors;
   },
   onComplete() {
+    for (let backend of backends) {
+      for (let tensor of (utility as any).tensors[backend.name]) {
+        tensor.delete();
+      }
+    }
     utility = {};
   }
 });
@@ -251,6 +306,14 @@ suite("Tensor matmul", () => {
       tensors[backend.name].push(backend.constructor([size,size], values2));
     }
     (utility as any).tensors = tensors;
+  },
+  onComplete() {
+    for (let backend of backends) {
+      for (let tensor of (utility as any).tensors[backend.name]) {
+        tensor.delete();
+      }
+    }
+    utility = {};
   }
 });
 
@@ -274,6 +337,12 @@ for (let axis of [[1,2],[0,1,2,3]]) {
         tensors[backend.name] = backend.constructor([size,size,size,size], values1);
       }
       (utility as any).tensors = tensors;
+    },
+    onComplete() {
+      for (let backend of backends) {
+        (utility as any).tensors[backend.name].delete();
+      }
+      utility = {};
     }
   });
 }
@@ -298,6 +367,12 @@ for (let axis of [[1,2],[0,1,2,3]]) {
         tensors[backend.name] = backend.constructor([size,size,size,size], values1);
       }
       (utility as any).tensors = tensors;
+    },
+    onComplete() {
+      for (let backend of backends) {
+        (utility as any).tensors[backend.name].delete();
+      }
+      utility = {};
     }
   });
 }
@@ -322,6 +397,12 @@ for (let axis of [[1,2],[0,1,2,3]]) {
         tensors[backend.name] = backend.constructor([size,size,size,size], values1);
       }
       (utility as any).tensors = tensors;
+    },
+    onComplete() {
+      for (let backend of backends) {
+        (utility as any).tensors[backend.name].delete();
+      }
+      utility = {};
     }
   });
 }
@@ -346,6 +427,12 @@ for (let axis of [[1,2],[0,1,2,3]]) {
         tensors[backend.name] = backend.constructor([size,size,size,size], values1);
       }
       (utility as any).tensors = tensors;
+    },
+    onComplete() {
+      for (let backend of backends) {
+        (utility as any).tensors[backend.name].delete();
+      }
+      utility = {};
     }
   });
 }
@@ -375,6 +462,11 @@ suite("Tensor conv", () => {
     (utility as any).tensors = tensors;
   },
   onComplete() {
+    for (let backend of backends) {
+      for (let tensor of (utility as any).tensors[backend.name]) {
+        tensor.delete();
+      }
+    }
     utility = {};
   }
 });
@@ -401,6 +493,11 @@ suite("Tensor softmax", () => {
     (utility as any).tensors = tensors;
   },
   onComplete() {
+    for (let backend of backends) {
+      for (let tensor of (utility as any).tensors[backend.name]) {
+        tensor.delete();
+      }
+    }
     utility = {};
   }
 });
@@ -433,6 +530,11 @@ suite("Tensor gemm", () => {
     (utility as any).tensors = tensors;
   },
   onComplete() {
+    for (let backend of backends) {
+      for (let tensor of (utility as any).tensors[backend.name]) {
+        tensor.delete();
+      }
+    }
     utility = {};
   }
 });

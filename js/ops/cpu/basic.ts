@@ -46,6 +46,10 @@ export function sqrt(a: CPUTensor) {
   return positionWiseUnaryOp(a, (o1) => Math.sqrt(o1));
 }
 
+export function abs(a: CPUTensor) {
+  return positionWiseUnaryOp(a, (o1) => Math.abs(o1));
+}
+
 export function add(a: CPUTensor, b: CPUTensor, resultShape: readonly number[]) {
   return positionWiseBinaryOp(a, b, (o1, o2) => o1 + o2, resultShape);
 }

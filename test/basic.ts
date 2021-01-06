@@ -54,6 +54,22 @@ export default function testBasic(name: string, constructor: TensorConstructor, 
     });
   });
 
+  describe(`${name} abs`, () => {
+    it('should compute the absolute value', async () => {
+      if (wait) {
+        await wait;
+      }
+
+      const input = constructor([2, 3], [-5,1,0.01,-0.05,-100,1000]);
+      const expected = constructor([2, 3], [5,1,0.01,0.05,100,1000]);
+
+      expect(await input.abs().compare(expected, epsilon)).toBeTruthy();
+
+      input.delete();
+      expected.delete();
+    });
+  });
+
   describe(`${name} add`, () => {
     it('should compute the pointwise addition', async () => {
       if (wait) {

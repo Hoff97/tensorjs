@@ -55,6 +55,10 @@ export default class WASMTensor extends Tensor {
     return new WASMTensor(this.wasmTensor.sqrt());
   }
 
+  abs(): Tensor {
+    return new WASMTensor(this.wasmTensor.abs());
+  }
+
   add_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor {
     if (!(tensor instanceof WASMTensor) || !(th instanceof WASMTensor)) {
       throw new Error('Can only add WASM tensor to WASM tensor');

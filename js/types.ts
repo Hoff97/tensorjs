@@ -101,6 +101,8 @@ export default abstract class Tensor {
 
   abstract sqrt(): Tensor;
 
+  abstract abs(): Tensor;
+
   alignTensor(tensor: Tensor) {
     let thisShape = this.getShape();
     let thatShape = tensor.getShape();
