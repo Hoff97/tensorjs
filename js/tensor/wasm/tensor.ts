@@ -87,6 +87,13 @@ export default class WASMTensor extends Tensor {
     return new WASMTensor(th.wasmTensor.divide(tensor.wasmTensor));
   }
 
+  power_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor {
+    if (!(tensor instanceof WASMTensor) || !(th instanceof WASMTensor)) {
+      throw new Error('Can only take WASM tensor to power of WASM tensor');
+    }
+    return new WASMTensor(th.wasmTensor.power(tensor.wasmTensor));
+  }
+
   matMul(tensor: Tensor): Tensor {
     if (!(tensor instanceof WASMTensor)) {
       throw new Error('Can only add WASM tensor to WASM tensor');

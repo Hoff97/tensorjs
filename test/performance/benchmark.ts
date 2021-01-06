@@ -311,6 +311,40 @@ suite("Tensor multiply", () => {
   }
 });
 
+suite("Tensor power", () => {
+  for (let backend of backends) {
+    benchmark(backend.name, () => {
+      const t1: Tensor = (utility as any).tensors[backend.name][0];
+      const t2: Tensor = (utility as any).tensors[backend.name][1];
+
+      const result = t1.power(t2);
+      result.delete();
+    });
+  }
+}, {
+  onStart() {
+    const values1 = randomValues(100*100);
+    const values2 = randomValues(100*100);
+
+    const tensors: {[name: string]: Tensor[]} = {};
+    for (let backend of backends) {
+      tensors[backend.name] = []
+      tensors[backend.name].push(backend.constructor([100,100], values1));
+      tensors[backend.name].push(backend.constructor([100,100], values2));
+    }
+
+    (utility as any).tensors = tensors;
+  },
+  onComplete() {
+    for (let backend of backends) {
+      for (let tensor of (utility as any).tensors[backend.name]) {
+        tensor.delete();
+      }
+    }
+    utility = {};
+  }
+});
+
 suite("Tensor matmul", () => {
   for (let backend of backends) {
     benchmark(backend.name, () => {

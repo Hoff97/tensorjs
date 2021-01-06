@@ -66,3 +66,6 @@ export function divide(a: CPUTensor, b: CPUTensor, resultShape: readonly number[
   return positionWiseBinaryOp(a, b, (o1, o2) => o1 / o2, resultShape);
 }
 
+export function power(a: CPUTensor, b: CPUTensor, resultShape: readonly number[]) {
+  return positionWiseBinaryOp(a, b, (o1, o2) =>  Math.pow(o1, o2), resultShape);
+}

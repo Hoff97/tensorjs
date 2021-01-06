@@ -242,6 +242,45 @@ export default function testBasic(name: string, constructor: TensorConstructor, 
     });
   });
 
+  describe(`${name} power`, () => {
+    it('should compute the pointwise power', async () => {
+      if (wait) {
+        await wait;
+      }
+
+      const a = constructor([2, 2], [1, 2, 3, 4]);
+      const b = constructor([2, 2], [2,3,2.5,3.5]);
+      const expected = constructor([2, 2], [1, 8, 15.588457268, 128]);
+
+      expect(await a.power(b).compare(expected, epsilon)).toBeTruthy();
+
+      a.delete();
+      b.delete();
+      expected.delete();
+    });
+
+    it('Should work with broadcasting', async () => {
+      if (wait) {
+        await wait;
+      }
+
+      const a = constructor([2, 2], [1,2,3,4]);
+      const b = constructor([1], [2]);
+      const c = constructor([2], [2,3.5]);
+      const expected1 = constructor([2, 2], [1,4,9,16]);
+      const expected2 = constructor([2, 2], [1, 11.313708499, 9, 128]);
+
+      expect(await a.power(b).compare(expected1, epsilon)).toBeTruthy();
+      expect(await a.power(c).compare(expected2, epsilon)).toBeTruthy();
+
+      a.delete();
+      b.delete();
+      c.delete();
+      expected1.delete();
+      expected2.delete();
+    });
+  });
+
   describe(`${name} matMul`, () => {
     it('should compute the matrix product', async () => {
       if (wait) {

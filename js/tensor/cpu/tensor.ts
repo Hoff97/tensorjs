@@ -1,6 +1,6 @@
 import {
   abs,
-  add, divide, exp, log, multiply, sqrt, subtract
+  add, divide, exp, log, multiply, power, sqrt, subtract
 } from '../../ops/cpu/basic';
 import { concat } from '../../ops/cpu/concat';
 import { conv } from '../../ops/cpu/conv';
@@ -121,6 +121,13 @@ export default class CPUTensor extends Tensor {
       throw new Error('Can only add CPU tensor to CPU tensor');
     }
     return divide(th, tensor, resultShape);
+  }
+
+  power_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor {
+    if (!(tensor instanceof CPUTensor) || !(th instanceof CPUTensor)) {
+      throw new Error('Can only take CPU tensor to power of CPU tensor');
+    }
+    return power(th, tensor, resultShape);
   }
 
   matMul(tensor: Tensor): Tensor {

@@ -149,6 +149,11 @@ export default abstract class Tensor {
     return this.divide_impl(th as Tensor, tens as Tensor, resultShape as number[]);
   }
 
+  power(tensor: Tensor) {
+    const [th, tens, resultShape] = this.alignTensor(tensor);
+    return this.power_impl(th as Tensor, tens as Tensor, resultShape as number[]);
+  }
+
   transpose(permutation?: number[]): Tensor {
     if (permutation === undefined) {
       const shape = this.getShape();
@@ -204,6 +209,8 @@ export default abstract class Tensor {
   abstract multiply_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor;
 
   abstract divide_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor;
+
+  abstract power_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor;
 
   abstract matMul(tensor: Tensor): Tensor;
 

@@ -604,6 +604,10 @@ impl Tensor {
         self.binary_op(other, |x: f32, y: f32| x / y)
     }
 
+    pub fn power(&self, other: &Tensor) -> Tensor {
+        self.binary_op(other, |x: f32, y: f32| x.powf(y))
+    }
+
     pub fn matmul(&self, other: &Tensor) -> Tensor {
         let m = self.shape[0];
         let n = self.shape[1];

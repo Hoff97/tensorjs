@@ -21,6 +21,7 @@ import { concat } from '../../ops/gpu/concat';
 import { gemm } from '../../ops/gpu/gemm';
 import { abs } from '../../ops/gpu/abs';
 import { transpose } from '../../ops/gpu/transpose';
+import { power } from '../../ops/gpu/power';
 
 
 export default class GPUTensor extends Tensor {
@@ -110,6 +111,13 @@ export default class GPUTensor extends Tensor {
       throw new Error('Can only divide GPU tensor by GPU tensor');
     }
     return divide(th, tensor, resultShape);
+  }
+
+  power_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor {
+    if (!(tensor instanceof GPUTensor) || !(th instanceof GPUTensor)) {
+      throw new Error('Can only take GPU tensor to power of GPU tensor');
+    }
+    return power(th, tensor, resultShape);
   }
 
   matMul(tensor: Tensor): Tensor {
