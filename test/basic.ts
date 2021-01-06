@@ -389,7 +389,7 @@ export default function testBasic(name: string, constructor: TensorConstructor, 
       expected.delete();
     });
 
-    fit('should work with batches and a and b transposed and c', async () => {
+    it('should work with batches and a and b transposed and c', async () => {
       if (wait) {
         await wait;
       }

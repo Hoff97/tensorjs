@@ -18,6 +18,7 @@ import { defaultAllocator, gl } from './gl';
 import { MemoryEntry } from './memory';
 import { conv } from '../../ops/gpu/conv';
 import { concat } from '../../ops/gpu/concat';
+import { gemm } from '../../ops/gpu/gemm';
 
 
 export default class GPUTensor extends Tensor {
@@ -110,6 +111,13 @@ export default class GPUTensor extends Tensor {
       throw new Error('Can only matrix multiply GPU tensor to GPU tensor');
     }
     return matmul(this, tensor);
+  }
+
+  gemm_impl(b: Tensor, aTranspose: boolean, bTranspose: boolean, alpha: number, beta: number, c?: Tensor): Tensor {
+    if (!(b instanceof GPUTensor && (c === undefined || c instanceof GPUTensor))) {
+      throw new Error('Can only do gemm with CPU tensors');
+    }
+    return gemm(this, b, aTranspose, bTranspose, alpha, beta, c as GPUTensor);
   }
 
   sum_impl(axes: number[], keepDims: boolean): Tensor {
