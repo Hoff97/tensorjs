@@ -1,5 +1,5 @@
 import testBasic from './basic';
-import testPool from './pool';
+import testAggregate from './aggregate';
 import WASMTensor from '../js/tensor/wasm/tensor';
 import { wasmLoaded } from '../js/tensor/wasm/tensor';
 import testConv from './conv';
@@ -10,6 +10,6 @@ const constructor = (shape: ReadonlyArray<number>, values: number[]) => {
   return new WASMTensor(vals, sh);
 };
 
-testBasic('WASM', constructor, wasmLoaded);
+/*testBasic('WASM', constructor, wasmLoaded);
 testPool('WASM', constructor, wasmLoaded);
-testConv('WASM', constructor, wasmLoaded);
+testConv('WASM', constructor, wasmLoaded);*/

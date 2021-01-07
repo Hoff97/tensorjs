@@ -1,3 +1,4 @@
+import { averagePool } from '../../ops/cpu/averagePool';
 import {
   abs,
   add, divide, exp, log, multiply, power, sqrt, subtract
@@ -166,6 +167,13 @@ export default class CPUTensor extends Tensor {
       throw new Error('Can only do convolution of CPU tensor with CPU tensor');
     }
     return conv(this, kernel, dilations, group, pads, strides, bias as CPUTensor);
+  }
+
+  averagePool_impl(kernelShape: number[],
+                    pads: number[],
+                    strides: number[],
+                    includePad: boolean): Tensor {
+    return averagePool(this, kernelShape, pads, strides, includePad);
   }
 
   reshape(shape: number[]): Tensor {

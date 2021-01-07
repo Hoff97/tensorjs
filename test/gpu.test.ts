@@ -1,7 +1,7 @@
 import GPUTensor from "../js/tensor/gpu/tensor";
 import testBasic from './basic';
 import testConv from "./conv";
-import testPool from './pool';
+import testAggregate from './aggregate';
 
 describe(`GPU create tensor`, () => {
   it('should get the same values back', async () => {

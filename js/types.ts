@@ -93,6 +93,19 @@ export default abstract class Tensor {
     return this.conv_impl(kernel, dilations, group, pads, strides, bias);
   }
 
+  averagePool(kernelShape: number[],
+               pads?: number[],
+               strides?: number[],
+               includePad?: boolean): Tensor {
+    const sh = this.getShape();
+    const dataRank = sh.length - 2;
+
+    pads = pads || new Array(dataRank * 2).fill(0);
+    strides = strides || new Array(dataRank).fill(1);
+
+    return this.averagePool_impl(kernelShape, pads, strides, includePad);
+  }
+
   abstract reshape(shape: readonly number[]): Tensor;
 
   abstract exp(): Tensor;
@@ -231,6 +244,11 @@ export default abstract class Tensor {
                      pads: number[],
                      strides: number[],
                      bias?: Tensor): Tensor;
+
+  abstract averagePool_impl(kernelShape: number[],
+                             pads: number[],
+                             strides: number[],
+                             includePad: boolean): Tensor;
 
   abstract concat(tensor: Tensor, axis: number): Tensor;
 

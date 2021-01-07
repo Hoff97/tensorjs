@@ -1,10 +1,13 @@
 import testBasic from './basic';
 import CPUTensor from '../js/tensor/cpu/tensor';
-import testPool from './pool';
+import testAggregate from './aggregate';
 import testConv from './conv';
+import testPool from './pool';
 
 const constructor = (shape: ReadonlyArray<number>, values: number[]) => new CPUTensor(shape, values);
 
-testBasic('CPU', constructor);
+/*testBasic('CPU', constructor);
 testPool('CPU', constructor);
-testConv('CPU', constructor);
+testConv('CPU', constructor);*/
+
+testPool('CPU', constructor);
