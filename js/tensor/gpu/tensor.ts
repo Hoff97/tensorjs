@@ -22,6 +22,7 @@ import { gemm } from '../../ops/gpu/gemm';
 import { abs } from '../../ops/gpu/abs';
 import { transpose } from '../../ops/gpu/transpose';
 import { power } from '../../ops/gpu/power';
+import { averagePool } from '../../ops/gpu/averagePool';
 
 
 export default class GPUTensor extends Tensor {
@@ -155,6 +156,10 @@ export default class GPUTensor extends Tensor {
       throw new Error('Can only do convolution of GPU tensor with GPU tensor');
     }
     return conv(this, kernel, dilations, group, pads, strides, bias as GPUTensor);
+  }
+
+  averagePool_impl(kernelShape: number[], pads: number[], strides: number[], includePad: boolean): Tensor {
+    return averagePool(this, kernelShape, pads, strides, includePad);
   }
 
   reshape(shape: number[]): Tensor {

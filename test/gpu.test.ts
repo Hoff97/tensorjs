@@ -2,6 +2,7 @@ import GPUTensor from "../js/tensor/gpu/tensor";
 import testBasic from './basic';
 import testConv from "./conv";
 import testAggregate from './aggregate';
+import testPool from "./pool";
 
 describe(`GPU create tensor`, () => {
   it('should get the same values back', async () => {
@@ -18,5 +19,6 @@ const constructor = (shape: ReadonlyArray<number>, values: number[]) => {
 };
 
 /*testBasic('GPU', constructor);
+testAggregate('GPU', constructor);
 testPool('GPU', constructor);
 testConv('GPU', constructor);*/

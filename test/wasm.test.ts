@@ -11,8 +11,7 @@ const constructor = (shape: ReadonlyArray<number>, values: number[]) => {
   return new WASMTensor(vals, sh);
 };
 
-/*testBasic('WASM', constructor, wasmLoaded);
-testPool('WASM', constructor, wasmLoaded);
-testConv('WASM', constructor, wasmLoaded);*/
-
+testBasic('WASM', constructor, wasmLoaded);
+testAggregate('WASM', constructor, wasmLoaded);
+testConv('WASM', constructor, wasmLoaded);
 testPool('CPU', constructor, wasmLoaded);
