@@ -1,7 +1,7 @@
 import { averagePool } from '../../ops/cpu/averagePool';
 import {
   abs,
-  add, divide, exp, log, multiply, power, sqrt, subtract
+  add, clip, divide, exp, log, multiply, power, sqrt, subtract
 } from '../../ops/cpu/basic';
 import { concat } from '../../ops/cpu/concat';
 import { conv } from '../../ops/cpu/conv';
@@ -94,6 +94,10 @@ export default class CPUTensor extends Tensor {
 
   abs(): Tensor {
     return abs(this);
+  }
+
+  clip(min?: number, max?: number): Tensor {
+    return clip(this, min, max);
   }
 
   add_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor {

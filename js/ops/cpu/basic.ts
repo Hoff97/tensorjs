@@ -50,6 +50,19 @@ export function abs(a: CPUTensor) {
   return positionWiseUnaryOp(a, (o1) => Math.abs(o1));
 }
 
+export function clip(a: CPUTensor, min?: number, max?: number) {
+  let f = (o1: number) => o1;
+  if (min !== undefined && max !== undefined) {
+    f = (o1: number) => Math.min(max, Math.max(min, o1));
+  } else if (max !== undefined) {
+    f = (o1: number) => Math.min(max, o1);
+  } else if (min !== undefined) {
+    f = (o1: number) => Math.max(min, o1);
+  }
+
+  return positionWiseUnaryOp(a, f);
+}
+
 export function add(a: CPUTensor, b: CPUTensor, resultShape: readonly number[]) {
   return positionWiseBinaryOp(a, b, (o1, o2) => o1 + o2, resultShape);
 }

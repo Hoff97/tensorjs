@@ -23,6 +23,7 @@ import { abs } from '../../ops/gpu/abs';
 import { transpose } from '../../ops/gpu/transpose';
 import { power } from '../../ops/gpu/power';
 import { averagePool } from '../../ops/gpu/averagePool';
+import { clip } from '../../ops/gpu/clip';
 
 
 export default class GPUTensor extends Tensor {
@@ -175,5 +176,9 @@ export default class GPUTensor extends Tensor {
 
   transpose_impl(permutation: number[]): Tensor {
     return transpose(this, permutation);
+  }
+
+  clip(min?: number, max?: number): Tensor {
+    return clip(this, min, max);
   }
 }

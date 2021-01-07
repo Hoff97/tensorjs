@@ -158,4 +158,15 @@ export default class WASMTensor extends Tensor {
   transpose_impl(permutation: number[]): Tensor {
     return new WASMTensor(this.wasmTensor.transpose(new Uint32Array(permutation)));
   }
+
+  clip(min?: number, max?: number): Tensor {
+    if (min !== undefined && max !== undefined) {
+      return new WASMTensor(this.wasmTensor.clip(min, max));
+    } else if (min !== undefined ) {
+      return new WASMTensor(this.wasmTensor.clip_min(min));
+    } else if (max !== undefined) {
+      return new WASMTensor(this.wasmTensor.clip_max(max));
+    }
+    return this;
+  }
 }

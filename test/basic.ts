@@ -580,4 +580,26 @@ export default function testBasic(name: string, constructor: TensorConstructor, 
       expected1.delete();
     });
   });
+
+  describe(`${name} clip`, () => {
+    it('should clip the tensor', async () => {
+      if (wait) {
+        await wait;
+      }
+
+      const a = constructor([2, 2], [1, 2, 3, 4]);
+      const expected1 = constructor([2, 2], [2,2,3,3]);
+      const expected2 = constructor([2, 2], [1,2,3,3]);
+      const expected3 = constructor([2, 2], [2,2,3,4]);
+
+      expect(await a.clip(2,3).compare(expected1, epsilon)).toBeTruthy();
+      expect(await a.clip(undefined,3).compare(expected2, epsilon)).toBeTruthy();
+      expect(await a.clip(2).compare(expected3, epsilon)).toBeTruthy();
+
+      a.delete();
+      expected1.delete();
+      expected2.delete();
+      expected3.delete();
+    });
+  });
 }

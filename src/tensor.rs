@@ -894,6 +894,18 @@ impl Tensor {
         }
         return self._transpose(&perm);
     }
+
+    pub fn clip(&self, min: f32, max: f32) -> Tensor {
+        self.unary_op(|x: f32| x.min(max).max(min))
+    }
+
+    pub fn clip_min(&self, min: f32) -> Tensor {
+        self.unary_op(|x: f32| x.max(min))
+    }
+
+    pub fn clip_max(&self, max: f32) -> Tensor {
+        self.unary_op(|x: f32| x.min(max))
+    }
 }
 
 impl Add for Tensor {
