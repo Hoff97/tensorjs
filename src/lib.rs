@@ -5,6 +5,7 @@ pub mod tensor;
 pub mod tests {
     pub mod shape;
     pub mod tensor {
+        pub mod aggregate;
         pub mod basic;
         pub mod pool;
         pub mod tensor;

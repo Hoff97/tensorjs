@@ -30,10 +30,11 @@ pub fn conv_output_size(in_sizes: &Vec<usize>,
                         kernels: &Vec<usize>,
                         pads: &Vec<usize>,
                         dilations: &Vec<usize>,
-                        strides: &Vec<usize>) -> Vec<usize> {
+                        strides: &Vec<usize>,
+                        kernel_offset: usize) -> Vec<usize> {
     let mut result = vec![0; dilations.len()];
     for i in 0..dilations.len() {
-        let dkernel = dilations[i] * (kernels[i+2] - 1) + 1;
+        let dkernel = dilations[i] * (kernels[i+kernel_offset] - 1) + 1;
         result[i] =  ((in_sizes[i+2] + pads[i] + pads[i + dilations.len()] - dkernel) / strides[i]) + 1
     }
     result
