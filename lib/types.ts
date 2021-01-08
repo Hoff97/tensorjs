@@ -102,6 +102,7 @@ export default abstract class Tensor {
 
     pads = pads || new Array(dataRank * 2).fill(0);
     strides = strides || new Array(dataRank).fill(1);
+    includePad = includePad || false;
 
     return this.averagePool_impl(kernelShape, pads, strides, includePad);
   }

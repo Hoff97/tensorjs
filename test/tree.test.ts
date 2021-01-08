@@ -1,6 +1,6 @@
 import { AVLTree } from "../lib/util/avl";
 
-/*describe('Create and insert', () => {
+describe('Create and insert', () => {
   it('should have zero keys in the beginning', () => {
     const tree = new AVLTree<number, number>({});
 
@@ -105,4 +105,4 @@ import { AVLTree } from "../lib/util/avl";
       expect(result.length).toBeGreaterThan(100);
     });
   }
-});*/
+});

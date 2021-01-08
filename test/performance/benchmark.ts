@@ -1,6 +1,6 @@
 import CPUTensor from "../../lib/tensor/cpu/tensor";
 import GPUTensor from "../../lib/tensor/gpu/tensor";
-import WASMTensor, { wasmLoaded } from "../../lib/tensor/wasm/tensor";
+import WASMTensor from "../../lib/tensor/wasm/tensor";
 import Tensor from "../../lib/types";
 
 declare const suite: any;
