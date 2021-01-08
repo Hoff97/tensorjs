@@ -5,7 +5,7 @@
   "scripts": {
     "build": "wasm-pack build && webpack",
     "build:wasm": "wasm-pack build",
-    "build:js": "webpack",
+    "build:js": "webpack --env=production",
     "test": "npm run test:rust && npm run test:integration",
     "test:integration": "karma start karma.conf.js",
     "test:performance": "karma start karma.performance.js",
