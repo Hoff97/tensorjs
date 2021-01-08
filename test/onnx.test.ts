@@ -4,7 +4,7 @@ import { toGPU } from '../lib/util/convert';
 
 const b: ArrayBuffer = require('arraybuffer-loader!./data/mobile_cnn.onnx');
 
-describe(`Onnx model`, () => {
+/*describe(`Onnx model`, () => {
   it('should be able to load a MobileNet', async () => {
     const model = new OnnxModel(b);
 
@@ -17,4 +17,4 @@ describe(`Onnx model`, () => {
 
     const values = await sM.getValues();
   })
-});
+});*/
