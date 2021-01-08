@@ -3,7 +3,10 @@
   "name": "@hoff97/tensor-js",
   "description": "PyTorch like deep learning inferrence library",
   "keywords": [
-    "pytorch", "deep-learning", "gpu", "tensors"
+    "pytorch",
+    "deep-learning",
+    "gpu",
+    "tensors"
   ],
   "homepage": "https://github.com/Hoff97/tensorjs",
   "repository": {
@@ -45,6 +48,7 @@
     "rimraf": "^3.0.0",
     "ts-loader": "^8.0.12",
     "ts-node": "^9.1.1",
+    "typedoc": "^0.20.13",
     "typescript": "^4.1.3",
     "wdio-chromedriver-service": "^6.0.4",
     "webpack": "^4.42.0",
