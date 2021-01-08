@@ -169,7 +169,7 @@ export class GPUTensor extends Tensor {
     return averagePool(this, kernelShape, pads, strides, includePad);
   }
 
-  reshape(shape: number[]): Tensor {
+  reshape_impl(shape: number[]): Tensor {
     return new GPUTensor(this.memory, shape);
   }
 

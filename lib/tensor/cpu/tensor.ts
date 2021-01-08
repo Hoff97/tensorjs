@@ -186,7 +186,7 @@ export class CPUTensor extends Tensor {
     return averagePool(this, kernelShape, pads, strides, includePad);
   }
 
-  reshape(shape: number[]): Tensor {
+  reshape_impl(shape: number[]): Tensor {
     return new CPUTensor(shape, this.values);
   }
 
