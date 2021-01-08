@@ -1,7 +1,21 @@
 {
-  "author": "You <you@example.com>",
-  "name": "rust-webpack-template",
+  "author": "Frithjof Winkelmann <frithjof97@web.de>",
+  "name": "@hoff97/tensor-js",
+  "description": "PyTorch like deep learning inferrence library",
+  "keywords": [
+    "pytorch", "deep-learning", "gpu", "tensors"
+  ],
+  "homepage": "https://github.com/Hoff97/tensorjs",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Hoff97/tensorjs.git"
+  },
+  "license": "MIT",
   "version": "0.1.0",
+  "browser": "dist/bundle.js",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "wasm-pack build && webpack",
     "build:wasm": "wasm-pack build",
