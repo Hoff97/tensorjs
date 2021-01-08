@@ -1,4 +1,4 @@
-import CPUTensor from '../../tensor/cpu/tensor';
+import { CPUTensor } from '../../tensor/cpu/tensor';
 import { incrementIndex } from '../../util/shape';
 
 export function transpose(x: CPUTensor, permutation: number[]) {

@@ -27,7 +27,7 @@ import { clip } from '../../ops/gpu/clip';
 import { reduceMean } from '../../ops/gpu/reduceMean';
 
 
-export default class GPUTensor extends Tensor {
+export class GPUTensor extends Tensor {
   public memory: MemoryEntry;
 
   public size: number;

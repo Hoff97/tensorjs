@@ -1,4 +1,4 @@
-import CPUTensor from '../../tensor/cpu/tensor';
+import { CPUTensor } from '../../tensor/cpu/tensor';
 import { getSize, incrementIndex, indexToPos, computeStrides } from '../../util/shape';
 
 import { poolResultShape } from '../util/pool';

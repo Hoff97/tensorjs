@@ -1,7 +1,7 @@
 import { DrawCommand, Framebuffer2D } from "regl";
 import { defaultAllocator, gl } from "../../tensor/gpu/gl";
 import { MemoryEntry } from "../../tensor/gpu/memory";
-import GPUTensor from "../../tensor/gpu/tensor";
+import { GPUTensor } from "../../tensor/gpu/tensor";
 import { getSize, computeStrides } from "../../util/shape";
 
 export interface Input {

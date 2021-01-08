@@ -1,4 +1,4 @@
-import GPUTensor from "../lib/tensor/gpu/tensor";
+import { GPUTensor } from "../lib/tensor/gpu/tensor";
 import testBasic from './basic';
 import testConv from "./conv";
 import testAggregate from './aggregate';

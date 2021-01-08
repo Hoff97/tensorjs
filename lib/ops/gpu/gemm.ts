@@ -1,5 +1,5 @@
 import { DrawCommand } from "regl";
-import GPUTensor from "../../tensor/gpu/tensor";
+import { GPUTensor } from "../../tensor/gpu/tensor";
 import { buildComp, compute, maxRank, defaultMain, initIndex, maxIterations } from "./util";
 
 let comp: DrawCommand;

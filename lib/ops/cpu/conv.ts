@@ -1,4 +1,4 @@
-import CPUTensor from '../../tensor/cpu/tensor';
+import { CPUTensor } from '../../tensor/cpu/tensor';
 import { getSize, incrementIndex } from '../../util/shape';
 import { outputDimsSize } from '../util/conv';
 

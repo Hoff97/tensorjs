@@ -1,5 +1,5 @@
 import { OnnxModel } from "../../lib/onnx/model";
-import CPUTensor from "../../lib/tensor/cpu/tensor";
+import { CPUTensor } from "../../lib/tensor/cpu/tensor";
 import Tensor from "../../lib/types";
 import { toGPU } from "../../lib/util/convert";
 

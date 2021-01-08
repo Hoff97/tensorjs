@@ -1,6 +1,6 @@
-import CPUTensor from "../tensor/cpu/tensor";
-import GPUTensor from "../tensor/gpu/tensor";
-import WASMTensor from "../tensor/wasm/tensor";
+import { CPUTensor } from "../tensor/cpu/tensor";
+import { GPUTensor } from "../tensor/gpu/tensor";
+import { WASMTensor } from "../tensor/wasm/tensor";
 import Tensor  from "../types";
 
 export async function toCPU(tensor: Tensor) {

@@ -1,6 +1,6 @@
 import Long from 'long';
 import {onnx} from 'onnx-proto';
-import CPUTensor from '../tensor/cpu/tensor';
+import { CPUTensor } from '../tensor/cpu/tensor';
 import Tensor from '../types';
 import { toCPU, toGPU, toWASM } from '../util/convert';
 import { TENSOR_FLOAT, TENSOR_INT64 } from './definitions';
