@@ -5,11 +5,17 @@ import { poolResultShape } from "../util/pool";
 import { buildComp, compute, maxRank, defaultMain, initIndex, maxIterations, pad, posToIndex, incrementIndex, incrementConditional } from "./util";
 
 
-export function fragmentShader(update: (a: string, b: string) => string) {
+export function fragmentShader(update: (a: string, b: string) => string,
+                               post?: (res: string) => string,
+                               vars?: string) {
+  if (post === undefined) {
+    post = (x: string) => '';
+  }
   return `
 uniform int mappedInputStrides[${maxRank}];
 uniform int sumDims[${maxRank}];
 uniform int sumSize;
+
 
 float process(int index[${maxRank}]) {
   int inputIx[${maxRank}];
@@ -40,6 +46,8 @@ float process(int index[${maxRank}]) {
 
     ${incrementConditional('inputIx', 'shapeinput1', 'sumDims')}
   }
+
+  ${post('res')}
 
   return res;
 }

@@ -1,6 +1,3 @@
-import CPUTensor from './tensor/cpu/tensor';
-import GPUTensor from './tensor/gpu/tensor';
-import WASMTensor from './tensor/wasm/tensor';
 import { compareShapes } from './util/shape';
 
 export default abstract class Tensor {
@@ -34,7 +31,7 @@ export default abstract class Tensor {
 
     return true;
   }
- 
+
   getAxes(axes?: number | number[]) {
     let ax: number[];
 
@@ -74,6 +71,12 @@ export default abstract class Tensor {
     let ax = this.getAxes(axes);
     keepDims = keepDims || false;
     return this.min_impl(ax, keepDims);
+  }
+
+  reduceMean(axes?: number | number[], keepDims?: boolean): Tensor {
+    let ax = this.getAxes(axes);
+    keepDims = keepDims || false;
+    return this.reduceMean_impl(ax, keepDims);
   }
 
   conv(kernel: Tensor,
@@ -238,6 +241,8 @@ export default abstract class Tensor {
   abstract max_impl(axes: number[], keepDims: boolean): Tensor;
 
   abstract min_impl(axes: number[], keepDims: boolean): Tensor;
+
+  abstract reduceMean_impl(axes: number[], keepDims: boolean): Tensor;
 
   abstract conv_impl(kernel: Tensor,
                      dilations: number[],

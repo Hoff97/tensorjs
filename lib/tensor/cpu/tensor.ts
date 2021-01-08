@@ -10,6 +10,7 @@ import { matMul } from '../../ops/cpu/matMul';
 import { max } from '../../ops/cpu/max';
 import { min } from '../../ops/cpu/min';
 import { product } from '../../ops/cpu/product';
+import { reduceMean } from '../../ops/cpu/reduceMean';
 import { sum } from '../../ops/cpu/sum';
 import { transpose } from '../../ops/cpu/transpose';
 import Tensor from '../../types';
@@ -164,6 +165,10 @@ export default class CPUTensor extends Tensor {
 
   min_impl(axes: number[], keepDims: boolean): Tensor {
     return min(this, axes, keepDims);
+  }
+
+  reduceMean_impl(axes: number[], keepDims: boolean): Tensor {
+    return reduceMean(this, axes, keepDims);
   }
 
   conv_impl(kernel: Tensor, dilations: number[], group: number, pads: number[], strides: number[], bias?: Tensor): Tensor {

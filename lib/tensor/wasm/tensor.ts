@@ -128,6 +128,10 @@ export default class WASMTensor extends Tensor {
     return new WASMTensor(this.wasmTensor.min(new Uint32Array(axes), keepDims));
   }
 
+  reduceMean_impl(axes: number[], keepDims: boolean): Tensor {
+    return new WASMTensor(this.wasmTensor.reduce_mean(new Uint32Array(axes), keepDims));
+  }
+
   conv_impl(kernel: Tensor, dilations: number[], group: number, pads: number[], strides: number[], bias?: Tensor): Tensor {
     if (!(kernel instanceof WASMTensor) || (bias !== undefined && !(bias instanceof WASMTensor))) {
       throw new Error('Can only do convolution of CPU tensor with CPU tensor');

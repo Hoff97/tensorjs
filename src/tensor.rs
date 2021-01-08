@@ -189,9 +189,9 @@ impl Tensor {
     }
 
     #[inline]
-    pub fn _pool<F>(&self, axes: &Vec<usize>, keep_dims: bool, op: F) -> Tensor where F: Fn(f32,f32) -> f32 {
+    pub fn _pool<F, F2>(&self, axes: &Vec<usize>, keep_dims: bool, op: F, postprocess: bool, post: F2) -> Tensor where F: Fn(f32,f32) -> f32, F2: Fn(f32) -> f32 {
         let mut result_rank = self.shape.len() - axes.len() as usize;
-        
+
         if keep_dims {
             result_rank = self.shape.len();
         }
@@ -254,6 +254,12 @@ impl Tensor {
             increment_index(&mut input_index, &self.shape);
         }
 
+        if postprocess {
+            for i in 0..result_size {
+                values[i] = post(values[i]);
+            }
+        }
+
         Tensor {
             values,
             shape: result_shape,
@@ -263,19 +269,29 @@ impl Tensor {
     }
 
     pub fn _sum(&self, axes: &Vec<usize>, keep_dims: bool) -> Tensor {
-        return self._pool(axes, keep_dims, |x: f32, y: f32| x+y)
+        return self._pool(axes, keep_dims, |x: f32, y: f32| x+y, false, |x: f32| x)
     }
 
     pub fn _product(&self, axes: &Vec<usize>, keep_dims: bool) -> Tensor {
-        return self._pool(axes, keep_dims, |x: f32, y: f32| x*y)
+        return self._pool(axes, keep_dims, |x: f32, y: f32| x*y, false, |x: f32| x)
     }
 
     pub fn _max(&self, axes: &Vec<usize>, keep_dims: bool) -> Tensor {
-        return self._pool(axes, keep_dims, |x: f32, y: f32| x.max(y))
+        return self._pool(axes, keep_dims, |x: f32, y: f32| x.max(y), false, |x: f32| x)
     }
 
     pub fn _min(&self, axes: &Vec<usize>, keep_dims: bool) -> Tensor {
-        return self._pool(axes, keep_dims, |x: f32, y: f32| x.min(y))
+        return self._pool(axes, keep_dims, |x: f32, y: f32| x.min(y), false, |x: f32| x)
+    }
+
+    pub fn _reduce_mean(&self, axes: &Vec<usize>, keep_dims: bool) -> Tensor {
+        let mut pool_size = 1;
+        for i in 0..axes.len() {
+            pool_size *= self.shape[axes[i]];
+        }
+        let pool_size_f = pool_size as f32;
+
+        return self._pool(axes, keep_dims, |x: f32, y: f32| x.min(y), true, |x: f32| x/pool_size_f)
     }
 
     pub fn _conv(&self,
@@ -779,6 +795,14 @@ impl Tensor {
             ax[i as usize] = axes.get_index(i) as usize;
         }
         return self._min(&ax, keep_dims);
+    }
+
+    pub fn reduce_mean(&self, axes: Uint32Array, keep_dims: bool) -> Tensor {
+        let mut ax: Vec<usize> = vec![0; axes.length() as usize];
+        for i in 0..axes.length() {
+            ax[i as usize] = axes.get_index(i) as usize;
+        }
+        return self._reduce_mean(&ax, keep_dims);
     }
 
     pub fn conv(&self,

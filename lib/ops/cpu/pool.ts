@@ -6,7 +6,8 @@ import { poolResultShape } from '../util/pool';
 export function pool(a: CPUTensor,
                      axes: number[],
                      operation: (a: number, b?: number) => number,
-                     keepDims: boolean): CPUTensor {
+                     keepDims: boolean,
+                     postProcess?: (a: number) => number): CPUTensor {
   const inputShape = a.getShape();
   const inputSize = getSize(inputShape);
   const [resultShape, ixMap] = poolResultShape(inputShape, axes, keepDims);
@@ -32,6 +33,12 @@ export function pool(a: CPUTensor,
     }
 
     incrementIndex(index, inputShape);
+  }
+
+  if (postProcess) {
+    for (let i = 0; i < result.size; i++) {
+      result.set(i, postProcess(result.get(i)));
+    }
   }
 
   return result;

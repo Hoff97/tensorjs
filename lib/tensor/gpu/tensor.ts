@@ -24,6 +24,7 @@ import { transpose } from '../../ops/gpu/transpose';
 import { power } from '../../ops/gpu/power';
 import { averagePool } from '../../ops/gpu/averagePool';
 import { clip } from '../../ops/gpu/clip';
+import { reduceMean } from '../../ops/gpu/reduceMean';
 
 
 export default class GPUTensor extends Tensor {
@@ -138,6 +139,10 @@ export default class GPUTensor extends Tensor {
 
   sum_impl(axes: number[], keepDims: boolean): Tensor {
     return sum(this, axes, keepDims);
+  }
+
+  reduceMean_impl(axes: number[], keepDims: boolean): Tensor {
+    return reduceMean(this, axes, keepDims);
   }
 
   product_impl(axes: number[], keepDims: boolean): Tensor {
