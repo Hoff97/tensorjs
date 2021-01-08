@@ -4,9 +4,8 @@ const WasmPackPlugin = require("@wasm-tool/wasm-pack-plugin");
 
 const dist = path.resolve(__dirname, "dist");
 
-module.exports = env => {
-  return {
-    mode: env === "production" ? "production" : "development",
+module.exports = {
+    mode: "production",
     entry: {
       index: "./lib/library.ts"
     },
@@ -35,5 +34,4 @@ module.exports = env => {
         crateDirectory: __dirname,
       }),
     ]
-  }
 };
