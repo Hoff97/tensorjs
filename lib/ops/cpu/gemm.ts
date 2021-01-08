@@ -1,4 +1,4 @@
-import CPUTensor from '../../tensor/cpu/tensor';
+import { CPUTensor } from '../../tensor/cpu/tensor';
 import { getSize } from '../../util/shape';
 
 export function gemm(a: CPUTensor, b: CPUTensor, aTranspose: boolean,

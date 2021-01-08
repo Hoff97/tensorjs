@@ -1,8 +1,6 @@
 import Tensor from './types';
-import WASMTensor from './tensor/wasm/tensor';
-import CPUTensor from './tensor/cpu/tensor';
-import GPUTensor from './tensor/gpu/tensor';
-import * as util from './util/convert'
-import { OnnxModel } from './onnx/model';
+import * as tensor from './tensor/index';
+import * as util from './util/index'
+import * as onnx from './onnx/index';
 
-export {Tensor, WASMTensor, CPUTensor, GPUTensor, util, OnnxModel};
+export {Tensor, tensor, util, onnx};

@@ -1,5 +1,5 @@
 import testBasic from './basic';
-import CPUTensor from '../lib/tensor/cpu/tensor';
+import { CPUTensor } from '../lib/tensor/cpu/tensor';
 import testAggregate from './aggregate';
 import testConv from './conv';
 import testPool from './pool';

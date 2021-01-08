@@ -1,4 +1,4 @@
-import { CPUTensor } from '../lib/library';
+import { CPUTensor } from '../lib/tensor/cpu/tensor';
 import { OnnxModel } from '../lib/onnx/model';
 import { toGPU } from '../lib/util/convert';
 

@@ -16,7 +16,7 @@ import { transpose } from '../../ops/cpu/transpose';
 import Tensor from '../../types';
 import { computeStrides, getSize, indexToPos } from '../../util/shape';
 
-export default class CPUTensor extends Tensor {
+export class CPUTensor extends Tensor {
   private values: Float32Array;
 
   public shape: ReadonlyArray<number>;

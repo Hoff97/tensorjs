@@ -1,4 +1,4 @@
-import CPUTensor from '../../tensor/cpu/tensor';
+import { CPUTensor } from '../../tensor/cpu/tensor';
 
 export function matMul(a: CPUTensor, b: CPUTensor) {
   if (a.shape.length !== 2 || b.shape.length !== 2) {

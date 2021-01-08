@@ -1,4 +1,4 @@
-import CPUTensor from '../../tensor/cpu/tensor';
+import { CPUTensor } from '../../tensor/cpu/tensor';
 import { checkEquivShapes, compareShapes, incrementIndex } from '../../util/shape';
 
 // eslint-disable-next-line no-unused-vars

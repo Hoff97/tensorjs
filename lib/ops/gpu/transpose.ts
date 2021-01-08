@@ -1,5 +1,5 @@
 import { DrawCommand } from "regl";
-import GPUTensor from "../../tensor/gpu/tensor";
+import { GPUTensor } from "../../tensor/gpu/tensor";
 import { computeStrides } from "../../util/shape";
 import { buildComp, compute, defaultMain, maxRank, pad } from "./util";
 

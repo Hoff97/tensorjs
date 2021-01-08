@@ -1,4 +1,4 @@
-import CPUTensor from '../../tensor/cpu/tensor';
+import { CPUTensor } from '../../tensor/cpu/tensor';
 
 export function concat(x: CPUTensor, y: CPUTensor, axis: number) {
   const outputShape = [...x.shape];

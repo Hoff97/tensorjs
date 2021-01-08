@@ -1,4 +1,4 @@
-import CPUTensor from "../../tensor/cpu/tensor";
+import { CPUTensor } from "../../tensor/cpu/tensor";
 import Tensor from "../../types";
 import { toCPU, toGPU, toWASM } from "../../util/convert";
 import { OnnxNode } from "../node";

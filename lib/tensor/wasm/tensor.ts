@@ -11,7 +11,7 @@ export let wasmLoaded: Promise<void> = new Promise((resolve, reject) => {
 });
 
 
-export default class WASMTensor extends Tensor {
+export class WASMTensor extends Tensor {
   public wasmTensor: WT;
 
   constructor(values: Float32Array | WT, shape?: Uint32Array) {

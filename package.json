@@ -23,7 +23,8 @@
     "test": "npm run test:rust && npm run test:integration",
     "test:integration": "karma start karma.conf.js",
     "test:performance": "karma start karma.performance.js",
-    "test:rust": "cargo test --tests"
+    "test:rust": "cargo test --tests",
+    "docs": "typedoc"
   },
   "devDependencies": {
     "@types/benchmark": "^2.1.0",

@@ -1,5 +1,5 @@
 import { DrawCommand } from "regl";
-import GPUTensor from "../../tensor/gpu/tensor";
+import { GPUTensor } from "../../tensor/gpu/tensor";
 import { computeStrides } from "../../util/shape";
 import { poolResultShape } from "../util/pool";
 import { buildComp, compute, maxRank, defaultMain, initIndex, maxIterations, pad, posToIndex, incrementIndex, incrementConditional } from "./util";
