@@ -261,4 +261,6 @@ export default abstract class Tensor {
   abstract transpose_impl(permutation: number[]): Tensor;
 
   abstract clip(min?: number, max?: number): Tensor;
+
+  abstract repeat(repeats: number[]): Tensor;
 }

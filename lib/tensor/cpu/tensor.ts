@@ -11,6 +11,7 @@ import { max } from '../../ops/cpu/max';
 import { min } from '../../ops/cpu/min';
 import { product } from '../../ops/cpu/product';
 import { reduceMean } from '../../ops/cpu/reduceMean';
+import { repeat } from '../../ops/cpu/repeat';
 import { sum } from '../../ops/cpu/sum';
 import { transpose } from '../../ops/cpu/transpose';
 import Tensor from '../../types';
@@ -198,5 +199,9 @@ export class CPUTensor extends Tensor {
 
   transpose_impl(permutation: number[]): Tensor {
     return transpose(this, permutation);
+  }
+
+  repeat(repeats: number[]): Tensor {
+    return repeat(this, repeats);
   }
 }

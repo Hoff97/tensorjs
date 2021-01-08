@@ -173,4 +173,8 @@ export class WASMTensor extends Tensor {
     }
     return this;
   }
+
+  repeat(repeats: number[]): Tensor {
+    return new WASMTensor(this.wasmTensor.repeat(new Uint32Array(repeats)));
+  }
 }
