@@ -1,4 +1,4 @@
-import GPUTensor from "../js/tensor/gpu/tensor";
+import GPUTensor from "../lib/tensor/gpu/tensor";
 import testBasic from './basic';
 import testConv from "./conv";
 import testAggregate from './aggregate';
@@ -18,7 +18,7 @@ const constructor = (shape: ReadonlyArray<number>, values: number[]) => {
   return new GPUTensor(vals, shape);
 };
 
-/*testBasic('GPU', constructor);
+testBasic('GPU', constructor);
 testAggregate('GPU', constructor);
 testPool('GPU', constructor);
-testConv('GPU', constructor);*/
+testConv('GPU', constructor);

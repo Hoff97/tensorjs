@@ -1,4 +1,4 @@
-import Tensor from '../js/types';
+import Tensor from '../lib/types';
 
 const epsilon = 0.00001;
 

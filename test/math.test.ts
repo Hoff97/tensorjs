@@ -1,4 +1,4 @@
-import { primeFactors } from '../js/util/math';
+import { primeFactors } from '../lib/util/math';
 
 describe('Prime factors', () => {
   it('should work', () => {

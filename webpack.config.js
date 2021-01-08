@@ -7,7 +7,7 @@ const dist = path.resolve(__dirname, "dist");
 module.exports = {
   mode: "development",
   entry: {
-    index: "./js/library.ts"
+    index: "./lib/library.ts"
   },
   output: {
     path: dist,
