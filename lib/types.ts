@@ -1,4 +1,4 @@
-import { compareShapes } from './util/shape';
+import { compareShapes, getSize } from './util/shape';
 
 export default abstract class Tensor {
   abstract getValues(): Promise<Float32Array>;
@@ -110,7 +110,30 @@ export default abstract class Tensor {
     return this.averagePool_impl(kernelShape, pads, strides, includePad);
   }
 
-  abstract reshape(shape: readonly number[]): Tensor;
+  reshape(shape: readonly number[]): Tensor {
+    let shSize = 1;
+    let negIndex = -1;
+    for (let i = 0; i < shape.length; i++) {
+      if (shape[i] === -1) {
+        negIndex = i;
+      } else {
+        shSize *= shape[i];
+      }
+    }
+
+    if (negIndex !== -1) {
+      const currShape = this.getShape();
+      const currSize = getSize(currShape);
+      const _shape = [...shape];
+
+      _shape[negIndex] = currSize / shSize;
+
+      return this.reshape_impl(_shape);
+    }
+    return this.reshape_impl(shape);
+  }
+
+  abstract reshape_impl(shape: readonly number[]): Tensor;
 
   abstract exp(): Tensor;
 
@@ -261,4 +284,6 @@ export default abstract class Tensor {
   abstract transpose_impl(permutation: number[]): Tensor;
 
   abstract clip(min?: number, max?: number): Tensor;
+
+  abstract repeat(repeats: number[]): Tensor;
 }

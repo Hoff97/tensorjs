@@ -25,6 +25,7 @@ import { power } from '../../ops/gpu/power';
 import { averagePool } from '../../ops/gpu/averagePool';
 import { clip } from '../../ops/gpu/clip';
 import { reduceMean } from '../../ops/gpu/reduceMean';
+import { repeat } from '../../ops/gpu/repeat';
 
 
 export class GPUTensor extends Tensor {
@@ -168,7 +169,7 @@ export class GPUTensor extends Tensor {
     return averagePool(this, kernelShape, pads, strides, includePad);
   }
 
-  reshape(shape: number[]): Tensor {
+  reshape_impl(shape: number[]): Tensor {
     return new GPUTensor(this.memory, shape);
   }
 
@@ -185,5 +186,9 @@ export class GPUTensor extends Tensor {
 
   clip(min?: number, max?: number): Tensor {
     return clip(this, min, max);
+  }
+
+  repeat(repeats: number[]): Tensor {
+    return repeat(this, repeats);
   }
 }

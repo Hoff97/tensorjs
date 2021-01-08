@@ -602,4 +602,31 @@ export default function testBasic(name: string, constructor: TensorConstructor, 
       expected3.delete();
     });
   });
+
+  fdescribe(`${name} repeat`, () => {
+    it('should reverse the axis by default', async () => {
+      if (wait) {
+        await wait;
+      }
+
+      const a = constructor([2,3], [1,2,3,4,5,6]);
+
+      const b = constructor([2,2], [1,2,3,4,]);
+
+      const expected1 = constructor([4,3], [1,2,3,4,5,6,1,2,3,4,5,6]);
+      const expected2 = constructor([2,6], [1,2,3,1,2,3,4,5,6,4,5,6]);
+
+      const expected3 = constructor([2,4], [1,2,1,2,3,4,3,4]);
+      const expected4 = constructor([4,2], [1,2,3,4,1,2,3,4]);
+
+      console.log(await a.repeat([1,2]).getValues());
+
+      expect(await a.repeat([2,1]).compare(expected1, epsilon)).toBeTruthy();
+      expect(await a.repeat([1,2]).compare(expected2, epsilon)).toBeTruthy();
+
+      a.delete();
+      expected1.delete();
+      expected2.delete();
+    });
+  });
 }

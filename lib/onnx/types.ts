@@ -8,4 +8,7 @@ export type NodeConstructor = (attributes: Attributes,
                                outputs: string[],
                                constants: Constants,
                                onnxVersion: number) => OnnxNode;
-export type Constants = {[name: string]: Tensor};
+export type Constants = {[name: string]: {
+  type: string,
+  value: Tensor
+}};

@@ -147,7 +147,7 @@ export class WASMTensor extends Tensor {
     return new WASMTensor(this.wasmTensor.average_pool(new Uint32Array(kernelShape), new Uint32Array(pads), new Uint32Array(strides), includePad));
   }
 
-  reshape(shape: number[]): Tensor {
+  reshape_impl(shape: number[]): Tensor {
     const sh = new Uint32Array(shape);
     return new WASMTensor(this.wasmTensor.reshape(sh), sh);
   }
@@ -172,5 +172,9 @@ export class WASMTensor extends Tensor {
       return new WASMTensor(this.wasmTensor.clip_max(max));
     }
     return this;
+  }
+
+  repeat(repeats: number[]): Tensor {
+    return new WASMTensor(this.wasmTensor.repeat(new Uint32Array(repeats)));
   }
 }

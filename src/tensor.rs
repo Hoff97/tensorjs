@@ -632,6 +632,39 @@ impl Tensor {
             values
         }
     }
+
+    pub fn _repeat(&self, repeats: &Vec<usize>) -> Tensor {
+        let rank = self.shape.len();
+
+        let mut output_shape = vec![0; rank];
+        for i in 0..rank {
+            output_shape[i] = self.shape[i] * repeats[i];
+        }
+
+        let output_strides = compute_strides(&output_shape);
+        let output_size = get_size(&output_shape);
+
+        let mut values = vec![0.0; output_size];
+
+        let mut index = vec![0; rank];
+        let mut in_ix = vec![0; rank];
+        for i in 0..output_size {
+            for j in 0..rank {
+                in_ix[j] = index[j] % self.shape[j];
+            }
+
+            values[i] = self.get(&in_ix);
+
+            increment_index(&mut index, &output_shape);
+        }
+
+        Tensor {
+            shape: output_shape,
+            strides: output_strides,
+            size: output_size,
+            values
+        }
+    }
 }
 
 #[wasm_bindgen]
@@ -917,6 +950,14 @@ impl Tensor {
             perm[i as usize] = permutation.get_index(i) as usize;
         }
         return self._transpose(&perm);
+    }
+
+    pub fn repeat(&self, repeats: Uint32Array) -> Tensor {
+        let mut _repeats: Vec<usize> = vec![0; repeats.length() as usize];
+        for i in 0..repeats.length() {
+            _repeats[i as usize] = repeats.get_index(i) as usize;
+        }
+        return self._repeat(&_repeats);
     }
 
     pub fn clip(&self, min: f32, max: f32) -> Tensor {

@@ -26,10 +26,6 @@ export abstract class OnnxNode {
         this.variableInputs++;
       }
     }
-
-    if (this.variableInputs === 0) {
-      throw new Error('Zero variable inputs is not yet handles');
-    }
   }
 
   getAttribute(name: string) {
@@ -74,6 +70,15 @@ export abstract class OnnxNode {
     const attr = this.attributes[name];
     if (attr !== undefined) {
       let result = attr.f;
+      return result;
+    }
+    return undefined;
+  }
+
+  getAttributeTensor(name: string) {
+    const attr = this.attributes[name];
+    if (attr !== undefined) {
+      let result = attr.t;
       return result;
     }
     return undefined;

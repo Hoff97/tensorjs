@@ -112,3 +112,27 @@ fn test_tensor_gemm_a_b_transposed_and_c() {
     assert!(a._gemm(&b, true, true, alpha, Some(&c3), 1.0).compare(&expected3, DELTA));
     assert!(a._gemm(&b, true, true, alpha, Some(&c4), 1.0).compare(&expected4, DELTA));
 }
+
+#[test]
+fn test_tensor_repeat() {
+    let a = Tensor::new(&vec![2,2], &vec![1.,2.,3.,4.]);
+    let b = Tensor::new(&vec![2,3], &vec![1.,2.,3.,4.,5.,6.]);
+
+    let expected1 = Tensor::new(&vec![2,4], &vec![1.,2.,1.,2.,3.,4.,3.,4.]);
+    let expected2 = Tensor::new(&vec![4,2], &vec![1.,2.,3.,4.,1.,2.,3.,4.]);
+
+    let expected3 = Tensor::new(&vec![2,6], &vec![1.,2.,3.,1.,2.,3.,4.,5.,6.,4.,5.,6.]);
+    let expected4 = Tensor::new(&vec![4,3], &vec![1.,2.,3.,4.,5.,6.,1.,2.,3.,4.,5.,6.]);
+
+    let result = a._repeat(&vec![1,2]);
+    let result2 = a._repeat(&vec![2,1]);
+
+    let result3 = b._repeat(&vec![1,2]);
+    let result4 = b._repeat(&vec![2,1]);
+
+    assert!(result.compare(&expected1, DELTA));
+    assert!(result2.compare(&expected2, DELTA));
+
+    assert!(result3.compare(&expected3, DELTA));
+    assert!(result4.compare(&expected4, DELTA));
+}
