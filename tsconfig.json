@@ -2,13 +2,14 @@
   "compilerOptions": {
     "outDir": "./dist/",
     "noImplicitAny": true,
-    "module": "esnext",
+    "module": "es2020",
     "target": "es6",
     "allowJs": true,
     "declaration": true,
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "lib": ["ES2015", "DOM"]
   },
   "typedocOptions": {
     "entryPoints": ["lib/library.ts"],
