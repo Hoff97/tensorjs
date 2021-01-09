@@ -30,8 +30,13 @@ export class OnnxModel {
 
   private constants: Constants = {};
 
-  constructor(buffer: ArrayBuffer) {
-    const arr = new Uint8Array(buffer);
+  constructor(buffer: ArrayBuffer | Uint8Array) {
+    let arr: Uint8Array;
+    if (buffer instanceof ArrayBuffer) {
+      arr = new Uint8Array(buffer);
+    } else {
+      arr = buffer;
+    }
     const modelProto = onnx.ModelProto.decode(arr);
 
     let ver = modelProto.opsetImport[0].version;
