@@ -2,8 +2,8 @@
   "compilerOptions": {
     "outDir": "./dist/",
     "noImplicitAny": true,
-    "module": "es2020",
-    "target": "es6",
+    "module": "esnext",
+    "target": "es5",
     "allowJs": true,
     "declaration": true,
     "moduleResolution": "node",
@@ -11,6 +11,15 @@
     "skipLibCheck": true,
     "lib": ["ES2015", "DOM"]
   },
+  "exclude": [
+    "node_modules",
+    "docs",
+    "test",
+    "pkg",
+    "dist",
+    "karma.conf.js",
+    "karma.performance.js"
+  ],
   "typedocOptions": {
     "entryPoints": ["lib/library.ts"],
     "out": "docs"
