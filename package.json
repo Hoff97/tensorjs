@@ -14,9 +14,12 @@
     "url": "https://github.com/Hoff97/tensorjs.git"
   },
   "license": "MIT",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "main": "./dist/lib/library.js",
   "types": "./dist/lib/library.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "wasm-pack build && mkdir -p lib/wasm && cp pkg/rust_wasm_tensor* lib/wasm && webpack --env=production && tsc && cp lib/wasm/rust_wasm_tensor_bg.wasm dist/lib/wasm",
     "build:wasm": "wasm-pack build && mkdir -p lib/wasm && cp pkg/rust_wasm_tensor* lib/wasm",

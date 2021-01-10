@@ -29,6 +29,8 @@ export class CPUTensor extends Tensor {
 
   public type: string;
 
+  public deleted: boolean = false;
+
   constructor(shape: ReadonlyArray<number>, values?: Float32Array | number[], type?: string) {
     super();
 
@@ -63,6 +65,18 @@ export class CPUTensor extends Tensor {
 
   delete(): void {
     this.values = undefined;
+    this.deleted = true;
+  }
+
+  copy(newShape?: number[]): Tensor {
+    if (newShape === undefined) {
+      newShape = [...this.shape];
+    }
+    const values = new Float32Array(this.size);
+    for (let i = 0; i < this.size; i++) {
+      values[i] = this.values[i];
+    }
+    return new CPUTensor(newShape, values);
   }
 
   get(index: number[] | number): number {
@@ -192,7 +206,7 @@ export class CPUTensor extends Tensor {
   }
 
   reshape_impl(shape: number[]): Tensor {
-    return new CPUTensor(shape, this.values);
+    return this.copy(shape);
   }
 
   concat(tensor: Tensor, axis: number): Tensor {
@@ -213,7 +227,7 @@ export class CPUTensor extends Tensor {
   expand(shape: number[]): Tensor {
     const [_shape, goal, resultShape] = this.alignShapes(this.shape, shape);
     if (compareShapes(this.shape, resultShape)) {
-      return this;
+      return this.copy();
     }
     return expand(this.reshape(_shape) as CPUTensor, resultShape);
   }

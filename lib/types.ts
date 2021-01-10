@@ -311,4 +311,6 @@ export default abstract class Tensor {
   abstract repeat(repeats: number[]): Tensor;
 
   abstract expand(shape: number[]): Tensor;
+
+  abstract copy(): Tensor;
 }
