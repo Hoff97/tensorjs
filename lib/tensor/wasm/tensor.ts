@@ -1,10 +1,10 @@
 import Tensor from '../../types';
 
-import { Tensor as WT } from '../../wasm/index';
+import { Tensor as WT } from '../../wasm/rust_wasm_tensor';
 
 let WASMT: typeof WT;
 export let wasmLoaded: Promise<void> = new Promise((resolve, reject) => {
-  import('../../wasm/index').then(x => {
+  import('../../wasm/rust_wasm_tensor').then(x => {
     WASMT = x.Tensor;
     resolve();
   });
