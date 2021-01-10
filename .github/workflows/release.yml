@@ -24,11 +24,6 @@ jobs:
     - name: Install wasm and dev dependencies
       run: |
         npm install
-    - name: Run tests
-      run: |
-        npm run test
-      env:
-        CI: true
     - name: Build
       run: |
         npm run build

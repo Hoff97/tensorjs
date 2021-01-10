@@ -26,7 +26,9 @@ export class CPUTensor extends Tensor {
 
   public size: number;
 
-  constructor(shape: ReadonlyArray<number>, values?: Float32Array | number[]) {
+  public type: string;
+
+  constructor(shape: ReadonlyArray<number>, values?: Float32Array | number[], type?: string) {
     super();
 
     this.shape = shape;
@@ -42,6 +44,8 @@ export class CPUTensor extends Tensor {
     } else {
       this.values = new Float32Array(this.size);
     }
+
+    this.type = type || "float";
   }
 
   getValues() {
@@ -57,7 +61,7 @@ export class CPUTensor extends Tensor {
   }
 
   delete(): void {
-    // TODO: Maybe set values to empty array?
+    this.values = undefined;
   }
 
   get(index: number[] | number): number {

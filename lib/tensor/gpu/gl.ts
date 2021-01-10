@@ -10,7 +10,7 @@ export let defaultAllocator: GPUMemoryAllocator;
 function setup() {
   glContext = canvas.getContext("webgl", {
     preserveDrawingBuffer: true,
-    failIfMajorPerformanceCaveat: true
+    failIfMajorPerformanceCaveat: false
   });
 
   gl = REGL({

@@ -28,7 +28,7 @@ export class BatchNormNode extends OnnxNode {
     let mean = inputs[3];
     let variance = inputs[4];
 
-    //TODO: Handle lower onnxversions here
+    //TODO: Handle lower onnx versions here
 
     const C = scale.getShape()[0];
 
@@ -52,7 +52,6 @@ export class BatchNormNode extends OnnxNode {
     xmean.delete();
     normalized.delete();
     scaled.delete();
-    result.delete();
 
     // TODO: Replace this with native batchnorm implementation
 

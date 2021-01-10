@@ -76,6 +76,7 @@ export default abstract class Tensor {
   reduceMean(axes?: number | number[], keepDims?: boolean): Tensor {
     let ax = this.getAxes(axes);
     keepDims = keepDims || false;
+
     return this.reduceMean_impl(ax, keepDims);
   }
 

@@ -21,6 +21,9 @@ jobs:
     - name: Install wasm and dev dependencies
       run: |
         npm install
+    - name: Get test data
+      run: |
+        npm run testData
     - name: Run tests
       run: |
         npm run test

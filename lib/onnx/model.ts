@@ -20,6 +20,7 @@ interface IntermediaryRes {
 export class OnnxModel {
   private version: number;
   public inputs: onnx.IValueInfoProto[];
+  private inputSet: Set<string> = new Set();
   private outputs: string[];
 
   private nodes: {[id: number]: OnnxNode} = {};
@@ -30,8 +31,13 @@ export class OnnxModel {
 
   private constants: Constants = {};
 
-  constructor(buffer: ArrayBuffer) {
-    const arr = new Uint8Array(buffer);
+  constructor(buffer: ArrayBuffer | Uint8Array) {
+    let arr: Uint8Array;
+    if (buffer instanceof ArrayBuffer) {
+      arr = new Uint8Array(buffer);
+    } else {
+      arr = buffer;
+    }
     const modelProto = onnx.ModelProto.decode(arr);
 
     let ver = modelProto.opsetImport[0].version;
@@ -42,6 +48,9 @@ export class OnnxModel {
     this.version = ver;
 
     this.inputs = modelProto.graph.input;
+    for (let i = 0; i < this.inputs.length; i++) {
+      this.inputSet.add(this.inputs[i].name);
+    }
     this.outputs = modelProto.graph.output.map(x => x.name);
 
     this.initializer(modelProto.graph.initializer);
@@ -87,10 +96,7 @@ export class OnnxModel {
       const tensorProto = initializer[i];
 
       const tensor = createTensor(tensorProto);
-      this.constants[tensorProto.name] = {
-        type: tensorProto.dataType === TENSOR_INT64 ? 'Int' : 'float',
-        value: tensor
-      }
+      this.constants[tensorProto.name] = tensor;
     }
   }
 
@@ -134,7 +140,7 @@ export class OnnxModel {
       for (let i = 0; i < node.inputs.length; i++) {
         const input = node.inputs[i];
         if (this.constants[input] !== undefined) {
-          inputs.push(this.constants[input].value);
+          inputs.push(this.constants[input]);
         } else {
           const inter = intermediaryRes[input];
           inter.used++;
@@ -169,9 +175,11 @@ export class OnnxModel {
       }
 
       for (let i = 0; i < toDelete.length; i++) {
-        const inter = intermediaryRes[toDelete[i]];
-        inter.value.delete();
-        delete intermediaryRes[toDelete[i]];
+        if (!this.inputSet.has(toDelete[i])) {
+          const inter = intermediaryRes[toDelete[i]];
+          inter.value.delete();
+          delete intermediaryRes[toDelete[i]];
+        }
       }
     }
 
@@ -185,9 +193,7 @@ export class OnnxModel {
 
   async toCPU() {
     for (let i in this.constants) {
-      if (this.constants[i].type !== 'Int') {
-        this.constants[i].value = await toCPU(this.constants[i].value);
-      }
+      this.constants[i] = await toCPU(this.constants[i]);
     }
 
     for (let i of this.nodeIds) {
@@ -197,9 +203,7 @@ export class OnnxModel {
 
   async toWASM() {
     for (let i in this.constants) {
-      if (this.constants[i].type !== 'Int') {
-        this.constants[i].value = await toWASM(this.constants[i].value);
-      }
+      this.constants[i] = await toWASM(this.constants[i]);
     }
 
     for (let i of this.nodeIds) {
@@ -209,9 +213,7 @@ export class OnnxModel {
 
   async toGPU() {
     for (let i in this.constants) {
-      if (this.constants[i].type !== 'Int') {
-        this.constants[i].value = await toGPU(this.constants[i].value);
-      }
+      this.constants[i] = await toGPU(this.constants[i]);
     }
 
     for (let i of this.nodeIds) {

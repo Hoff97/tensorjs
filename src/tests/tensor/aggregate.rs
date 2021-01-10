@@ -171,3 +171,13 @@ fn test_tensor_min_multiple_axes() {
     assert!(res2.compare(&expected2, DELTA));
     assert!(res3.compare(&expected3, DELTA));
 }
+
+#[test]
+fn test_tensor_mean() {
+    let a = Tensor::new(&vec![2,2,3], &vec![0.9762700796127319, 4.3037872314453125, 2.055267572402954, 0.8976636528968811, -1.5269039869308472, 2.917882204055786, -1.248255729675293, 7.835460186004639, 9.273255348205566, -2.331169605255127, 5.834500789642334, 0.577898383140564]);
+    let expected1 = Tensor::new(&vec![1], &vec![2.4638044834136963]);
+
+    let res1 = a._reduce_mean(&vec![0,1,2], false);
+
+    assert!(res1.compare(&expected1, DELTA));
+}

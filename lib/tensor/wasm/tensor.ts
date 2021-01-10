@@ -1,15 +1,14 @@
 import Tensor from '../../types';
 
-import { Tensor as WT } from 'rust-wasm-tensor';
+import { Tensor as WT } from '../../wasm/rust_wasm_tensor';
 
 let WASMT: typeof WT;
 export let wasmLoaded: Promise<void> = new Promise((resolve, reject) => {
-  import('rust-wasm-tensor').then(x => {
+  import('../../wasm/rust_wasm_tensor').then(x => {
     WASMT = x.Tensor;
     resolve();
   });
 });
-
 
 export class WASMTensor extends Tensor {
   public wasmTensor: WT;
@@ -63,6 +62,7 @@ export class WASMTensor extends Tensor {
     if (!(tensor instanceof WASMTensor) || !(th instanceof WASMTensor)) {
       throw new Error('Can only add WASM tensor to WASM tensor');
     }
+
     return new WASMTensor(th.wasmTensor.addition(tensor.wasmTensor));
   }
 

@@ -14,20 +14,21 @@
     "url": "https://github.com/Hoff97/tensorjs.git"
   },
   "license": "MIT",
-  "version": "0.1.2",
-  "browser": "dist/bundle.js",
-  "files": [
-    "dist"
-  ],
+  "version": "0.1.4",
+  "main": "./dist/lib/library.js",
+  "types": "./dist/lib/library.d.ts",
   "scripts": {
-    "build": "wasm-pack build && webpack",
-    "build:wasm": "wasm-pack build",
+    "build": "wasm-pack build && mkdir -p lib/wasm && cp pkg/rust_wasm_tensor* lib/wasm && webpack --env=production && tsc && cp lib/wasm/rust_wasm_tensor_bg.wasm dist/lib/wasm",
+    "build:wasm": "wasm-pack build && mkdir -p lib/wasm && cp pkg/rust_wasm_tensor* lib/wasm",
+    "build:copyWasm": "cp lib/wasm/rust_wasm_tensor_bg.wasm dist/lib/wasm",
     "build:js": "webpack --env=production",
+    "build:ts": "tsc",
     "test": "npm run test:rust && npm run test:integration",
     "test:integration": "karma start karma.conf.js",
     "test:performance": "karma start karma.performance.js",
     "test:rust": "cargo test --tests",
-    "docs": "typedoc"
+    "docs": "typedoc",
+    "testData": "ts-node --project tsconfig.dev.json tools/test.ts"
   },
   "devDependencies": {
     "@types/benchmark": "^2.1.0",
@@ -36,12 +37,14 @@
     "arraybuffer-loader": "^1.0.8",
     "benchmark": "^2.1.4",
     "copy-webpack-plugin": "^5.0.3",
+    "file-loader": "^6.2.0",
     "karma": "^4.1.0",
     "karma-benchmark": "^1.0.4",
     "karma-benchmarkjs-reporter": "^1.0.0",
     "karma-chrome-launcher": "^2.2.0",
     "karma-cli": "^2.0.0",
     "karma-jasmine": "^2.0.1",
+    "karma-sourcemap-loader": "^0.3.8",
     "karma-spec-reporter": "0.0.32",
     "karma-webpack": "^4.0.2",
     "puppeteer": "^5.5.0",
@@ -57,7 +60,6 @@
   },
   "dependencies": {
     "onnx-proto": "^4.0.4",
-    "regl": "^2.0.1",
-    "rust-wasm-tensor": "file:pkg"
+    "regl": "^2.0.1"
   }
 }
