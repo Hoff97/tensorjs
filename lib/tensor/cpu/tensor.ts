@@ -5,6 +5,7 @@ import {
 } from '../../ops/cpu/basic';
 import { concat } from '../../ops/cpu/concat';
 import { conv } from '../../ops/cpu/conv';
+import { expand } from '../../ops/cpu/expand';
 import { gemm } from '../../ops/cpu/gemm';
 import { matMul } from '../../ops/cpu/matMul';
 import { max } from '../../ops/cpu/max';
@@ -15,7 +16,7 @@ import { repeat } from '../../ops/cpu/repeat';
 import { sum } from '../../ops/cpu/sum';
 import { transpose } from '../../ops/cpu/transpose';
 import Tensor from '../../types';
-import { computeStrides, getSize, indexToPos } from '../../util/shape';
+import { compareShapes, computeStrides, getSize, indexToPos } from '../../util/shape';
 
 export class CPUTensor extends Tensor {
   private values: Float32Array;
@@ -207,5 +208,13 @@ export class CPUTensor extends Tensor {
 
   repeat(repeats: number[]): Tensor {
     return repeat(this, repeats);
+  }
+
+  expand(shape: number[]): Tensor {
+    const [_shape, goal, resultShape] = this.alignShapes(this.shape, shape);
+    if (compareShapes(this.shape, resultShape)) {
+      return this;
+    }
+    return expand(this.reshape(_shape) as CPUTensor, resultShape);
   }
 }

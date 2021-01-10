@@ -61,7 +61,7 @@ export class BinarySearchTree<K,V> {
     if (options.hasOwnProperty('key')) { this.key = options.key; }
     this.value = options.hasOwnProperty('value') ? [options.value] : [];
     this.unique = options.unique || false;
-  
+
     this.compareKeys = options.compareKeys || defaultCompareKeysFunction;
     this.compareValues = options.compareValues || ((a: V, b: V) => a === b);
   }
@@ -92,15 +92,15 @@ export class BinarySearchTree<K,V> {
 
   checkAllNodesFullfillCondition(test: (k: K, v: V[]) => boolean) {
     if (!this.hasOwnProperty('key')) { return; }
-  
+
     test(this.key, this.value);
     if (this.left) { this.left.checkAllNodesFullfillCondition(test); }
     if (this.right) { this.right.checkAllNodesFullfillCondition(test); }
   }
 
-  checkNodeOrdering() {  
+  checkNodeOrdering() {
     if (!this.hasOwnProperty('key')) { return; }
-  
+
     if (this.left) {
       this.left.checkAllNodesFullfillCondition((k: K, _v: V[]) => {
         if (this.compareKeys(k, this.key) >= 0) {
@@ -110,7 +110,7 @@ export class BinarySearchTree<K,V> {
       });
       this.left.checkNodeOrdering();
     }
-  
+
     if (this.right) {
       this.right.checkAllNodesFullfillCondition((k: K, _v: V[]) => {
         if (this.compareKeys(k, this.key) <= 0) {
@@ -172,7 +172,7 @@ export class BinarySearchTree<K,V> {
     var rightChild = this.createSimilar(options);
     rightChild.parent = this;
     this.right = rightChild;
-  
+
     return rightChild;
   }
 
@@ -183,7 +183,7 @@ export class BinarySearchTree<K,V> {
       this.value.push(value);
       return;
     }
-  
+
     // Same key as root
     if (this.compareKeys(this.key, key) === 0) {
       if (this.unique) {
@@ -194,7 +194,7 @@ export class BinarySearchTree<K,V> {
       }
       return;
     }
-  
+
     if (this.compareKeys(key, this.key) < 0) {
       // Insert in left subtree
       if (this.left) {
@@ -214,9 +214,9 @@ export class BinarySearchTree<K,V> {
 
   search(key: K): V[] {
     if (!this.hasOwnProperty('key')) { return []; }
-  
+
     if (this.compareKeys(this.key, key) === 0) { return this.value; }
-  
+
     if (this.compareKeys(key, this.key) < 0) {
       if (this.left) {
         return this.left.search(key);
@@ -237,19 +237,19 @@ export class BinarySearchTree<K,V> {
     if (!query.hasOwnProperty('gt') && !query.hasOwnProperty('gte')) {
       return () => { return true; };
     }
-  
+
     if (query.hasOwnProperty('gt') && query.hasOwnProperty('gte')) {
       if (this.compareKeys(query.gte, query.gt) === 0) {
         return (key: K) => { return this.compareKeys(key, query.gt) > 0; };
       }
-  
+
       if (this.compareKeys(query.gte, query.gt) > 0) {
         return (key: K) => { return this.compareKeys(key, query.gte) >= 0; };
       } else {
         return (key: K) => { return this.compareKeys(key, query.gt) > 0; };
       }
     }
-  
+
     if (query.hasOwnProperty('gt')) {
       return (key: K) => { return this.compareKeys(key, query.gt) > 0; };
     } else {
@@ -262,19 +262,19 @@ export class BinarySearchTree<K,V> {
     if (!query.hasOwnProperty('lt') && !query.hasOwnProperty('lte')) {
       return () => { return true; };
     }
-  
+
     if (query.hasOwnProperty('lt') && query.hasOwnProperty('lte')) {
       if (this.compareKeys(query.lte, query.lt) === 0) {
         return (key: K) => { return this.compareKeys(key, query.lt) < 0; };
       }
-  
+
       if (this.compareKeys(query.lte, query.lt) < 0) {
         return (key: K) => { return this.compareKeys(key, query.lte) <= 0; };
       } else {
         return (key: K) => { return this.compareKeys(key, query.lt) < 0; };
       }
     }
-  
+
     if (query.hasOwnProperty('lt')) {
       return (key: K) => { return this.compareKeys(key, query.lt) < 0; };
     } else {
@@ -284,12 +284,12 @@ export class BinarySearchTree<K,V> {
 
   betweenBounds(query: SearchQuery<K>, lbm?: (key: K) => boolean, ubm?: (key: K) => boolean) {
     var res: QueryResult<K,V> = [];
-  
+
     if (!this.hasOwnProperty('key')) { return []; }   // Empty tree
-  
+
     lbm = lbm || this.getLowerBoundMatcher(query);
     ubm = ubm || this.getUpperBoundMatcher(query);
-  
+
     if (lbm(this.key) && this.left) { append(res, this.left.betweenBounds(query, lbm, ubm)); }
     if (lbm(this.key) && ubm(this.key)) { 
       for (let i = 0; i < this.value.length; i++) {
@@ -297,23 +297,23 @@ export class BinarySearchTree<K,V> {
       }
     }
     if (ubm(this.key) && this.right) { append(res, this.right.betweenBounds(query, lbm, ubm)); }
-  
+
     return res;
   }
 
   betweenBoundsFirst(query: SearchQuery<K>, lbm?: (key: K) => boolean, ubm?: (key: K) => boolean): QueryResult<K, V> {
     if (!this.hasOwnProperty('key')) { return []; }   // Empty tree
-  
+
     lbm = lbm || this.getLowerBoundMatcher(query);
     ubm = ubm || this.getUpperBoundMatcher(query);
-  
+
     if (lbm(this.key) && this.left) {
       const res = this.left.betweenBoundsFirst(query, lbm, ubm);
       if (res.length > 0) {
         return res;
       };
     }
-    if (lbm(this.key) && ubm(this.key)) { 
+    if (lbm(this.key) && ubm(this.key)) {
       if (this.value.length > 0) {
         return [{key: this.key, value: this.value[0]}];
       }
@@ -327,30 +327,30 @@ export class BinarySearchTree<K,V> {
 
   deleteIfLeaf() {
     if (this.left || this.right) { return false; }
-  
+
     // The leaf is itself a root
     if (!this.parent) {
       delete this.key;
       this.value = [];
       return true;
     }
-  
+
     if (this.parent.left === this) {
       this.parent.left = null;
     } else {
       this.parent.right = null;
     }
-  
+
     return true;
   }
 
   deleteIfOnlyOneChild() {
     var child: BinarySearchTree<K, V>;
-  
+
     if (this.left && !this.right) { child = this.left; }
     if (!this.left && this.right) { child = this.right; }
     if (!child) { return false; }
-  
+
     // Root
     if (!this.parent) {
       this.key = child.key;

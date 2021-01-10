@@ -1,6 +1,6 @@
 import Tensor from '../../types';
 
-import { getSize } from '../../util/shape';
+import { compareShapes, getSize } from '../../util/shape';
 
 import { exp } from '../../ops/gpu/exp';
 import { log } from '../../ops/gpu/log';
@@ -26,6 +26,7 @@ import { averagePool } from '../../ops/gpu/averagePool';
 import { clip } from '../../ops/gpu/clip';
 import { reduceMean } from '../../ops/gpu/reduceMean';
 import { repeat } from '../../ops/gpu/repeat';
+import { expand } from '../../ops/gpu/expand';
 
 
 export class GPUTensor extends Tensor {
@@ -190,5 +191,13 @@ export class GPUTensor extends Tensor {
 
   repeat(repeats: number[]): Tensor {
     return repeat(this, repeats);
+  }
+
+  expand(shape: number[]): Tensor {
+    const [_shape, goal, resultShape] = this.alignShapes(this.shape, shape);
+    if (compareShapes(this.shape, resultShape)) {
+      return this;
+    }
+    return expand(this.reshape(_shape) as GPUTensor, resultShape);
   }
 }

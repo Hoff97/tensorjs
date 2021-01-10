@@ -315,14 +315,14 @@ impl Tensor {
         let W = &kernel.shape;
         let M = kernel.shape[0];
         let CG = kernel.shape[1];
-                  
+
         let kernel_size = get_size_from(W, 2);
 
         let data_rank = self.shape.len() - 2;
-                  
+
         let R = conv_output_size(D, W, _pads, _dilations, _strides, 2);
         let output_size = get_size(&R);
-        
+
         let mut output_shape = vec![0; data_rank + 2];
         output_shape[0] = N;
         output_shape[1] = M;
@@ -672,6 +672,31 @@ impl Tensor {
             values
         }
     }
+
+    pub fn _expand(&self, shape: &Vec<usize>) -> Tensor {
+        let mut output_shape = vec![0; shape.len()];
+        for i in 0..shape.len() {
+            output_shape[i] = shape[i]
+        }
+        let output_strides = compute_strides(&output_shape);
+        let output_size = get_size(&output_shape);
+
+        let mut values = vec![0.0; output_size];
+
+        let mut ix = vec![0; shape.len()];
+        for i in 0..output_size {
+            values[i] = self.get(&ix);
+
+            increment_index(&mut ix, &output_shape);
+        }
+
+        Tensor {
+            shape: output_shape,
+            strides: output_strides,
+            size: output_size,
+            values
+        }
+    }
 }
 
 #[wasm_bindgen]
@@ -977,6 +1002,14 @@ impl Tensor {
 
     pub fn clip_max(&self, max: f32) -> Tensor {
         self.unary_op(|x: f32| x.min(max))
+    }
+
+    pub fn expand(&self, shape: Uint32Array) -> Tensor {
+        let mut _shape: Vec<usize> = vec![0; shape.length() as usize];
+        for i in 0..shape.length() {
+            _shape[i as usize] = shape.get_index(i) as usize;
+        }
+        return self._expand(&_shape);
     }
 }
 

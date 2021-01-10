@@ -10,21 +10,21 @@ export class AVLTree<K, V> {
 
   insert(key: K, value: V) {
     let newTree = this.tree.insert(key, value);
-  
+
     // If newTree is undefined, that means its structure was not modified
     if (newTree) { this.tree = newTree; }
   }
 
   delete(key: K, value: V) {
     let newTree = this.tree.delete(key, value);
-  
+
     // If newTree is undefined, that means its structure was not modified
     if (newTree) { this.tree = newTree; }
   }
 
   deleteFirst(key: K) {
     let newTree = this.tree.deleteFirst(key);
-  
+
     // If newTree is undefined, that means its structure was not modified
     if (newTree) { this.tree = newTree; }
   }
@@ -68,16 +68,16 @@ class _AVLTree<K,V> extends BinarySearchTree<K, V> {
   checkHeightCorrect() {
     let leftH;
     let rightH;
-  
+
     if (!this.hasOwnProperty('key')) { return; }   // Empty tree
-  
+
     if (this.left && this.left.height === undefined) { throw new Error("Undefined height for node " + this.left.key); }
     if (this.right && this.right.height === undefined) { throw new Error("Undefined height for node " + this.right.key); }
     if (this.height === undefined) { throw new Error("Undefined height for node " + this.key); }
-  
+
     leftH = this.left ? this.left.height : 0;
     rightH = this.right ? this.right.height : 0;
-  
+
     if (this.height !== 1 + Math.max(leftH, rightH)) { throw new Error("Height constraint failed for node " + this.key); }
     if (this.left) { this.left.checkHeightCorrect(); }
     if (this.right) { this.right.checkHeightCorrect(); }
@@ -91,7 +91,7 @@ class _AVLTree<K,V> extends BinarySearchTree<K, V> {
 
   checkBalanceFactors() {
     if (Math.abs(this.balanceFactor()) > 1) { throw new Error('Tree is unbalanced at node ' + this.key); }
-  
+
     if (this.left) { this.left.checkBalanceFactors(); }
     if (this.right) { this.right.checkBalanceFactors(); }
   }
@@ -106,11 +106,11 @@ class _AVLTree<K,V> extends BinarySearchTree<K, V> {
     let q = this;
     let p = this.left;
     let b: _AVLTree<K, V>, ah: number, bh: number, ch: number;
-  
+
     if (!p) { return this; }
-  
+
     b = p.right;
-  
+
     // Alter tree structure
     if (q.parent) {
       p.parent = q.parent;
@@ -122,14 +122,14 @@ class _AVLTree<K,V> extends BinarySearchTree<K, V> {
     q.parent = p;
     q.left = b;
     if (b) { b.parent = q; }
-  
+
     // Update heights
     ah = p.left ? p.left.height : 0;
     bh = b ? b.height : 0;
     ch = q.right ? q.right.height : 0;
     q.height = Math.max(bh, ch) + 1;
     p.height = Math.max(ah, q.height) + 1;
-  
+
     return p;
   }
 
@@ -138,11 +138,11 @@ class _AVLTree<K,V> extends BinarySearchTree<K, V> {
     let q = this.right;
     let b: _AVLTree<K, V>;
     let ah: number, bh: number, ch: number;
-  
+
     if (!q) { return this; }   // No change
-  
+
     b = q.left;
-  
+
     // Alter tree structure
     if (p.parent) {
       q.parent = p.parent;
@@ -154,34 +154,34 @@ class _AVLTree<K,V> extends BinarySearchTree<K, V> {
     p.parent = q;
     p.right = b;
     if (b) { b.parent = p; }
-  
+
     // Update heights
     ah = p.left ? p.left.height : 0;
     bh = b ? b.height : 0;
     ch = q.right ? q.right.height : 0;
     p.height = Math.max(ah, bh) + 1;
     q.height = Math.max(ch, p.height) + 1;
-  
+
     return q;
   }
 
   rightTooSmall() {
     if (this.balanceFactor() <= 1) { return this; }   // Right is not too small, don't change
-  
+
     if (this.left.balanceFactor() < 0) {
       this.left.leftRotation();
     }
-  
+
     return this.rightRotation();
   }
 
   leftTooSmall() {
     if (this.balanceFactor() >= -1) { return this; }   // Left is not too small, don't change
-  
+
     if (this.right.balanceFactor() > 0) {
       this.right.rightRotation();
     }
-  
+
     return this.leftRotation();
   }
 
@@ -189,31 +189,31 @@ class _AVLTree<K,V> extends BinarySearchTree<K, V> {
     let newRoot: _AVLTree<K,V> = this;
     let rotated;
     let i;
-  
+
     if (!this.hasOwnProperty('key')) { delete this.height; return this; }   // Empty tree
-  
+
     // Rebalance the tree and update all heights
     for (i = path.length - 1; i >= 0; i -= 1) {
       path[i].height = 1 + Math.max(path[i].left ? path[i].left.height : 0, path[i].right ? path[i].right.height : 0);
-  
+
       if (path[i].balanceFactor() > 1) {
         rotated = path[i].rightTooSmall();
         if (i === 0) { newRoot = rotated; }
       }
-  
+
       if (path[i].balanceFactor() < -1) {
         rotated = path[i].leftTooSmall();
         if (i === 0) { newRoot = rotated; }
       }
     }
-  
+
     return newRoot;
   }
 
   insert(key: K, value: V) {
     var insertPath: _AVLTree<K,V>[] = [];
     let currentNode: _AVLTree<K,V> = this;
-  
+
     // Empty tree, insert as root
     if (!this.hasOwnProperty('key')) {
       this.key = key;
@@ -221,7 +221,7 @@ class _AVLTree<K,V> extends BinarySearchTree<K, V> {
       this.height = 1;
       return this;
     }
-  
+
     // Insert new leaf at the right place
     while (true) {
       // Same key: no change in the tree structure
@@ -234,9 +234,9 @@ class _AVLTree<K,V> extends BinarySearchTree<K, V> {
         }
         return this;
       }
-  
+
       insertPath.push(currentNode);
-  
+
       if (currentNode.compareKeys(key, currentNode.key) < 0) {
         if (!currentNode.left) {
           insertPath.push(currentNode.createLeftChild({ key: key, value: value }) as _AVLTree<K,V>);
@@ -253,7 +253,7 @@ class _AVLTree<K,V> extends BinarySearchTree<K, V> {
         }
       }
     }
-  
+
     return this.rebalanceAlongPath(insertPath);
   }
 
@@ -261,7 +261,7 @@ class _AVLTree<K,V> extends BinarySearchTree<K, V> {
     options = options || {};
     options.unique = this.unique;
     options.compareKeys = this.compareKeys;
-  
+
     return new _AVLTree(options);
   }
 
@@ -270,16 +270,16 @@ class _AVLTree<K,V> extends BinarySearchTree<K, V> {
     let replaceWith;
     let currentNode: _AVLTree<K, V> = this;
     let deletePath = [];
-  
+
     if (!this.hasOwnProperty('key')) { return this; }   // Empty tree
-  
+
     // Either no match is found and the function will return from within the loop
     // Or a match is found and deletePath will contain the path from the root to the node to delete after the loop
     while (true) {
       if (currentNode.compareKeys(key, currentNode.key) === 0) { break; }
-  
+
       deletePath.push(currentNode);
-  
+
       if (currentNode.compareKeys(key, currentNode.key) < 0) {
         if (currentNode.left) {
           currentNode = currentNode.left;
@@ -376,7 +376,7 @@ class _AVLTree<K,V> extends BinarySearchTree<K, V> {
   
     replaceWith.parent.right = replaceWith.left;
     if (replaceWith.left) { replaceWith.left.parent = replaceWith.parent; }
-  
+
     return this.rebalanceAlongPath(deletePath);
   }
 
@@ -384,16 +384,16 @@ class _AVLTree<K,V> extends BinarySearchTree<K, V> {
     let replaceWith;
     let currentNode: _AVLTree<K, V> = this;
     let deletePath = [];
-  
+
     if (!this.hasOwnProperty('key')) { return this; }   // Empty tree
-  
+
     // Either no match is found and the function will return from within the loop
     // Or a match is found and deletePath will contain the path from the root to the node to delete after the loop
     while (true) {
       if (currentNode.compareKeys(key, currentNode.key) === 0) { break; }
-  
+
       deletePath.push(currentNode);
-  
+
       if (currentNode.compareKeys(key, currentNode.key) < 0) {
         if (currentNode.left) {
           currentNode = currentNode.left;
