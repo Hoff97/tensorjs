@@ -24,7 +24,7 @@ export class ClipNode extends OnnxNode {
       const min = inputs.length > 1 ? inputs[1] : undefined;
       const max = inputs.length > 2 ? inputs[2] : undefined;
       if (min === undefined && max === undefined) {
-        return [x];
+        return [x.copy()];
       }
       throw new Error('Clip with onnx version >= 11 not yet implemented');
     }

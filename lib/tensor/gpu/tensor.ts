@@ -27,6 +27,7 @@ import { clip } from '../../ops/gpu/clip';
 import { reduceMean } from '../../ops/gpu/reduceMean';
 import { repeat } from '../../ops/gpu/repeat';
 import { expand } from '../../ops/gpu/expand';
+import { copy } from '../../ops/gpu/copy';
 
 
 export class GPUTensor extends Tensor {
@@ -72,6 +73,10 @@ export class GPUTensor extends Tensor {
   delete(): void {
     this.deleted = true;
     defaultAllocator.deallocate(this.memory);
+  }
+
+  copy(): Tensor {
+    return copy(this);
   }
 
   exp(): Tensor {
@@ -171,7 +176,7 @@ export class GPUTensor extends Tensor {
   }
 
   reshape_impl(shape: number[]): Tensor {
-    return new GPUTensor(this.memory, shape);
+    return copy(this, shape);
   }
 
   concat(tensor: Tensor, axis: number): Tensor {
@@ -196,7 +201,7 @@ export class GPUTensor extends Tensor {
   expand(shape: number[]): Tensor {
     const [_shape, goal, resultShape] = this.alignShapes(this.shape, shape);
     if (compareShapes(this.shape, resultShape)) {
-      return this;
+      return this.copy();
     }
     return expand(this.reshape(_shape) as GPUTensor, resultShape);
   }

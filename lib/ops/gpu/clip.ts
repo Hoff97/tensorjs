@@ -59,5 +59,5 @@ export function clip(tensor: GPUTensor, min?: number, max?: number) {
       inputTensor: tensor
     }, {maxVal: max});
   }
-  return tensor;
+  return tensor.copy();
 }

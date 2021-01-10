@@ -1011,6 +1011,27 @@ impl Tensor {
         }
         return self._expand(&_shape);
     }
+
+    pub fn copy(&self) -> Tensor {
+        let mut _shape: Vec<usize> = vec![0; self.shape.len() as usize];
+        let mut _strides: Vec<usize> = vec![0; self.shape.len() as usize];
+        for i in 0..self.shape.len() {
+            _shape[i] = self.shape[i];
+            _strides[i] = self.strides[i];
+        }
+
+        let mut values = vec![0.0; self.size];
+        for i in 0..self.size {
+            values[i] = self.values[i];
+        }
+
+        Tensor {
+            shape: _shape,
+            strides: _strides,
+            size: self.size,
+            values
+        }
+    }
 }
 
 impl Add for Tensor {

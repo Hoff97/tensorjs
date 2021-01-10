@@ -43,6 +43,10 @@ export class WASMTensor extends Tensor {
     this.wasmTensor.free();
   }
 
+  copy(): Tensor {
+    return new WASMTensor(this.wasmTensor.copy());
+  }
+
   exp(): Tensor {
     return new WASMTensor(this.wasmTensor.exp());
   }
@@ -172,7 +176,7 @@ export class WASMTensor extends Tensor {
     } else if (max !== undefined) {
       return new WASMTensor(this.wasmTensor.clip_max(max));
     }
-    return this;
+    return this.copy();
   }
 
   repeat(repeats: number[]): Tensor {
@@ -184,7 +188,7 @@ export class WASMTensor extends Tensor {
 
     const [_shape, goal, resultShape] = this.alignShapes(thisShape, shape);
     if (compareShapes(thisShape, resultShape)) {
-      return this;
+      return this.copy();
     }
 
     const reshaped = this.reshape(_shape) as WASMTensor;

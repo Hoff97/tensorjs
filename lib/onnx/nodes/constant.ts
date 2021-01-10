@@ -18,7 +18,7 @@ export class ConstantNode extends OnnxNode {
   forward(inputs: Tensor[]): Tensor[] {
 
     if (this.onnxVersion < 11) {
-      return [this.tensor];
+      return [this.tensor.copy()];
     }
     throw new Error('Constant with onnx version >= 11 not yet implemented');
   }
