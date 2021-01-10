@@ -128,7 +128,7 @@ impl Tensor {
     }
 
     #[inline]
-    pub fn pool_continuous<F>(&self, axes: &Vec<usize>, keep_dims: bool, op: F) -> Tensor where F: Fn(f32,f32) -> f32 {
+    pub fn pool_continuous<F,F2>(&self, axes: &Vec<usize>, keep_dims: bool, op: F, postprocess: bool, post: F2) -> Tensor where F: Fn(f32,f32) -> f32, F2: Fn(f32) -> f32 {
         let mut result_rank = self.shape.len() - axes.len() as usize;
         
         if keep_dims {
@@ -176,6 +176,9 @@ impl Tensor {
                 for k in 1..sum_size {
                     res = op(self.values[input_start_ix + j + k*step_size], res);
                 }
+                if postprocess {
+                    res = post(res);
+                }
                 values[output_ix+j] = res;
             }
         }
@@ -202,6 +205,10 @@ impl Tensor {
                 value = op(value, self.values[i]);
             }
 
+            if postprocess {
+                value = post(value);
+            }
+
             return Tensor {
                 values: vec![value],
                 shape: if keep_dims { vec![1;result_rank] } else { vec![1;1] },
@@ -211,7 +218,7 @@ impl Tensor {
         }
 
         if self.axes_continuous(axes) {
-            return self.pool_continuous(axes, keep_dims, op);
+            return self.pool_continuous(axes, keep_dims, op, postprocess, post);
         }
 
         let mut result_shape = vec![0; result_rank];
@@ -291,7 +298,7 @@ impl Tensor {
         }
         let pool_size_f = pool_size as f32;
 
-        return self._pool(axes, keep_dims, |x: f32, y: f32| x.min(y), true, |x: f32| x/pool_size_f)
+        return self._pool(axes, keep_dims, |x: f32, y: f32| x + y, true, |x: f32| x/pool_size_f)
     }
 
     pub fn _conv(&self,
