@@ -28,7 +28,7 @@ const epsilon = 0.00001;
 
 const opsetVersions = ['9'];
 
-const backends = ['CPU', 'WASM', 'GPU'];
+const backends = ['CPU', 'WASM'/*, 'GPU'*/];
 
 for (let opset of opsetVersions) {
   describe(`Opset ${opset}`, () => {
