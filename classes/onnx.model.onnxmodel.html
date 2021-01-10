@@ -94,6 +94,7 @@
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="onnx.model.onnxmodel.html#constants" class="tsd-kind-icon">constants</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="onnx.model.onnxmodel.html#defaultready" class="tsd-kind-icon">default<wbr>Ready</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="onnx.model.onnxmodel.html#inputset" class="tsd-kind-icon">input<wbr>Set</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="onnx.model.onnxmodel.html#inputs" class="tsd-kind-icon">inputs</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="onnx.model.onnxmodel.html#intermediaries" class="tsd-kind-icon">intermediaries</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="onnx.model.onnxmodel.html#nodeids" class="tsd-kind-icon">node<wbr>Ids</a></li>
@@ -122,19 +123,19 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Onnx<wbr>Model<span class="tsd-signature-symbol">(</span>buffer<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ArrayBuffer</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="onnx.model.onnxmodel.html" class="tsd-signature-type" data-tsd-kind="Class">OnnxModel</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Onnx<wbr>Model<span class="tsd-signature-symbol">(</span>buffer<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ArrayBuffer</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Uint8Array</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="onnx.model.onnxmodel.html" class="tsd-signature-type" data-tsd-kind="Class">OnnxModel</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/cd6a6fc/lib/onnx/model.ts#L31">onnx/model.ts:31</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/onnx/model.ts#L32">onnx/model.ts:32</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>buffer: <span class="tsd-signature-type">ArrayBuffer</span></h5>
+									<h5>buffer: <span class="tsd-signature-type">ArrayBuffer</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Uint8Array</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="onnx.model.onnxmodel.html" class="tsd-signature-type" data-tsd-kind="Class">OnnxModel</a></h4>
@@ -150,7 +151,7 @@
 					<div class="tsd-signature tsd-kind-icon">constants<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Constants</span><span class="tsd-signature-symbol"> = ...</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/cd6a6fc/lib/onnx/model.ts#L31">onnx/model.ts:31</a></li>
+							<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/onnx/model.ts#L32">onnx/model.ts:32</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -160,7 +161,17 @@
 					<div class="tsd-signature tsd-kind-icon">default<wbr>Ready<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> = ...</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/cd6a6fc/lib/onnx/model.ts#L27">onnx/model.ts:27</a></li>
+							<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/onnx/model.ts#L28">onnx/model.ts:28</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
+					<a name="inputset" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> input<wbr>Set</h3>
+					<div class="tsd-signature tsd-kind-icon">input<wbr>Set<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Set</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/onnx/model.ts#L23">onnx/model.ts:23</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -170,7 +181,7 @@
 					<div class="tsd-signature tsd-kind-icon">inputs<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">IValueInfoProto</span><span class="tsd-signature-symbol">[]</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/cd6a6fc/lib/onnx/model.ts#L22">onnx/model.ts:22</a></li>
+							<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/onnx/model.ts#L22">onnx/model.ts:22</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -180,7 +191,7 @@
 					<div class="tsd-signature tsd-kind-icon">intermediaries<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol"> = ...</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/cd6a6fc/lib/onnx/model.ts#L29">onnx/model.ts:29</a></li>
+							<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/onnx/model.ts#L30">onnx/model.ts:30</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -198,7 +209,7 @@
 					<div class="tsd-signature tsd-kind-icon">node<wbr>Ids<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> = ...</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/cd6a6fc/lib/onnx/model.ts#L26">onnx/model.ts:26</a></li>
+							<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/onnx/model.ts#L27">onnx/model.ts:27</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -208,7 +219,7 @@
 					<div class="tsd-signature tsd-kind-icon">nodes<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol"> = ...</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/cd6a6fc/lib/onnx/model.ts#L25">onnx/model.ts:25</a></li>
+							<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/onnx/model.ts#L26">onnx/model.ts:26</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -226,7 +237,7 @@
 					<div class="tsd-signature tsd-kind-icon">outputs<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/cd6a6fc/lib/onnx/model.ts#L23">onnx/model.ts:23</a></li>
+							<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/onnx/model.ts#L24">onnx/model.ts:24</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -236,7 +247,7 @@
 					<div class="tsd-signature tsd-kind-icon">version<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/cd6a6fc/lib/onnx/model.ts#L21">onnx/model.ts:21</a></li>
+							<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/onnx/model.ts#L21">onnx/model.ts:21</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -253,7 +264,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/cd6a6fc/lib/onnx/model.ts#L97">onnx/model.ts:97</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/onnx/model.ts#L103">onnx/model.ts:103</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -276,7 +287,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/cd6a6fc/lib/onnx/model.ts#L52">onnx/model.ts:52</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/onnx/model.ts#L61">onnx/model.ts:61</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -299,7 +310,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/cd6a6fc/lib/onnx/model.ts#L85">onnx/model.ts:85</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/onnx/model.ts#L94">onnx/model.ts:94</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -322,7 +333,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/cd6a6fc/lib/onnx/model.ts#L186">onnx/model.ts:186</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/onnx/model.ts#L194">onnx/model.ts:194</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -339,7 +350,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/cd6a6fc/lib/onnx/model.ts#L210">onnx/model.ts:210</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/onnx/model.ts#L214">onnx/model.ts:214</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -356,7 +367,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/cd6a6fc/lib/onnx/model.ts#L198">onnx/model.ts:198</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/onnx/model.ts#L204">onnx/model.ts:204</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -415,6 +426,9 @@
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
 								<a href="onnx.model.onnxmodel.html#defaultready" class="tsd-kind-icon">default<wbr>Ready</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
+								<a href="onnx.model.onnxmodel.html#inputset" class="tsd-kind-icon">input<wbr>Set</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="onnx.model.onnxmodel.html#inputs" class="tsd-kind-icon">inputs</a>
