@@ -106,6 +106,7 @@
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="tensor.wasm.wasmtensor.html#abs" class="tsd-kind-icon">abs</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="tensor.wasm.wasmtensor.html#add" class="tsd-kind-icon">add</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="tensor.wasm.wasmtensor.html#add_impl" class="tsd-kind-icon">add_<wbr>impl</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="tensor.wasm.wasmtensor.html#alignshapes" class="tsd-kind-icon">align<wbr>Shapes</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="tensor.wasm.wasmtensor.html#aligntensor" class="tsd-kind-icon">align<wbr>Tensor</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="tensor.wasm.wasmtensor.html#averagepool" class="tsd-kind-icon">average<wbr>Pool</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="tensor.wasm.wasmtensor.html#averagepool_impl" class="tsd-kind-icon">average<wbr>Pool_<wbr>impl</a></li>
@@ -118,6 +119,7 @@
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="tensor.wasm.wasmtensor.html#divide" class="tsd-kind-icon">divide</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="tensor.wasm.wasmtensor.html#divide_impl" class="tsd-kind-icon">divide_<wbr>impl</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="tensor.wasm.wasmtensor.html#exp" class="tsd-kind-icon">exp</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="tensor.wasm.wasmtensor.html#expand" class="tsd-kind-icon">expand</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="tensor.wasm.wasmtensor.html#gemm" class="tsd-kind-icon">gemm</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="tensor.wasm.wasmtensor.html#gemm_impl" class="tsd-kind-icon">gemm_<wbr>impl</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="tensor.wasm.wasmtensor.html#getaxes" class="tsd-kind-icon">get<wbr>Axes</a></li>
@@ -167,7 +169,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="tensor.html">Tensor</a>.<a href="tensor.html#constructor">constructor</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/tensor/wasm/tensor.ts#L14">tensor/wasm/tensor.ts:14</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/tensor/wasm/tensor.ts#L15">tensor/wasm/tensor.ts:15</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -192,7 +194,7 @@
 					<div class="tsd-signature tsd-kind-icon">wasm<wbr>Tensor<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Tensor</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/tensor/wasm/tensor.ts#L14">tensor/wasm/tensor.ts:14</a></li>
+							<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/tensor/wasm/tensor.ts#L15">tensor/wasm/tensor.ts:15</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -210,7 +212,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#abs">abs</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/tensor/wasm/tensor.ts#L57">tensor/wasm/tensor.ts:57</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/tensor/wasm/tensor.ts#L58">tensor/wasm/tensor.ts:58</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
@@ -228,7 +230,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="tensor.html">Tensor</a>.<a href="tensor.html#add">add</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L173">types.ts:173</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L195">types.ts:195</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -252,7 +254,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#add_impl">add_impl</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/tensor/wasm/tensor.ts#L61">tensor/wasm/tensor.ts:61</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/tensor/wasm/tensor.ts#L62">tensor/wasm/tensor.ts:62</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -272,6 +274,33 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+					<a name="alignshapes" class="tsd-anchor"></a>
+					<h3>align<wbr>Shapes</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">align<wbr>Shapes<span class="tsd-signature-symbol">(</span>shape1<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span>, shape2<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">[]</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="tensor.html">Tensor</a>.<a href="tensor.html#alignshapes">alignShapes</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L147">types.ts:147</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>shape1: <span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+								<li>
+									<h5>shape2: <span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">[]</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
 					<a name="aligntensor" class="tsd-anchor"></a>
 					<h3>align<wbr>Tensor</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
@@ -282,7 +311,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="tensor.html">Tensor</a>.<a href="tensor.html#aligntensor">alignTensor</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L147">types.ts:147</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L169">types.ts:169</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -306,7 +335,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="tensor.html">Tensor</a>.<a href="tensor.html#averagepool">averagePool</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L100">types.ts:100</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L100">types.ts:100</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -339,7 +368,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#averagepool_impl">averagePool_impl</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/tensor/wasm/tensor.ts#L146">tensor/wasm/tensor.ts:146</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/tensor/wasm/tensor.ts#L147">tensor/wasm/tensor.ts:147</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -372,7 +401,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#clip">clip</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/tensor/wasm/tensor.ts#L166">tensor/wasm/tensor.ts:166</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/tensor/wasm/tensor.ts#L167">tensor/wasm/tensor.ts:167</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -399,7 +428,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="tensor.html">Tensor</a>.<a href="tensor.html#compare">compare</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L10">types.ts:10</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L10">types.ts:10</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -426,7 +455,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#concat">concat</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/tensor/wasm/tensor.ts#L155">tensor/wasm/tensor.ts:155</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/tensor/wasm/tensor.ts#L156">tensor/wasm/tensor.ts:156</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -453,7 +482,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="tensor.html">Tensor</a>.<a href="tensor.html#conv">conv</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L83">types.ts:83</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L83">types.ts:83</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -492,7 +521,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#conv_impl">conv_impl</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/tensor/wasm/tensor.ts#L135">tensor/wasm/tensor.ts:135</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/tensor/wasm/tensor.ts#L136">tensor/wasm/tensor.ts:136</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -531,7 +560,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#delete">delete</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/tensor/wasm/tensor.ts#L41">tensor/wasm/tensor.ts:41</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/tensor/wasm/tensor.ts#L42">tensor/wasm/tensor.ts:42</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -549,7 +578,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="tensor.html">Tensor</a>.<a href="tensor.html#divide">divide</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L188">types.ts:188</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L210">types.ts:210</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -573,7 +602,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#divide_impl">divide_impl</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/tensor/wasm/tensor.ts#L83">tensor/wasm/tensor.ts:83</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/tensor/wasm/tensor.ts#L84">tensor/wasm/tensor.ts:84</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -603,9 +632,33 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#exp">exp</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/tensor/wasm/tensor.ts#L45">tensor/wasm/tensor.ts:45</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/tensor/wasm/tensor.ts#L46">tensor/wasm/tensor.ts:46</a></li>
 								</ul>
 							</aside>
+							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+					<a name="expand" class="tsd-anchor"></a>
+					<h3>expand</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+						<li class="tsd-signature tsd-kind-icon">expand<span class="tsd-signature-symbol">(</span>shape<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#expand">expand</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/tensor/wasm/tensor.ts#L182">tensor/wasm/tensor.ts:182</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>shape: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
 						</li>
 					</ul>
@@ -621,7 +674,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="tensor.html">Tensor</a>.<a href="tensor.html#gemm">gemm</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L226">types.ts:226</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L248">types.ts:248</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -660,7 +713,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#gemm_impl">gemm_impl</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/tensor/wasm/tensor.ts#L104">tensor/wasm/tensor.ts:104</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/tensor/wasm/tensor.ts#L105">tensor/wasm/tensor.ts:105</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -699,7 +752,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="tensor.html">Tensor</a>.<a href="tensor.html#getaxes">getAxes</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L35">types.ts:35</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L35">types.ts:35</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -723,7 +776,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#getshape">getShape</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/tensor/wasm/tensor.ts#L33">tensor/wasm/tensor.ts:33</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/tensor/wasm/tensor.ts#L34">tensor/wasm/tensor.ts:34</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h4>
@@ -741,7 +794,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#getvalues">getValues</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/tensor/wasm/tensor.ts#L29">tensor/wasm/tensor.ts:29</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/tensor/wasm/tensor.ts#L30">tensor/wasm/tensor.ts:30</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Float32Array</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -759,7 +812,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#log">log</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/tensor/wasm/tensor.ts#L49">tensor/wasm/tensor.ts:49</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/tensor/wasm/tensor.ts#L50">tensor/wasm/tensor.ts:50</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
@@ -777,7 +830,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#matmul">matMul</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/tensor/wasm/tensor.ts#L97">tensor/wasm/tensor.ts:97</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/tensor/wasm/tensor.ts#L98">tensor/wasm/tensor.ts:98</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -801,7 +854,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="tensor.html">Tensor</a>.<a href="tensor.html#max">max</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L64">types.ts:64</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L64">types.ts:64</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -828,7 +881,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#max_impl">max_impl</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/tensor/wasm/tensor.ts#L123">tensor/wasm/tensor.ts:123</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/tensor/wasm/tensor.ts#L124">tensor/wasm/tensor.ts:124</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -855,7 +908,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="tensor.html">Tensor</a>.<a href="tensor.html#min">min</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L70">types.ts:70</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L70">types.ts:70</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -882,7 +935,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#min_impl">min_impl</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/tensor/wasm/tensor.ts#L127">tensor/wasm/tensor.ts:127</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/tensor/wasm/tensor.ts#L128">tensor/wasm/tensor.ts:128</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -909,7 +962,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="tensor.html">Tensor</a>.<a href="tensor.html#multiply">multiply</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L183">types.ts:183</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L205">types.ts:205</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -933,7 +986,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#multiply_impl">multiply_impl</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/tensor/wasm/tensor.ts#L76">tensor/wasm/tensor.ts:76</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/tensor/wasm/tensor.ts#L77">tensor/wasm/tensor.ts:77</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -963,7 +1016,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="tensor.html">Tensor</a>.<a href="tensor.html#power">power</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L193">types.ts:193</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L215">types.ts:215</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -987,7 +1040,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#power_impl">power_impl</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/tensor/wasm/tensor.ts#L90">tensor/wasm/tensor.ts:90</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/tensor/wasm/tensor.ts#L91">tensor/wasm/tensor.ts:91</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1017,7 +1070,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="tensor.html">Tensor</a>.<a href="tensor.html#product">product</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L58">types.ts:58</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L58">types.ts:58</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1044,7 +1097,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#product_impl">product_impl</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/tensor/wasm/tensor.ts#L119">tensor/wasm/tensor.ts:119</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/tensor/wasm/tensor.ts#L120">tensor/wasm/tensor.ts:120</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1071,7 +1124,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="tensor.html">Tensor</a>.<a href="tensor.html#reducemean">reduceMean</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L76">types.ts:76</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L76">types.ts:76</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1098,7 +1151,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#reducemean_impl">reduceMean_impl</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/tensor/wasm/tensor.ts#L131">tensor/wasm/tensor.ts:131</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/tensor/wasm/tensor.ts#L132">tensor/wasm/tensor.ts:132</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1125,7 +1178,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#repeat">repeat</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/tensor/wasm/tensor.ts#L177">tensor/wasm/tensor.ts:177</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/tensor/wasm/tensor.ts#L178">tensor/wasm/tensor.ts:178</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1149,7 +1202,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="tensor.html">Tensor</a>.<a href="tensor.html#reshape">reshape</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L114">types.ts:114</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L114">types.ts:114</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1173,7 +1226,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#reshape_impl">reshape_impl</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/tensor/wasm/tensor.ts#L150">tensor/wasm/tensor.ts:150</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/tensor/wasm/tensor.ts#L151">tensor/wasm/tensor.ts:151</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1197,7 +1250,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="tensor.html">Tensor</a>.<a href="tensor.html#softmax">softmax</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L210">types.ts:210</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L232">types.ts:232</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1221,7 +1274,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#sqrt">sqrt</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/tensor/wasm/tensor.ts#L53">tensor/wasm/tensor.ts:53</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/tensor/wasm/tensor.ts#L54">tensor/wasm/tensor.ts:54</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
@@ -1239,7 +1292,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="tensor.html">Tensor</a>.<a href="tensor.html#subtract">subtract</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L178">types.ts:178</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L200">types.ts:200</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1263,7 +1316,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#subtract_impl">subtract_impl</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/tensor/wasm/tensor.ts#L69">tensor/wasm/tensor.ts:69</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/tensor/wasm/tensor.ts#L70">tensor/wasm/tensor.ts:70</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1293,7 +1346,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="tensor.html">Tensor</a>.<a href="tensor.html#sum">sum</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L52">types.ts:52</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L52">types.ts:52</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1320,7 +1373,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#sum_impl">sum_impl</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/tensor/wasm/tensor.ts#L115">tensor/wasm/tensor.ts:115</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/tensor/wasm/tensor.ts#L116">tensor/wasm/tensor.ts:116</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1347,7 +1400,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="tensor.html">Tensor</a>.<a href="tensor.html#transpose">transpose</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L198">types.ts:198</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L220">types.ts:220</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1371,7 +1424,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#transpose_impl">transpose_impl</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/tensor/wasm/tensor.ts#L162">tensor/wasm/tensor.ts:162</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/tensor/wasm/tensor.ts#L163">tensor/wasm/tensor.ts:163</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1394,7 +1447,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/tensor/wasm/tensor.ts#L37">tensor/wasm/tensor.ts:37</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/tensor/wasm/tensor.ts#L38">tensor/wasm/tensor.ts:38</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="tensor.wasm.wasmtensor.html" class="tsd-signature-type" data-tsd-kind="Class">WASMTensor</a><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -1461,6 +1514,9 @@
 								<a href="tensor.wasm.wasmtensor.html#add_impl" class="tsd-kind-icon">add_<wbr>impl</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="tensor.wasm.wasmtensor.html#alignshapes" class="tsd-kind-icon">align<wbr>Shapes</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
 								<a href="tensor.wasm.wasmtensor.html#aligntensor" class="tsd-kind-icon">align<wbr>Tensor</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
@@ -1495,6 +1551,9 @@
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
 								<a href="tensor.wasm.wasmtensor.html#exp" class="tsd-kind-icon">exp</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+								<a href="tensor.wasm.wasmtensor.html#expand" class="tsd-kind-icon">expand</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
 								<a href="tensor.wasm.wasmtensor.html#gemm" class="tsd-kind-icon">gemm</a>

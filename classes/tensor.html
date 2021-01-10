@@ -100,6 +100,7 @@
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#abs" class="tsd-kind-icon">abs</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#add" class="tsd-kind-icon">add</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#add_impl" class="tsd-kind-icon">add_<wbr>impl</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#alignshapes" class="tsd-kind-icon">align<wbr>Shapes</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#aligntensor" class="tsd-kind-icon">align<wbr>Tensor</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#averagepool" class="tsd-kind-icon">average<wbr>Pool</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#averagepool_impl" class="tsd-kind-icon">average<wbr>Pool_<wbr>impl</a></li>
@@ -112,6 +113,7 @@
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#divide" class="tsd-kind-icon">divide</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#divide_impl" class="tsd-kind-icon">divide_<wbr>impl</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#exp" class="tsd-kind-icon">exp</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#expand" class="tsd-kind-icon">expand</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#gemm" class="tsd-kind-icon">gemm</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#gemm_impl" class="tsd-kind-icon">gemm_<wbr>impl</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#getaxes" class="tsd-kind-icon">get<wbr>Axes</a></li>
@@ -176,7 +178,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L145">types.ts:145</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L145">types.ts:145</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
@@ -193,7 +195,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L173">types.ts:173</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L195">types.ts:195</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -216,7 +218,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L246">types.ts:246</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L268">types.ts:268</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -236,6 +238,32 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="alignshapes" class="tsd-anchor"></a>
+					<h3>align<wbr>Shapes</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">align<wbr>Shapes<span class="tsd-signature-symbol">(</span>shape1<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span>, shape2<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">[]</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L147">types.ts:147</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>shape1: <span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+								<li>
+									<h5>shape2: <span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">[]</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
 					<a name="aligntensor" class="tsd-anchor"></a>
 					<h3>align<wbr>Tensor</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -245,7 +273,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L147">types.ts:147</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L169">types.ts:169</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -268,7 +296,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L100">types.ts:100</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L100">types.ts:100</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -300,7 +328,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L278">types.ts:278</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L300">types.ts:300</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -332,7 +360,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L287">types.ts:287</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L309">types.ts:309</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -358,7 +386,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L10">types.ts:10</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L10">types.ts:10</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -384,7 +412,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L283">types.ts:283</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L305">types.ts:305</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -410,7 +438,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L83">types.ts:83</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L83">types.ts:83</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -448,7 +476,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L271">types.ts:271</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L293">types.ts:293</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -486,7 +514,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L8">types.ts:8</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L8">types.ts:8</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -503,7 +531,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L188">types.ts:188</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L210">types.ts:210</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -526,7 +554,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L252">types.ts:252</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L274">types.ts:274</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -555,9 +583,32 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L139">types.ts:139</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L139">types.ts:139</a></li>
 								</ul>
 							</aside>
+							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="expand" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagAbstract">Abstract</span> expand</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">expand<span class="tsd-signature-symbol">(</span>shape<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L313">types.ts:313</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>shape: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
 						</li>
 					</ul>
@@ -572,7 +623,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L226">types.ts:226</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L248">types.ts:248</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -610,7 +661,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L258">types.ts:258</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L280">types.ts:280</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -648,7 +699,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L35">types.ts:35</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L35">types.ts:35</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -671,7 +722,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L6">types.ts:6</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L6">types.ts:6</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h4>
@@ -688,7 +739,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L4">types.ts:4</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L4">types.ts:4</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Float32Array</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -705,7 +756,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L141">types.ts:141</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L141">types.ts:141</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
@@ -722,7 +773,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L256">types.ts:256</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L278">types.ts:278</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -745,7 +796,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L64">types.ts:64</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L64">types.ts:64</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -771,7 +822,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L265">types.ts:265</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L287">types.ts:287</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -797,7 +848,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L70">types.ts:70</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L70">types.ts:70</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -823,7 +874,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L267">types.ts:267</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L289">types.ts:289</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -849,7 +900,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L183">types.ts:183</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L205">types.ts:205</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -872,7 +923,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L250">types.ts:250</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L272">types.ts:272</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -901,7 +952,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L193">types.ts:193</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L215">types.ts:215</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -924,7 +975,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L254">types.ts:254</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L276">types.ts:276</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -953,7 +1004,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L58">types.ts:58</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L58">types.ts:58</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -979,7 +1030,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L263">types.ts:263</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L285">types.ts:285</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1005,7 +1056,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L76">types.ts:76</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L76">types.ts:76</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1031,7 +1082,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L269">types.ts:269</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L291">types.ts:291</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1057,7 +1108,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L289">types.ts:289</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L311">types.ts:311</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1080,7 +1131,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L114">types.ts:114</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L114">types.ts:114</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1103,7 +1154,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L137">types.ts:137</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L137">types.ts:137</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1126,7 +1177,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L210">types.ts:210</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L232">types.ts:232</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1149,7 +1200,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L143">types.ts:143</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L143">types.ts:143</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
@@ -1166,7 +1217,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L178">types.ts:178</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L200">types.ts:200</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1189,7 +1240,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L248">types.ts:248</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L270">types.ts:270</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1218,7 +1269,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L52">types.ts:52</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L52">types.ts:52</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1244,7 +1295,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L261">types.ts:261</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L283">types.ts:283</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1270,7 +1321,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L198">types.ts:198</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L220">types.ts:220</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1293,7 +1344,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/4f7e108/lib/types.ts#L285">types.ts:285</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/743bfbf/lib/types.ts#L307">types.ts:307</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1336,6 +1387,9 @@
 								<a href="tensor.html#add_impl" class="tsd-kind-icon">add_<wbr>impl</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="tensor.html#alignshapes" class="tsd-kind-icon">align<wbr>Shapes</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="tensor.html#aligntensor" class="tsd-kind-icon">align<wbr>Tensor</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
@@ -1370,6 +1424,9 @@
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="tensor.html#exp" class="tsd-kind-icon">exp</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="tensor.html#expand" class="tsd-kind-icon">expand</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="tensor.html#gemm" class="tsd-kind-icon">gemm</a>
