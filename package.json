@@ -28,7 +28,8 @@
     "test:integration": "karma start karma.conf.js",
     "test:performance": "karma start karma.performance.js",
     "test:rust": "cargo test --tests",
-    "docs": "typedoc"
+    "docs": "typedoc",
+    "testData": "ts-node --project tsconfig.dev.json tools/test.ts"
   },
   "devDependencies": {
     "@types/benchmark": "^2.1.0",
@@ -37,6 +38,7 @@
     "arraybuffer-loader": "^1.0.8",
     "benchmark": "^2.1.4",
     "copy-webpack-plugin": "^5.0.3",
+    "file-loader": "^6.2.0",
     "karma": "^4.1.0",
     "karma-benchmark": "^1.0.4",
     "karma-benchmarkjs-reporter": "^1.0.0",

@@ -5,3 +5,4 @@ pkg
 wasm-pack.log
 docs
 lib/wasm
+test/data/onnx

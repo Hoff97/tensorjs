@@ -11,6 +11,7 @@ export class AddNode extends OnnxNode {
     if (this.onnxVersion < 13 && this.onnxVersion >= 7) {
       const a = inputs[0];
       const b = inputs[1];
+
       return [a.add(b)];
     }
     throw new Error(`Add not implemented for onnx version ${this.onnxVersion}`);
