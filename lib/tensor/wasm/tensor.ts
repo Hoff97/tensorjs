@@ -1,4 +1,5 @@
 import Tensor from '../../types';
+import { compareShapes } from '../../util/shape';
 
 import { Tensor as WT } from '../../wasm/rust_wasm_tensor';
 
@@ -176,5 +177,18 @@ export class WASMTensor extends Tensor {
 
   repeat(repeats: number[]): Tensor {
     return new WASMTensor(this.wasmTensor.repeat(new Uint32Array(repeats)));
+  }
+
+  expand(shape: number[]): Tensor {
+    const thisShape = this.getShape();
+
+    const [_shape, goal, resultShape] = this.alignShapes(thisShape, shape);
+    if (compareShapes(thisShape, resultShape)) {
+      return this;
+    }
+
+    const reshaped = this.reshape(_shape) as WASMTensor;
+
+    return new WASMTensor(reshaped.wasmTensor.expand(new Uint32Array(resultShape)));
   }
 }

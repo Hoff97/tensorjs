@@ -144,6 +144,28 @@ export default abstract class Tensor {
 
   abstract abs(): Tensor;
 
+  alignShapes(shape1: readonly number[], shape2: readonly number[]): (readonly number[])[] {
+    if (compareShapes(shape1, shape2)) {
+      return [shape1, shape2];
+    }
+    if (shape1.length < shape2.length) {
+      shape1 = [...shape1];
+      const prepend = shape2.length - shape1.length;
+      (shape1 as number[]).unshift(...new Array(prepend).fill(1));
+    } else if (shape2.length < shape1.length) {
+      shape2 = [...shape2];
+      const prepend = shape1.length - shape2.length;
+      (shape2 as number[]).unshift(...new Array(prepend).fill(1));
+    }
+
+    const resultShape = new Array(shape1.length).fill(1);
+    for (let i = 0; i < shape1.length; i++) {
+      resultShape[i] = Math.max(shape1[i], shape2[i]);
+    }
+
+    return [shape1, shape2, resultShape];
+  }
+
   alignTensor(tensor: Tensor) {
     let thisShape = this.getShape();
     let thatShape = tensor.getShape();
@@ -287,4 +309,6 @@ export default abstract class Tensor {
   abstract clip(min?: number, max?: number): Tensor;
 
   abstract repeat(repeats: number[]): Tensor;
+
+  abstract expand(shape: number[]): Tensor;
 }
