@@ -603,7 +603,7 @@ export default function testBasic(name: string, constructor: TensorConstructor, 
     });
   });
 
-  fdescribe(`${name} repeat`, () => {
+  describe(`${name} repeat`, () => {
     it('should reverse the axis by default', async () => {
       if (wait) {
         await wait;
