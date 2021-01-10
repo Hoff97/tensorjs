@@ -44,6 +44,7 @@
     "karma-chrome-launcher": "^2.2.0",
     "karma-cli": "^2.0.0",
     "karma-jasmine": "^2.0.1",
+    "karma-sourcemap-loader": "^0.3.8",
     "karma-spec-reporter": "0.0.32",
     "karma-webpack": "^4.0.2",
     "puppeteer": "^5.5.0",

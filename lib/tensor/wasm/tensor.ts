@@ -10,7 +10,6 @@ export let wasmLoaded: Promise<void> = new Promise((resolve, reject) => {
   });
 });
 
-
 export class WASMTensor extends Tensor {
   public wasmTensor: WT;
 
@@ -63,6 +62,7 @@ export class WASMTensor extends Tensor {
     if (!(tensor instanceof WASMTensor) || !(th instanceof WASMTensor)) {
       throw new Error('Can only add WASM tensor to WASM tensor');
     }
+
     return new WASMTensor(th.wasmTensor.addition(tensor.wasmTensor));
   }
 

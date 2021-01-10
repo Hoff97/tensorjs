@@ -1,5 +1,9 @@
 const webpackConfig = require('./webpack.config.js');
 
+const webpack = require('webpack');
+
+const path = require('path');
+
 const process = require('process');
 process.env.CHROME_BIN = require('puppeteer').executablePath();
 
@@ -19,13 +23,23 @@ module.exports = function(config) {
         },
         exclude: [],
         preprocessors: {
-            'test/**/*.ts': ['webpack']
+            '**/*.ts': ['webpack'],
         },
+        mime: { 'text/x-typescript': ['ts', 'tsx'] },
         webpack: {
             module: webpackConfig.module,
             resolve: webpackConfig.resolve,
-            mode: webpackConfig.mode,
-            devtool: 'inline-source-map',
+            mode: 'development',
+            devtool: false,
+            plugins: [
+                new webpack.SourceMapDevToolPlugin({
+                    test: /\.(ts|js|css)($|\?)/i,
+                    filename: null
+                })
+            ],
+        },
+        webpackMiddleware: {
+            logLevel: 'error'
         },
         reporters: ['spec'],
         port: 9876,
@@ -49,7 +63,7 @@ module.exports = function(config) {
             },
             ChromeGPU: {
                 base: 'Chrome',
-                flags: ['--use-gl=desktop', '--enable-webgl', '--disable-swiftshader']
+                flags: ['--use-gl=desktop', '--enable-webgl', '--disable-swiftshader', '--remote-debugging-port=9333']
             }
         },
 

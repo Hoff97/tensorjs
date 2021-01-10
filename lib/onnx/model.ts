@@ -20,6 +20,7 @@ interface IntermediaryRes {
 export class OnnxModel {
   private version: number;
   public inputs: onnx.IValueInfoProto[];
+  private inputSet: Set<string> = new Set();
   private outputs: string[];
 
   private nodes: {[id: number]: OnnxNode} = {};
@@ -47,6 +48,9 @@ export class OnnxModel {
     this.version = ver;
 
     this.inputs = modelProto.graph.input;
+    for (let i = 0; i < this.inputs.length; i++) {
+      this.inputSet.add(this.inputs[i].name);
+    }
     this.outputs = modelProto.graph.output.map(x => x.name);
 
     this.initializer(modelProto.graph.initializer);
@@ -171,9 +175,11 @@ export class OnnxModel {
       }
 
       for (let i = 0; i < toDelete.length; i++) {
-        const inter = intermediaryRes[toDelete[i]];
-        inter.value.delete();
-        delete intermediaryRes[toDelete[i]];
+        if (!this.inputSet.has(toDelete[i])) {
+          const inter = intermediaryRes[toDelete[i]];
+          inter.value.delete();
+          delete intermediaryRes[toDelete[i]];
+        }
       }
     }
 
