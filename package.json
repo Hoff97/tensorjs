@@ -19,8 +19,8 @@
   "main": "./dist/lib/library.js",
   "types": "./dist/lib/library.d.ts",
   "scripts": {
-    "build": "wasm-pack build && cp pkg/index* lib/wasm && webpack --env=production && tsc && cp lib/wasm/index_bg.wasm dist/lib/wasm",
-    "build:wasm": "wasm-pack build && cp pkg/index* lib/wasm",
+    "build": "wasm-pack build && mkdir -p lib/wasm && cp pkg/index* lib/wasm && webpack --env=production && tsc && cp lib/wasm/index_bg.wasm dist/lib/wasm",
+    "build:wasm": "wasm-pack build && mkdir -p lib/wasm && cp pkg/index* lib/wasm",
     "build:copyWasm": "cp lib/wasm/index_bg.wasm dist/lib/wasm",
     "build:js": "webpack --env=production",
     "build:ts": "tsc",
