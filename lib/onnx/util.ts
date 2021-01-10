@@ -5,7 +5,7 @@ import { CPUTensor } from "../tensor/cpu/tensor";
 import { TENSOR_FLOAT, TENSOR_INT64 } from './definitions';
 import Long from 'long';
 
-export function createTensor(tensorProto: onnx.ITensorProto): Tensor {
+export function createTensor(tensorProto: onnx.ITensorProto): CPUTensor {
   if (tensorProto.segment !== undefined && tensorProto.segment !== null) {
     throw new Error('Handling of tensor proto segment not yet implemented');
   }

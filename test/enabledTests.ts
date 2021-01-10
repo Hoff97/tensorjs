@@ -78,7 +78,7 @@ export const enabledTests = [
   "test_concat_3d_axis_1",
   "test_concat_3d_axis_2",
   "test_constant",
-//  "test_constantofshape_float_ones",
+  "test_constantofshape_float_ones",
 //  "test_constantofshape_int_zeros",
 //  "test_constant_pad",
 //  "test_convtranspose",

@@ -146,7 +146,7 @@ export default abstract class Tensor {
 
   alignShapes(shape1: readonly number[], shape2: readonly number[]): (readonly number[])[] {
     if (compareShapes(shape1, shape2)) {
-      return [shape1, shape2];
+      return [shape1, shape2, shape1];
     }
     if (shape1.length < shape2.length) {
       shape1 = [...shape1];
