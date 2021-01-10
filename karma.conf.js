@@ -7,7 +7,16 @@ module.exports = function(config) {
     config.set({
         basePath: '',
         frameworks: ['jasmine'],
-        files: ['test/*.ts'],
+        files: ['test/*.ts', {
+            pattern: 'test/data/onnx/**',
+            included: false,
+            served: true,
+            watched: false,
+            nocache: true
+        }],
+        proxies: {
+            "/onnx/": "http://localhost:9876/base/test/data/onnx/"
+        },
         exclude: [],
         preprocessors: {
             'test/**/*.ts': ['webpack']

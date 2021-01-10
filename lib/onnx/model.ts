@@ -92,10 +92,7 @@ export class OnnxModel {
       const tensorProto = initializer[i];
 
       const tensor = createTensor(tensorProto);
-      this.constants[tensorProto.name] = {
-        type: tensorProto.dataType === TENSOR_INT64 ? 'Int' : 'float',
-        value: tensor
-      }
+      this.constants[tensorProto.name] = tensor;
     }
   }
 
@@ -139,7 +136,7 @@ export class OnnxModel {
       for (let i = 0; i < node.inputs.length; i++) {
         const input = node.inputs[i];
         if (this.constants[input] !== undefined) {
-          inputs.push(this.constants[input].value);
+          inputs.push(this.constants[input]);
         } else {
           const inter = intermediaryRes[input];
           inter.used++;
@@ -190,9 +187,7 @@ export class OnnxModel {
 
   async toCPU() {
     for (let i in this.constants) {
-      if (this.constants[i].type !== 'Int') {
-        this.constants[i].value = await toCPU(this.constants[i].value);
-      }
+      this.constants[i] = await toCPU(this.constants[i]);
     }
 
     for (let i of this.nodeIds) {
@@ -202,9 +197,7 @@ export class OnnxModel {
 
   async toWASM() {
     for (let i in this.constants) {
-      if (this.constants[i].type !== 'Int') {
-        this.constants[i].value = await toWASM(this.constants[i].value);
-      }
+      this.constants[i] = await toWASM(this.constants[i]);
     }
 
     for (let i of this.nodeIds) {
@@ -214,9 +207,7 @@ export class OnnxModel {
 
   async toGPU() {
     for (let i in this.constants) {
-      if (this.constants[i].type !== 'Int') {
-        this.constants[i].value = await toGPU(this.constants[i].value);
-      }
+      this.constants[i] = await toGPU(this.constants[i]);
     }
 
     for (let i of this.nodeIds) {
