@@ -61,7 +61,7 @@ export class CPUTensor extends Tensor {
   }
 
   delete(): void {
-    // TODO: Maybe set values to empty array?
+    this.values = undefined;
   }
 
   get(index: number[] | number): number {
