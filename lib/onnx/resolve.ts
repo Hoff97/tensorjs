@@ -3,6 +3,7 @@ import { BatchNormNode } from "./nodes/batchNormalization";
 import { ClipNode } from "./nodes/clip";
 import { ConcatNode } from "./nodes/concat";
 import { ConstantNode } from "./nodes/constant";
+import { ConstantOfShapeNode } from "./nodes/constantOfShape";
 import { ConvNode } from "./nodes/conv";
 import { DivNode } from "./nodes/div";
 import { ExpNode } from "./nodes/exp";
@@ -36,6 +37,6 @@ export const nodeResolve: {[opType: string]: NodeConstructor} = {
   'Div': (attributes, inputs, outputs, constants, onnxVersion) => new DivNode(attributes, inputs, outputs, constants, onnxVersion),
   'Unsqueeze': (attributes, inputs, outputs, constants, onnxVersion) => new UnsqueezeNode(attributes, inputs, outputs, constants, onnxVersion),
   'Concat': (attributes, inputs, outputs, constants, onnxVersion) => new ConcatNode(attributes, inputs, outputs, constants, onnxVersion),
-  'ConstantOfShape': (attributes, inputs, outputs, constants, onnxVersion) => new ConstantNode(attributes, inputs, outputs, constants, onnxVersion),
+  'ConstantOfShape': (attributes, inputs, outputs, constants, onnxVersion) => new ConstantOfShapeNode(attributes, inputs, outputs, constants, onnxVersion),
   'Expand': (attributes, inputs, outputs, constants, onnxVersion) => new ExpandNode(attributes, inputs, outputs, constants, onnxVersion),
 };
