@@ -41,7 +41,7 @@ export function createTensor(tensorProto: onnx.ITensorProto): Tensor {
         values.push(value);
       }
 
-      return new CPUTensor(shape, values);
+      return new CPUTensor(shape, values, "int");
     } else {
       throw new Error('Cant process int64 tensor without raw data');
     }

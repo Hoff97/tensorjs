@@ -15,12 +15,18 @@ export async function toWASM(tensor: Tensor) {
   if (tensor instanceof WASMTensor) {
     return tensor;
   }
+  if (tensor instanceof CPUTensor && tensor.type === "int") {
+    return tensor;
+  }
   const values = await tensor.getValues();
   return new WASMTensor(values, new Uint32Array(tensor.getShape()));
 }
 
 export async function toGPU(tensor: Tensor) {
   if (tensor instanceof GPUTensor) {
+    return tensor;
+  }
+  if (tensor instanceof CPUTensor && tensor.type === "int") {
     return tensor;
   }
   const values = await tensor.getValues();
