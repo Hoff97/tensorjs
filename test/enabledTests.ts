@@ -118,7 +118,7 @@ export const enabledTests = [
   "test_exp",
 //  "test_expand_dim_changed",
 //  "test_expand_dim_unchanged",
-// "test_exp_example",
+  "test_exp_example",
 // "test_eyelike_populate_off_main_diagonal",
 // "test_eyelike_with_dtype",
 // "test_eyelike_without_dtype",
