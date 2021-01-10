@@ -1,4 +1,7 @@
 node_modules
+pkg
+lib
+TODO
 wasm-pack.log
 docs
 

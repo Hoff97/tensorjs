@@ -4,3 +4,4 @@ target
 pkg
 wasm-pack.log
 docs
+lib/wasm
