@@ -5,7 +5,7 @@ import { toCPU, toGPU, toWASM } from "../../util/convert";
 import { OnnxNode } from "../node";
 import { Attributes, Constants } from "../types";
 
-export class BatchNormalizationNode extends OnnxNode {
+export class InstanceNormalizationNode extends OnnxNode {
   private epsilon: number;
   private momentum: number;
 
@@ -15,32 +15,39 @@ export class BatchNormalizationNode extends OnnxNode {
     super(attributes, inputs, outputs, constants, onnxVersion);
 
     this.epsilon = this.getAttributeFloat('epsilon') || 1e-05;
-    this.momentum = this.getAttributeFloat('momentum') || 0.9;
 
     this.epsTensor = new CPUTensor([1], [this.epsilon]);
 
-    //TODO: Handle lower onnxversions here
+    //TODO: Handle onnx versions < 6 here
   }
 
   forward(inputs: Tensor[]): Tensor[] {
     const x = inputs[0];
     let scale = inputs[1];
     let B = inputs[2];
-    let mean = inputs[3];
-    let variance = inputs[4];
 
+    const dataRank = x.getShape().length - 2;
     //TODO: Handle lower onnx versions here
 
     const C = scale.getShape()[0];
 
-    const newShape = [1,C,...new Array(x.getShape().length - 2).fill(1)];
+    const newShape = [1,C,...new Array(dataRank).fill(1)];
 
     scale = scale.reshape(newShape);
     B = B.reshape(newShape);
-    mean = mean.reshape(newShape);
-    variance = variance.reshape(newShape);
 
+    const reduceAxes = new Array(x.getShape().length  -2);
+    for (let i = 0; i < dataRank; i++) {
+      reduceAxes[i] = i+2;
+    }
+
+    const mean = x.reduceMean(reduceAxes, true);
     glContext.flush();
+    const diff = x.subtract(mean);
+    glContext.flush();
+    const variance = diff.reduceMeanSquare(reduceAxes, true);
+    glContext.flush();
+
     const varEps = variance.add(this.epsTensor);
     glContext.flush();
     const varEpsSqrt = varEps.sqrt();
@@ -53,6 +60,9 @@ export class BatchNormalizationNode extends OnnxNode {
     glContext.flush();
     const result = scaled.add(B);
 
+    mean.delete();
+    diff.delete();
+    variance.delete();
     varEps.delete();
     varEpsSqrt.delete();
     xmean.delete();
