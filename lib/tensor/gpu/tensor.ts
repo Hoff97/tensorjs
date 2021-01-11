@@ -31,6 +31,8 @@ import { copy } from '../../ops/gpu/copy';
 import { reduceMeanSquare } from '../../ops/gpu/reduceMeanSquare';
 import { sumSquare } from '../../ops/gpu/sumSquare';
 import { padOp } from '../../ops/gpu/pad';
+import { CPUTensor } from '../cpu/tensor';
+import { gather } from '../../ops/gpu/gather';
 
 
 export class GPUTensor extends Tensor {
@@ -220,5 +222,9 @@ export class GPUTensor extends Tensor {
 
   pad_impl(pads: number[], mode: PadMode, value: number): Tensor {
     return padOp(this, pads, mode, value);
+  }
+
+  gather(axis: number, indices: CPUTensor): Tensor {
+    return gather(this, axis, indices);
   }
 }
