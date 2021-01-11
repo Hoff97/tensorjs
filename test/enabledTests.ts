@@ -286,7 +286,7 @@ export const enabledTests = [
   "test_reduce_sum_square_keepdims_example",
   "test_reduce_sum_square_keepdims_random",
   "test_reflect_pad",
-//  "test_relu",
+  "test_relu",
   "test_reshape_extended_dims",
   "test_reshape_negative_dim",
   "test_reshape_one_dim",

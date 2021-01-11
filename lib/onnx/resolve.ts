@@ -16,6 +16,7 @@ import { PadNode } from "./nodes/pad";
 import { ReduceMeanNode } from "./nodes/reduceMean";
 import { ReduceSumNode } from "./nodes/reduceSum";
 import { ReduceSumSquareNode } from "./nodes/reduceSumSquare";
+import { ReluNode } from "./nodes/relu";
 import { ReshapeNode } from "./nodes/reshape";
 import { SubNode } from "./nodes/sub";
 import { TileNode } from "./nodes/tile";
@@ -45,4 +46,5 @@ export const nodeResolve: {[opType: string]: NodeConstructor} = {
   'Expand': (attributes, inputs, outputs, constants, onnxVersion) => new ExpandNode(attributes, inputs, outputs, constants, onnxVersion),
   'InstanceNormalization': (attributes, inputs, outputs, constants, onnxVersion) => new InstanceNormalizationNode(attributes, inputs, outputs, constants, onnxVersion),
   'Pad': (attributes, inputs, outputs, constants, onnxVersion) => new PadNode(attributes, inputs, outputs, constants, onnxVersion),
+  'Relu': (attributes, inputs, outputs, constants, onnxVersion) => new ReluNode(attributes, inputs, outputs, constants, onnxVersion),
 };
