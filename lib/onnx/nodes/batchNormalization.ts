@@ -1,4 +1,5 @@
 import { CPUTensor } from "../../tensor/cpu/tensor";
+import { glContext } from "../../tensor/gpu/gl";
 import Tensor from "../../types";
 import { toCPU, toGPU, toWASM } from "../../util/convert";
 import { OnnxNode } from "../node";
@@ -39,12 +40,17 @@ export class BatchNormNode extends OnnxNode {
     mean = mean.reshape(newShape);
     variance = variance.reshape(newShape);
 
+    glContext.flush();
     const varEps = variance.add(this.epsTensor);
+    glContext.flush();
     const varEpsSqrt = varEps.sqrt();
     const xmean = x.subtract(mean);
+    glContext.flush();
     const normalized = xmean.divide(varEpsSqrt);
 
+    glContext.flush();
     const scaled = normalized.multiply(scale);
+    glContext.flush();
     const result = scaled.add(B);
 
     varEps.delete();
