@@ -28,6 +28,8 @@ import { reduceMean } from '../../ops/gpu/reduceMean';
 import { repeat } from '../../ops/gpu/repeat';
 import { expand } from '../../ops/gpu/expand';
 import { copy } from '../../ops/gpu/copy';
+import { reduceMeanSquare } from '../../ops/gpu/reduceMeanSquare';
+import { sumSquare } from '../../ops/gpu/sumSquare';
 
 
 export class GPUTensor extends Tensor {
@@ -73,6 +75,7 @@ export class GPUTensor extends Tensor {
   delete(): void {
     this.deleted = true;
     defaultAllocator.deallocate(this.memory);
+    this.memory = undefined;
   }
 
   copy(): Tensor {
@@ -148,8 +151,16 @@ export class GPUTensor extends Tensor {
     return sum(this, axes, keepDims);
   }
 
+  sumSquare_impl(axes: number[], keepDims: boolean): Tensor {
+    return sumSquare(this, axes, keepDims);
+  }
+
   reduceMean_impl(axes: number[], keepDims: boolean): Tensor {
     return reduceMean(this, axes, keepDims);
+  }
+
+  reduceMeanSquare_impl(axes: number[], keepDims: boolean): Tensor {
+    return reduceMeanSquare(this, axes, keepDims);
   }
 
   product_impl(axes: number[], keepDims: boolean): Tensor {

@@ -55,6 +55,12 @@ export default abstract class Tensor {
     return this.sum_impl(ax, keepDims);
   }
 
+  sumSquare(axes?: number | number[], keepDims?: boolean): Tensor {
+    let ax = this.getAxes(axes);
+    keepDims = keepDims || false;
+    return this.sumSquare_impl(ax, keepDims);
+  }
+
   product(axes?: number | number[], keepDims?: boolean): Tensor {
     let ax = this.getAxes(axes);
     keepDims = keepDims || false;
@@ -78,6 +84,13 @@ export default abstract class Tensor {
     keepDims = keepDims || false;
 
     return this.reduceMean_impl(ax, keepDims);
+  }
+
+  reduceMeanSquare(axes?: number | number[], keepDims?: boolean): Tensor {
+    let ax = this.getAxes(axes);
+    keepDims = keepDims || false;
+
+    return this.reduceMeanSquare_impl(ax, keepDims);
   }
 
   conv(kernel: Tensor,
@@ -281,6 +294,7 @@ export default abstract class Tensor {
                      alpha: number, beta: number, C?: Tensor): Tensor;
 
   abstract sum_impl(axes: number[], keepDims: boolean): Tensor;
+  abstract sumSquare_impl(axes: number[], keepDims: boolean): Tensor;
 
   abstract product_impl(axes: number[], keepDims: boolean): Tensor;
 
@@ -289,6 +303,8 @@ export default abstract class Tensor {
   abstract min_impl(axes: number[], keepDims: boolean): Tensor;
 
   abstract reduceMean_impl(axes: number[], keepDims: boolean): Tensor;
+
+  abstract reduceMeanSquare_impl(axes: number[], keepDims: boolean): Tensor;
 
   abstract conv_impl(kernel: Tensor,
                      dilations: number[],

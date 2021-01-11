@@ -128,9 +128,10 @@ impl Tensor {
     }
 
     #[inline]
-    pub fn pool_continuous<F,F2>(&self, axes: &Vec<usize>, keep_dims: bool, op: F, postprocess: bool, post: F2) -> Tensor where F: Fn(f32,f32) -> f32, F2: Fn(f32) -> f32 {
+    pub fn pool_continuous<F,F2,F3>(&self, axes: &Vec<usize>, keep_dims: bool,
+                                 op: F, postprocess: bool, post: F2, init: bool, init_func: F3) -> Tensor where F: Fn(f32,f32) -> f32, F2: Fn(f32) -> f32, F3: Fn(f32) -> f32 {
         let mut result_rank = self.shape.len() - axes.len() as usize;
-        
+
         if keep_dims {
             result_rank = self.shape.len()
         }
@@ -173,6 +174,9 @@ impl Tensor {
 
             for j in 0..cont_size {
                 let mut res = self.values[input_start_ix + j];
+                if init {
+                    res = init_func(res);
+                }
                 for k in 1..sum_size {
                     res = op(self.values[input_start_ix + j + k*step_size], res);
                 }
@@ -192,7 +196,9 @@ impl Tensor {
     }
 
     #[inline]
-    pub fn _pool<F, F2>(&self, axes: &Vec<usize>, keep_dims: bool, op: F, postprocess: bool, post: F2) -> Tensor where F: Fn(f32,f32) -> f32, F2: Fn(f32) -> f32 {
+    pub fn _pool<F, F2, F3>(&self, axes: &Vec<usize>, keep_dims: bool,
+                        op: F, postprocess: bool, post: F2,
+                        init: bool, init_func: F3) -> Tensor where F: Fn(f32,f32) -> f32, F2: Fn(f32) -> f32, F3: Fn(f32) -> f32 {
         let mut result_rank = self.shape.len() - axes.len() as usize;
 
         if keep_dims {
@@ -201,8 +207,11 @@ impl Tensor {
 
         if result_rank == 0 {
             let mut value = self.values[0];
+            if init {
+                value = init_func(value);
+            }
             for i in 1..self.size {
-                value = op(value, self.values[i]);
+                value = op(self.values[i], value);
             }
 
             if postprocess {
@@ -218,7 +227,7 @@ impl Tensor {
         }
 
         if self.axes_continuous(axes) {
-            return self.pool_continuous(axes, keep_dims, op, postprocess, post);
+            return self.pool_continuous(axes, keep_dims, op, postprocess, post, init, init_func);
         }
 
         let mut result_shape = vec![0; result_rank];
@@ -253,6 +262,9 @@ impl Tensor {
             }
             if !initialized[res_ix] {
                 values[res_ix] = self.values[i];
+                if init {
+                    values[res_ix] = init_func(values[res_ix]);
+                }
                 initialized[res_ix] = true;
             } else {
                 values[res_ix] = op(self.values[i], values[res_ix]);
@@ -276,19 +288,23 @@ impl Tensor {
     }
 
     pub fn _sum(&self, axes: &Vec<usize>, keep_dims: bool) -> Tensor {
-        return self._pool(axes, keep_dims, |x: f32, y: f32| x+y, false, |x: f32| x)
+        return self._pool(axes, keep_dims, |x: f32, y: f32| x+y, false, |x: f32| x, false, |x: f32| x)
+    }
+
+    pub fn _sum_square(&self, axes: &Vec<usize>, keep_dims: bool) -> Tensor {
+        return self._pool(axes, keep_dims, |x: f32, y: f32| (x*x)+y, false, |x: f32| x, true, |x: f32| x*x)
     }
 
     pub fn _product(&self, axes: &Vec<usize>, keep_dims: bool) -> Tensor {
-        return self._pool(axes, keep_dims, |x: f32, y: f32| x*y, false, |x: f32| x)
+        return self._pool(axes, keep_dims, |x: f32, y: f32| x*y, false, |x: f32| x, false, |x: f32| x)
     }
 
     pub fn _max(&self, axes: &Vec<usize>, keep_dims: bool) -> Tensor {
-        return self._pool(axes, keep_dims, |x: f32, y: f32| x.max(y), false, |x: f32| x)
+        return self._pool(axes, keep_dims, |x: f32, y: f32| x.max(y), false, |x: f32| x, false, |x: f32| x)
     }
 
     pub fn _min(&self, axes: &Vec<usize>, keep_dims: bool) -> Tensor {
-        return self._pool(axes, keep_dims, |x: f32, y: f32| x.min(y), false, |x: f32| x)
+        return self._pool(axes, keep_dims, |x: f32, y: f32| x.min(y), false, |x: f32| x, false, |x: f32| x)
     }
 
     pub fn _reduce_mean(&self, axes: &Vec<usize>, keep_dims: bool) -> Tensor {
@@ -298,7 +314,17 @@ impl Tensor {
         }
         let pool_size_f = pool_size as f32;
 
-        return self._pool(axes, keep_dims, |x: f32, y: f32| x + y, true, |x: f32| x/pool_size_f)
+        return self._pool(axes, keep_dims, |x: f32, y: f32| x + y, true, |x: f32| x/pool_size_f, false, |x: f32| x)
+    }
+
+    pub fn _reduce_mean_square(&self, axes: &Vec<usize>, keep_dims: bool) -> Tensor {
+        let mut pool_size = 1;
+        for i in 0..axes.len() {
+            pool_size *= self.shape[axes[i]];
+        }
+        let pool_size_f = pool_size as f32;
+
+        return self._pool(axes, keep_dims, |x: f32, y: f32| (x*x) + y, true, |x: f32| x/pool_size_f, true, |x: f32| x*x)
     }
 
     pub fn _conv(&self,
@@ -838,6 +864,14 @@ impl Tensor {
         return self._sum(&ax, keep_dims);
     }
 
+    pub fn sum_square(&self, axes: Uint32Array, keep_dims: bool) -> Tensor {
+        let mut ax: Vec<usize> = vec![0; axes.length() as usize];
+        for i in 0..axes.length() {
+            ax[i as usize] = axes.get_index(i) as usize;
+        }
+        return self._sum_square(&ax, keep_dims);
+    }
+
     pub fn product(&self, axes: Uint32Array, keep_dims: bool) -> Tensor {
         let mut ax: Vec<usize> = vec![0; axes.length() as usize];
         for i in 0..axes.length() {
@@ -868,6 +902,14 @@ impl Tensor {
             ax[i as usize] = axes.get_index(i) as usize;
         }
         return self._reduce_mean(&ax, keep_dims);
+    }
+
+    pub fn reduce_mean_square(&self, axes: Uint32Array, keep_dims: bool) -> Tensor {
+        let mut ax: Vec<usize> = vec![0; axes.length() as usize];
+        for i in 0..axes.length() {
+            ax[i as usize] = axes.get_index(i) as usize;
+        }
+        return self._reduce_mean_square(&ax, keep_dims);
     }
 
     pub fn conv(&self,

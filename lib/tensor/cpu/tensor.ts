@@ -12,8 +12,10 @@ import { max } from '../../ops/cpu/max';
 import { min } from '../../ops/cpu/min';
 import { product } from '../../ops/cpu/product';
 import { reduceMean } from '../../ops/cpu/reduceMean';
+import { reduceMeanSquare } from '../../ops/cpu/reduceMeanSquare';
 import { repeat } from '../../ops/cpu/repeat';
 import { sum } from '../../ops/cpu/sum';
+import { sumSquare } from '../../ops/cpu/sumSquare';
 import { transpose } from '../../ops/cpu/transpose';
 import Tensor from '../../types';
 import { compareShapes, computeStrides, getSize, indexToPos } from '../../util/shape';
@@ -175,6 +177,11 @@ export class CPUTensor extends Tensor {
     return sum(this, axes, keepDims);
   }
 
+  sumSquare_impl(axes: number[], keepDims: boolean): Tensor {
+    return sumSquare(this, axes, keepDims);
+  }
+
+
   product_impl(axes: number[], keepDims: boolean): Tensor {
     return product(this, axes, keepDims);
   }
@@ -189,6 +196,10 @@ export class CPUTensor extends Tensor {
 
   reduceMean_impl(axes: number[], keepDims: boolean): Tensor {
     return reduceMean(this, axes, keepDims);
+  }
+
+  reduceMeanSquare_impl(axes: number[], keepDims: boolean): Tensor {
+    return reduceMeanSquare(this, axes, keepDims);
   }
 
   conv_impl(kernel: Tensor, dilations: number[], group: number, pads: number[], strides: number[], bias?: Tensor): Tensor {

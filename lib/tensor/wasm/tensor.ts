@@ -41,6 +41,7 @@ export class WASMTensor extends Tensor {
 
   delete(): void {
     this.wasmTensor.free();
+    this.wasmTensor = undefined;
   }
 
   copy(): Tensor {
@@ -121,6 +122,10 @@ export class WASMTensor extends Tensor {
     return new WASMTensor(this.wasmTensor.sum(new Uint32Array(axes), keepDims));
   }
 
+  sumSquare_impl(axes: number[], keepDims: boolean): Tensor {
+    return new WASMTensor(this.wasmTensor.sum_square(new Uint32Array(axes), keepDims));
+  }
+
   product_impl(axes: number[], keepDims: boolean): Tensor {
     return new WASMTensor(this.wasmTensor.product(new Uint32Array(axes), keepDims));
   }
@@ -135,6 +140,10 @@ export class WASMTensor extends Tensor {
 
   reduceMean_impl(axes: number[], keepDims: boolean): Tensor {
     return new WASMTensor(this.wasmTensor.reduce_mean(new Uint32Array(axes), keepDims));
+  }
+
+  reduceMeanSquare_impl(axes: number[], keepDims: boolean): Tensor {
+    return new WASMTensor(this.wasmTensor.reduce_mean_square(new Uint32Array(axes), keepDims));
   }
 
   conv_impl(kernel: Tensor, dilations: number[], group: number, pads: number[], strides: number[], bias?: Tensor): Tensor {
