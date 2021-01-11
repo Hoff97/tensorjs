@@ -1,4 +1,4 @@
-import Tensor from '../../types';
+import Tensor, { PadMode } from '../../types';
 
 import { compareShapes, getSize } from '../../util/shape';
 
@@ -30,6 +30,7 @@ import { expand } from '../../ops/gpu/expand';
 import { copy } from '../../ops/gpu/copy';
 import { reduceMeanSquare } from '../../ops/gpu/reduceMeanSquare';
 import { sumSquare } from '../../ops/gpu/sumSquare';
+import { padOp } from '../../ops/gpu/pad';
 
 
 export class GPUTensor extends Tensor {
@@ -215,5 +216,9 @@ export class GPUTensor extends Tensor {
       return this.copy();
     }
     return expand(this.reshape(_shape) as GPUTensor, resultShape);
+  }
+
+  pad_impl(pads: number[], mode: PadMode, value: number): Tensor {
+    return padOp(this, pads, mode, value);
   }
 }

@@ -20,9 +20,9 @@ export function pad(arr: number[], len=maxRank) {
   return arr;
 }
 
-export function copyPad(arr: readonly number[]) {
+export function copyPad(arr: readonly number[], len=maxRank) {
   const result = Array.from(arr);
-  while (result.length < maxRank) {
+  while (result.length < len) {
     result.push(-1);
   }
   return result;
