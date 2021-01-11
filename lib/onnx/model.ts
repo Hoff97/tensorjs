@@ -1,5 +1,6 @@
 import Long from 'long';
 import {onnx} from 'onnx-proto';
+import { gl, glContext } from '../tensor/gpu/gl';
 import Tensor from '../types';
 import { toCPU, toGPU, toWASM } from '../util/convert';
 import { TENSOR_INT64 } from './definitions';
@@ -152,6 +153,7 @@ export class OnnxModel {
       }
 
       const outputs = node.forward(inputs);
+      glContext.flush();
       for (let i = 0; i < node.outputs.length; i++) {
         const output = node.outputs[i];
         intermediaryRes[output] = {
