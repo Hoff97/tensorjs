@@ -35,7 +35,11 @@ export abstract class OnnxNode {
   getAttributeString(name: string) {
     const attr = this.attributes[name];
     if (attr !== undefined) {
-      return attr.s;
+      const str = attr.s;
+      if (str !== undefined) {
+        return new TextDecoder("utf-8").decode(str);
+      }
+      return undefined;
     }
     return undefined;
   }

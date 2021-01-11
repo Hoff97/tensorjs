@@ -10,6 +10,7 @@ import { gemm } from '../../ops/cpu/gemm';
 import { matMul } from '../../ops/cpu/matMul';
 import { max } from '../../ops/cpu/max';
 import { min } from '../../ops/cpu/min';
+import { pad } from '../../ops/cpu/pad';
 import { product } from '../../ops/cpu/product';
 import { reduceMean } from '../../ops/cpu/reduceMean';
 import { reduceMeanSquare } from '../../ops/cpu/reduceMeanSquare';
@@ -17,7 +18,7 @@ import { repeat } from '../../ops/cpu/repeat';
 import { sum } from '../../ops/cpu/sum';
 import { sumSquare } from '../../ops/cpu/sumSquare';
 import { transpose } from '../../ops/cpu/transpose';
-import Tensor from '../../types';
+import Tensor, { PadMode } from '../../types';
 import { compareShapes, computeStrides, getSize, indexToPos } from '../../util/shape';
 
 export class CPUTensor extends Tensor {
@@ -207,6 +208,10 @@ export class CPUTensor extends Tensor {
       throw new Error('Can only do convolution of CPU tensor with CPU tensor');
     }
     return conv(this, kernel, dilations, group, pads, strides, bias as CPUTensor);
+  }
+
+  pad_impl(pads: number[], mode: PadMode, value: number): Tensor {
+    return pad(this, pads, mode, value);
   }
 
   averagePool_impl(kernelShape: number[],

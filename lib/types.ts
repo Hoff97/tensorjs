@@ -1,5 +1,7 @@
 import { compareShapes, getSize } from './util/shape';
 
+export type PadMode = 'constant' | 'reflect' | 'edge';
+
 export default abstract class Tensor {
   abstract getValues(): Promise<Float32Array>;
 
@@ -108,6 +110,18 @@ export default abstract class Tensor {
     strides = strides || new Array(dataRank).fill(1);
 
     return this.conv_impl(kernel, dilations, group, pads, strides, bias);
+  }
+
+  pad(pads: number[],
+      mode?: PadMode,
+      value?: number): Tensor {
+    if (mode === undefined) {
+      mode = 'constant';
+    }
+    if (value === undefined) {
+      value = 0;
+    }
+    return this.pad_impl(pads, mode, value);
   }
 
   averagePool(kernelShape: number[],
@@ -312,6 +326,10 @@ export default abstract class Tensor {
                      pads: number[],
                      strides: number[],
                      bias?: Tensor): Tensor;
+
+  abstract pad_impl(pads: number[],
+                    mode: PadMode,
+                    value: number): Tensor;
 
   abstract averagePool_impl(kernelShape: number[],
                              pads: number[],

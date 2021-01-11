@@ -12,6 +12,7 @@ import { GemmNode } from "./nodes/gemm";
 import { InstanceNormalizationNode } from "./nodes/instanceNormalization";
 import { MatMulNode } from "./nodes/matMul";
 import { MulNode } from "./nodes/mul";
+import { PadNode } from "./nodes/pad";
 import { ReduceMeanNode } from "./nodes/reduceMean";
 import { ReduceSumNode } from "./nodes/reduceSum";
 import { ReduceSumSquareNode } from "./nodes/reduceSumSquare";
@@ -43,4 +44,5 @@ export const nodeResolve: {[opType: string]: NodeConstructor} = {
   'ConstantOfShape': (attributes, inputs, outputs, constants, onnxVersion) => new ConstantOfShapeNode(attributes, inputs, outputs, constants, onnxVersion),
   'Expand': (attributes, inputs, outputs, constants, onnxVersion) => new ExpandNode(attributes, inputs, outputs, constants, onnxVersion),
   'InstanceNormalization': (attributes, inputs, outputs, constants, onnxVersion) => new InstanceNormalizationNode(attributes, inputs, outputs, constants, onnxVersion),
+  'Pad': (attributes, inputs, outputs, constants, onnxVersion) => new PadNode(attributes, inputs, outputs, constants, onnxVersion),
 };
