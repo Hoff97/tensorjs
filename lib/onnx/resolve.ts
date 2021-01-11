@@ -18,6 +18,7 @@ import { ReduceSumNode } from "./nodes/reduceSum";
 import { ReduceSumSquareNode } from "./nodes/reduceSumSquare";
 import { ReluNode } from "./nodes/relu";
 import { ReshapeNode } from "./nodes/reshape";
+import { ShapeNode } from "./nodes/shape";
 import { SubNode } from "./nodes/sub";
 import { TileNode } from "./nodes/tile";
 import { UnsqueezeNode } from "./nodes/unsqueeze";
@@ -47,4 +48,5 @@ export const nodeResolve: {[opType: string]: NodeConstructor} = {
   'InstanceNormalization': (attributes, inputs, outputs, constants, onnxVersion) => new InstanceNormalizationNode(attributes, inputs, outputs, constants, onnxVersion),
   'Pad': (attributes, inputs, outputs, constants, onnxVersion) => new PadNode(attributes, inputs, outputs, constants, onnxVersion),
   'Relu': (attributes, inputs, outputs, constants, onnxVersion) => new ReluNode(attributes, inputs, outputs, constants, onnxVersion),
+  'Shape': (attributes, inputs, outputs, constants, onnxVersion) => new ShapeNode(attributes, inputs, outputs, constants, onnxVersion),
 };
