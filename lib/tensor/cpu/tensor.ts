@@ -6,6 +6,7 @@ import {
 import { concat } from '../../ops/cpu/concat';
 import { conv } from '../../ops/cpu/conv';
 import { expand } from '../../ops/cpu/expand';
+import { gather } from '../../ops/cpu/gather';
 import { gemm } from '../../ops/cpu/gemm';
 import { matMul } from '../../ops/cpu/matMul';
 import { max } from '../../ops/cpu/max';
@@ -22,7 +23,7 @@ import Tensor, { PadMode } from '../../types';
 import { compareShapes, computeStrides, getSize, indexToPos } from '../../util/shape';
 
 export class CPUTensor extends Tensor {
-  private values: Float32Array;
+  public values: Float32Array | Int32Array;
 
   public shape: ReadonlyArray<number>;
 
@@ -34,7 +35,7 @@ export class CPUTensor extends Tensor {
 
   public deleted: boolean = false;
 
-  constructor(shape: ReadonlyArray<number>, values?: Float32Array | number[], type?: string) {
+  constructor(shape: ReadonlyArray<number>, values?: Float32Array | number[] | Int32Array, type?: string) {
     super();
 
     this.shape = shape;
@@ -42,16 +43,25 @@ export class CPUTensor extends Tensor {
     this.size = getSize(shape);
 
     if (values !== undefined) {
-      if (values instanceof Float32Array) {
+      if (values instanceof Float32Array || values instanceof Int32Array) {
         this.values = values;
+        this.type = values instanceof Float32Array ? "float" : "int";
+      } else if (type === "int") {
+        this.values = Int32Array.from(values);
+        this.type = "int";
       } else {
         this.values = Float32Array.from(values);
+        this.type = "float";
       }
     } else {
-      this.values = new Float32Array(this.size);
+      if (type === "int") {
+        this.values = new Int32Array(this.size);
+        this.type = "int";
+      } else {
+        this.values = new Float32Array(this.size);
+        this.type = "float";
+      }
     }
-
-    this.type = type || "float";
   }
 
   getValues() {
@@ -246,5 +256,9 @@ export class CPUTensor extends Tensor {
       return this.copy();
     }
     return expand(this.reshape(_shape) as CPUTensor, resultShape);
+  }
+
+  gather(axis: number, indices: CPUTensor): Tensor {
+    return gather(this, axis, indices);
   }
 }

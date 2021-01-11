@@ -8,6 +8,7 @@ import { ConvNode } from "./nodes/conv";
 import { DivNode } from "./nodes/div";
 import { ExpNode } from "./nodes/exp";
 import { ExpandNode } from "./nodes/expand";
+import { GatherNode } from "./nodes/gather";
 import { GemmNode } from "./nodes/gemm";
 import { InstanceNormalizationNode } from "./nodes/instanceNormalization";
 import { MatMulNode } from "./nodes/matMul";
@@ -49,4 +50,5 @@ export const nodeResolve: {[opType: string]: NodeConstructor} = {
   'Pad': (attributes, inputs, outputs, constants, onnxVersion) => new PadNode(attributes, inputs, outputs, constants, onnxVersion),
   'Relu': (attributes, inputs, outputs, constants, onnxVersion) => new ReluNode(attributes, inputs, outputs, constants, onnxVersion),
   'Shape': (attributes, inputs, outputs, constants, onnxVersion) => new ShapeNode(attributes, inputs, outputs, constants, onnxVersion),
+  'Gather': (attributes, inputs, outputs, constants, onnxVersion) => new GatherNode(attributes, inputs, outputs, constants, onnxVersion),
 };

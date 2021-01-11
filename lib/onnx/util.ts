@@ -35,10 +35,10 @@ export function createTensor(tensorProto: onnx.ITensorProto): CPUTensor {
     }
   } else if (tensorProto.dataType === TENSOR_INT64) {
     if (tensorProto.rawData && tensorProto.rawData.length > 0) {
-      const values = [];
+      const values = new Int32Array(tensorProto.rawData.length / 8);
       for (let i = 0; i < tensorProto.rawData.length; i += 8) {
         const value = Long.fromBytesLE(Array.from(tensorProto.rawData.slice(i,i+8))).toNumber();
-        values.push(value);
+        values[i/8] = value;
       }
 
       return new CPUTensor(shape, values, "int");

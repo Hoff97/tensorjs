@@ -2,6 +2,7 @@ import Tensor, { PadMode } from '../../types';
 import { compareShapes } from '../../util/shape';
 
 import { Tensor as WT } from '../../wasm/rust_wasm_tensor';
+import { CPUTensor } from '../cpu/tensor';
 
 let WASMT: typeof WT;
 export let wasmLoaded: Promise<void> = new Promise((resolve, reject) => {
@@ -213,5 +214,9 @@ export class WASMTensor extends Tensor {
 
   pad_impl(pads: number[], mode: PadMode, value: number): Tensor {
     return new WASMTensor(this.wasmTensor.pad(new Uint32Array(pads), WASMTensor.padModeToInt[mode],value))
+  }
+
+  gather(axis: number, indices: CPUTensor): Tensor {
+    return new WASMTensor(this.wasmTensor.gather(axis, indices.values as Int32Array, new Uint32Array(indices.shape)));
   }
 }

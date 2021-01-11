@@ -1,3 +1,4 @@
+use js_sys::Int32Array;
 use crate::utils::conv_output_size;
 use std::cmp::Ordering;
 use std::ops::{Add, Sub};
@@ -1140,6 +1141,60 @@ impl Tensor {
             _pads[i as usize] = pads.get_index(i) as usize;
         }
         return self._pad(&_pads, mode, value);
+    }
+
+    // Mode: 0 == constant, 1 == reflect, 2 == edge
+    pub fn gather(&self, axis: i32, indices: Int32Array, indice_shape: Uint32Array) -> Tensor {
+        let indice_strides = compute_strides_uint32(&indice_shape);
+
+        let r = self.shape.len();
+        let q = indice_shape.length();
+
+        let result_rank = r + (q as usize) - 1;
+        let mut result_shape = vec![0; result_rank];
+        for i in 0..axis {
+            result_shape[i as usize] = self.shape[i as usize];
+        }
+        for i in 0..q {
+            result_shape[(i + (axis as u32)) as usize] = indice_shape.get_index(i) as usize;
+        }
+        for i in (axis + 1)..(r as i32) {
+            result_shape[(i as usize) + (q as usize) - 1] = self.shape[i as usize];
+        }
+
+        let result_strides = compute_strides(&result_shape);
+        let result_size = get_size(&result_shape);
+
+        let mut values = vec![0.0; result_size];
+
+        let mut out_ix = vec![0; result_rank];
+        let mut input_ix = vec![0; self.shape.len()];
+        for i in 0..result_size {
+            let mut gather_pos = 0;
+            for j in 0..q {
+                gather_pos += out_ix[j as usize + (axis as usize)] * indice_strides[j as usize];
+            }
+            let ax_ix = indices.get_index(gather_pos as u32);
+
+            for j in 0..axis {
+                input_ix[j as usize] = out_ix[j as usize];
+            }
+            input_ix[axis as usize] = ax_ix as usize;
+            for j in (axis as usize + 1)..r {
+                input_ix[j] = out_ix[j + q as usize - 1];
+            }
+
+            values[i] = self.get(&input_ix);
+
+            increment_index(&mut out_ix, &result_shape);
+        }
+
+        Tensor {
+            shape: result_shape,
+            strides: result_strides,
+            size: result_size,
+            values
+        }
     }
 }
 

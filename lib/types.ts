@@ -1,9 +1,10 @@
+import { CPUTensor } from './tensor/cpu/tensor';
 import { compareShapes, getSize } from './util/shape';
 
 export type PadMode = 'constant' | 'reflect' | 'edge';
 
 export default abstract class Tensor {
-  abstract getValues(): Promise<Float32Array>;
+  abstract getValues(): Promise<Float32Array | Int32Array>;
 
   abstract getShape(): ReadonlyArray<number>;
 
@@ -347,4 +348,6 @@ export default abstract class Tensor {
   abstract expand(shape: number[]): Tensor;
 
   abstract copy(): Tensor;
+
+  abstract gather(axis: number, indices: CPUTensor): Tensor;
 }
