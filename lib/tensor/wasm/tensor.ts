@@ -1,4 +1,4 @@
-import Tensor from '../../types';
+import Tensor, { PadMode } from '../../types';
 import { compareShapes } from '../../util/shape';
 
 import { Tensor as WT } from '../../wasm/rust_wasm_tensor';
@@ -203,5 +203,15 @@ export class WASMTensor extends Tensor {
     const reshaped = this.reshape(_shape) as WASMTensor;
 
     return new WASMTensor(reshaped.wasmTensor.expand(new Uint32Array(resultShape)));
+  }
+
+  static padModeToInt = {
+    'constant': 0,
+    'reflect': 1,
+    'edge': 2
+  }
+
+  pad_impl(pads: number[], mode: PadMode, value: number): Tensor {
+    return new WASMTensor(this.wasmTensor.pad(new Uint32Array(pads), WASMTensor.padModeToInt[mode],value))
   }
 }

@@ -723,6 +723,64 @@ impl Tensor {
             values
         }
     }
+
+    pub fn _pad(&self, pads: &Vec<usize>, mode: i32, value: f32) -> Tensor {
+        let rank = self.shape.len();
+
+        let mut output_shape = vec![0; rank];
+        for i in 0..rank {
+            output_shape[i] = self.shape[i] + pads[i] + pads[i+rank];
+        }
+        let output_strides = compute_strides(&output_shape);
+        let output_size = get_size(&output_shape);
+
+        let mut values = vec![0.0; output_size];
+
+        let mut ix = vec![0; rank];
+        let mut input_ix = vec![0; rank];
+        for i in 0..output_size {
+            let mut use_const = false;
+            for j in 0..rank {
+                if ix[j] < pads[j] {
+                    if mode == 0 {
+                        use_const = true;
+                        break;
+                    } else if mode == 1 {
+                        input_ix[j] = pads[j] - ix[j];
+                    } else {
+                        input_ix[j] = 0;
+                    }
+                } else {
+                    input_ix[j] = ix[j] - pads[j];
+                }
+                if input_ix[j] >= self.shape[j] {
+                    if mode == 0 {
+                        use_const = true;
+                        break;
+                    } else if mode == 1 {
+                        input_ix[j] = 2*self.shape[j] - input_ix[j] - 2;
+                    } else {
+                        input_ix[j] = self.shape[j] - 1;
+                    }
+                }
+            }
+
+            if use_const {
+                values[i] = value;
+            } else {
+                values[i] = self.get(&input_ix);
+            }
+
+            increment_index(&mut ix, &output_shape);
+        }
+
+        Tensor {
+            shape: output_shape,
+            strides: output_strides,
+            size: output_size,
+            values
+        }
+    }
 }
 
 #[wasm_bindgen]
@@ -1073,6 +1131,15 @@ impl Tensor {
             size: self.size,
             values
         }
+    }
+
+    // Mode: 0 == constant, 1 == reflect, 2 == edge
+    pub fn pad(&self, pads: Uint32Array, mode: i32, value: f32) -> Tensor {
+        let mut _pads: Vec<usize> = vec![0; pads.length() as usize];
+        for i in 0..pads.length() {
+            _pads[i as usize] = pads.get_index(i) as usize;
+        }
+        return self._pad(&_pads, mode, value);
     }
 }
 
