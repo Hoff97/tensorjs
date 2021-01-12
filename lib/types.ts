@@ -295,6 +295,33 @@ export default abstract class Tensor {
     return this.gemm_impl(b, aTranspose, bTranspose, alpha, beta, c);
   }
 
+  slice(starts: number[], ends: number[], axes?: number[]): Tensor {
+    const shape = this.getShape();
+    const rank = shape.length;
+    if (axes === undefined) {
+      axes = [];
+      for (let i = 0; i < rank; i++) {
+        axes.push(i)
+      }
+    }
+    starts = [...starts];
+    ends = [...ends];
+    for (let i = 0; i < axes.length; i++) {
+      const sh = shape[axes[i]];
+      if (starts[i] < 0) {
+        starts[i] += sh;
+      } else if (starts[i] >= sh) {
+        starts[i] = sh;
+      }
+      if (ends[i] < 0) {
+        ends[i] += sh;
+      } else if (ends[i] >= sh) {
+        ends[i] = sh;
+      }
+    }
+    return this.slice_impl(starts, ends, axes);
+  }
+
   abstract add_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor;
 
   abstract subtract_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor;
@@ -356,4 +383,6 @@ export default abstract class Tensor {
   abstract floor(): Tensor;
 
   abstract ceil(): Tensor;
+
+  abstract slice_impl(starts: number[], ends: number[], axes: number[]): Tensor;
 }

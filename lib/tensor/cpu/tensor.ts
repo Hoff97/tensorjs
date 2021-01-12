@@ -16,6 +16,7 @@ import { product } from '../../ops/cpu/product';
 import { reduceMean } from '../../ops/cpu/reduceMean';
 import { reduceMeanSquare } from '../../ops/cpu/reduceMeanSquare';
 import { repeat } from '../../ops/cpu/repeat';
+import { slice } from '../../ops/cpu/slice';
 import { sum } from '../../ops/cpu/sum';
 import { sumSquare } from '../../ops/cpu/sumSquare';
 import { transpose } from '../../ops/cpu/transpose';
@@ -268,5 +269,9 @@ export class CPUTensor extends Tensor {
 
   gather(axis: number, indices: CPUTensor): Tensor {
     return gather(this, axis, indices);
+  }
+
+  slice_impl(starts: number[], ends: number[], axes: number[]): Tensor {
+    return slice(this, starts, ends, axes);
   }
 }

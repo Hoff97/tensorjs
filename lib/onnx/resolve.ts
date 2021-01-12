@@ -23,6 +23,7 @@ import { ReduceSumSquareNode } from "./nodes/reduceSumSquare";
 import { ReluNode } from "./nodes/relu";
 import { ReshapeNode } from "./nodes/reshape";
 import { ShapeNode } from "./nodes/shape";
+import { SliceNode } from "./nodes/slice";
 import { SubNode } from "./nodes/sub";
 import { TileNode } from "./nodes/tile";
 import { UnsqueezeNode } from "./nodes/unsqueeze";
@@ -57,4 +58,5 @@ export const nodeResolve: {[opType: string]: NodeConstructor} = {
   'Cast': (attributes, inputs, outputs, constants, onnxVersion) => new CastNode(attributes, inputs, outputs, constants, onnxVersion),
   'Floor': (attributes, inputs, outputs, constants, onnxVersion) => new FloorNode(attributes, inputs, outputs, constants, onnxVersion),
   'Ceil': (attributes, inputs, outputs, constants, onnxVersion) => new CeilNode(attributes, inputs, outputs, constants, onnxVersion),
+  'Slice': (attributes, inputs, outputs, constants, onnxVersion) => new SliceNode(attributes, inputs, outputs, constants, onnxVersion),
 };
