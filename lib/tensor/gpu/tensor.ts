@@ -35,6 +35,7 @@ import { CPUTensor } from '../cpu/tensor';
 import { gather } from '../../ops/gpu/gather';
 import { floor } from '../../ops/gpu/floor';
 import { ceil } from '../../ops/gpu/ceil';
+import { slice } from '../../ops/gpu/slice';
 
 
 export class GPUTensor extends Tensor {
@@ -236,5 +237,9 @@ export class GPUTensor extends Tensor {
 
   gather(axis: number, indices: CPUTensor): Tensor {
     return gather(this, axis, indices);
+  }
+
+  slice_impl(starts: number[], ends: number[], axes: number[]): Tensor {
+    return slice(this, starts, ends, axes);
   }
 }
