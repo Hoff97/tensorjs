@@ -9,7 +9,7 @@ export class ExpandNode extends OnnxNode {
     super(attributes, inputs, outputs, constants, onnxVersion);
   }
 
-  forward(inputs: Tensor[]): Tensor[] {
+  async forward(inputs: Tensor[]): Promise<Tensor[]> {
     if (this.onnxVersion < 13) {
       const tensor = inputs[0];
 

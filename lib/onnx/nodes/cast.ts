@@ -15,7 +15,7 @@ export class CastNode extends OnnxNode {
     this.to = this.getAttributeString("to");
   }
 
-  forward(inputs: Tensor[]): Tensor[] {
+  async forward(inputs: Tensor[]): Promise<Tensor[]> {
     const x = inputs[0];
 
     if (x instanceof CPUTensor) {

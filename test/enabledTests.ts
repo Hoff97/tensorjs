@@ -370,7 +370,7 @@ export const enabledTests = [
 //  "test_transpose_all_permutations_5",
 //  "test_transpose_default",
   "test_unsqueeze",
-//  "test_upsample_nearest",
+  "test_upsample_nearest",
 //  "test_where_example",
 //  "test_xor2d",
 //  "test_xor3d",

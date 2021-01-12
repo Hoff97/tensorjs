@@ -13,7 +13,7 @@ export class UnsqueezeNode extends OnnxNode {
     }
   }
 
-  forward(inputs: Tensor[]): Tensor[] {
+  async forward(inputs: Tensor[]): Promise<Tensor[]> {
     const x = inputs[0];
 
     if (this.onnxVersion < 13) {

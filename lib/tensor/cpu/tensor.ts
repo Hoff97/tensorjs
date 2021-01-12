@@ -20,6 +20,7 @@ import { slice } from '../../ops/cpu/slice';
 import { sum } from '../../ops/cpu/sum';
 import { sumSquare } from '../../ops/cpu/sumSquare';
 import { transpose } from '../../ops/cpu/transpose';
+import { upsample } from '../../ops/cpu/upsample';
 import Tensor, { PadMode, TensorValues } from '../../types';
 import { compareShapes, computeStrides, getSize, indexToPos } from '../../util/shape';
 
@@ -273,5 +274,9 @@ export class CPUTensor extends Tensor {
 
   slice_impl(starts: number[], ends: number[], axes: number[]): Tensor {
     return slice(this, starts, ends, axes);
+  }
+
+  upsample(scales: number[]): Tensor {
+    return upsample(this, scales);
   }
 }

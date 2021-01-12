@@ -385,4 +385,6 @@ export default abstract class Tensor {
   abstract ceil(): Tensor;
 
   abstract slice_impl(starts: number[], ends: number[], axes: number[]): Tensor;
+
+  abstract upsample(scales: number[]): Tensor;
 }

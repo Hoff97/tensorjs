@@ -15,7 +15,7 @@ export class ReduceMeanNode extends OnnxNode {
     this.keepDims = keep === 1 || keep === undefined;
   }
 
-  forward(inputs: Tensor[]): Tensor[] {
+  async forward(inputs: Tensor[]): Promise<Tensor[]> {
     if (this.onnxVersion < 11) {
       return [inputs[0].reduceMean(this.axes, this.keepDims)];
     }

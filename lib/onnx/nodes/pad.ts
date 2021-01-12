@@ -18,7 +18,7 @@ export class PadNode extends OnnxNode {
     this.value = this.getAttributeFloat("value");
   }
 
-  forward(inputs: Tensor[]): Tensor[] {
+  async forward(inputs: Tensor[]): Promise<Tensor[]> {
     if (this.onnxVersion < 11) {
       return [inputs[0].pad(this.pads, this.mode, this.value)];
     }

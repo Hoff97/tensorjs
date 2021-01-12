@@ -13,7 +13,7 @@ export class ConcatNode extends OnnxNode {
     }
   }
 
-  forward(inputs: Tensor[]): Tensor[] {
+  async forward(inputs: Tensor[]): Promise<Tensor[]> {
     if (inputs.length > 2) {
       throw new Error("Concat with more than 2 tensors not yet supported");
     }

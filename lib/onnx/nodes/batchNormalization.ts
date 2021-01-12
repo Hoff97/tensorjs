@@ -22,7 +22,7 @@ export class BatchNormalizationNode extends OnnxNode {
     //TODO: Handle lower onnxversions here
   }
 
-  forward(inputs: Tensor[]): Tensor[] {
+  async forward(inputs: Tensor[]): Promise<Tensor[]> {
     const x = inputs[0];
     let scale = inputs[1];
     let B = inputs[2];

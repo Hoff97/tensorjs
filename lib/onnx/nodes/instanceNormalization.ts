@@ -21,7 +21,7 @@ export class InstanceNormalizationNode extends OnnxNode {
     //TODO: Handle onnx versions < 6 here
   }
 
-  forward(inputs: Tensor[]): Tensor[] {
+  async forward(inputs: Tensor[]): Promise<Tensor[]> {
     const x = inputs[0];
     let scale = inputs[1];
     let B = inputs[2];

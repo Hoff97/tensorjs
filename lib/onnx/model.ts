@@ -61,6 +61,12 @@ export class OnnxModel {
 
   private initNodes(modelProto: onnx.ModelProto) {
     for (let i = 0; i < modelProto.graph.node.length; i++) {
+      if (modelProto.graph.node[i].opType === "Upsample") {
+        console.log(new TextDecoder("utf-8").decode(modelProto.graph.node[i].attribute[0].s));
+      }
+    }
+
+    for (let i = 0; i < modelProto.graph.node.length; i++) {
       const nodeData = modelProto.graph.node[i];
       const cls = nodeResolve[nodeData.opType];
 
@@ -101,7 +107,7 @@ export class OnnxModel {
     }
   }
 
-  forward(inputs: Tensor[]): Tensor[] {
+  async forward(inputs: Tensor[]): Promise<Tensor[]> {
     const intermediaryRes: {[name: string]: IntermediaryRes} = {};
 
     const nodes: {[id: number]: {variableInputs: number}} = {};
@@ -152,7 +158,7 @@ export class OnnxModel {
         }
       }
 
-      const outputs = node.forward(inputs);
+      const outputs = await node.forward(inputs);
       glContext.flush();
       for (let i = 0; i < node.outputs.length; i++) {
         const output = node.outputs[i];

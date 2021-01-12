@@ -7,7 +7,7 @@ export class AddNode extends OnnxNode {
     super(attributes, inputs, outputs, constants, onnxVersion);
   }
 
-  forward(inputs: Tensor[]): Tensor[] {
+  async forward(inputs: Tensor[]): Promise<Tensor[]> {
     if (this.onnxVersion < 13 && this.onnxVersion >= 7) {
       const a = inputs[0];
       const b = inputs[1];

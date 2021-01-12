@@ -15,7 +15,7 @@ export class ConstantNode extends OnnxNode {
     }
   }
 
-  forward(inputs: Tensor[]): Tensor[] {
+  async forward(inputs: Tensor[]): Promise<Tensor[]> {
 
     if (this.onnxVersion < 11) {
       return [this.tensor.copy()];

@@ -19,7 +19,7 @@ export class ConstantOfShapeNode extends OnnxNode {
     }
   }
 
-  forward(inputs: Tensor[]): Tensor[] {
+  async forward(inputs: Tensor[]): Promise<Tensor[]> {
     const _shape = inputs[0];
 
     if (!(_shape instanceof CPUTensor)) {

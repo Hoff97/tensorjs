@@ -7,7 +7,7 @@ export class FloorNode extends OnnxNode {
     super(attributes, inputs, outputs, constants, onnxVersion);
   }
 
-  forward(inputs: Tensor[]): Tensor[] {
+  async forward(inputs: Tensor[]): Promise<Tensor[]> {
     const a = inputs[0];
 
     return [a.floor()];

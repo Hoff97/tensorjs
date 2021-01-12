@@ -92,5 +92,5 @@ export abstract class OnnxNode {
   async toWASM() {}
   async toGPU() {}
 
-  abstract forward(inputs: Tensor[]): Tensor[];
+  abstract forward(inputs: Tensor[]): Promise<Tensor[]>;
 }

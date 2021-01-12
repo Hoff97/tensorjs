@@ -7,7 +7,7 @@ export class MatMulNode extends OnnxNode {
     super(attributes, inputs, outputs, constants, onnxVersion);
   }
 
-  forward(inputs: Tensor[]): Tensor[] {
+  async forward(inputs: Tensor[]): Promise<Tensor[]> {
     const A = inputs[0];
     const B = inputs[1];
 

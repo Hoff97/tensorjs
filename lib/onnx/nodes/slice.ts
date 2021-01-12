@@ -16,7 +16,7 @@ export class SliceNode extends OnnxNode {
     this.ends = this.getAttributeInts("ends");
   }
 
-  forward(inputs: Tensor[]): Tensor[] {
+  async forward(inputs: Tensor[]): Promise<Tensor[]> {
     if (this.onnxVersion < 11) {
       const a = inputs[0];
 

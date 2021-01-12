@@ -806,13 +806,47 @@ impl Tensor {
 
         for i in 0..result_size {
             ax_ix = 0;
-            for i in 0..rank {
-                if ax_ix < axis.len() && i == axis[ax_ix] {
-                    in_ix[i] = out_ix[i] + starts[ax_ix];
+            for j in 0..rank {
+                if ax_ix < axis.len() && j == axis[ax_ix] {
+                    in_ix[j] = out_ix[j] + starts[ax_ix];
                     ax_ix += 1;
                 } else {
-                    in_ix[i] = out_ix[i];
+                    in_ix[j] = out_ix[j];
                 }
+            }
+
+            values[i] = self.get(&in_ix);
+
+            increment_index(&mut out_ix, &result_shape);
+        }
+
+        Tensor {
+            shape: result_shape,
+            strides: result_strides,
+            size: result_size,
+            values
+        }
+    }
+
+    pub fn _upsample(&self, scales: &Vec<f32>) -> Tensor {
+        let rank = self.shape.len();
+        let mut result_shape = vec![0; rank];
+        let mut ax_ix = 0;
+        for i in 0..rank {
+            result_shape[i] = ((self.shape[i] as f32) * scales[i]).floor() as usize;
+        }
+
+        let result_strides = compute_strides(&result_shape);
+        let result_size = get_size(&result_shape);
+
+        let mut values = vec![0.0; result_size];
+
+        let mut out_ix = vec![0; rank];
+        let mut in_ix = vec![0; rank];
+
+        for i in 0..result_size {
+            for j in 0..rank {
+                in_ix[j] = ((out_ix[j] as f32)/scales[j]).floor() as usize;
             }
 
             values[i] = self.get(&in_ix);
@@ -1261,6 +1295,15 @@ impl Tensor {
         }
 
         return self._slice(&_starts, &_ends, &_axis);
+    }
+
+    pub fn upsample(&self, scales: Float32Array) -> Tensor {
+        let mut _scales: Vec<f32> = vec![0.0; scales.length() as usize];
+        for i in 0..scales.length() {
+            _scales[i as usize] = scales.get_index(i) as f32;
+        }
+
+        return self._upsample(&_scales);
     }
 }
 

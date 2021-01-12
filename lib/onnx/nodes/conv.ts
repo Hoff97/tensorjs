@@ -22,7 +22,7 @@ export class ConvNode extends OnnxNode {
     this.strides = this.getAttributeInts('strides');
   }
 
-  forward(inputs: Tensor[]): Tensor[] {
+  async forward(inputs: Tensor[]): Promise<Tensor[]> {
     const x = inputs[0];
     const w = inputs[1];
     const b = inputs.length > 2 ? inputs[2] : undefined;
