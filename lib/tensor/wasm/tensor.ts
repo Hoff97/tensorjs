@@ -227,4 +227,8 @@ export class WASMTensor extends Tensor {
   ceil(): Tensor {
     return new WASMTensor(this.wasmTensor.ceil());
   }
+
+  slice_impl(starts: number[], ends: number[], axes: number[]): Tensor {
+    return new WASMTensor(this.wasmTensor.slice(new Uint32Array(starts), new Uint32Array(ends), new Uint32Array(axes)));
+  }
 }

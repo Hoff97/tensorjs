@@ -782,6 +782,51 @@ impl Tensor {
             values
         }
     }
+
+    pub fn _slice(&self, starts: &Vec<usize>, ends: &Vec<usize>, axis: &Vec<usize>) -> Tensor {
+        let rank = self.shape.len();
+        let mut result_shape = vec![0; rank];
+        let mut ax_ix = 0;
+        for i in 0..rank {
+            if ax_ix < axis.len() && i == axis[ax_ix] {
+                result_shape[i] = ends[ax_ix] - starts[ax_ix];
+                ax_ix += 1;
+            } else {
+                result_shape[i] = self.shape[i];
+            }
+        }
+
+        let result_strides = compute_strides(&result_shape);
+        let result_size = get_size(&result_shape);
+
+        let mut values = vec![0.0; result_size];
+
+        let mut out_ix = vec![0; rank];
+        let mut in_ix = vec![0; rank];
+
+        for i in 0..result_size {
+            ax_ix = 0;
+            for i in 0..rank {
+                if ax_ix < axis.len() && i == axis[ax_ix] {
+                    in_ix[i] = out_ix[i] + starts[ax_ix];
+                    ax_ix += 1;
+                } else {
+                    in_ix[i] = out_ix[i];
+                }
+            }
+
+            values[i] = self.get(&in_ix);
+
+            increment_index(&mut out_ix, &result_shape);
+        }
+
+        Tensor {
+            shape: result_shape,
+            strides: result_strides,
+            size: result_size,
+            values
+        }
+    }
 }
 
 #[wasm_bindgen]
@@ -1203,6 +1248,19 @@ impl Tensor {
 
     pub fn ceil(&self) -> Tensor {
         self.unary_op(|x: f32| x.ceil())
+    }
+
+    pub fn slice(&self, starts: Uint32Array, ends: Uint32Array, axis: Uint32Array) -> Tensor {
+        let mut _starts: Vec<usize> = vec![0; starts.length() as usize];
+        let mut _ends: Vec<usize> = vec![0; ends.length() as usize];
+        let mut _axis: Vec<usize> = vec![0; axis.length() as usize];
+        for i in 0..starts.length() {
+            _starts[i as usize] = starts.get_index(i) as usize;
+            _ends[i as usize] = ends.get_index(i) as usize;
+            _axis[i as usize] = axis.get_index(i) as usize;
+        }
+
+        return self._slice(&_starts, &_ends, &_axis);
     }
 }
 
