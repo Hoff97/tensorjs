@@ -20,7 +20,8 @@
     "dist",
     "karma.conf.js",
     "karma.performance.js",
-    "tools"
+    "tools",
+    "examples"
   ],
   "typedocOptions": {
     "entryPoints": ["lib/library.ts"],

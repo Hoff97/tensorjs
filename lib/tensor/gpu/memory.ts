@@ -1,4 +1,4 @@
-import { Framebuffer2D, Regl } from "regl";
+import REGL, { Framebuffer2D, Regl } from "regl";
 import { AVLTree } from "../../util/avl";
 import { primeFactors } from "../../util/math";
 
@@ -105,6 +105,49 @@ export class GPUMemoryAllocator {
       width: width,
       height: height,
       size: arraySize,
+      frameBuffer: framebuffer,
+      id: this.entryId++
+    }
+  }
+
+  allocateOfDimensions(width: number, height: number): MemoryEntry {
+    const arraySize = width*height*4;
+
+    const texture = this.regl.texture({
+      width: width,
+      height: height,
+      format: 'rgba',
+      type: 'float',
+    });
+
+    const framebuffer = this.regl.framebuffer({
+      color: texture,
+      width: width,
+      height: height,
+      depthStencil: false
+    });
+
+    return {
+      width: width,
+      height: height,
+      size: arraySize,
+      frameBuffer: framebuffer,
+      id: this.entryId++
+    }
+  }
+
+  allocateFramebuffer(texture: REGL.Texture2D): MemoryEntry {
+    const framebuffer = this.regl.framebuffer({
+      color: texture,
+      width: texture.width,
+      height: texture.height,
+      depthStencil: false
+    });
+
+    return {
+      width: texture.width,
+      height: texture.height,
+      size: texture.width*texture.height*4,
       frameBuffer: framebuffer,
       id: this.entryId++
     }

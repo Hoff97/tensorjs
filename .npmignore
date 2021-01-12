@@ -4,6 +4,7 @@ lib
 TODO
 wasm-pack.log
 docs
+examples
 
 target/
 node_modules/
