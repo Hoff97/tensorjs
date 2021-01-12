@@ -17,8 +17,6 @@ export class BatchNormalizationNode extends OnnxNode {
     this.epsilon = this.getAttributeFloat('epsilon') || 1e-05;
     this.momentum = this.getAttributeFloat('momentum') || 0.9;
 
-    this.epsTensor = new CPUTensor([1], [this.epsilon]);
-
     //TODO: Handle lower onnxversions here
   }
 
@@ -35,42 +33,13 @@ export class BatchNormalizationNode extends OnnxNode {
 
     const newShape = [1,C,...new Array(x.getShape().length - 2).fill(1)];
 
-    scale = scale.reshape(newShape);
-    B = B.reshape(newShape);
-    mean = mean.reshape(newShape);
-    variance = variance.reshape(newShape);
+    scale = scale.reshape(newShape, false);
+    B = B.reshape(newShape, false);
+    mean = mean.reshape(newShape, false);
+    variance = variance.reshape(newShape, false);
 
-    glContext.flush();
-    const varEps = variance.add(this.epsTensor);
-    glContext.flush();
-    const varEpsSqrt = varEps.sqrt();
-    const xmean = x.subtract(mean);
-    glContext.flush();
-    const normalized = xmean.divide(varEpsSqrt);
-
-    glContext.flush();
-    const scaled = normalized.multiply(scale);
-    glContext.flush();
-    const result = scaled.add(B);
-
-    varEps.delete();
-    varEpsSqrt.delete();
-    xmean.delete();
-    normalized.delete();
-    scaled.delete();
-
-    // TODO: Replace this with native batchnorm implementation
+    const result = x.normalize(mean, variance, this.epsilon, scale, B);
 
     return [result];
-  }
-
-  async toCPU() {
-    this.epsTensor = await toCPU(this.epsTensor);
-  }
-  async toWASM() {
-    this.epsTensor = await toWASM(this.epsTensor);
-  }
-  async toGPU() {
-    this.epsTensor = await toGPU(this.epsTensor);
   }
 }

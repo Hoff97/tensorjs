@@ -141,7 +141,7 @@ export default abstract class Tensor {
     return this.averagePool_impl(kernelShape, pads, strides, includePad);
   }
 
-  reshape(shape: readonly number[]): Tensor {
+  reshape(shape: readonly number[], copy?: boolean): Tensor {
     let shSize = 1;
     let negIndex = -1;
     for (let i = 0; i < shape.length; i++) {
@@ -152,6 +152,10 @@ export default abstract class Tensor {
       }
     }
 
+    if (copy === undefined) {
+      copy = true;
+    }
+
     if (negIndex !== -1) {
       const currShape = this.getShape();
       const currSize = getSize(currShape);
@@ -159,12 +163,12 @@ export default abstract class Tensor {
 
       _shape[negIndex] = currSize / shSize;
 
-      return this.reshape_impl(_shape);
+      return this.reshape_impl(_shape, copy);
     }
-    return this.reshape_impl(shape);
+    return this.reshape_impl(shape, copy);
   }
 
-  abstract reshape_impl(shape: readonly number[]): Tensor;
+  abstract reshape_impl(shape: readonly number[], copy: boolean): Tensor;
 
   abstract exp(): Tensor;
 
@@ -387,4 +391,6 @@ export default abstract class Tensor {
   abstract slice_impl(starts: number[], ends: number[], axes: number[]): Tensor;
 
   abstract upsample(scales: number[]): Tensor;
+
+  abstract normalize(mean: Tensor, variance: Tensor, epsilon: number, scale: Tensor, bias: Tensor): Tensor;
 }

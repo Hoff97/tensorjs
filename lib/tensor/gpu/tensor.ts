@@ -37,6 +37,9 @@ import { floor } from '../../ops/gpu/floor';
 import { ceil } from '../../ops/gpu/ceil';
 import { slice } from '../../ops/gpu/slice';
 import { upsample } from '../../ops/gpu/upsample';
+import REGL from 'regl';
+import { toTexture } from '../../ops/gpu/toTexture';
+import { normalize } from '../../ops/gpu/normalize';
 
 
 export class GPUTensor extends Tensor {
@@ -59,6 +62,27 @@ export class GPUTensor extends Tensor {
     } else {
       this.memory = values;
     }
+  }
+
+  static fromData(data: REGL.TextureImageData) {
+    const texture = gl.texture({
+      data: data,
+      format: "rgba",
+      type: "float"
+    });
+
+    const memory = defaultAllocator.allocateFramebuffer(texture);
+
+    const width = texture.width;
+    const height = texture.height;
+
+    console.log(texture.format, texture.type);
+
+    return new GPUTensor(memory, [width, height, 4]);
+  }
+
+  toTexture(): GPUTensor {
+    return toTexture(this);
   }
 
   getValues(): Promise<Float32Array> {
@@ -201,8 +225,12 @@ export class GPUTensor extends Tensor {
     return averagePool(this, kernelShape, pads, strides, includePad);
   }
 
-  reshape_impl(shape: number[]): Tensor {
-    return copy(this, shape);
+  reshape_impl(shape: number[], _copy: boolean): Tensor {
+    if (copy) {
+      return copy(this, shape);
+    } else {
+      return new GPUTensor(this.memory, shape);
+    }
   }
 
   concat(tensor: Tensor, axis: number): Tensor {
@@ -246,5 +274,12 @@ export class GPUTensor extends Tensor {
 
   upsample(scales: number[]): Tensor {
     return upsample(this, scales);
+  }
+
+  normalize(mean: Tensor, variance: Tensor, epsilon: number, scale: Tensor, bias: Tensor): Tensor {
+    if (!(mean instanceof GPUTensor) || !(variance instanceof GPUTensor) || !(scale instanceof GPUTensor) || !(bias instanceof GPUTensor)) {
+      throw new Error('Can only normalize with CPU tensors');
+    }
+    return normalize(this, mean, variance, epsilon, scale, bias);
   }
 }
