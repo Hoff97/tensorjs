@@ -61,12 +61,6 @@ export class OnnxModel {
 
   private initNodes(modelProto: onnx.ModelProto) {
     for (let i = 0; i < modelProto.graph.node.length; i++) {
-      if (modelProto.graph.node[i].opType === "Upsample") {
-        console.log(new TextDecoder("utf-8").decode(modelProto.graph.node[i].attribute[0].s));
-      }
-    }
-
-    for (let i = 0; i < modelProto.graph.node.length; i++) {
       const nodeData = modelProto.graph.node[i];
       const cls = nodeResolve[nodeData.opType];
 
