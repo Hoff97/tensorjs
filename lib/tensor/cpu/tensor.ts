@@ -1,7 +1,7 @@
 import { averagePool } from '../../ops/cpu/averagePool';
 import {
   abs,
-  add, clip, divide, exp, log, multiply, power, sqrt, subtract
+  add, ceil, clip, divide, exp, floor, log, multiply, power, sqrt, subtract
 } from '../../ops/cpu/basic';
 import { concat } from '../../ops/cpu/concat';
 import { conv } from '../../ops/cpu/conv';
@@ -19,11 +19,11 @@ import { repeat } from '../../ops/cpu/repeat';
 import { sum } from '../../ops/cpu/sum';
 import { sumSquare } from '../../ops/cpu/sumSquare';
 import { transpose } from '../../ops/cpu/transpose';
-import Tensor, { PadMode } from '../../types';
+import Tensor, { PadMode, TensorValues } from '../../types';
 import { compareShapes, computeStrides, getSize, indexToPos } from '../../util/shape';
 
 export class CPUTensor extends Tensor {
-  public values: Float32Array | Int32Array;
+  public values: TensorValues;
 
   public shape: ReadonlyArray<number>;
 
@@ -35,7 +35,7 @@ export class CPUTensor extends Tensor {
 
   public deleted: boolean = false;
 
-  constructor(shape: ReadonlyArray<number>, values?: Float32Array | number[] | Int32Array, type?: string) {
+  constructor(shape: ReadonlyArray<number>, values?: TensorValues | number[], type?: string) {
     super();
 
     this.shape = shape;
@@ -128,6 +128,14 @@ export class CPUTensor extends Tensor {
 
   abs(): Tensor {
     return abs(this);
+  }
+
+  floor(): Tensor {
+    return floor(this);
+  }
+
+  ceil(): Tensor {
+    return ceil(this);
   }
 
   clip(min?: number, max?: number): Tensor {

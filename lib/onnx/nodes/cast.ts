@@ -1,0 +1,26 @@
+import { cast } from "../../ops/cpu/cast";
+import { CPUTensor } from "../../tensor/cpu/tensor";
+import { glContext } from "../../tensor/gpu/gl";
+import Tensor from "../../types";
+import { toCPU, toGPU, toWASM } from "../../util/convert";
+import { OnnxNode } from "../node";
+import { Attributes, Constants } from "../types";
+
+export class CastNode extends OnnxNode {
+  private to: string;
+
+  constructor(attributes: Attributes, inputs: string[], outputs: string[], constants: Constants, onnxVersion: number) {
+    super(attributes, inputs, outputs, constants, onnxVersion);
+
+    this.to = this.getAttributeString("to");
+  }
+
+  forward(inputs: Tensor[]): Tensor[] {
+    const x = inputs[0];
+
+    if (x instanceof CPUTensor) {
+      return [cast(x, this.to)];
+    }
+    throw new Error("Can only cast CPU tensors right now");
+  }
+}

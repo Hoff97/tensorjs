@@ -1,5 +1,7 @@
 import { AddNode } from "./nodes/add";
 import { BatchNormalizationNode } from "./nodes/batchNormalization";
+import { CastNode } from "./nodes/cast";
+import { CeilNode } from "./nodes/ceil";
 import { ClipNode } from "./nodes/clip";
 import { ConcatNode } from "./nodes/concat";
 import { ConstantNode } from "./nodes/constant";
@@ -8,6 +10,7 @@ import { ConvNode } from "./nodes/conv";
 import { DivNode } from "./nodes/div";
 import { ExpNode } from "./nodes/exp";
 import { ExpandNode } from "./nodes/expand";
+import { FloorNode } from "./nodes/floor";
 import { GatherNode } from "./nodes/gather";
 import { GemmNode } from "./nodes/gemm";
 import { InstanceNormalizationNode } from "./nodes/instanceNormalization";
@@ -51,4 +54,7 @@ export const nodeResolve: {[opType: string]: NodeConstructor} = {
   'Relu': (attributes, inputs, outputs, constants, onnxVersion) => new ReluNode(attributes, inputs, outputs, constants, onnxVersion),
   'Shape': (attributes, inputs, outputs, constants, onnxVersion) => new ShapeNode(attributes, inputs, outputs, constants, onnxVersion),
   'Gather': (attributes, inputs, outputs, constants, onnxVersion) => new GatherNode(attributes, inputs, outputs, constants, onnxVersion),
+  'Cast': (attributes, inputs, outputs, constants, onnxVersion) => new CastNode(attributes, inputs, outputs, constants, onnxVersion),
+  'Floor': (attributes, inputs, outputs, constants, onnxVersion) => new FloorNode(attributes, inputs, outputs, constants, onnxVersion),
+  'Ceil': (attributes, inputs, outputs, constants, onnxVersion) => new CeilNode(attributes, inputs, outputs, constants, onnxVersion),
 };

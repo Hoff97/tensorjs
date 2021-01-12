@@ -33,6 +33,8 @@ import { sumSquare } from '../../ops/gpu/sumSquare';
 import { padOp } from '../../ops/gpu/pad';
 import { CPUTensor } from '../cpu/tensor';
 import { gather } from '../../ops/gpu/gather';
+import { floor } from '../../ops/gpu/floor';
+import { ceil } from '../../ops/gpu/ceil';
 
 
 export class GPUTensor extends Tensor {
@@ -99,6 +101,14 @@ export class GPUTensor extends Tensor {
 
   abs(): Tensor {
     return abs(this);
+  }
+
+  floor(): Tensor {
+    return floor(this);
+  }
+
+  ceil(): Tensor {
+    return ceil(this);
   }
 
   add_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor {

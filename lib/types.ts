@@ -3,8 +3,10 @@ import { compareShapes, getSize } from './util/shape';
 
 export type PadMode = 'constant' | 'reflect' | 'edge';
 
+export type TensorValues = Float32Array | Int32Array;
+
 export default abstract class Tensor {
-  abstract getValues(): Promise<Float32Array | Int32Array>;
+  abstract getValues(): Promise<TensorValues>;
 
   abstract getShape(): ReadonlyArray<number>;
 
@@ -350,4 +352,8 @@ export default abstract class Tensor {
   abstract copy(): Tensor;
 
   abstract gather(axis: number, indices: CPUTensor): Tensor;
+
+  abstract floor(): Tensor;
+
+  abstract ceil(): Tensor;
 }

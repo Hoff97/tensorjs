@@ -219,4 +219,12 @@ export class WASMTensor extends Tensor {
   gather(axis: number, indices: CPUTensor): Tensor {
     return new WASMTensor(this.wasmTensor.gather(axis, indices.values as Int32Array, new Uint32Array(indices.shape)));
   }
+
+  floor(): Tensor {
+    return new WASMTensor(this.wasmTensor.floor());
+  }
+
+  ceil(): Tensor {
+    return new WASMTensor(this.wasmTensor.ceil());
+  }
 }

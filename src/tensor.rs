@@ -1196,6 +1196,14 @@ impl Tensor {
             values
         }
     }
+
+    pub fn floor(&self) -> Tensor {
+        self.unary_op(|x: f32| x.floor())
+    }
+
+    pub fn ceil(&self) -> Tensor {
+        self.unary_op(|x: f32| x.ceil())
+    }
 }
 
 impl Add for Tensor {
