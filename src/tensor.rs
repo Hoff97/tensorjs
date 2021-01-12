@@ -1,3 +1,4 @@
+use js_sys::Int32Array;
 use crate::utils::conv_output_size;
 use std::cmp::Ordering;
 use std::ops::{Add, Sub};
@@ -128,9 +129,10 @@ impl Tensor {
     }
 
     #[inline]
-    pub fn pool_continuous<F,F2>(&self, axes: &Vec<usize>, keep_dims: bool, op: F, postprocess: bool, post: F2) -> Tensor where F: Fn(f32,f32) -> f32, F2: Fn(f32) -> f32 {
+    pub fn pool_continuous<F,F2,F3>(&self, axes: &Vec<usize>, keep_dims: bool,
+                                 op: F, postprocess: bool, post: F2, init: bool, init_func: F3) -> Tensor where F: Fn(f32,f32) -> f32, F2: Fn(f32) -> f32, F3: Fn(f32) -> f32 {
         let mut result_rank = self.shape.len() - axes.len() as usize;
-        
+
         if keep_dims {
             result_rank = self.shape.len()
         }
@@ -173,6 +175,9 @@ impl Tensor {
 
             for j in 0..cont_size {
                 let mut res = self.values[input_start_ix + j];
+                if init {
+                    res = init_func(res);
+                }
                 for k in 1..sum_size {
                     res = op(self.values[input_start_ix + j + k*step_size], res);
                 }
@@ -192,7 +197,9 @@ impl Tensor {
     }
 
     #[inline]
-    pub fn _pool<F, F2>(&self, axes: &Vec<usize>, keep_dims: bool, op: F, postprocess: bool, post: F2) -> Tensor where F: Fn(f32,f32) -> f32, F2: Fn(f32) -> f32 {
+    pub fn _pool<F, F2, F3>(&self, axes: &Vec<usize>, keep_dims: bool,
+                        op: F, postprocess: bool, post: F2,
+                        init: bool, init_func: F3) -> Tensor where F: Fn(f32,f32) -> f32, F2: Fn(f32) -> f32, F3: Fn(f32) -> f32 {
         let mut result_rank = self.shape.len() - axes.len() as usize;
 
         if keep_dims {
@@ -201,8 +208,11 @@ impl Tensor {
 
         if result_rank == 0 {
             let mut value = self.values[0];
+            if init {
+                value = init_func(value);
+            }
             for i in 1..self.size {
-                value = op(value, self.values[i]);
+                value = op(self.values[i], value);
             }
 
             if postprocess {
@@ -218,7 +228,7 @@ impl Tensor {
         }
 
         if self.axes_continuous(axes) {
-            return self.pool_continuous(axes, keep_dims, op, postprocess, post);
+            return self.pool_continuous(axes, keep_dims, op, postprocess, post, init, init_func);
         }
 
         let mut result_shape = vec![0; result_rank];
@@ -253,6 +263,9 @@ impl Tensor {
             }
             if !initialized[res_ix] {
                 values[res_ix] = self.values[i];
+                if init {
+                    values[res_ix] = init_func(values[res_ix]);
+                }
                 initialized[res_ix] = true;
             } else {
                 values[res_ix] = op(self.values[i], values[res_ix]);
@@ -276,19 +289,23 @@ impl Tensor {
     }
 
     pub fn _sum(&self, axes: &Vec<usize>, keep_dims: bool) -> Tensor {
-        return self._pool(axes, keep_dims, |x: f32, y: f32| x+y, false, |x: f32| x)
+        return self._pool(axes, keep_dims, |x: f32, y: f32| x+y, false, |x: f32| x, false, |x: f32| x)
+    }
+
+    pub fn _sum_square(&self, axes: &Vec<usize>, keep_dims: bool) -> Tensor {
+        return self._pool(axes, keep_dims, |x: f32, y: f32| (x*x)+y, false, |x: f32| x, true, |x: f32| x*x)
     }
 
     pub fn _product(&self, axes: &Vec<usize>, keep_dims: bool) -> Tensor {
-        return self._pool(axes, keep_dims, |x: f32, y: f32| x*y, false, |x: f32| x)
+        return self._pool(axes, keep_dims, |x: f32, y: f32| x*y, false, |x: f32| x, false, |x: f32| x)
     }
 
     pub fn _max(&self, axes: &Vec<usize>, keep_dims: bool) -> Tensor {
-        return self._pool(axes, keep_dims, |x: f32, y: f32| x.max(y), false, |x: f32| x)
+        return self._pool(axes, keep_dims, |x: f32, y: f32| x.max(y), false, |x: f32| x, false, |x: f32| x)
     }
 
     pub fn _min(&self, axes: &Vec<usize>, keep_dims: bool) -> Tensor {
-        return self._pool(axes, keep_dims, |x: f32, y: f32| x.min(y), false, |x: f32| x)
+        return self._pool(axes, keep_dims, |x: f32, y: f32| x.min(y), false, |x: f32| x, false, |x: f32| x)
     }
 
     pub fn _reduce_mean(&self, axes: &Vec<usize>, keep_dims: bool) -> Tensor {
@@ -298,7 +315,17 @@ impl Tensor {
         }
         let pool_size_f = pool_size as f32;
 
-        return self._pool(axes, keep_dims, |x: f32, y: f32| x + y, true, |x: f32| x/pool_size_f)
+        return self._pool(axes, keep_dims, |x: f32, y: f32| x + y, true, |x: f32| x/pool_size_f, false, |x: f32| x)
+    }
+
+    pub fn _reduce_mean_square(&self, axes: &Vec<usize>, keep_dims: bool) -> Tensor {
+        let mut pool_size = 1;
+        for i in 0..axes.len() {
+            pool_size *= self.shape[axes[i]];
+        }
+        let pool_size_f = pool_size as f32;
+
+        return self._pool(axes, keep_dims, |x: f32, y: f32| (x*x) + y, true, |x: f32| x/pool_size_f, true, |x: f32| x*x)
     }
 
     pub fn _conv(&self,
@@ -697,6 +724,143 @@ impl Tensor {
             values
         }
     }
+
+    pub fn _pad(&self, pads: &Vec<usize>, mode: i32, value: f32) -> Tensor {
+        let rank = self.shape.len();
+
+        let mut output_shape = vec![0; rank];
+        for i in 0..rank {
+            output_shape[i] = self.shape[i] + pads[i] + pads[i+rank];
+        }
+        let output_strides = compute_strides(&output_shape);
+        let output_size = get_size(&output_shape);
+
+        let mut values = vec![0.0; output_size];
+
+        let mut ix = vec![0; rank];
+        let mut input_ix = vec![0; rank];
+        for i in 0..output_size {
+            let mut use_const = false;
+            for j in 0..rank {
+                if ix[j] < pads[j] {
+                    if mode == 0 {
+                        use_const = true;
+                        break;
+                    } else if mode == 1 {
+                        input_ix[j] = pads[j] - ix[j];
+                    } else {
+                        input_ix[j] = 0;
+                    }
+                } else {
+                    input_ix[j] = ix[j] - pads[j];
+                }
+                if input_ix[j] >= self.shape[j] {
+                    if mode == 0 {
+                        use_const = true;
+                        break;
+                    } else if mode == 1 {
+                        input_ix[j] = 2*self.shape[j] - input_ix[j] - 2;
+                    } else {
+                        input_ix[j] = self.shape[j] - 1;
+                    }
+                }
+            }
+
+            if use_const {
+                values[i] = value;
+            } else {
+                values[i] = self.get(&input_ix);
+            }
+
+            increment_index(&mut ix, &output_shape);
+        }
+
+        Tensor {
+            shape: output_shape,
+            strides: output_strides,
+            size: output_size,
+            values
+        }
+    }
+
+    pub fn _slice(&self, starts: &Vec<usize>, ends: &Vec<usize>, axis: &Vec<usize>) -> Tensor {
+        let rank = self.shape.len();
+        let mut result_shape = vec![0; rank];
+        let mut ax_ix = 0;
+        for i in 0..rank {
+            if ax_ix < axis.len() && i == axis[ax_ix] {
+                result_shape[i] = ends[ax_ix] - starts[ax_ix];
+                ax_ix += 1;
+            } else {
+                result_shape[i] = self.shape[i];
+            }
+        }
+
+        let result_strides = compute_strides(&result_shape);
+        let result_size = get_size(&result_shape);
+
+        let mut values = vec![0.0; result_size];
+
+        let mut out_ix = vec![0; rank];
+        let mut in_ix = vec![0; rank];
+
+        for i in 0..result_size {
+            ax_ix = 0;
+            for j in 0..rank {
+                if ax_ix < axis.len() && j == axis[ax_ix] {
+                    in_ix[j] = out_ix[j] + starts[ax_ix];
+                    ax_ix += 1;
+                } else {
+                    in_ix[j] = out_ix[j];
+                }
+            }
+
+            values[i] = self.get(&in_ix);
+
+            increment_index(&mut out_ix, &result_shape);
+        }
+
+        Tensor {
+            shape: result_shape,
+            strides: result_strides,
+            size: result_size,
+            values
+        }
+    }
+
+    pub fn _upsample(&self, scales: &Vec<f32>) -> Tensor {
+        let rank = self.shape.len();
+        let mut result_shape = vec![0; rank];
+        let mut ax_ix = 0;
+        for i in 0..rank {
+            result_shape[i] = ((self.shape[i] as f32) * scales[i]).floor() as usize;
+        }
+
+        let result_strides = compute_strides(&result_shape);
+        let result_size = get_size(&result_shape);
+
+        let mut values = vec![0.0; result_size];
+
+        let mut out_ix = vec![0; rank];
+        let mut in_ix = vec![0; rank];
+
+        for i in 0..result_size {
+            for j in 0..rank {
+                in_ix[j] = ((out_ix[j] as f32)/scales[j]).floor() as usize;
+            }
+
+            values[i] = self.get(&in_ix);
+
+            increment_index(&mut out_ix, &result_shape);
+        }
+
+        Tensor {
+            shape: result_shape,
+            strides: result_strides,
+            size: result_size,
+            values
+        }
+    }
 }
 
 #[wasm_bindgen]
@@ -838,6 +1002,14 @@ impl Tensor {
         return self._sum(&ax, keep_dims);
     }
 
+    pub fn sum_square(&self, axes: Uint32Array, keep_dims: bool) -> Tensor {
+        let mut ax: Vec<usize> = vec![0; axes.length() as usize];
+        for i in 0..axes.length() {
+            ax[i as usize] = axes.get_index(i) as usize;
+        }
+        return self._sum_square(&ax, keep_dims);
+    }
+
     pub fn product(&self, axes: Uint32Array, keep_dims: bool) -> Tensor {
         let mut ax: Vec<usize> = vec![0; axes.length() as usize];
         for i in 0..axes.length() {
@@ -868,6 +1040,14 @@ impl Tensor {
             ax[i as usize] = axes.get_index(i) as usize;
         }
         return self._reduce_mean(&ax, keep_dims);
+    }
+
+    pub fn reduce_mean_square(&self, axes: Uint32Array, keep_dims: bool) -> Tensor {
+        let mut ax: Vec<usize> = vec![0; axes.length() as usize];
+        for i in 0..axes.length() {
+            ax[i as usize] = axes.get_index(i) as usize;
+        }
+        return self._reduce_mean_square(&ax, keep_dims);
     }
 
     pub fn conv(&self,
@@ -1031,6 +1211,99 @@ impl Tensor {
             size: self.size,
             values
         }
+    }
+
+    // Mode: 0 == constant, 1 == reflect, 2 == edge
+    pub fn pad(&self, pads: Uint32Array, mode: i32, value: f32) -> Tensor {
+        let mut _pads: Vec<usize> = vec![0; pads.length() as usize];
+        for i in 0..pads.length() {
+            _pads[i as usize] = pads.get_index(i) as usize;
+        }
+        return self._pad(&_pads, mode, value);
+    }
+
+    // Mode: 0 == constant, 1 == reflect, 2 == edge
+    pub fn gather(&self, axis: i32, indices: Int32Array, indice_shape: Uint32Array) -> Tensor {
+        let indice_strides = compute_strides_uint32(&indice_shape);
+
+        let r = self.shape.len();
+        let q = indice_shape.length();
+
+        let result_rank = r + (q as usize) - 1;
+        let mut result_shape = vec![0; result_rank];
+        for i in 0..axis {
+            result_shape[i as usize] = self.shape[i as usize];
+        }
+        for i in 0..q {
+            result_shape[(i + (axis as u32)) as usize] = indice_shape.get_index(i) as usize;
+        }
+        for i in (axis + 1)..(r as i32) {
+            result_shape[(i as usize) + (q as usize) - 1] = self.shape[i as usize];
+        }
+
+        let result_strides = compute_strides(&result_shape);
+        let result_size = get_size(&result_shape);
+
+        let mut values = vec![0.0; result_size];
+
+        let mut out_ix = vec![0; result_rank];
+        let mut input_ix = vec![0; self.shape.len()];
+        for i in 0..result_size {
+            let mut gather_pos = 0;
+            for j in 0..q {
+                gather_pos += out_ix[j as usize + (axis as usize)] * indice_strides[j as usize];
+            }
+            let ax_ix = indices.get_index(gather_pos as u32);
+
+            for j in 0..axis {
+                input_ix[j as usize] = out_ix[j as usize];
+            }
+            input_ix[axis as usize] = ax_ix as usize;
+            for j in (axis as usize + 1)..r {
+                input_ix[j] = out_ix[j + q as usize - 1];
+            }
+
+            values[i] = self.get(&input_ix);
+
+            increment_index(&mut out_ix, &result_shape);
+        }
+
+        Tensor {
+            shape: result_shape,
+            strides: result_strides,
+            size: result_size,
+            values
+        }
+    }
+
+    pub fn floor(&self) -> Tensor {
+        self.unary_op(|x: f32| x.floor())
+    }
+
+    pub fn ceil(&self) -> Tensor {
+        self.unary_op(|x: f32| x.ceil())
+    }
+
+    pub fn slice(&self, starts: Uint32Array, ends: Uint32Array, axis: Uint32Array) -> Tensor {
+        let mut _starts: Vec<usize> = vec![0; starts.length() as usize];
+        let mut _ends: Vec<usize> = vec![0; ends.length() as usize];
+        let mut _axis: Vec<usize> = vec![0; axis.length() as usize];
+        for i in 0..starts.length() {
+            _starts[i as usize] = starts.get_index(i) as usize;
+            _ends[i as usize] = ends.get_index(i) as usize;
+            _axis[i as usize] = axis.get_index(i) as usize;
+        }
+
+        return self._slice(&_starts, &_ends, &_axis);
+    }
+
+    pub fn upsample(&self, scales: Float32Array) -> Tensor {
+        let mut _scales: Vec<f32> = vec![0.0; scales.length() as usize];
+        for i in 0..scales.length() {
+            _scales[i as usize] = scales.get_index(i) as f32;
+        }
+
+        return self._upsample(&_scales);
     }
 }
 

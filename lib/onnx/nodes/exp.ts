@@ -7,7 +7,7 @@ export class ExpNode extends OnnxNode {
     super(attributes, inputs, outputs, constants, onnxVersion);
   }
 
-  forward(inputs: Tensor[]): Tensor[] {
+  async forward(inputs: Tensor[]): Promise<Tensor[]> {
     const x = inputs[0];
 
     return [x.exp()];

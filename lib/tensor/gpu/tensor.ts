@@ -1,4 +1,4 @@
-import Tensor from '../../types';
+import Tensor, { PadMode } from '../../types';
 
 import { compareShapes, getSize } from '../../util/shape';
 
@@ -28,6 +28,15 @@ import { reduceMean } from '../../ops/gpu/reduceMean';
 import { repeat } from '../../ops/gpu/repeat';
 import { expand } from '../../ops/gpu/expand';
 import { copy } from '../../ops/gpu/copy';
+import { reduceMeanSquare } from '../../ops/gpu/reduceMeanSquare';
+import { sumSquare } from '../../ops/gpu/sumSquare';
+import { padOp } from '../../ops/gpu/pad';
+import { CPUTensor } from '../cpu/tensor';
+import { gather } from '../../ops/gpu/gather';
+import { floor } from '../../ops/gpu/floor';
+import { ceil } from '../../ops/gpu/ceil';
+import { slice } from '../../ops/gpu/slice';
+import { upsample } from '../../ops/gpu/upsample';
 
 
 export class GPUTensor extends Tensor {
@@ -73,6 +82,7 @@ export class GPUTensor extends Tensor {
   delete(): void {
     this.deleted = true;
     defaultAllocator.deallocate(this.memory);
+    this.memory = undefined;
   }
 
   copy(): Tensor {
@@ -93,6 +103,14 @@ export class GPUTensor extends Tensor {
 
   abs(): Tensor {
     return abs(this);
+  }
+
+  floor(): Tensor {
+    return floor(this);
+  }
+
+  ceil(): Tensor {
+    return ceil(this);
   }
 
   add_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor {
@@ -148,8 +166,16 @@ export class GPUTensor extends Tensor {
     return sum(this, axes, keepDims);
   }
 
+  sumSquare_impl(axes: number[], keepDims: boolean): Tensor {
+    return sumSquare(this, axes, keepDims);
+  }
+
   reduceMean_impl(axes: number[], keepDims: boolean): Tensor {
     return reduceMean(this, axes, keepDims);
+  }
+
+  reduceMeanSquare_impl(axes: number[], keepDims: boolean): Tensor {
+    return reduceMeanSquare(this, axes, keepDims);
   }
 
   product_impl(axes: number[], keepDims: boolean): Tensor {
@@ -204,5 +230,21 @@ export class GPUTensor extends Tensor {
       return this.copy();
     }
     return expand(this.reshape(_shape) as GPUTensor, resultShape);
+  }
+
+  pad_impl(pads: number[], mode: PadMode, value: number): Tensor {
+    return padOp(this, pads, mode, value);
+  }
+
+  gather(axis: number, indices: CPUTensor): Tensor {
+    return gather(this, axis, indices);
+  }
+
+  slice_impl(starts: number[], ends: number[], axes: number[]): Tensor {
+    return slice(this, starts, ends, axes);
+  }
+
+  upsample(scales: number[]): Tensor {
+    return upsample(this, scales);
   }
 }

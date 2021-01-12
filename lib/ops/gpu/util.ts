@@ -20,9 +20,9 @@ export function pad(arr: number[], len=maxRank) {
   return arr;
 }
 
-export function copyPad(arr: readonly number[]) {
+export function copyPad(arr: readonly number[], len=maxRank) {
   const result = Array.from(arr);
-  while (result.length < maxRank) {
+  while (result.length < len) {
     result.push(-1);
   }
   return result;
@@ -63,8 +63,7 @@ int indexToPos(int index[${maxRank}], int strides[${maxRank}]) {
   return pos;
 }
 
-float getValueAt(int index[${maxRank}], int strides[${maxRank}], int textureWidth, int textureHeight, sampler2D tex) {
-  int pos = indexToPos(index, strides);
+float getValueAtPos(int pos, int textureWidth, int textureHeight, sampler2D tex) {
   vec2 coord = posToCoordinate(pos, textureWidth, textureHeight);
   int res = pos - (pos/4)*4;
   vec4 val = texture2D(tex, coord);
@@ -77,6 +76,11 @@ float getValueAt(int index[${maxRank}], int strides[${maxRank}], int textureWidt
   } else {
     return val.a;
   }
+}
+
+float getValueAt(int index[${maxRank}], int strides[${maxRank}], int textureWidth, int textureHeight, sampler2D tex) {
+  int pos = indexToPos(index, strides);
+  return getValueAtPos(pos, textureWidth, textureHeight, tex);
 }`;
 
 let copyCounter = 0;

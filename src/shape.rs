@@ -1,3 +1,5 @@
+use js_sys::Uint32Array;
+
 pub fn get_size(shape: &Vec<usize>) -> usize {
     if shape.len() == 0 {
         return 0;
@@ -58,6 +60,36 @@ pub fn compute_strides(shape: &Vec<usize>) -> Vec<usize> {
             res[i] = 0;
         } else {
             res[i] = last_stride;
+        }
+    }
+
+    return res;
+}
+
+pub fn compute_strides_uint32(shape: &Uint32Array) -> Vec<usize> {
+    let rank = shape.length();
+
+    if rank == 0 {
+        return vec![];
+    }
+    if rank == 1 {
+        return vec![1];
+    }
+
+    let mut res: Vec<usize> = vec![1; rank as usize];
+    if shape.get_index(rank - 1) == 1 {
+        res[rank as usize - 1] = 0;
+    } else {
+        res[rank as usize - 1] = 1;
+    }
+    let mut last_stride = 1;
+
+    for i in (0..(shape.length()-1)).rev() {
+        last_stride = last_stride * (shape.get_index(i + 1) as usize);
+        if shape.get_index(i) == 1 {
+            res[i as usize] = 0;
+        } else {
+            res[i as usize] = last_stride;
         }
     }
 

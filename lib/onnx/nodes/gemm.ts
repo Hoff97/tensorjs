@@ -21,7 +21,7 @@ export class GemmNode extends OnnxNode {
     this.transB = transB === 1;
   }
 
-  forward(inputs: Tensor[]): Tensor[] {
+  async forward(inputs: Tensor[]): Promise<Tensor[]> {
     if (this.onnxVersion >= 9 && this.onnxVersion < 11) {
       const a = inputs[0];
       const b = inputs[1];

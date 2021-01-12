@@ -1,25 +1,31 @@
 import { averagePool } from '../../ops/cpu/averagePool';
 import {
   abs,
-  add, clip, divide, exp, log, multiply, power, sqrt, subtract
+  add, ceil, clip, divide, exp, floor, log, multiply, power, sqrt, subtract
 } from '../../ops/cpu/basic';
 import { concat } from '../../ops/cpu/concat';
 import { conv } from '../../ops/cpu/conv';
 import { expand } from '../../ops/cpu/expand';
+import { gather } from '../../ops/cpu/gather';
 import { gemm } from '../../ops/cpu/gemm';
 import { matMul } from '../../ops/cpu/matMul';
 import { max } from '../../ops/cpu/max';
 import { min } from '../../ops/cpu/min';
+import { pad } from '../../ops/cpu/pad';
 import { product } from '../../ops/cpu/product';
 import { reduceMean } from '../../ops/cpu/reduceMean';
+import { reduceMeanSquare } from '../../ops/cpu/reduceMeanSquare';
 import { repeat } from '../../ops/cpu/repeat';
+import { slice } from '../../ops/cpu/slice';
 import { sum } from '../../ops/cpu/sum';
+import { sumSquare } from '../../ops/cpu/sumSquare';
 import { transpose } from '../../ops/cpu/transpose';
-import Tensor from '../../types';
+import { upsample } from '../../ops/cpu/upsample';
+import Tensor, { PadMode, TensorValues } from '../../types';
 import { compareShapes, computeStrides, getSize, indexToPos } from '../../util/shape';
 
 export class CPUTensor extends Tensor {
-  private values: Float32Array;
+  public values: TensorValues;
 
   public shape: ReadonlyArray<number>;
 
@@ -31,7 +37,7 @@ export class CPUTensor extends Tensor {
 
   public deleted: boolean = false;
 
-  constructor(shape: ReadonlyArray<number>, values?: Float32Array | number[], type?: string) {
+  constructor(shape: ReadonlyArray<number>, values?: TensorValues | number[], type?: string) {
     super();
 
     this.shape = shape;
@@ -39,16 +45,25 @@ export class CPUTensor extends Tensor {
     this.size = getSize(shape);
 
     if (values !== undefined) {
-      if (values instanceof Float32Array) {
+      if (values instanceof Float32Array || values instanceof Int32Array) {
         this.values = values;
+        this.type = values instanceof Float32Array ? "float" : "int";
+      } else if (type === "int") {
+        this.values = Int32Array.from(values);
+        this.type = "int";
       } else {
         this.values = Float32Array.from(values);
+        this.type = "float";
       }
     } else {
-      this.values = new Float32Array(this.size);
+      if (type === "int") {
+        this.values = new Int32Array(this.size);
+        this.type = "int";
+      } else {
+        this.values = new Float32Array(this.size);
+        this.type = "float";
+      }
     }
-
-    this.type = type || "float";
   }
 
   getValues() {
@@ -117,6 +132,14 @@ export class CPUTensor extends Tensor {
     return abs(this);
   }
 
+  floor(): Tensor {
+    return floor(this);
+  }
+
+  ceil(): Tensor {
+    return ceil(this);
+  }
+
   clip(min?: number, max?: number): Tensor {
     return clip(this, min, max);
   }
@@ -175,6 +198,11 @@ export class CPUTensor extends Tensor {
     return sum(this, axes, keepDims);
   }
 
+  sumSquare_impl(axes: number[], keepDims: boolean): Tensor {
+    return sumSquare(this, axes, keepDims);
+  }
+
+
   product_impl(axes: number[], keepDims: boolean): Tensor {
     return product(this, axes, keepDims);
   }
@@ -191,11 +219,19 @@ export class CPUTensor extends Tensor {
     return reduceMean(this, axes, keepDims);
   }
 
+  reduceMeanSquare_impl(axes: number[], keepDims: boolean): Tensor {
+    return reduceMeanSquare(this, axes, keepDims);
+  }
+
   conv_impl(kernel: Tensor, dilations: number[], group: number, pads: number[], strides: number[], bias?: Tensor): Tensor {
     if (!(kernel instanceof CPUTensor) || (bias !== undefined && !(bias instanceof CPUTensor))) {
       throw new Error('Can only do convolution of CPU tensor with CPU tensor');
     }
     return conv(this, kernel, dilations, group, pads, strides, bias as CPUTensor);
+  }
+
+  pad_impl(pads: number[], mode: PadMode, value: number): Tensor {
+    return pad(this, pads, mode, value);
   }
 
   averagePool_impl(kernelShape: number[],
@@ -230,5 +266,17 @@ export class CPUTensor extends Tensor {
       return this.copy();
     }
     return expand(this.reshape(_shape) as CPUTensor, resultShape);
+  }
+
+  gather(axis: number, indices: CPUTensor): Tensor {
+    return gather(this, axis, indices);
+  }
+
+  slice_impl(starts: number[], ends: number[], axes: number[]): Tensor {
+    return slice(this, starts, ends, axes);
+  }
+
+  upsample(scales: number[]): Tensor {
+    return upsample(this, scales);
   }
 }

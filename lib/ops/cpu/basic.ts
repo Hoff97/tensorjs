@@ -50,6 +50,14 @@ export function abs(a: CPUTensor) {
   return positionWiseUnaryOp(a, (o1) => Math.abs(o1));
 }
 
+export function floor(a: CPUTensor) {
+  return positionWiseUnaryOp(a, (o1) => Math.floor(o1));
+}
+
+export function ceil(a: CPUTensor) {
+  return positionWiseUnaryOp(a, (o1) => Math.ceil(o1));
+}
+
 export function clip(a: CPUTensor, min?: number, max?: number) {
   let f = (o1: number) => o1;
   if (min !== undefined && max !== undefined) {

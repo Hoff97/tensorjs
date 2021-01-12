@@ -7,9 +7,12 @@ import { buildComp, compute, maxRank, defaultMain, initIndex, maxIterations, pad
 
 export function fragmentShader(update: (a: string, b: string) => string,
                                post?: (res: string) => string,
-                               vars?: string) {
+                               init?: (res: string) => string) {
   if (post === undefined) {
     post = (x: string) => '';
+  }
+  if (init === undefined) {
+    init = (x: string) => x;
   }
   return `
 uniform int mappedInputStrides[${maxRank}];
@@ -39,9 +42,9 @@ float process(int index[${maxRank}]) {
     }
     float curr = _input1(inputIx);
     if (i == 0) {
-      res = curr;
+      res = ${init('curr')};
     } else {
-      res = ${update('res', 'curr')};
+      res = ${update('curr', 'res')};
     }
 
     ${incrementConditional('inputIx', 'shapeinput1', 'sumDims')}

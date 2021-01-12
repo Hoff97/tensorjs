@@ -101,7 +101,7 @@ export class OnnxModel {
     }
   }
 
-  forward(inputs: Tensor[]): Tensor[] {
+  async forward(inputs: Tensor[]): Promise<Tensor[]> {
     const intermediaryRes: {[name: string]: IntermediaryRes} = {};
 
     const nodes: {[id: number]: {variableInputs: number}} = {};
@@ -152,7 +152,7 @@ export class OnnxModel {
         }
       }
 
-      const outputs = node.forward(inputs);
+      const outputs = await node.forward(inputs);
       glContext.flush();
       for (let i = 0; i < node.outputs.length; i++) {
         const output = node.outputs[i];

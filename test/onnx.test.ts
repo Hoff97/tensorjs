@@ -84,9 +84,11 @@ for (let opset of opsetVersions) {
             }
           }
 
-          const result = model.forward(inputsDevice)[0];
 
-          expect(await result.compare(out, epsilon)).toBeTruthy();
+          const result1 = (await model.forward(inputsDevice))[0];
+          expect(await result1.compare(out, epsilon)).toBeTrue();
+          const result2 = (await model.forward(inputsDevice))[0];
+          expect(await result2.compare(out, epsilon)).toBeTrue();
         });
       }
     }

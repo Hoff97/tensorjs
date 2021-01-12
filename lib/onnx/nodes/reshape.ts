@@ -14,7 +14,7 @@ export class ReshapeNode extends OnnxNode {
     }
   }
 
-  forward(inputs: Tensor[]): Tensor[] {
+  async forward(inputs: Tensor[]): Promise<Tensor[]> {
     const x = inputs[0];
     const shape = inputs[1];
 

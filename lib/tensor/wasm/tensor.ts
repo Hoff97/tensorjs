@@ -1,7 +1,8 @@
-import Tensor from '../../types';
+import Tensor, { PadMode } from '../../types';
 import { compareShapes } from '../../util/shape';
 
 import { Tensor as WT } from '../../wasm/rust_wasm_tensor';
+import { CPUTensor } from '../cpu/tensor';
 
 let WASMT: typeof WT;
 export let wasmLoaded: Promise<void> = new Promise((resolve, reject) => {
@@ -41,6 +42,7 @@ export class WASMTensor extends Tensor {
 
   delete(): void {
     this.wasmTensor.free();
+    this.wasmTensor = undefined;
   }
 
   copy(): Tensor {
@@ -121,6 +123,10 @@ export class WASMTensor extends Tensor {
     return new WASMTensor(this.wasmTensor.sum(new Uint32Array(axes), keepDims));
   }
 
+  sumSquare_impl(axes: number[], keepDims: boolean): Tensor {
+    return new WASMTensor(this.wasmTensor.sum_square(new Uint32Array(axes), keepDims));
+  }
+
   product_impl(axes: number[], keepDims: boolean): Tensor {
     return new WASMTensor(this.wasmTensor.product(new Uint32Array(axes), keepDims));
   }
@@ -135,6 +141,10 @@ export class WASMTensor extends Tensor {
 
   reduceMean_impl(axes: number[], keepDims: boolean): Tensor {
     return new WASMTensor(this.wasmTensor.reduce_mean(new Uint32Array(axes), keepDims));
+  }
+
+  reduceMeanSquare_impl(axes: number[], keepDims: boolean): Tensor {
+    return new WASMTensor(this.wasmTensor.reduce_mean_square(new Uint32Array(axes), keepDims));
   }
 
   conv_impl(kernel: Tensor, dilations: number[], group: number, pads: number[], strides: number[], bias?: Tensor): Tensor {
@@ -194,5 +204,35 @@ export class WASMTensor extends Tensor {
     const reshaped = this.reshape(_shape) as WASMTensor;
 
     return new WASMTensor(reshaped.wasmTensor.expand(new Uint32Array(resultShape)));
+  }
+
+  static padModeToInt = {
+    'constant': 0,
+    'reflect': 1,
+    'edge': 2
+  }
+
+  pad_impl(pads: number[], mode: PadMode, value: number): Tensor {
+    return new WASMTensor(this.wasmTensor.pad(new Uint32Array(pads), WASMTensor.padModeToInt[mode],value))
+  }
+
+  gather(axis: number, indices: CPUTensor): Tensor {
+    return new WASMTensor(this.wasmTensor.gather(axis, indices.values as Int32Array, new Uint32Array(indices.shape)));
+  }
+
+  floor(): Tensor {
+    return new WASMTensor(this.wasmTensor.floor());
+  }
+
+  ceil(): Tensor {
+    return new WASMTensor(this.wasmTensor.ceil());
+  }
+
+  slice_impl(starts: number[], ends: number[], axes: number[]): Tensor {
+    return new WASMTensor(this.wasmTensor.slice(new Uint32Array(starts), new Uint32Array(ends), new Uint32Array(axes)));
+  }
+
+  upsample(scales: number[]): Tensor {
+    return new WASMTensor(this.wasmTensor.upsample(new Float32Array(scales)));
   }
 }

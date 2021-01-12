@@ -1,7 +1,12 @@
+import { CPUTensor } from './tensor/cpu/tensor';
 import { compareShapes, getSize } from './util/shape';
 
+export type PadMode = 'constant' | 'reflect' | 'edge';
+
+export type TensorValues = Float32Array | Int32Array;
+
 export default abstract class Tensor {
-  abstract getValues(): Promise<Float32Array>;
+  abstract getValues(): Promise<TensorValues>;
 
   abstract getShape(): ReadonlyArray<number>;
 
@@ -55,6 +60,12 @@ export default abstract class Tensor {
     return this.sum_impl(ax, keepDims);
   }
 
+  sumSquare(axes?: number | number[], keepDims?: boolean): Tensor {
+    let ax = this.getAxes(axes);
+    keepDims = keepDims || false;
+    return this.sumSquare_impl(ax, keepDims);
+  }
+
   product(axes?: number | number[], keepDims?: boolean): Tensor {
     let ax = this.getAxes(axes);
     keepDims = keepDims || false;
@@ -80,6 +91,13 @@ export default abstract class Tensor {
     return this.reduceMean_impl(ax, keepDims);
   }
 
+  reduceMeanSquare(axes?: number | number[], keepDims?: boolean): Tensor {
+    let ax = this.getAxes(axes);
+    keepDims = keepDims || false;
+
+    return this.reduceMeanSquare_impl(ax, keepDims);
+  }
+
   conv(kernel: Tensor,
        bias?: Tensor,
        dilations?: number[],
@@ -95,6 +113,18 @@ export default abstract class Tensor {
     strides = strides || new Array(dataRank).fill(1);
 
     return this.conv_impl(kernel, dilations, group, pads, strides, bias);
+  }
+
+  pad(pads: number[],
+      mode?: PadMode,
+      value?: number): Tensor {
+    if (mode === undefined) {
+      mode = 'constant';
+    }
+    if (value === undefined) {
+      value = 0;
+    }
+    return this.pad_impl(pads, mode, value);
   }
 
   averagePool(kernelShape: number[],
@@ -265,6 +295,33 @@ export default abstract class Tensor {
     return this.gemm_impl(b, aTranspose, bTranspose, alpha, beta, c);
   }
 
+  slice(starts: number[], ends: number[], axes?: number[]): Tensor {
+    const shape = this.getShape();
+    const rank = shape.length;
+    if (axes === undefined) {
+      axes = [];
+      for (let i = 0; i < rank; i++) {
+        axes.push(i)
+      }
+    }
+    starts = [...starts];
+    ends = [...ends];
+    for (let i = 0; i < axes.length; i++) {
+      const sh = shape[axes[i]];
+      if (starts[i] < 0) {
+        starts[i] += sh;
+      } else if (starts[i] >= sh) {
+        starts[i] = sh;
+      }
+      if (ends[i] < 0) {
+        ends[i] += sh;
+      } else if (ends[i] >= sh) {
+        ends[i] = sh;
+      }
+    }
+    return this.slice_impl(starts, ends, axes);
+  }
+
   abstract add_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor;
 
   abstract subtract_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor;
@@ -281,6 +338,7 @@ export default abstract class Tensor {
                      alpha: number, beta: number, C?: Tensor): Tensor;
 
   abstract sum_impl(axes: number[], keepDims: boolean): Tensor;
+  abstract sumSquare_impl(axes: number[], keepDims: boolean): Tensor;
 
   abstract product_impl(axes: number[], keepDims: boolean): Tensor;
 
@@ -290,12 +348,18 @@ export default abstract class Tensor {
 
   abstract reduceMean_impl(axes: number[], keepDims: boolean): Tensor;
 
+  abstract reduceMeanSquare_impl(axes: number[], keepDims: boolean): Tensor;
+
   abstract conv_impl(kernel: Tensor,
                      dilations: number[],
                      group: number,
                      pads: number[],
                      strides: number[],
                      bias?: Tensor): Tensor;
+
+  abstract pad_impl(pads: number[],
+                    mode: PadMode,
+                    value: number): Tensor;
 
   abstract averagePool_impl(kernelShape: number[],
                              pads: number[],
@@ -313,4 +377,14 @@ export default abstract class Tensor {
   abstract expand(shape: number[]): Tensor;
 
   abstract copy(): Tensor;
+
+  abstract gather(axis: number, indices: CPUTensor): Tensor;
+
+  abstract floor(): Tensor;
+
+  abstract ceil(): Tensor;
+
+  abstract slice_impl(starts: number[], ends: number[], axes: number[]): Tensor;
+
+  abstract upsample(scales: number[]): Tensor;
 }
