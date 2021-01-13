@@ -76,9 +76,7 @@ export class GPUTensor extends Tensor {
     const width = texture.width;
     const height = texture.height;
 
-    console.log(texture.format, texture.type);
-
-    return new GPUTensor(memory, [width, height, 4]);
+    return new GPUTensor(memory, [height, width, 4]);
   }
 
   toTexture(): GPUTensor {
@@ -226,7 +224,7 @@ export class GPUTensor extends Tensor {
   }
 
   reshape_impl(shape: number[], _copy: boolean): Tensor {
-    if (copy) {
+    if (_copy) {
       return copy(this, shape);
     } else {
       return new GPUTensor(this.memory, shape);
@@ -257,7 +255,7 @@ export class GPUTensor extends Tensor {
     if (compareShapes(this.shape, resultShape)) {
       return this.copy();
     }
-    return expand(this.reshape(_shape) as GPUTensor, resultShape);
+    return expand(this.reshape(_shape, false) as GPUTensor, resultShape);
   }
 
   pad_impl(pads: number[], mode: PadMode, value: number): Tensor {

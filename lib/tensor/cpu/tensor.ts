@@ -270,7 +270,7 @@ export class CPUTensor extends Tensor {
     if (compareShapes(this.shape, resultShape)) {
       return this.copy();
     }
-    return expand(this.reshape(_shape) as CPUTensor, resultShape);
+    return expand(this.reshape(_shape, false) as CPUTensor, resultShape);
   }
 
   gather(axis: number, indices: CPUTensor): Tensor {

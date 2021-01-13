@@ -101,7 +101,7 @@ export class OnnxModel {
     }
   }
 
-  async forward(inputs: Tensor[]): Promise<Tensor[]> {
+  async forward(inputs: Tensor[], wait?: number): Promise<Tensor[]> {
     const intermediaryRes: {[name: string]: IntermediaryRes} = {};
 
     const nodes: {[id: number]: {variableInputs: number}} = {};
@@ -182,6 +182,12 @@ export class OnnxModel {
           inter.value.delete();
           delete intermediaryRes[toDelete[i]];
         }
+      }
+
+      if (wait !== undefined) {
+        await new Promise((resolve, _) => {
+          setTimeout(resolve, wait);
+        });
       }
     }
 

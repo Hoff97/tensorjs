@@ -201,7 +201,7 @@ export class WASMTensor extends Tensor {
       return this.copy();
     }
 
-    const reshaped = this.reshape(_shape) as WASMTensor;
+    const reshaped = this.reshape(_shape, false) as WASMTensor;
 
     return new WASMTensor(reshaped.wasmTensor.expand(new Uint32Array(resultShape)));
   }
