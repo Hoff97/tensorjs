@@ -18,6 +18,11 @@ interface IntermediaryRes {
   used: number;
 }
 
+interface ModelArgs {
+  noConvertConstants?: string[];
+  noConvertNodes?: number[];
+}
+
 export class OnnxModel {
   private version: number;
   public inputs: onnx.IValueInfoProto[];
@@ -32,7 +37,10 @@ export class OnnxModel {
 
   private constants: Constants = {};
 
-  constructor(buffer: ArrayBuffer | Uint8Array) {
+  private noConvertConstants: Set<string>;
+  private noConvertNodes: Set<number>;
+
+  constructor(buffer: ArrayBuffer | Uint8Array, args: ModelArgs) {
     let arr: Uint8Array;
     if (buffer instanceof ArrayBuffer) {
       arr = new Uint8Array(buffer);
@@ -57,6 +65,9 @@ export class OnnxModel {
     this.initializer(modelProto.graph.initializer);
 
     this.initNodes(modelProto);
+
+    this.noConvertConstants = new Set<string>(args.noConvertConstants !== undefined ? args.noConvertConstants : []);
+    this.noConvertNodes = new Set<number>(args.noConvertNodes !== undefined ? args.noConvertNodes : []);
   }
 
   private initNodes(modelProto: onnx.ModelProto) {
@@ -152,7 +163,13 @@ export class OnnxModel {
         }
       }
 
-      const outputs = await node.forward(inputs);
+      let outputs: Tensor[];
+      try {
+        outputs = await node.forward(inputs);
+      } catch (e) {
+        console.error(`Error occurred in node ${nodeId} with inputs ${node.inputs} from nodes ${node.inputs.map(x => this.getNodeWithOutput(x))}`);
+        throw e;
+      }
       glContext.flush();
       for (let i = 0; i < node.outputs.length; i++) {
         const output = node.outputs[i];
@@ -199,33 +216,53 @@ export class OnnxModel {
     return outputs;
   }
 
+  public getNodeWithOutput(output: string) {
+    for (let id of this.nodeIds) {
+      if (this.nodes[id].outputs.findIndex(x => x === output) !== -1) {
+        return id;
+      }
+    }
+  }
+
   async toCPU() {
     for (let i in this.constants) {
-      this.constants[i] = await toCPU(this.constants[i]);
+      if (!this.noConvertConstants.has(i)) {
+        this.constants[i] = await toCPU(this.constants[i]);
+      }
     }
 
     for (let i of this.nodeIds) {
-      await this.nodes[i].toCPU();
+      if (!this.noConvertNodes.has(i)) {
+        await this.nodes[i].toCPU();
+      }
     }
   }
 
   async toWASM() {
     for (let i in this.constants) {
-      this.constants[i] = await toWASM(this.constants[i]);
+      if (!this.noConvertConstants.has(i)) {
+        this.constants[i] = await toWASM(this.constants[i]);
+      }
     }
 
     for (let i of this.nodeIds) {
-      await this.nodes[i].toWASM();
+      if (!this.noConvertNodes.has(i)) {
+        await this.nodes[i].toWASM();
+      }
     }
   }
 
   async toGPU() {
     for (let i in this.constants) {
-      this.constants[i] = await toGPU(this.constants[i]);
+      if (!this.noConvertConstants.has(i)) {
+        this.constants[i] = await toGPU(this.constants[i]);
+      }
     }
 
     for (let i of this.nodeIds) {
-      await this.nodes[i].toGPU();
+      if (!this.noConvertNodes.has(i)) {
+        await this.nodes[i].toGPU();
+      }
     }
   }
 }

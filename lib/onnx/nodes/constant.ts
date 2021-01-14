@@ -1,4 +1,5 @@
 import Tensor from "../../types";
+import { toCPU, toGPU, toWASM } from "../../util/convert";
 import { OnnxNode } from "../node";
 import { Attributes, Constants } from "../types";
 import { createTensor } from "../util";
@@ -21,5 +22,16 @@ export class ConstantNode extends OnnxNode {
       return [this.tensor.copy()];
     }
     throw new Error('Constant with onnx version >= 11 not yet implemented');
+  }
+
+  async toCPU() {
+    this.tensor = await toCPU(this.tensor);
+  }
+
+  async toWASM() {
+    this.tensor = await toWASM(this.tensor);
+  }
+  async toGPU() {
+    this.tensor = await toGPU(this.tensor);
   }
 }
