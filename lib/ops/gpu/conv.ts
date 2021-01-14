@@ -1,4 +1,5 @@
 import { DrawCommand } from "regl";
+import { gl } from "../../tensor/gpu/gl";
 import { GPUTensor } from "../../tensor/gpu/tensor";
 import { getSize } from "../../util/shape";
 import { outputDimsSize } from "../util/conv";

@@ -211,12 +211,12 @@ export default abstract class Tensor {
       thisShape = [...thisShape];
       const prepend = thatShape.length - thisShape.length;
       (thisShape as number[]).unshift(...new Array(prepend).fill(1));
-      th = this.reshape(thisShape);
+      th = this.reshape(thisShape, false);
     } else if (thatShape.length < thisShape.length) {
       thatShape = [...thatShape];
       const prepend = thisShape.length - thatShape.length;
       (thatShape as number[]).unshift(...new Array(prepend).fill(1));
-      tensor = tensor.reshape(thatShape);
+      tensor = tensor.reshape(thatShape, false);
     }
 
     const resultShape = new Array(thisShape.length).fill(1);

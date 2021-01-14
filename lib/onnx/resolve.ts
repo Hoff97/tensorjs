@@ -26,6 +26,7 @@ import { ShapeNode } from "./nodes/shape";
 import { SliceNode } from "./nodes/slice";
 import { SubNode } from "./nodes/sub";
 import { TileNode } from "./nodes/tile";
+import { TransposeNode } from "./nodes/transpose";
 import { UnsqueezeNode } from "./nodes/unsqueeze";
 import { UpsampleNode } from "./nodes/upsample";
 import { NodeConstructor } from "./types";
@@ -61,4 +62,5 @@ export const nodeResolve: {[opType: string]: NodeConstructor} = {
   'Ceil': (attributes, inputs, outputs, constants, onnxVersion) => new CeilNode(attributes, inputs, outputs, constants, onnxVersion),
   'Slice': (attributes, inputs, outputs, constants, onnxVersion) => new SliceNode(attributes, inputs, outputs, constants, onnxVersion),
   'Upsample': (attributes, inputs, outputs, constants, onnxVersion) => new UpsampleNode(attributes, inputs, outputs, constants, onnxVersion),
+  'Transpose': (attributes, inputs, outputs, constants, onnxVersion) => new TransposeNode(attributes, inputs, outputs, constants, onnxVersion),
 };
