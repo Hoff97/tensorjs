@@ -18,8 +18,9 @@ jobs:
     - uses: jetli/wasm-pack-action@v0.3.0
       with:
         version: 'latest'
-    - name: Build wasm
+    - name: Build
       run: |
+        npm install
         npm run build
     - name: Install wasm and dev dependencies
       run: |
