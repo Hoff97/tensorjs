@@ -2,6 +2,7 @@
   "name": "style",
   "version": "0.1.0",
   "private": true,
+  "homepage": ".",
   "dependencies": {
     "@hoff97/tensor-js": "file:../..",
     "@testing-library/jest-dom": "^5.11.8",
