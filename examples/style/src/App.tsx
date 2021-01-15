@@ -1,5 +1,4 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 import { loadModel } from './inference';
 
@@ -170,7 +169,7 @@ class App extends React.Component<{}, AppState> {
                 //@ts-ignore
                 onChange={ev => this.setState({...this.state, showResult: false, scale: parseInt(ev.currentTarget.value)})}/>
             </div>
-            <img id="img" src={this.state.img} alt="your image" width={width}/><br/>
+            <img id="img" src={this.state.img} alt="Your upload" width={width}/><br/>
 
             <button onClick={() => this.getImageData()}>Run</button><br/>
 
