@@ -5,7 +5,7 @@ import { Attributes, Constants } from "../types";
 import { createTensor } from "../util";
 
 export class ConstantNode extends OnnxNode {
-  private tensor: Tensor;
+  public tensor: Tensor;
 
   constructor(attributes: Attributes, inputs: string[], outputs: string[], constants: Constants, onnxVersion: number) {
     super(attributes, inputs, outputs, constants, onnxVersion);
@@ -17,9 +17,8 @@ export class ConstantNode extends OnnxNode {
   }
 
   async forward(inputs: Tensor[]): Promise<Tensor[]> {
-
     if (this.onnxVersion < 11) {
-      return [this.tensor.copy()];
+      return [this.tensor];
     }
     throw new Error('Constant with onnx version >= 11 not yet implemented');
   }

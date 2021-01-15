@@ -5,12 +5,15 @@ import Tensor from '../types';
 import { toCPU, toGPU, toWASM } from '../util/convert';
 import { TENSOR_INT64 } from './definitions';
 import { OnnxNode } from './node';
+import { ConcatNode } from './nodes/concat';
+import { ConstantNode } from './nodes/constant';
 import { nodeResolve } from './resolve';
 import { Constants } from './types';
 import { createTensor } from './util';
 
 interface Intermediary {
   to: number[];
+  deletable: boolean;
 }
 
 interface IntermediaryRes {
@@ -40,7 +43,7 @@ export class OnnxModel {
   private noConvertConstants: Set<string>;
   private noConvertNodes: Set<number>;
 
-  constructor(buffer: ArrayBuffer | Uint8Array, args: ModelArgs) {
+  constructor(buffer: ArrayBuffer | Uint8Array, args?: ModelArgs) {
     let arr: Uint8Array;
     if (buffer instanceof ArrayBuffer) {
       arr = new Uint8Array(buffer);
@@ -65,6 +68,10 @@ export class OnnxModel {
     this.initializer(modelProto.graph.initializer);
 
     this.initNodes(modelProto);
+
+    if (args === undefined) {
+      args = {};
+    }
 
     this.noConvertConstants = new Set<string>(args.noConvertConstants !== undefined ? args.noConvertConstants : []);
     this.noConvertNodes = new Set<number>(args.noConvertNodes !== undefined ? args.noConvertNodes : []);
@@ -91,7 +98,8 @@ export class OnnxModel {
         const input = inputs[j];
         if (this.intermediaries[input] === undefined) {
           this.intermediaries[input] = {
-            to: []
+            to: [],
+            deletable: true
           };
         }
         this.intermediaries[input].to.push(i);
@@ -100,6 +108,21 @@ export class OnnxModel {
       if (node.variableInputs === 0) {
         this.defaultReady.push(i);
       }
+
+      if (nodeData.opType === 'Constant') {
+        if (this.intermediaries[nodeData.output[0]] === undefined) {
+          this.intermediaries[nodeData.output[0]] = {
+            to: [],
+            deletable: false
+          }
+        } else {
+          this.intermediaries[nodeData.output[0]].deletable = false;
+        }
+      }
+    }
+
+    for (let nodeId of this.nodeIds) {
+      this.nodes[nodeId].initialize((name) => this.resolveConstant(name));
     }
   }
 
@@ -156,7 +179,7 @@ export class OnnxModel {
         } else {
           const inter = intermediaryRes[input];
           inter.used++;
-          if (inter.used === this.intermediaries[input].to.length) {
+          if (inter.used === this.intermediaries[input].to.length && this.intermediaries[input].deletable) {
             toDelete.push(input);
           }
           inputs.push(inter.value);
@@ -222,6 +245,18 @@ export class OnnxModel {
         return id;
       }
     }
+  }
+
+  public resolveConstant(name: string) {
+    if (this.constants[name] !== undefined) {
+      return this.constants[name];
+    }
+    const nodeIdOut = this.getNodeWithOutput(name);
+    const nodeOut = this.nodes[nodeIdOut];
+    if (nodeOut instanceof ConstantNode) {
+      return nodeOut.tensor;
+    }
+    return undefined;
   }
 
   async toCPU() {
