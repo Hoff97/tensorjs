@@ -10,7 +10,16 @@ interface AppState {
   scale: number;
   croppedSize: number;
   showResult: boolean;
+  model: string;
 }
+
+const models = [
+  "mosaic",
+  "candy",
+  "pointilism",
+  "udnie",
+  "rain-princess"
+];
 
 class App extends React.Component<{}, AppState> {
   private model?: tjs.onnx.model.OnnxModel = undefined;
@@ -20,12 +29,13 @@ class App extends React.Component<{}, AppState> {
   constructor(props: {}) {
     super(props);
 
-    loadModel().then(x => {
+    loadModel('mosaic').then(x => {
       this.model = x;
     });
 
     this.setState({
-      scale: 50
+      scale: 50,
+      model: 'mosaic'
     });
   }
 
@@ -65,7 +75,7 @@ class App extends React.Component<{}, AppState> {
     const reshaped = multiplied.reshape([1,3,croppedSize,croppedSize], false);
 
     console.log('Doing forward pass');
-    this.model?.forward([reshaped]).then(result => this.handleResult(result[0]));
+    this.model?.forward([reshaped], 100).then(result => this.handleResult(result[0]));
   }
 
   handleResult(tensor: tjs.Tensor) {
@@ -115,9 +125,17 @@ class App extends React.Component<{}, AppState> {
   }
 
   getImageWidth(scale: number) {
-    const width = Math.round(200*(scale/50) + 50);
+    const width = Math.round(400*(scale/50) + 50);
 
-    return Math.floor(width/20)*20;
+    return Math.floor(width/32)*32;
+  }
+
+  async setModel(name: string) {
+    this.setState({
+      ...this.state,
+      model: name
+    })
+    this.model = await loadModel(name);
   }
 
   render() {
@@ -137,7 +155,14 @@ class App extends React.Component<{}, AppState> {
     return (
       <div className="App">
         <h1>Style transfer</h1>
-        <input type='file' onChange={x => this.fileSelected(x)}/><br/>
+        <label htmlFor="model">Choose a style:</label> <select id="model" onChange={x => this.setModel(x.target.value)}>
+          {
+            models.map(x => (
+              <option value={x} key={x}>{x}</option>
+            ))
+          }
+        </select><br/>
+        <label htmlFor="file">Choose an image:</label> <input type='file' id="file" onChange={x => this.fileSelected(x)}/><br/>
         { img !== undefined ? (<>
             <div className="slidecontainer">
               Scale: <input type="range" min="1" max="100" defaultValue={scale}
