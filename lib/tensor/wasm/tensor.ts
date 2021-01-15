@@ -201,7 +201,7 @@ export class WASMTensor extends Tensor {
       return this.copy();
     }
 
-    const reshaped = this.reshape(_shape) as WASMTensor;
+    const reshaped = this.reshape(_shape, false) as WASMTensor;
 
     return new WASMTensor(reshaped.wasmTensor.expand(new Uint32Array(resultShape)));
   }
@@ -234,5 +234,12 @@ export class WASMTensor extends Tensor {
 
   upsample(scales: number[]): Tensor {
     return new WASMTensor(this.wasmTensor.upsample(new Float32Array(scales)));
+  }
+
+  normalize(mean: Tensor, variance: Tensor, epsilon: number, scale: Tensor, bias: Tensor): Tensor {
+    if (!(mean instanceof WASMTensor) || !(variance instanceof WASMTensor) || !(scale instanceof WASMTensor) || !(bias instanceof WASMTensor)) {
+      throw new Error('Can only normalize with CPU tensors');
+    }
+    return new WASMTensor(this.wasmTensor.normalize(mean.wasmTensor, variance.wasmTensor, epsilon, scale.wasmTensor, bias.wasmTensor));
   }
 }

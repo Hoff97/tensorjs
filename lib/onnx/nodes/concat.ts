@@ -15,12 +15,18 @@ export class ConcatNode extends OnnxNode {
 
   async forward(inputs: Tensor[]): Promise<Tensor[]> {
     if (inputs.length > 2) {
-      throw new Error("Concat with more than 2 tensors not yet supported");
+      console.warn(`Concat with more than 2 tensors is currently slow. Doing concat with ${inputs.length} tensors`);
     }
 
-    const a = inputs[0];
-    const b = inputs[1];
+    let result = inputs[0];
+    for (let i = 1; i < inputs.length; i++) {
+      let newRes = result.concat(inputs[i], this.axis);
+      if (i > 1) {
+        result.delete();
+      }
+      result = newRes;
+    }
 
-    return [a.concat(b, this.axis)];
+    return [result];
   }
 }

@@ -17,6 +17,7 @@ import { InstanceNormalizationNode } from "./nodes/instanceNormalization";
 import { MatMulNode } from "./nodes/matMul";
 import { MulNode } from "./nodes/mul";
 import { PadNode } from "./nodes/pad";
+import { ReduceMaxNode } from "./nodes/reduceMax";
 import { ReduceMeanNode } from "./nodes/reduceMean";
 import { ReduceSumNode } from "./nodes/reduceSum";
 import { ReduceSumSquareNode } from "./nodes/reduceSumSquare";
@@ -24,8 +25,10 @@ import { ReluNode } from "./nodes/relu";
 import { ReshapeNode } from "./nodes/reshape";
 import { ShapeNode } from "./nodes/shape";
 import { SliceNode } from "./nodes/slice";
+import { SoftmaxNode } from "./nodes/softmax";
 import { SubNode } from "./nodes/sub";
 import { TileNode } from "./nodes/tile";
+import { TransposeNode } from "./nodes/transpose";
 import { UnsqueezeNode } from "./nodes/unsqueeze";
 import { UpsampleNode } from "./nodes/upsample";
 import { NodeConstructor } from "./types";
@@ -43,6 +46,7 @@ export const nodeResolve: {[opType: string]: NodeConstructor} = {
   'MatMul': (attributes, inputs, outputs, constants, onnxVersion) => new MatMulNode(attributes, inputs, outputs, constants, onnxVersion),
   'Exp': (attributes, inputs, outputs, constants, onnxVersion) => new ExpNode(attributes, inputs, outputs, constants, onnxVersion),
   'ReduceSum': (attributes, inputs, outputs, constants, onnxVersion) => new ReduceSumNode(attributes, inputs, outputs, constants, onnxVersion),
+  'ReduceMax': (attributes, inputs, outputs, constants, onnxVersion) => new ReduceMaxNode(attributes, inputs, outputs, constants, onnxVersion),
   'ReduceSumSquare': (attributes, inputs, outputs, constants, onnxVersion) => new ReduceSumSquareNode(attributes, inputs, outputs, constants, onnxVersion),
   'Sub': (attributes, inputs, outputs, constants, onnxVersion) => new SubNode(attributes, inputs, outputs, constants, onnxVersion),
   'Mul': (attributes, inputs, outputs, constants, onnxVersion) => new MulNode(attributes, inputs, outputs, constants, onnxVersion),
@@ -61,4 +65,6 @@ export const nodeResolve: {[opType: string]: NodeConstructor} = {
   'Ceil': (attributes, inputs, outputs, constants, onnxVersion) => new CeilNode(attributes, inputs, outputs, constants, onnxVersion),
   'Slice': (attributes, inputs, outputs, constants, onnxVersion) => new SliceNode(attributes, inputs, outputs, constants, onnxVersion),
   'Upsample': (attributes, inputs, outputs, constants, onnxVersion) => new UpsampleNode(attributes, inputs, outputs, constants, onnxVersion),
+  'Transpose': (attributes, inputs, outputs, constants, onnxVersion) => new TransposeNode(attributes, inputs, outputs, constants, onnxVersion),
+  'Softmax': (attributes, inputs, outputs, constants, onnxVersion) => new SoftmaxNode(attributes, inputs, outputs, constants, onnxVersion),
 };

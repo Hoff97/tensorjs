@@ -28,6 +28,8 @@ export abstract class OnnxNode {
     }
   }
 
+  initialize(resolveConstant: (name: string) => Tensor) {}
+
   getAttribute(name: string) {
     return this.attributes[name];
   }

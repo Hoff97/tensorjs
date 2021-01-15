@@ -1305,6 +1305,34 @@ impl Tensor {
 
         return self._upsample(&_scales);
     }
+
+    pub fn normalize(&self, mean: &Tensor, variance: &Tensor, epsilon: f32, scale: &Tensor, bias: &Tensor) -> Tensor {
+        let mut result_shape = vec![0; self.shape.len()];
+        for i in 0..self.shape.len() {
+            result_shape[i] = self.shape[i];
+        }
+        let result_strides = compute_strides(&result_shape);
+
+        let mut values = vec![0.0; self.size];
+
+        let mut out_ix = vec![0; self.shape.len()];
+        for i in 0..self.size {
+            let mut res = self.values[i] - mean.get(&out_ix);
+            res = res / (variance.get(&out_ix) + epsilon).sqrt();
+            res = res * scale.get(&out_ix) + bias.get(&out_ix);
+
+            values[i] = res;
+
+            increment_index(&mut out_ix, &result_shape);
+        }
+
+        Tensor {
+            shape: result_shape,
+            strides: result_strides,
+            size: self.size,
+            values
+        }
+    }
 }
 
 impl Add for Tensor {

@@ -11,6 +11,7 @@ import { gemm } from '../../ops/cpu/gemm';
 import { matMul } from '../../ops/cpu/matMul';
 import { max } from '../../ops/cpu/max';
 import { min } from '../../ops/cpu/min';
+import { normalize } from '../../ops/cpu/normalize';
 import { pad } from '../../ops/cpu/pad';
 import { product } from '../../ops/cpu/product';
 import { reduceMean } from '../../ops/cpu/reduceMean';
@@ -241,8 +242,12 @@ export class CPUTensor extends Tensor {
     return averagePool(this, kernelShape, pads, strides, includePad);
   }
 
-  reshape_impl(shape: number[]): Tensor {
-    return this.copy(shape);
+  reshape_impl(shape: number[], copy: boolean): Tensor {
+    if (copy) {
+      return this.copy(shape);
+    } else {
+      return new CPUTensor(shape, this.values, this.type);
+    }
   }
 
   concat(tensor: Tensor, axis: number): Tensor {
@@ -265,7 +270,7 @@ export class CPUTensor extends Tensor {
     if (compareShapes(this.shape, resultShape)) {
       return this.copy();
     }
-    return expand(this.reshape(_shape) as CPUTensor, resultShape);
+    return expand(this.reshape(_shape, false) as CPUTensor, resultShape);
   }
 
   gather(axis: number, indices: CPUTensor): Tensor {
@@ -278,5 +283,12 @@ export class CPUTensor extends Tensor {
 
   upsample(scales: number[]): Tensor {
     return upsample(this, scales);
+  }
+
+  normalize(mean: Tensor, variance: Tensor, epsilon: number, scale: Tensor, bias: Tensor): Tensor {
+    if (!(mean instanceof CPUTensor) || !(variance instanceof CPUTensor) || !(scale instanceof CPUTensor) || !(bias instanceof CPUTensor)) {
+      throw new Error('Can only normalize with CPU tensors');
+    }
+    return normalize(this, mean, variance, epsilon, scale, bias);
   }
 }

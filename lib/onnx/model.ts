@@ -5,17 +5,25 @@ import Tensor from '../types';
 import { toCPU, toGPU, toWASM } from '../util/convert';
 import { TENSOR_INT64 } from './definitions';
 import { OnnxNode } from './node';
+import { ConcatNode } from './nodes/concat';
+import { ConstantNode } from './nodes/constant';
 import { nodeResolve } from './resolve';
 import { Constants } from './types';
 import { createTensor } from './util';
 
 interface Intermediary {
   to: number[];
+  deletable: boolean;
 }
 
 interface IntermediaryRes {
   value: Tensor;
   used: number;
+}
+
+interface ModelArgs {
+  noConvertConstants?: string[];
+  noConvertNodes?: number[];
 }
 
 export class OnnxModel {
@@ -32,7 +40,10 @@ export class OnnxModel {
 
   private constants: Constants = {};
 
-  constructor(buffer: ArrayBuffer | Uint8Array) {
+  private noConvertConstants: Set<string>;
+  private noConvertNodes: Set<number>;
+
+  constructor(buffer: ArrayBuffer | Uint8Array, args?: ModelArgs) {
     let arr: Uint8Array;
     if (buffer instanceof ArrayBuffer) {
       arr = new Uint8Array(buffer);
@@ -57,6 +68,13 @@ export class OnnxModel {
     this.initializer(modelProto.graph.initializer);
 
     this.initNodes(modelProto);
+
+    if (args === undefined) {
+      args = {};
+    }
+
+    this.noConvertConstants = new Set<string>(args.noConvertConstants !== undefined ? args.noConvertConstants : []);
+    this.noConvertNodes = new Set<number>(args.noConvertNodes !== undefined ? args.noConvertNodes : []);
   }
 
   private initNodes(modelProto: onnx.ModelProto) {
@@ -80,7 +98,8 @@ export class OnnxModel {
         const input = inputs[j];
         if (this.intermediaries[input] === undefined) {
           this.intermediaries[input] = {
-            to: []
+            to: [],
+            deletable: true
           };
         }
         this.intermediaries[input].to.push(i);
@@ -89,6 +108,21 @@ export class OnnxModel {
       if (node.variableInputs === 0) {
         this.defaultReady.push(i);
       }
+
+      if (nodeData.opType === 'Constant') {
+        if (this.intermediaries[nodeData.output[0]] === undefined) {
+          this.intermediaries[nodeData.output[0]] = {
+            to: [],
+            deletable: false
+          }
+        } else {
+          this.intermediaries[nodeData.output[0]].deletable = false;
+        }
+      }
+    }
+
+    for (let nodeId of this.nodeIds) {
+      this.nodes[nodeId].initialize((name) => this.resolveConstant(name));
     }
   }
 
@@ -101,7 +135,7 @@ export class OnnxModel {
     }
   }
 
-  async forward(inputs: Tensor[]): Promise<Tensor[]> {
+  async forward(inputs: Tensor[], wait?: number): Promise<Tensor[]> {
     const intermediaryRes: {[name: string]: IntermediaryRes} = {};
 
     const nodes: {[id: number]: {variableInputs: number}} = {};
@@ -145,14 +179,20 @@ export class OnnxModel {
         } else {
           const inter = intermediaryRes[input];
           inter.used++;
-          if (inter.used === this.intermediaries[input].to.length) {
+          if (inter.used === this.intermediaries[input].to.length && this.intermediaries[input].deletable) {
             toDelete.push(input);
           }
           inputs.push(inter.value);
         }
       }
 
-      const outputs = await node.forward(inputs);
+      let outputs: Tensor[];
+      try {
+        outputs = await node.forward(inputs);
+      } catch (e) {
+        console.error(`Error occurred in node ${nodeId} with inputs ${node.inputs} from nodes ${node.inputs.map(x => this.getNodeWithOutput(x))}`);
+        throw e;
+      }
       glContext.flush();
       for (let i = 0; i < node.outputs.length; i++) {
         const output = node.outputs[i];
@@ -183,6 +223,12 @@ export class OnnxModel {
           delete intermediaryRes[toDelete[i]];
         }
       }
+
+      if (wait !== undefined) {
+        await new Promise((resolve, _) => {
+          setTimeout(resolve, wait);
+        });
+      }
     }
 
     const outputs: Tensor[] = [];
@@ -193,33 +239,65 @@ export class OnnxModel {
     return outputs;
   }
 
+  public getNodeWithOutput(output: string) {
+    for (let id of this.nodeIds) {
+      if (this.nodes[id].outputs.findIndex(x => x === output) !== -1) {
+        return id;
+      }
+    }
+  }
+
+  public resolveConstant(name: string) {
+    if (this.constants[name] !== undefined) {
+      return this.constants[name];
+    }
+    const nodeIdOut = this.getNodeWithOutput(name);
+    const nodeOut = this.nodes[nodeIdOut];
+    if (nodeOut instanceof ConstantNode) {
+      return nodeOut.tensor;
+    }
+    return undefined;
+  }
+
   async toCPU() {
     for (let i in this.constants) {
-      this.constants[i] = await toCPU(this.constants[i]);
+      if (!this.noConvertConstants.has(i)) {
+        this.constants[i] = await toCPU(this.constants[i]);
+      }
     }
 
     for (let i of this.nodeIds) {
-      await this.nodes[i].toCPU();
+      if (!this.noConvertNodes.has(i)) {
+        await this.nodes[i].toCPU();
+      }
     }
   }
 
   async toWASM() {
     for (let i in this.constants) {
-      this.constants[i] = await toWASM(this.constants[i]);
+      if (!this.noConvertConstants.has(i)) {
+        this.constants[i] = await toWASM(this.constants[i]);
+      }
     }
 
     for (let i of this.nodeIds) {
-      await this.nodes[i].toWASM();
+      if (!this.noConvertNodes.has(i)) {
+        await this.nodes[i].toWASM();
+      }
     }
   }
 
   async toGPU() {
     for (let i in this.constants) {
-      this.constants[i] = await toGPU(this.constants[i]);
+      if (!this.noConvertConstants.has(i)) {
+        this.constants[i] = await toGPU(this.constants[i]);
+      }
     }
 
     for (let i of this.nodeIds) {
-      await this.nodes[i].toGPU();
+      if (!this.noConvertNodes.has(i)) {
+        await this.nodes[i].toGPU();
+      }
     }
   }
 }
