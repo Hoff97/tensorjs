@@ -2,21 +2,19 @@ import Tensor, { PadMode } from '../../types';
 
 import { compareShapes, getSize } from '../../util/shape';
 
-import { exp } from '../../ops/gpu/exp';
 import { log } from '../../ops/gpu/log';
 import { sqrt } from '../../ops/gpu/sqrt';
 import { add } from '../../ops/gpu/add';
 import { subtract } from '../../ops/gpu/subtract';
 import { multiply } from '../../ops/gpu/multiply';
 import { divide } from '../../ops/gpu/divide';
-import { matmul } from '../../ops/gpu/matmul';
+import { MatMulOperation } from '../../ops/gpu/matmul';
 import { sum } from '../../ops/gpu/sum';
 import { product } from '../../ops/gpu/product';
 import { max } from '../../ops/gpu/max';
 import { min } from '../../ops/gpu/min';
 import { defaultAllocator, gl } from './gl';
 import { MemoryEntry } from './memory';
-import { conv } from '../../ops/gpu/conv';
 import { concat } from '../../ops/gpu/concat';
 import { gemm } from '../../ops/gpu/gemm';
 import { abs } from '../../ops/gpu/abs';
@@ -40,9 +38,12 @@ import { upsample } from '../../ops/gpu/upsample';
 import REGL from 'regl';
 import { toTexture } from '../../ops/gpu/toTexture';
 import { normalize } from '../../ops/gpu/normalize';
+import { ExpOperation } from '../../ops/gpu/exp';
+import { GPUTensorConstructor, GPUTensorI } from './interface';
+import { ConvBiasOperation, ConvOperation } from '../../ops/gpu/conv';
 
 
-export class GPUTensor extends Tensor {
+export class GPUTensor extends Tensor implements GPUTensorI {
   public memory: MemoryEntry;
 
   public size: number;
@@ -112,7 +113,7 @@ export class GPUTensor extends Tensor {
   }
 
   exp(): Tensor {
-    return exp(this);
+    return defaultExp.calc({input: this}) as any;
   }
 
   log(): Tensor {
@@ -174,7 +175,7 @@ export class GPUTensor extends Tensor {
     if (!(tensor instanceof GPUTensor)) {
       throw new Error('Can only matrix multiply GPU tensor to GPU tensor');
     }
-    return matmul(this, tensor);
+    return defaultMatMul.calc({A: this, B: tensor});
   }
 
   gemm_impl(b: Tensor, aTranspose: boolean, bTranspose: boolean, alpha: number, beta: number, c?: Tensor): Tensor {
@@ -216,7 +217,21 @@ export class GPUTensor extends Tensor {
     if (!(kernel instanceof GPUTensor) || (bias !== undefined && !(bias instanceof GPUTensor))) {
       throw new Error('Can only do convolution of GPU tensor with GPU tensor');
     }
-    return conv(this, kernel, dilations, group, pads, strides, bias as GPUTensor);
+
+    if (bias === undefined) {
+      return defaultConv.calc({
+        X: this,
+        W: kernel,
+        pads, dilations, strides
+      });
+    } else {
+      return defaultConvBias.calc({
+        X: this,
+        W: kernel,
+        B: bias as GPUTensor,
+        pads, dilations, strides
+      });
+    }
   }
 
   averagePool_impl(kernelShape: number[], pads: number[], strides: number[], includePad: boolean): Tensor {
@@ -281,3 +296,10 @@ export class GPUTensor extends Tensor {
     return normalize(this, mean, variance, epsilon, scale, bias);
   }
 }
+
+const constructor: GPUTensorConstructor<GPUTensor> = (a: MemoryEntry,b: readonly number[]) => new GPUTensor(a,b);
+
+const defaultMatMul = new MatMulOperation(constructor);
+const defaultExp = new ExpOperation(constructor);
+const defaultConv = new ConvOperation(constructor);
+const defaultConvBias = new ConvBiasOperation(constructor);
