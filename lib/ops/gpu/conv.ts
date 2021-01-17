@@ -14,12 +14,18 @@ export interface ConvInfo {
   shapeW?: number[];
   widthW?: number;
   heightW?: number;
-  shapeB?: number[];
-  widthB?: number;
-  heightB?: number;
   shapeOutput?: number[],
   widthOutput?: number;
   heightOutput?: number;
+
+  pads?: number[];
+  dilations?: number[];
+  strides?: number[];
+
+  CG?: number;
+  kernelSize?: number;
+  dataRank?: number;
+  C?: number;
 }
 
 export interface ConvInput {
@@ -116,8 +122,6 @@ export class ConvOperation<GPUTensor extends GPUTensorI, ConvInf extends ConvInf
 
   getFragmentShader(info: ConvInfo): string {
     return `
-    ${this.getVariables()}
-
     float process(int index[${this.maxRank}]) {
       float res = 0.0;
 
@@ -170,6 +174,19 @@ export class ConvOperation<GPUTensor extends GPUTensorI, ConvInf extends ConvInf
   }
 
   compile(info: ConvInf) {
+    if (info.shapeW !== undefined) {
+      info.CG = info.shapeW[1];
+      info.kernelSize = getSize(info.shapeW.slice(2));
+      info.dataRank = info.shapeW.length - 2;
+      this.maxRank = info.shapeW.length;
+    }
+    if (info.shapeX !== undefined) {
+      info.C = info.shapeX[1];
+      info.dataRank = info.shapeX.length - 2;
+
+      this.maxRank = info.shapeX.length;
+    }
+
     super.compile(info);
   }
 }

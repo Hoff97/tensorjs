@@ -74,6 +74,10 @@ export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictB
     return result;
   }
 
+  getVariables() {
+    return '';
+  }
+
   getVariableDeclarations(info: Info) {
     const textures = this.getTextureNames();
     textures.push('Output');
@@ -90,7 +94,9 @@ export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictB
         ${this.getVarModifier('rank' + x)} int rank${x};
         `;
       }).join('\n')}
-      varying vec2 uv;`
+      varying vec2 uv;
+
+      ${this.getVariables()}`
   }
 
   getVariableInitializations(info: Info) {
