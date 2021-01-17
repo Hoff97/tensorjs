@@ -1,166 +1,244 @@
-import { DrawCommand } from "regl";
-import { gl } from "../../tensor/gpu/gl";
-import { GPUTensor } from "../../tensor/gpu/tensor";
 import { getSize } from "../../util/shape";
 import { outputDimsSize } from "../util/conv";
-import { buildComp, compute, maxRank, defaultMain, initIndex, maxIterations, incrementIndex, pad } from "./util";
 
-let comp: DrawCommand;
-let compWithBias: DrawCommand;
+import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
+import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
+import { Input, Operation } from "./operation";
+import { GPUTensor } from "../../tensor/gpu/tensor";
 
-const updateInputIx = `
-for (int d = 0; d < ${maxRank - 2}; d++) {
-  int stride = strides[d];
-  int pad = pads[d];
-  int dilation = dilations[d];
-  if (stride == -1) {
-    break;
-  }
 
-  inputIx[d+2] = index[d+2]*stride - pad + kernelIx[d+2]*dilation;
-  if (inputIx[d+2] < 0 || inputIx[d+2] >= shapex[d+2]) {
-    skip = true;
-    break;
-  }
+export interface ConvInfo {
+  shapeX?: number[];
+  widthX?: number;
+  heightX?: number;
+  shapeW?: number[];
+  widthW?: number;
+  heightW?: number;
+  shapeB?: number[];
+  widthB?: number;
+  heightB?: number;
+  shapeOutput?: number[],
+  widthOutput?: number;
+  heightOutput?: number;
 }
-`;
 
-const variables = `
-uniform int CG;
-uniform int kernelSize;
-uniform int dataRank;
-uniform int C;
-uniform int dilations[${maxRank}];
-uniform int pads[${maxRank}];
-uniform int strides[${maxRank}];
-`;
+export interface ConvInput {
+  X: GPUTensorI;
+  W: GPUTensorI;
+  pads: number[];
+  dilations: number[];
+  strides: number[];
+}
 
-const mainBody = `
-  int n = index[0];
-  int m = index[1];
+export class ConvOperation<GPUTensor extends GPUTensorI, ConvInf extends ConvInfo = ConvInfo, ConvIn extends ConvInput = ConvInput> extends Operation<GPUTensor, ConvInf, ConvIn> {
+  protected maxIterations = 1000000;
 
-  int kernelIx[${maxRank}];
-  ${initIndex('kernelIx')}
-  for (int i = 0; i < ${maxRank}; i++) {
-    if (i >= dataRank) {
-      break;
-    }
-    kernelIx[i+2] = 0;
+  constructor(tensorConstructor: GPUTensorConstructor<GPUTensor>, allocator?: GPUMemoryAllocator) {
+    super(tensorConstructor, allocator);
   }
-  kernelIx[0] = m;
-  int inputIx[${maxRank}];
-  ${initIndex('inputIx')}
-  inputIx[0] = n;
 
-  for (int cg = 0; cg < ${maxIterations}; cg++) {
-    if (cg >= CG) {
-      break;
-    }
-    int c = m * CG + cg;
-    int d = c/C;
-    c = c - d*C;
-    inputIx[1] = c;
-    kernelIx[1] = cg;
-    for (int kIx = 0; kIx < ${maxIterations}; kIx++) {
-      if (kIx >= kernelSize) {
+  updateInputIx() {
+    return `
+    for (int d = 0; d < ${this.maxRank - 2}; d++) {
+      int stride = strides[d];
+      int pad = pads[d];
+      int dilation = dilations[d];
+      if (stride == -1) {
         break;
       }
 
-      bool skip = false;
-
-      ${updateInputIx}
-
-      if (!skip) {
-        res += _x(inputIx) * _kernel(kernelIx);
+      inputIx[d+2] = index[d+2]*stride - pad + kernelIx[d+2]*dilation;
+      if (inputIx[d+2] < 0 || inputIx[d+2] >= shapeX[d+2]) {
+        skip = true;
+        break;
       }
-
-      ${incrementIndex('kernelIx', 'shapekernel')}
     }
-  }
-`;
-
-const fragmentShaderBias = `
-${variables}
-
-float process(int index[${maxRank}]) {
-  int biasIndex[${maxRank}];
-  ${initIndex('biasIndex')}
-  biasIndex[0] = index[1];
-  float res = _bias(biasIndex);
-
-  ${mainBody}
-
-  return res;
-}
-
-${defaultMain}
-`;
-
-const fragmentShader = `
-${variables}
-
-float process(int index[${maxRank}]) {
-  float res = 0.0;
-
-  ${mainBody}
-
-  return res;
-}
-
-${defaultMain}
-`;
-
-function initComp() {
-  const args = [
-    {name: 'CG'},
-    {name: 'kernelSize'},
-    {name: 'dataRank'},
-    {name: 'C'},
-    {name: 'dilations', length: maxRank},
-    {name: 'pads', length: maxRank},
-    {name: 'strides', length: maxRank}
-  ];
-
-  compWithBias = buildComp(['x', 'kernel', 'bias'], fragmentShaderBias, args);
-  comp = buildComp(['x', 'kernel'], fragmentShader, args);
-}
-
-export function conv(x: GPUTensor,
-                     kernel: GPUTensor,
-                     dilations: number[],
-                     group: number,
-                     pads: number[],
-                     strides: number[],
-                     bias?: GPUTensor) {
-  if (comp === undefined) {
-    initComp();
+    `
   }
 
-  const N = x.shape[0];
-  const C = x.shape[1];
-  const D = x.shape.slice(2);
-  const W = kernel.shape.slice(2);
-  const M = kernel.shape[0];
-  const CG = kernel.shape[1];
+  getMainBody() {
+    return `
+    int n = index[0];
+    int m = index[1];
 
-  const kernelSize = getSize(W);
+    int kernelIx[${this.maxRank}];
+    ${this.initIndex('kernelIx')}
+    for (int i = 0; i < ${this.maxRank}; i++) {
+      if (i >= dataRank) {
+        break;
+      }
+      kernelIx[i+2] = 0;
+    }
+    kernelIx[0] = m;
+    int inputIx[${this.maxRank}];
+    ${this.initIndex('inputIx')}
+    inputIx[0] = n;
 
-  const R = outputDimsSize(D, W, pads.slice(0, pads.length/2), pads.slice(pads.length/2), dilations, strides);
-  let outputShape = [N, M];
-  outputShape = outputShape.concat(R);
+    for (int cg = 0; cg < ${this.maxIterations}; cg++) {
+      if (cg >= CG) {
+        break;
+      }
+      int c = m * CG + cg;
+      int d = c/C;
+      c = c - d*C;
+      inputIx[1] = c;
+      kernelIx[1] = cg;
+      for (int kIx = 0; kIx < ${this.maxIterations}; kIx++) {
+        if (kIx >= kernelSize) {
+          break;
+        }
 
-  const input: any = { x, kernel };
-  if (bias) {
-    input.bias = bias;
+        bool skip = false;
+
+        ${this.updateInputIx()}
+
+        if (!skip) {
+          res += _X(inputIx) * _W(kernelIx);
+        }
+
+        ${this.incrementIndex('kernelIx', 'shapeW')}
+      }
+    }
+    `;
   }
 
-  return compute(bias ? compWithBias : comp, outputShape, input, {
-    kernelSize,
-    CG: CG,
-    dataRank: D.length,
-    C: C,
-    dilations: pad(dilations),
-    pads: pad(pads.slice(0, pads.length/2)),
-    strides: pad(strides)
-  });
+  getVariables() {
+    return `
+    ${this.getVarModifier('CG')} int CG;
+    ${this.getVarModifier('kernelSize')} int kernelSize;
+    ${this.getVarModifier('dataRank')} int dataRank;
+    ${this.getVarModifier('C')} int C;
+    ${this.getVarModifier('dilations')} int dilations[${this.maxRank}];
+    ${this.getVarModifier('pads')} int pads[${this.maxRank}];
+    ${this.getVarModifier('strides')} int strides[${this.maxRank}];
+    `;
+  }
+
+  getFragmentShader(info: ConvInfo): string {
+    return `
+    ${this.getVariables()}
+
+    float process(int index[${this.maxRank}]) {
+      float res = 0.0;
+
+      ${this.getMainBody()}
+
+      return res;
+    }
+
+    ${this.getDefaultMain()}
+    `;
+  }
+
+  getTextureNames(): string[] {
+    return ["X", "W"];
+  }
+
+  getUniformAttrs(): Input[] {
+    return [
+      { name: "CG" },
+      { name: "kernelSize" },
+      { name: "C" },
+      { name: "dataRank" },
+      { name: "pads", length: this.maxRank*2 },
+      { name: "strides", length: this.maxRank },
+      { name: "dilations", length: this.maxRank }
+    ];
+  }
+
+  calc(input: ConvInput): GPUTensor {
+    const N = input.X.shape[0];
+    const C = input.X.shape[1];
+    const D = input.X.shape.slice(2);
+    const W = input.W.shape.slice(2);
+    const M = input.W.shape[0];
+    const CG = input.W.shape[1];
+
+    const kernelSize = getSize(W);
+
+    const R = outputDimsSize(D, W, input.pads.slice(0, input.pads.length/2), input.pads.slice(input.pads.length/2), input.dilations, input.strides);
+    let outputShape = [N, M];
+    outputShape = outputShape.concat(R);
+
+    return this.compute(outputShape, {X: input.X, W: input.W}, {
+      CG, kernelSize, C,
+      dataRank: D.length,
+      pads: this.copyPad(input.pads, this.maxRank*2),
+      strides: this.copyPad(input.strides),
+      dilations: this.copyPad(input.dilations)
+    })
+  }
+
+  compile(info: ConvInf) {
+    super.compile(info);
+  }
+}
+
+
+export interface ConvBiasInput extends ConvInput {
+  B: GPUTensorI;
+}
+
+export interface ConvBiasInfo extends ConvInfo {
+  shapeB?: number[];
+  widthB?: number;
+  heightB?: number;
+}
+
+export class ConvBiasOperation<GPUTensor extends GPUTensorI> extends ConvOperation<GPUTensor, ConvBiasInfo, ConvBiasInput> {
+  protected maxIterations = 1000000;
+
+  constructor(tensorConstructor: GPUTensorConstructor<GPUTensor>, allocator?: GPUMemoryAllocator) {
+    super(tensorConstructor, allocator);
+  }
+
+  getFragmentShader(info: ConvBiasInfo): string {
+    return `
+    ${this.getVariables()}
+
+    float process(int index[${this.maxRank}]) {
+      int biasIndex[${this.maxRank}];
+      ${this.initIndex('biasIndex')}
+      biasIndex[0] = index[1];
+      float res = _B(biasIndex);
+
+      ${this.getMainBody()}
+
+      return res;
+    }
+
+    ${this.getDefaultMain()}
+    `;
+  }
+
+  getTextureNames(): string[] {
+    return ["X", "W", "B"];
+  }
+
+  calc(input: ConvBiasInput): GPUTensor {
+    const N = input.X.shape[0];
+    const C = input.X.shape[1];
+    const D = input.X.shape.slice(2);
+    const W = input.W.shape.slice(2);
+    const M = input.W.shape[0];
+    const CG = input.W.shape[1];
+
+    const kernelSize = getSize(W);
+
+    const R = outputDimsSize(D, W, input.pads.slice(0, input.pads.length/2), input.pads.slice(input.pads.length/2), input.dilations, input.strides);
+    let outputShape = [N, M];
+    outputShape = outputShape.concat(R);
+
+    return this.compute(outputShape, {X: input.X, W: input.W, B: input.B}, {
+      CG, kernelSize, C,
+      dataRank: D.length,
+      pads: this.copyPad(input.pads, this.maxRank*2),
+      strides: this.copyPad(input.strides),
+      dilations: this.copyPad(input.dilations)
+    })
+  }
+
+  compile(info: ConvBiasInfo) {
+    super.compile(info);
+  }
 }
