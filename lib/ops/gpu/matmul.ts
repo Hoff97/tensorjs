@@ -1,56 +1,83 @@
-import { DrawCommand } from "regl";
-import { GPUTensor } from "../../tensor/gpu/tensor";
-import { buildComp, compute, maxRank, defaultMain, initIndex, maxIterations } from "./util";
+import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
+import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
+import { Operation } from "./operation";
+export interface MatMulInfo {
+  shapeA?: number[];
+  widthA?: number;
+  heightA?: number;
+  shapeB?: number[];
+  widthB?: number;
+  heightB?: number;
+  shapeOutput?: number[],
+  widthOutput?: number;
+  heightOutput?: number;
+}
 
-let comp: DrawCommand;
+export interface MatMulInput {
+  A: GPUTensorI;
+  B: GPUTensorI;
+}
 
-const fragmentShader = `
-uniform int k;
+export class MatMulOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTensor, MatMulInfo, MatMulInput> {
+  protected maxIterations = 1000000;
 
-float process(int index[${maxRank}]) {
-  int ix1[${maxRank}];
-  ${initIndex('ix1')}
-  ix1[0] = index[0];
+  constructor(tensorConstructor: GPUTensorConstructor<GPUTensor>, allocator?: GPUMemoryAllocator) {
+    super(tensorConstructor, allocator);
 
-  int ix2[${maxRank}];
-  ${initIndex('ix2')}
-  ix2[1] = index[1];
+    this.maxRank = 2;
+  }
 
-  float res = 0.0;
+  getFragmentShader(info: MatMulInfo): string {
+    return `
+    float process(int index[${this.maxRank}]) {
+      int ix1[${this.maxRank}];
+      ${this.initIndex('ix1')}
+      ix1[0] = index[0];
 
-  for (int i = 0; i < ${maxIterations}; i++) {
-    if (i >= k) {
-      break;
+      int ix2[${this.maxRank}];
+      ${this.initIndex('ix2')}
+      ix2[1] = index[1];
+
+      int k = shapeA[1];
+
+      float res = 0.0;
+
+      for (int i = 0; i < ${this.maxIterations}; i++) {
+        if (i >= k) {
+          break;
+        }
+        ix1[1] = i;
+        ix2[0] = i;
+
+        float v1 = _A(ix1);
+        float v2 = _B(ix2);
+        res += v1*v2;
+      }
+
+      return res;
     }
-    ix1[1] = i;
-    ix2[0] = i;
 
-    float v1 = _input1(ix1);
-    float v2 = _input2(ix2);
-    res += v1*v2;
+    ${this.getDefaultMain()}
+    `;
   }
 
-  return res;
-}
-
-${defaultMain}
-`;
-
-function initComp() {
-  comp = buildComp(['input1', 'input2'], fragmentShader, [{name: 'k'}]);
-}
-
-export function matmul(tensor1: GPUTensor, tensor2: GPUTensor) {
-  if (comp === undefined) {
-    initComp();
+  getTextureNames(): string[] {
+    return ["A", "B"];
   }
 
-  const outputShape = [tensor1.getShape()[0], tensor2.getShape()[1]]
+  calc(input: MatMulInput): GPUTensor {
+    const outputShape = [input.A.shape[0], input.B.shape[1]];
 
-  return compute(comp, outputShape, {
-    input1: tensor1,
-    input2: tensor2
-  }, {
-    k: tensor1.getShape()[1]
-  });
+    return this.compute(outputShape, {A: input.A, B: input.B})
+  }
+
+  compile(info: MatMulInfo) {
+    if (info.shapeA !== undefined) {
+      this.maxIterations = info.shapeA[1]
+    } else if (info.shapeB !== undefined) {
+      this.maxIterations = info.shapeB[0]
+    }
+
+    super.compile(info);
+  }
 }
