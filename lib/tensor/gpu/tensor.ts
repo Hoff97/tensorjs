@@ -15,7 +15,6 @@ import { concat } from '../../ops/gpu/concat';
 import { gemm } from '../../ops/gpu/gemm';
 import { transpose } from '../../ops/gpu/transpose';
 import { power } from '../../ops/gpu/power';
-import { averagePool } from '../../ops/gpu/averagePool';
 import { clip } from '../../ops/gpu/clip';
 import { reduceMean } from '../../ops/gpu/reduceMean';
 import { repeat } from '../../ops/gpu/repeat';
@@ -41,6 +40,7 @@ import { AddOperation } from '../../ops/gpu/add';
 import { MultiplyOperation } from '../../ops/gpu/multiply';
 import { SubtractOperation } from '../../ops/gpu/subtract';
 import { DivideOperation } from '../../ops/gpu/divide';
+import { AveragePoolOperation } from '../../ops/gpu/averagePool';
 
 
 export class GPUTensor extends Tensor implements GPUTensorI {
@@ -235,7 +235,13 @@ export class GPUTensor extends Tensor implements GPUTensorI {
   }
 
   averagePool_impl(kernelShape: number[], pads: number[], strides: number[], includePad: boolean): Tensor {
-    return averagePool(this, kernelShape, pads, strides, includePad);
+    return defaultAveragePool.calc({
+      X: this,
+      includePad,
+      kernelShape,
+      pads,
+      strides
+    });
   }
 
   reshape_impl(shape: number[], _copy: boolean): Tensor {
@@ -302,6 +308,7 @@ const constructor: GPUTensorConstructor<GPUTensor> = (a: MemoryEntry,b: readonly
 const defaultMatMul = new MatMulOperation(constructor);
 const defaultExp = new ExpOperation(constructor);
 const defaultConv = new ConvOperation(constructor);
+const defaultAveragePool = new AveragePoolOperation(constructor);
 const defaultConvBias = new ConvBiasOperation(constructor);
 const defaultAbs = new AbsOperation(constructor);
 const defaultAdd = new AddOperation(constructor);

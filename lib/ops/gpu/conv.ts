@@ -4,7 +4,6 @@ import { outputDimsSize } from "../util/conv";
 import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
 import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
 import { Input, Operation } from "./operation";
-import { GPUTensor } from "../../tensor/gpu/tensor";
 
 
 export interface ConvInfo {
