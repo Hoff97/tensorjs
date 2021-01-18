@@ -4,9 +4,6 @@ import { compareShapes, getSize } from '../../util/shape';
 
 import { log } from '../../ops/gpu/log';
 import { sqrt } from '../../ops/gpu/sqrt';
-import { subtract } from '../../ops/gpu/subtract';
-import { multiply } from '../../ops/gpu/multiply';
-import { divide } from '../../ops/gpu/divide';
 import { MatMulOperation } from '../../ops/gpu/matmul';
 import { sum } from '../../ops/gpu/sum';
 import { product } from '../../ops/gpu/product';
@@ -41,6 +38,9 @@ import { GPUTensorConstructor, GPUTensorI } from './interface';
 import { ConvBiasOperation, ConvOperation } from '../../ops/gpu/conv';
 import { AbsOperation } from '../../ops/gpu/abs';
 import { AddOperation } from '../../ops/gpu/add';
+import { MultiplyOperation } from '../../ops/gpu/multiply';
+import { SubtractOperation } from '../../ops/gpu/subtract';
+import { DivideOperation } from '../../ops/gpu/divide';
 
 
 export class GPUTensor extends Tensor implements GPUTensorI {
@@ -147,21 +147,21 @@ export class GPUTensor extends Tensor implements GPUTensorI {
     if (!(tensor instanceof GPUTensor) || !(th instanceof GPUTensor)) {
       throw new Error('Can only subtract GPU tensor from GPU tensor');
     }
-    return subtract(th, tensor, resultShape);
+    return defaultSubtract.calc({A: th, B: tensor, outputShape: resultShape});
   }
 
   multiply_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor {
     if (!(tensor instanceof GPUTensor) || !(th instanceof GPUTensor)) {
       throw new Error('Can only multiply GPU tensor with GPU tensor');
     }
-    return multiply(th, tensor, resultShape);
+    return defaultMultiply.calc({A: th, B: tensor, outputShape: resultShape});
   }
 
   divide_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor {
     if (!(tensor instanceof GPUTensor) || !(th instanceof GPUTensor)) {
       throw new Error('Can only divide GPU tensor by GPU tensor');
     }
-    return divide(th, tensor, resultShape);
+    return defaultDivide.calc({A: th, B: tensor, outputShape: resultShape});
   }
 
   power_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor {
@@ -305,3 +305,6 @@ const defaultConv = new ConvOperation(constructor);
 const defaultConvBias = new ConvBiasOperation(constructor);
 const defaultAbs = new AbsOperation(constructor);
 const defaultAdd = new AddOperation(constructor);
+const defaultSubtract = new SubtractOperation(constructor);
+const defaultMultiply = new MultiplyOperation(constructor);
+const defaultDivide = new DivideOperation(constructor);

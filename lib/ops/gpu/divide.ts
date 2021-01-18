@@ -1,28 +1,57 @@
-import { DrawCommand } from "regl";
-import { GPUTensor } from "../../tensor/gpu/tensor";
-import { buildComp, compute, defaultMain, maxRank } from "./util";
+import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
+import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
+import { Operation } from "./operation";
 
-let comp: DrawCommand;
 
-const fragmentShader = `
-float process(int index[${maxRank}]) {
-  return _inputTensor1(index) / _inputTensor2(index);
+export interface DivideInfo {
+  shapeA?: number[];
+  widthA?: number;
+  heightA?: number;
+  shapeB?: number[];
+  widthB?: number;
+  heightB?: number;
+  shapeOutput?: number[],
+  widthOutput?: number;
+  heightOutput?: number;
 }
 
-${defaultMain}
-`;
-
-function initComp() {
-  comp = buildComp(['inputTensor1', 'inputTensor2'], fragmentShader);
+export interface DivideInput {
+  A: GPUTensorI;
+  B: GPUTensorI;
+  outputShape: readonly number[];
 }
 
-export function divide(tensor1: GPUTensor, tensor2: GPUTensor, resultShape: readonly number[]) {
-  if (comp === undefined) {
-    initComp();
+export class DivideOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTensor, DivideInfo, DivideInput> {
+  constructor(tensorConstructor: GPUTensorConstructor<GPUTensor>, allocator?: GPUMemoryAllocator) {
+    super(tensorConstructor, allocator);
   }
 
-  return compute(comp, resultShape, {
-    inputTensor1: tensor1,
-    inputTensor2: tensor2
-  });
+  getFragmentShader(info: DivideInfo): string {
+    return `
+    float process(int[${this.maxRank}] index) {
+      return _A(index) / _B(index);;
+    }
+
+    ${this.getDefaultMain()}
+    `;
+  }
+
+  getTextureNames(): string[] {
+    return ["A", "B"];
+  }
+
+  calc(input: DivideInput): GPUTensor {
+    return this.compute(input.outputShape, {A: input.A, B: input.B})
+  }
+
+  compile(info: DivideInfo) {
+    if (info.shapeA !== undefined) {
+      this.maxRank = info.shapeA.length;
+    }
+    if (info.shapeB !== undefined) {
+      this.maxRank = info.shapeB.length;
+    }
+
+    super.compile(info);
+  }
 }
