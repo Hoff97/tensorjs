@@ -211,8 +211,6 @@ export class ConvBiasOperation<GPUTensor extends GPUTensorI> extends ConvOperati
 
   getFragmentShader(info: ConvBiasInfo): string {
     return `
-    ${this.getVariables()}
-
     float process(int index[${this.maxRank}]) {
       int biasIndex[${this.maxRank}];
       ${this.initIndex('biasIndex')}
