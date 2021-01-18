@@ -17,7 +17,6 @@ import { defaultAllocator, gl } from './gl';
 import { MemoryEntry } from './memory';
 import { concat } from '../../ops/gpu/concat';
 import { gemm } from '../../ops/gpu/gemm';
-import { abs } from '../../ops/gpu/abs';
 import { transpose } from '../../ops/gpu/transpose';
 import { power } from '../../ops/gpu/power';
 import { averagePool } from '../../ops/gpu/averagePool';
@@ -41,6 +40,7 @@ import { normalize } from '../../ops/gpu/normalize';
 import { ExpOperation } from '../../ops/gpu/exp';
 import { GPUTensorConstructor, GPUTensorI } from './interface';
 import { ConvBiasOperation, ConvOperation } from '../../ops/gpu/conv';
+import { AbsOperation } from '../../ops/gpu/abs';
 
 
 export class GPUTensor extends Tensor implements GPUTensorI {
@@ -125,7 +125,7 @@ export class GPUTensor extends Tensor implements GPUTensorI {
   }
 
   abs(): Tensor {
-    return abs(this);
+    return defaultAbs.calc({input: this});
   }
 
   floor(): Tensor {
@@ -303,3 +303,4 @@ const defaultMatMul = new MatMulOperation(constructor);
 const defaultExp = new ExpOperation(constructor);
 const defaultConv = new ConvOperation(constructor);
 const defaultConvBias = new ConvBiasOperation(constructor);
+const defaultAbs = new AbsOperation(constructor);

@@ -1,24 +1,49 @@
-import { DrawCommand } from "regl";
-import { GPUTensor } from "../../tensor/gpu/tensor";
-import { buildComp, compute } from "./util";
+import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
+import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
+import { Operation } from "./operation";
 
-let comp: DrawCommand;
 
-const fragmentShader = `
-void main() {
-  gl_FragColor = abs(texture2D(inputTensor, uv));
-}`;
-
-function initComp() {
-  comp = buildComp(['inputTensor'], fragmentShader);
+export interface AbsInfo {
+  shapeX?: number[];
+  widthX?: number;
+  heightX?: number;
+  shapeOutput?: number[],
+  widthOutput?: number;
+  heightOutput?: number;
 }
 
-export function abs(tensor: GPUTensor) {
-  if (comp === undefined) {
-    initComp();
+export interface AbsInput {
+  input: GPUTensorI;
+}
+
+export class AbsOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTensor, AbsInfo, AbsInput> {
+  constructor(tensorConstructor: GPUTensorConstructor<GPUTensor>, allocator?: GPUMemoryAllocator) {
+    super(tensorConstructor, allocator);
   }
 
-  return compute(comp, tensor.getShape(), {
-    inputTensor: tensor
-  });
+  getFragmentShader(info: AbsInfo): string {
+    return `
+    void main() {
+      initVars();
+
+      gl_FragColor = abs(texture2D(X, uv));
+    }
+    `;
+  }
+
+  getTextureNames(): string[] {
+    return ["X"];
+  }
+
+  calc(input: AbsInput): GPUTensor {
+    return this.compute(input.input.shape, {X: input.input})
+  }
+
+  compile(info: AbsInfo) {
+    if (info.shapeX !== undefined) {
+      this.maxRank = info.shapeX.length;
+    }
+
+    super.compile(info);
+  }
 }
