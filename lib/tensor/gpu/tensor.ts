@@ -4,7 +4,6 @@ import { compareShapes, getSize } from '../../util/shape';
 
 import { log } from '../../ops/gpu/log';
 import { sqrt } from '../../ops/gpu/sqrt';
-import { add } from '../../ops/gpu/add';
 import { subtract } from '../../ops/gpu/subtract';
 import { multiply } from '../../ops/gpu/multiply';
 import { divide } from '../../ops/gpu/divide';
@@ -41,6 +40,7 @@ import { ExpOperation } from '../../ops/gpu/exp';
 import { GPUTensorConstructor, GPUTensorI } from './interface';
 import { ConvBiasOperation, ConvOperation } from '../../ops/gpu/conv';
 import { AbsOperation } from '../../ops/gpu/abs';
+import { AddOperation } from '../../ops/gpu/add';
 
 
 export class GPUTensor extends Tensor implements GPUTensorI {
@@ -140,7 +140,7 @@ export class GPUTensor extends Tensor implements GPUTensorI {
     if (!(tensor instanceof GPUTensor) || !(th instanceof GPUTensor)) {
       throw new Error('Can only add GPU tensor to GPU tensor');
     }
-    return add(th, tensor, resultShape);
+    return defaultAdd.calc({A: th, B: tensor, outputShape: resultShape});
   }
 
   subtract_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor {
@@ -304,3 +304,4 @@ const defaultExp = new ExpOperation(constructor);
 const defaultConv = new ConvOperation(constructor);
 const defaultConvBias = new ConvBiasOperation(constructor);
 const defaultAbs = new AbsOperation(constructor);
+const defaultAdd = new AddOperation(constructor);
