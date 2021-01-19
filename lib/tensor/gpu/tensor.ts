@@ -5,7 +5,6 @@ import { compareShapes, getSize } from '../../util/shape';
 import { MatMulOperation } from '../../ops/gpu/matmul';
 import { defaultAllocator, gl } from './gl';
 import { MemoryEntry } from './memory';
-import { transpose } from '../../ops/gpu/transpose';
 import { repeat } from '../../ops/gpu/repeat';
 import { padOp } from '../../ops/gpu/pad';
 import { CPUTensor } from '../cpu/tensor';
@@ -41,6 +40,7 @@ import { GemmCOperation, GemmOperation } from '../../ops/gpu/gemm';
 import { PowerOperation } from '../../ops/gpu/power';
 import { SqrtOperation } from '../../ops/gpu/sqrt';
 import { LogOperation } from '../../ops/gpu/log';
+import { TransposeOperation } from '../../ops/gpu/transpose';
 
 
 export class GPUTensor extends Tensor implements GPUTensorI {
@@ -264,7 +264,7 @@ export class GPUTensor extends Tensor implements GPUTensorI {
   }
 
   transpose_impl(permutation: number[]): Tensor {
-    return transpose(this, permutation);
+    return defaultTranspose.calc({A: this, permutation});
   }
 
   clip(min?: number, max?: number): Tensor {
@@ -348,3 +348,4 @@ const defaultConcat = new ConcatOperation(constructor);
 const defaultCopy = new CopyOperation(constructor);
 const defaultExpand = new ExpandOperation(constructor);
 const defaultGather = new GatherOperation(constructor);
+const defaultTranspose = new TransposeOperation(constructor);
