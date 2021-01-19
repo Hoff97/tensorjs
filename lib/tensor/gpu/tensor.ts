@@ -6,7 +6,6 @@ import { MatMulOperation } from '../../ops/gpu/matmul';
 import { defaultAllocator, gl } from './gl';
 import { MemoryEntry } from './memory';
 import { CPUTensor } from '../cpu/tensor';
-import { upsample } from '../../ops/gpu/upsample';
 import REGL from 'regl';
 import { toTexture } from '../../ops/gpu/toTexture';
 import { normalize } from '../../ops/gpu/normalize';
@@ -41,6 +40,7 @@ import { TransposeOperation } from '../../ops/gpu/transpose';
 import { RepeatOperation } from '../../ops/gpu/repeat';
 import { PadOperation } from '../../ops/gpu/pad';
 import { SliceOperation } from '../../ops/gpu/slice';
+import { UpsampleOperation } from '../../ops/gpu/upsample';
 
 
 export class GPUTensor extends Tensor implements GPUTensorI {
@@ -296,7 +296,7 @@ export class GPUTensor extends Tensor implements GPUTensorI {
   }
 
   upsample(scales: number[]): Tensor {
-    return upsample(this, scales);
+    return defaultUpsample.calc({X: this, scales});
   }
 
   normalize(mean: Tensor, variance: Tensor, epsilon: number, scale: Tensor, bias: Tensor): Tensor {
@@ -327,6 +327,7 @@ const defaultConv = new ConvOperation(constructor);
 const defaultAveragePool = new AveragePoolOperation(constructor);
 const defaultConvBias = new ConvBiasOperation(constructor);
 const defaultPad = new PadOperation(constructor);
+const defaultUpsample = new UpsampleOperation(constructor);
 
 //Binary operations
 const defaultAdd = new AddOperation(constructor);

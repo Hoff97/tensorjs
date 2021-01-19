@@ -1,51 +1,85 @@
-import { DrawCommand } from "regl";
-import { GPUTensor } from "../../tensor/gpu/tensor";
-import { buildComp, compute, copyPad, defaultMain, initIndex, maxRank, pad } from "./util";
+import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
+import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
+import { PadMode } from "../../types";
+import { Input, Operation } from "./operation";
 
-let comp: DrawCommand;
 
-const fragmentShader = `
-uniform float scales[${maxRank}];
+export interface UpsampleInfo {
+  shapeX?: number[];
+  widthX?: number;
+  heightX?: number;
+  shapeOutput?: number[],
+  widthOutput?: number;
+  heightOutput?: number;
 
-float process(int index[${maxRank}]) {
-  int inIx[${maxRank}];
-  ${initIndex('inIx')}
+  scales?: number[];
+}
 
-  for (int i = 0; i < ${maxRank}; i++) {
-    if (index[i] == -1) {
-      break;
+export interface UpsampleInput {
+  X: GPUTensorI;
+  scales: number[];
+}
+
+export class UpsampleOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTensor, UpsampleInfo, UpsampleInput> {
+  constructor(tensorConstructor: GPUTensorConstructor<GPUTensor>, allocator?: GPUMemoryAllocator) {
+    super(tensorConstructor, allocator);
+  }
+
+  getFragmentShader(info: UpsampleInfo): string {
+    return `
+    float process(int index[${this.maxRank}]) {
+      int inIx[${this.maxRank}];
+      ${this.initIndex('inIx')}
+
+      for (int i = 0; i < ${this.maxRank}; i++) {
+        if (index[i] == -1) {
+          break;
+        }
+
+        inIx[i] = int(floor(float(index[i]) / scales[i]));
+      }
+
+      return _X(inIx);
     }
 
-    inIx[i] = int(floor(float(index[i]) / scales[i]));
+    ${this.getDefaultMain()}
+    `;
   }
 
-  return _x(inIx);
-}
-
-${defaultMain}
-`;
-
-function initComp() {
-  comp = buildComp(['x'], fragmentShader, [
-    {name: 'scales', length: maxRank},
-  ]);
-}
-
-export function upsample(x: GPUTensor, scales: number[]) {
-  if (comp === undefined) {
-    initComp();
+  getTextureNames(): string[] {
+    return ["X"];
   }
 
-  const rank = x.shape.length;
-
-  const resultShape = [...x.shape];
-  for (let i = 0; i < rank; i++) {
-    resultShape[i] = Math.floor(resultShape[i] * scales[i]);
+  getVariables() {
+    return `
+    ${this.getVarModifier('scales')} float scales[${this.maxRank}];
+    `;
   }
 
-  return compute(comp, resultShape, {
-    x: x
-  }, {
-    scales: copyPad(scales)
-  });
+  getUniformAttrs(): Input[] {
+    return [
+      { name: "scales", length: this.maxRank, type: "float" }
+    ];
+  }
+
+  calc(input: UpsampleInput): GPUTensor {
+    const rank = input.X.shape.length;
+
+    const resultShape = [...input.X.shape];
+    for (let i = 0; i < rank; i++) {
+      resultShape[i] = Math.floor(resultShape[i] * input.scales[i]);
+    }
+
+    return this.compute(resultShape, {X: input.X}, {
+      scales: this.copyPad(input.scales)
+    });
+  }
+
+  compile(info: UpsampleInfo) {
+    if (info.shapeX !== undefined) {
+      this.maxRank = info.shapeX.length;
+    }
+
+    super.compile(info);
+  }
 }
