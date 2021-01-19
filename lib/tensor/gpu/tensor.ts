@@ -6,7 +6,6 @@ import { MatMulOperation } from '../../ops/gpu/matmul';
 import { defaultAllocator, gl } from './gl';
 import { MemoryEntry } from './memory';
 import { CPUTensor } from '../cpu/tensor';
-import { slice } from '../../ops/gpu/slice';
 import { upsample } from '../../ops/gpu/upsample';
 import REGL from 'regl';
 import { toTexture } from '../../ops/gpu/toTexture';
@@ -41,6 +40,7 @@ import { LogOperation } from '../../ops/gpu/log';
 import { TransposeOperation } from '../../ops/gpu/transpose';
 import { RepeatOperation } from '../../ops/gpu/repeat';
 import { PadOperation } from '../../ops/gpu/pad';
+import { SliceOperation } from '../../ops/gpu/slice';
 
 
 export class GPUTensor extends Tensor implements GPUTensorI {
@@ -292,7 +292,7 @@ export class GPUTensor extends Tensor implements GPUTensorI {
   }
 
   slice_impl(starts: number[], ends: number[], axes: number[]): Tensor {
-    return slice(this, starts, ends, axes);
+    return defaultSlice.calc({X: this, starts, ends, axes});
   }
 
   upsample(scales: number[]): Tensor {
@@ -351,3 +351,4 @@ const defaultExpand = new ExpandOperation(constructor);
 const defaultGather = new GatherOperation(constructor);
 const defaultTranspose = new TransposeOperation(constructor);
 const defaultRepeat = new RepeatOperation(constructor);
+const defaultSlice = new SliceOperation(constructor);

@@ -1,56 +1,90 @@
-import { DrawCommand } from "regl";
-import { GPUTensor } from "../../tensor/gpu/tensor";
-import { buildComp, compute, defaultMain, initIndex, maxRank, pad } from "./util";
+import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
+import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
+import { PadMode } from "../../types";
+import { Input, Operation } from "./operation";
 
-let comp: DrawCommand;
 
-const fragmentShader = `
-uniform int offsets[${maxRank}];
-
-float process(int index[${maxRank}]) {
-  int inIx[${maxRank}];
-  ${initIndex('inIx')}
-  for (int i = 0; i < ${maxRank}; i++) {
-    if (index[i] == -1) {
-      break;
-    }
-
-    inIx[i] = index[i] + offsets[i];
-  }
-
-  return _x(inIx);
+export interface SliceInfo {
+  shapeX?: number[];
+  widthX?: number;
+  heightX?: number;
+  shapeOutput?: number[],
+  widthOutput?: number;
+  heightOutput?: number;
 }
 
-${defaultMain}
-`;
-
-function initComp() {
-  comp = buildComp(['x'], fragmentShader, [
-    {name: 'offsets', length: maxRank},
-  ]);
+export interface SliceInput {
+  X: GPUTensorI;
+  starts: number[];
+  ends: number[];
+  axes: number[];
 }
 
-export function slice(x: GPUTensor, starts: number[], ends: number[], axes: number[]) {
-  if (comp === undefined) {
-    initComp();
+export class SliceOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTensor, SliceInfo, SliceInput> {
+  constructor(tensorConstructor: GPUTensorConstructor<GPUTensor>, allocator?: GPUMemoryAllocator) {
+    super(tensorConstructor, allocator);
   }
 
-  const rank = x.shape.length;
+  getFragmentShader(info: SliceInfo): string {
+    return `
+    float process(int index[${this.maxRank}]) {
+      int inIx[${this.maxRank}];
+      ${this.initIndex('inIx')}
+      for (int i = 0; i < ${this.maxRank}; i++) {
+        if (index[i] == -1) {
+          break;
+        }
 
-  const resultShape = [...x.shape];
-  const offsets: number[] = new Array(rank).fill(0);
-  let axIx = 0;
-  for (let i = 0; i < rank && axIx < axes.length; i++) {
-    if (i == axes[axIx]) {
-      resultShape[i] = ends[axIx] - starts[axIx];
-      offsets[i] = starts[axIx];
-      axIx++;
+        inIx[i] = index[i] + offsets[i];
+      }
+
+      return _X(inIx);
     }
+
+    ${this.getDefaultMain()}
+    `;
   }
 
-  return compute(comp, resultShape, {
-    x: x
-  }, {
-    offsets: pad(offsets)
-  });
+  getTextureNames(): string[] {
+    return ["X"];
+  }
+
+  getVariables() {
+    return `
+    ${this.getVarModifier('offsets')} int offsets[${this.maxRank}];
+    `;
+  }
+
+  getUniformAttrs(): Input[] {
+    return [
+      { name: "offsets", length: this.maxRank*2 }
+    ];
+  }
+
+  calc(input: SliceInput): GPUTensor {
+    const rank = input.X.shape.length;
+
+    const resultShape = [...input.X.shape];
+    const offsets: number[] = new Array(rank).fill(0);
+    let axIx = 0;
+    for (let i = 0; i < rank && axIx < input.axes.length; i++) {
+      if (i == input.axes[axIx]) {
+        resultShape[i] = input.ends[axIx] - input.starts[axIx];
+        offsets[i] = input.starts[axIx];
+        axIx++;
+      }
+    }
+
+    return this.compute(resultShape, {X: input.X}, {
+      offsets: this.pad(offsets)
+    });
+  }
+
+  compile(info: SliceInfo) {
+    if (info.shapeX !== undefined) {
+      this.maxRank = info.shapeX.length;
+    }
+
+    super.compile(info);
+  }
 }
