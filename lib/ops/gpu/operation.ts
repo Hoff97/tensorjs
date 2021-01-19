@@ -336,6 +336,23 @@ export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictB
     `;
   }
 
+  incrementConditional(index: string, shape: string, cond: string) {
+    return `
+    for (int i = 0; i < ${this.maxRank}; i++) {
+      if (${cond}[i] == 1) {
+        ${index}[i] += 1;
+        if (${index}[i] >= ${shape}[i]) {
+          ${index}[i] = 0;
+        } else {
+          break;
+        }
+      } else if (${cond}[i] == -1) {
+        break;
+      }
+    }
+    `;
+  }
+
   getDefaultMain() {
     return `
     void main() {

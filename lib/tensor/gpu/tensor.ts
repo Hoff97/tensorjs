@@ -5,10 +5,6 @@ import { compareShapes, getSize } from '../../util/shape';
 import { log } from '../../ops/gpu/log';
 import { sqrt } from '../../ops/gpu/sqrt';
 import { MatMulOperation } from '../../ops/gpu/matmul';
-import { sum } from '../../ops/gpu/sum';
-import { product } from '../../ops/gpu/product';
-import { max } from '../../ops/gpu/max';
-import { min } from '../../ops/gpu/min';
 import { defaultAllocator, gl } from './gl';
 import { MemoryEntry } from './memory';
 import { concat } from '../../ops/gpu/concat';
@@ -16,12 +12,9 @@ import { gemm } from '../../ops/gpu/gemm';
 import { transpose } from '../../ops/gpu/transpose';
 import { power } from '../../ops/gpu/power';
 import { clip } from '../../ops/gpu/clip';
-import { reduceMean } from '../../ops/gpu/reduceMean';
 import { repeat } from '../../ops/gpu/repeat';
 import { expand } from '../../ops/gpu/expand';
 import { copy } from '../../ops/gpu/copy';
-import { reduceMeanSquare } from '../../ops/gpu/reduceMeanSquare';
-import { sumSquare } from '../../ops/gpu/sumSquare';
 import { padOp } from '../../ops/gpu/pad';
 import { CPUTensor } from '../cpu/tensor';
 import { gather } from '../../ops/gpu/gather';
@@ -41,6 +34,13 @@ import { MultiplyOperation } from '../../ops/gpu/multiply';
 import { SubtractOperation } from '../../ops/gpu/subtract';
 import { DivideOperation } from '../../ops/gpu/divide';
 import { AveragePoolOperation } from '../../ops/gpu/averagePool';
+import { ReduceMeanOperation } from '../../ops/gpu/reduceMean';
+import { ReduceMeanSquareOperation } from '../../ops/gpu/reduceMeanSquare';
+import { SumSquareOperation } from '../../ops/gpu/sumSquare';
+import { SumOperation } from '../../ops/gpu/sum';
+import { ProductOperation } from '../../ops/gpu/product';
+import { MaxOperation } from '../../ops/gpu/max';
+import { MinOperation } from '../../ops/gpu/min';
 
 
 export class GPUTensor extends Tensor implements GPUTensorI {
@@ -186,31 +186,31 @@ export class GPUTensor extends Tensor implements GPUTensorI {
   }
 
   sum_impl(axes: number[], keepDims: boolean): Tensor {
-    return sum(this, axes, keepDims);
+    return defaultSum.calc({X: this, axes, keepDims});
   }
 
   sumSquare_impl(axes: number[], keepDims: boolean): Tensor {
-    return sumSquare(this, axes, keepDims);
+    return defaultSumSquare.calc({X: this, axes, keepDims});
   }
 
   reduceMean_impl(axes: number[], keepDims: boolean): Tensor {
-    return reduceMean(this, axes, keepDims);
+    return defaultMean.calc({X: this, axes, keepDims});
   }
 
   reduceMeanSquare_impl(axes: number[], keepDims: boolean): Tensor {
-    return reduceMeanSquare(this, axes, keepDims);
+    return defaultMeanSquare.calc({X: this, axes, keepDims});
   }
 
   product_impl(axes: number[], keepDims: boolean): Tensor {
-    return product(this, axes, keepDims);
+    return defaultProduct.calc({X: this, axes, keepDims});
   }
 
   max_impl(axes: number[], keepDims: boolean): Tensor {
-    return max(this, axes, keepDims);
+    return defaultMax.calc({X: this, axes, keepDims});
   }
 
   min_impl(axes: number[], keepDims: boolean): Tensor {
-    return min(this, axes, keepDims);
+    return defaultMin.calc({X: this, axes, keepDims});
   }
 
   conv_impl(kernel: Tensor, dilations: number[], group: number, pads: number[], strides: number[], bias?: Tensor): Tensor {
@@ -315,3 +315,10 @@ const defaultAdd = new AddOperation(constructor);
 const defaultSubtract = new SubtractOperation(constructor);
 const defaultMultiply = new MultiplyOperation(constructor);
 const defaultDivide = new DivideOperation(constructor);
+const defaultMean = new ReduceMeanOperation(constructor);
+const defaultMeanSquare = new ReduceMeanSquareOperation(constructor);
+const defaultSumSquare = new SumSquareOperation(constructor);
+const defaultSum = new SumOperation(constructor);
+const defaultProduct = new ProductOperation(constructor);
+const defaultMax = new MaxOperation(constructor);
+const defaultMin = new MinOperation(constructor);

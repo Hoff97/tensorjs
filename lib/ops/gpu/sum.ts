@@ -1,19 +1,8 @@
-import { DrawCommand } from "regl";
-import { GPUTensor } from "../../tensor/gpu/tensor";
-import { fragmentShader, initComputation, performComputation } from './pool';
+import { GPUTensorI } from "../../tensor/gpu/interface";
+import { PoolOperation } from "./pool";
 
-let comp: DrawCommand;
-
-const fragShader = fragmentShader((a, b) => `${a} + ${b}`);
-
-function initComp() {
-  comp = initComputation(fragShader);
-}
-
-export function sum(tensor1: GPUTensor, axes: number[], keepDims: boolean) {
-  if (comp === undefined) {
-    initComp();
+export class SumOperation<GPUTensor extends GPUTensorI> extends PoolOperation<GPUTensor> {
+  update(a: string, b: string): string {
+    return `${a} + ${b}`;
   }
-
-  return performComputation(tensor1, axes, keepDims, comp);
 }
