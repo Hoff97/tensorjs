@@ -1,48 +1,83 @@
-import { DrawCommand } from "regl";
-import { GPUTensor } from "../../tensor/gpu/tensor";
-import { buildComp, compute, copyPad, defaultMain, initIndex, maxRank } from "./util";
+import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
+import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
+import { computeStrides } from "../../util/shape";
+import { Input, Operation } from "./operation";
 
-let comp: DrawCommand;
 
-const fragmentShader = `
-uniform int repeats[${maxRank}];
+export interface RepeatInfo {
+  shapeA?: number[];
+  widthA?: number;
+  heightA?: number;
 
-float process(int index[${maxRank}]) {
-  int inIndex[${maxRank}];
-  ${initIndex('inIndex')}
-  for (int i = 0; i < ${maxRank}; i++) {
-    if (repeats[i] == -1) {
-      break;
+  shapeOutput?: number[],
+  widthOutput?: number;
+  heightOutput?: number;
+
+  repeats?: number[];
+}
+
+export interface RepeatInput {
+  A: GPUTensorI;
+  repeats: number[];
+}
+
+export class RepeatOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTensor, RepeatInfo, RepeatInput> {
+  constructor(tensorConstructor: GPUTensorConstructor<GPUTensor>, allocator?: GPUMemoryAllocator) {
+    super(tensorConstructor, allocator);
+  }
+
+  getVariables() {
+    return `
+    ${this.getVarModifier('repeats')} int repeats[${this.maxRank}];
+    `;
+  }
+
+  getUniformAttrs(): Input[] {
+    return [
+      { name: "repeats", length: this.maxRank }
+    ];
+  }
+
+  getFragmentShader(info: RepeatInfo): string {
+    return `
+    float process(int index[${this.maxRank}]) {
+      int inIndex[${this.maxRank}];
+      ${this.initIndex('inIndex')}
+      for (int i = 0; i < ${this.maxRank}; i++) {
+        if (repeats[i] == -1) {
+          break;
+        }
+        int d = index[i] / shapeA[i];
+        inIndex[i] = index[i] - d*shapeA[i];
+      }
+
+      return _A(inIndex);
     }
-    int d = index[i] / shapex[i];
-    inIndex[i] = index[i] - d*shapex[i];
+
+    ${this.getDefaultMain()}
+    `;
   }
 
-  return _x(inIndex);
-}
-
-${defaultMain}
-`;
-
-function initComp() {
-  comp = buildComp(['x'], fragmentShader, [{name: 'repeats', length: maxRank}]);
-}
-
-export function repeat(tensor: GPUTensor, repeats: number[]) {
-  if (comp === undefined) {
-    initComp();
+  getTextureNames(): string[] {
+    return ["A"];
   }
 
-  const rank = tensor.shape.length;
+  calc(input: RepeatInput): GPUTensor {
+    const rank = input.A.shape.length;
 
-  const outputShape = new Array(rank);
-  for (let i = 0; i < rank; i++) {
-    outputShape[i] = tensor.shape[i] * repeats[i];
+    const outputShape = new Array(rank);
+    for (let i = 0; i < rank; i++) {
+      outputShape[i] = input.A.shape[i] * input.repeats[i];
+    }
+
+    return this.compute(outputShape, {A: input.A}, {repeats: this.copyPad(input.repeats)});
   }
 
-  return compute(comp, outputShape, {
-    x: tensor
-  }, {
-    repeats: copyPad(repeats)
-  });
+  compile(info: RepeatInfo) {
+    if (info.shapeA !== undefined) {
+      this.maxRank = info.shapeA.length;
+    }
+
+    super.compile(info);
+  }
 }
