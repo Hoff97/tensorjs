@@ -11,7 +11,6 @@ import { concat } from '../../ops/gpu/concat';
 import { gemm } from '../../ops/gpu/gemm';
 import { transpose } from '../../ops/gpu/transpose';
 import { power } from '../../ops/gpu/power';
-import { clip } from '../../ops/gpu/clip';
 import { repeat } from '../../ops/gpu/repeat';
 import { expand } from '../../ops/gpu/expand';
 import { copy } from '../../ops/gpu/copy';
@@ -41,6 +40,7 @@ import { ProductOperation } from '../../ops/gpu/product';
 import { MaxOperation } from '../../ops/gpu/max';
 import { MinOperation } from '../../ops/gpu/min';
 import { CeilOperation } from '../../ops/gpu/ceil';
+import { ClipOperation } from '../../ops/gpu/clip';
 
 
 export class GPUTensor extends Tensor implements GPUTensorI {
@@ -264,7 +264,7 @@ export class GPUTensor extends Tensor implements GPUTensorI {
   }
 
   clip(min?: number, max?: number): Tensor {
-    return clip(this, min, max);
+    return defaultClip.calc({input: this, minVal: min, maxVal: max});
   }
 
   repeat(repeats: number[]): Tensor {
@@ -323,3 +323,4 @@ const defaultProduct = new ProductOperation(constructor);
 const defaultMax = new MaxOperation(constructor);
 const defaultMin = new MinOperation(constructor);
 const defaultCeil = new CeilOperation(constructor);
+const defaultClip = new ClipOperation(constructor);

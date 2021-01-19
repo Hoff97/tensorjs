@@ -10,9 +10,12 @@ export const defaultMaxIterations = 10000000;
 
 type DictBase = {[name: string]: any};
 
+type InputType = 'int' | 'float';
+
 export interface Input {
-  name: string,
-  length?: number
+  name: string;
+  length?: number;
+  type?: InputType;
 }
 
 export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictBase, InputType> {
@@ -122,12 +125,26 @@ export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictB
         if (Array.isArray(info[k])) {
           inits += this.getArrayInit(k, info[k]);
         } else {
-          inits += `\n${k} = ${info[k]};`;
+          const type = this.getVarType(k);
+
+          if (type === "int") {
+            inits += `\n${k} = ${info[k]};`;
+          } else {
+            inits += `\n${k} = ${info[k]};`; // TODO: Format float
+          }
         }
       }
     }
 
     return inits;
+  }
+
+  getVarType(name: string) {
+    let res = this.getUniformAttrs().find(x => x.name === name);
+    if (res !== undefined) {
+      return res.type ? res.type : "int";
+    }
+    return "int";
   }
 
   getArrayInit(name: string, values: any[], len?: number, pad?: string) {
