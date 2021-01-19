@@ -29,7 +29,7 @@ export class AddOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTen
   getFragmentShader(info: AddInfo): string {
     return `
     float process(int[${this.maxRank}] index) {
-      return _A(index) + _B(index);;
+      return _A(index) + _B(index);
     }
 
     ${this.getDefaultMain()}

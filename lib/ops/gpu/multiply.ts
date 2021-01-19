@@ -29,7 +29,7 @@ export class MultiplyOperation<GPUTensor extends GPUTensorI> extends Operation<G
   getFragmentShader(info: MultiplyInfo): string {
     return `
     float process(int[${this.maxRank}] index) {
-      return _A(index) * _B(index);;
+      return _A(index) * _B(index);
     }
 
     ${this.getDefaultMain()}

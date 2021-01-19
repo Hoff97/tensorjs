@@ -2,13 +2,10 @@ import Tensor, { PadMode } from '../../types';
 
 import { compareShapes, getSize } from '../../util/shape';
 
-import { log } from '../../ops/gpu/log';
-import { sqrt } from '../../ops/gpu/sqrt';
 import { MatMulOperation } from '../../ops/gpu/matmul';
 import { defaultAllocator, gl } from './gl';
 import { MemoryEntry } from './memory';
 import { transpose } from '../../ops/gpu/transpose';
-import { power } from '../../ops/gpu/power';
 import { repeat } from '../../ops/gpu/repeat';
 import { padOp } from '../../ops/gpu/pad';
 import { CPUTensor } from '../cpu/tensor';
@@ -41,6 +38,9 @@ import { CopyOperation } from '../../ops/gpu/copy';
 import { ExpandOperation } from '../../ops/gpu/expand';
 import { GatherOperation } from '../../ops/gpu/gather';
 import { GemmCOperation, GemmOperation } from '../../ops/gpu/gemm';
+import { PowerOperation } from '../../ops/gpu/power';
+import { SqrtOperation } from '../../ops/gpu/sqrt';
+import { LogOperation } from '../../ops/gpu/log';
 
 
 export class GPUTensor extends Tensor implements GPUTensorI {
@@ -117,11 +117,11 @@ export class GPUTensor extends Tensor implements GPUTensorI {
   }
 
   log(): Tensor {
-    return log(this);
+    return defaultLog.calc({input: this}) as any;
   }
 
   sqrt(): Tensor {
-    return sqrt(this);
+    return defaultSqrt.calc({input: this}) as any;
   }
 
   abs(): Tensor {
@@ -168,7 +168,7 @@ export class GPUTensor extends Tensor implements GPUTensorI {
     if (!(tensor instanceof GPUTensor) || !(th instanceof GPUTensor)) {
       throw new Error('Can only take GPU tensor to power of GPU tensor');
     }
-    return power(th, tensor, resultShape);
+    return defaultPower.calc({A: th, B: tensor, outputShape: resultShape});
   }
 
   matMul(tensor: Tensor): Tensor {
@@ -319,6 +319,8 @@ const defaultAbs = new AbsOperation(constructor);
 const defaultCeil = new CeilOperation(constructor);
 const defaultFloor = new FloorOperation(constructor);
 const defaultClip = new ClipOperation(constructor);
+const defaultSqrt = new SqrtOperation(constructor);
+const defaultLog = new LogOperation(constructor);
 
 //Convolutions
 const defaultConv = new ConvOperation(constructor);
@@ -330,6 +332,7 @@ const defaultAdd = new AddOperation(constructor);
 const defaultSubtract = new SubtractOperation(constructor);
 const defaultMultiply = new MultiplyOperation(constructor);
 const defaultDivide = new DivideOperation(constructor);
+const defaultPower = new PowerOperation(constructor);
 
 //Reductions
 const defaultMean = new ReduceMeanOperation(constructor);

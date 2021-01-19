@@ -29,7 +29,7 @@ export class DivideOperation<GPUTensor extends GPUTensorI> extends Operation<GPU
   getFragmentShader(info: DivideInfo): string {
     return `
     float process(int[${this.maxRank}] index) {
-      return _A(index) / _B(index);;
+      return _A(index) / _B(index);
     }
 
     ${this.getDefaultMain()}
