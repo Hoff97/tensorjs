@@ -1,150 +1,224 @@
-import { DrawCommand } from "regl";
-import { GPUTensor } from "../../tensor/gpu/tensor";
-import { buildComp, compute, maxRank, defaultMain, initIndex, maxIterations } from "./util";
+import { getSize } from "../../util/shape";
+import { outputDimsSize } from "../util/conv";
 
-let comp: DrawCommand;
-let compWithC: DrawCommand;
+import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
+import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
+import { Input, Operation } from "./operation";
 
-const variables = `
-uniform int M;
-uniform int N;
-uniform int O;
-uniform int rank;
-uniform int aTranspose;
-uniform int bTranspose;
-uniform float alpha;
-uniform float beta;
-`;
 
-const body = `
-int ixA[${maxRank}];
-  ${initIndex('ixA')}
-  int ixB[${maxRank}];
-  ${initIndex('ixA')}
-  for (int i = 0; i < ${maxRank}; i++) {
-    if (i >= rank - 2) {
-      break;
-    }
-    ixA[i] = index[i];
-    ixB[i] = index[i];
+export interface GemmInfo {
+  shapeA?: number[];
+  widthA?: number;
+  heightA?: number;
+  shapeB?: number[];
+  widthB?: number;
+  heightB?: number;
+  shapeOutput?: number[],
+  widthOutput?: number;
+  heightOutput?: number;
+
+  //TODO
+}
+
+export interface GemmInput {
+  a: GPUTensorI;
+  b: GPUTensorI;
+  aTranspose: boolean;
+  bTranspose: boolean;
+  alpha: number;
+  beta: number;
+}
+
+export class GemmOperation<GPUTensor extends GPUTensorI, GemmInf extends GemmInfo = GemmInfo, GemmIn extends GemmInput = GemmInput> extends Operation<GPUTensor, GemmInf, GemmIn> {
+  protected maxIterations = 1000000;
+
+  constructor(tensorConstructor: GPUTensorConstructor<GPUTensor>, allocator?: GPUMemoryAllocator) {
+    super(tensorConstructor, allocator);
   }
 
-  int m = 0;
-  int o = 0;
-  for (int i = 0; i < ${maxRank}; i++) {
-    if (i == rank-2) {
-      m = index[i];
-      o = index[i+1];
-
-      if (aTranspose == 0) {
-        ixA[i] = m;
-      } else {
-        ixA[i+1] = m;
-      }
-
-      if (bTranspose == 0) {
-        ixB[i+1] = o;
-      } else {
-        ixB[i] = o;
-      }
-
-      break;
-    }
-  }
-
-  float res = 0.0;
-
-  for (int n = 0; n < ${maxIterations}; n++) {
-    if (n >= N) {
-      break;
-    }
-    for (int i = 0; i < ${maxRank}; i++) {
-      if (i == rank-2) {
-        if (aTranspose == 0) {
-          ixA[i+1] = n;
-        } else {
-          ixA[i] = n;
+  getMainBody() {
+    return `
+      int ixA[${this.maxRank}];
+      ${this.initIndex('ixA')}
+      int ixB[${this.maxRank}];
+      ${this.initIndex('ixA')}
+      for (int i = 0; i < ${this.maxRank}; i++) {
+        if (i >= rank - 2) {
+          break;
         }
-
-        if (bTranspose == 0) {
-          ixB[i] = n;
-        } else {
-          ixB[i+1] = n;
-        }
-
-        break;
+        ixA[i] = index[i];
+        ixB[i] = index[i];
       }
+
+      int m = 0;
+      int o = 0;
+      for (int i = 0; i < ${this.maxRank}; i++) {
+        if (i == rank-2) {
+          m = index[i];
+          o = index[i+1];
+
+          if (aTranspose == 0) {
+            ixA[i] = m;
+          } else {
+            ixA[i+1] = m;
+          }
+
+          if (bTranspose == 0) {
+            ixB[i+1] = o;
+          } else {
+            ixB[i] = o;
+          }
+
+          break;
+        }
+      }
+
+      float res = 0.0;
+
+      for (int n = 0; n < ${this.maxIterations}; n++) {
+        if (n >= N) {
+          break;
+        }
+        for (int i = 0; i < ${this.maxRank}; i++) {
+          if (i == rank-2) {
+            if (aTranspose == 0) {
+              ixA[i+1] = n;
+            } else {
+              ixA[i] = n;
+            }
+
+            if (bTranspose == 0) {
+              ixB[i] = n;
+            } else {
+              ixB[i+1] = n;
+            }
+
+            break;
+          }
+        }
+        res += _A(ixA) * _B(ixB);
+      }
+
+      res = res*alpha;
+    `;
+  }
+
+  getVariables() {
+    return `
+    ${this.getVarModifier('M')} int M;
+    ${this.getVarModifier('N')} int N;
+    ${this.getVarModifier('O')} int O;
+    ${this.getVarModifier('rank')} int rank;
+    ${this.getVarModifier('aTranspose')} int aTranspose;
+    ${this.getVarModifier('bTranspose')} int bTranspose;
+    ${this.getVarModifier('alpha')} float alpha;
+    ${this.getVarModifier('beta')} float beta;
+    `;
+  }
+
+  getFragmentShader(info: GemmInfo): string {
+    return `
+    float process(int index[${this.maxRank}]) {
+      ${this.getMainBody()}
+
+      return res;
     }
-    res += _a(ixA) * _b(ixB);
+
+    ${this.getDefaultMain()}
+    `;
   }
 
-  res = res*alpha;
-`;
-
-const fragmentShader = `
-${variables}
-
-float process(int index[${maxRank}]) {
-  ${body}
-
-  return res;
-}
-
-${defaultMain}
-`;
-
-const fragmentShaderWithC = `
-${variables}
-
-float process(int index[${maxRank}]) {
-  ${body}
-
-  res += beta*_c(index);
-
-  return res;
-}
-
-${defaultMain}
-`;
-
-function initComp() {
-  const uniforms = [
-    {name: 'M'}, {name: 'N'}, {name: 'O'}, {name: 'rank'},
-    {name: 'aTranspose'}, {name: 'bTranspose'}, {name: 'alpha'}, {name: 'beta'}
-  ];
-  comp = buildComp(['a', 'b'], fragmentShader, uniforms);
-  compWithC = buildComp(['a', 'b', 'c'], fragmentShaderWithC, uniforms);
-}
-
-export function gemm(a: GPUTensor, b: GPUTensor, aTranspose: boolean, bTranspose: boolean,
-                     alpha: number, beta: number, c?: GPUTensor) {
-  if (comp === undefined) {
-    initComp();
+  getTextureNames(): string[] {
+    return ["A", "B"];
   }
 
-  const rank = a.shape.length;
+  getUniformAttrs(): Input[] {
+    return [
+      { name: "M" },
+      { name: "N" },
+      { name: "O" },
+      { name: "rank" },
+      { name: "aTranspose" },
+      { name: "bTranspose" },
+      { name: "alpha", type: "float" },
+      { name: "beta", type: "float" }
+    ];
+  }
 
-  const M = aTranspose ? a.shape[rank - 1] : a.shape[rank - 2];
-  const N = aTranspose ? a.shape[rank - 2] : a.shape[rank - 1];
-  const O = bTranspose ? b.shape[rank - 2] : b.shape[rank - 1];
+  calc(input: GemmInput): GPUTensor {
+    const rank = input.a.shape.length;
 
-  const batchShape = a.shape.slice(0, rank-2);
-  const resultShape = [...batchShape, M, O];
+    const M = input.aTranspose ? input.a.shape[rank - 1] : input.a.shape[rank - 2];
+    const N = input.aTranspose ? input.a.shape[rank - 2] : input.a.shape[rank - 1];
+    const O = input.bTranspose ? input.b.shape[rank - 2] : input.b.shape[rank - 1];
 
-  const uniforms = {
-    M, N, O, rank,
-    aTranspose: aTranspose ? 1 : 0,
-    bTranspose: bTranspose ? 1 : 0,
-    alpha, beta
-  };
+    const batchShape = input.a.shape.slice(0, rank-2);
+    const resultShape = [...batchShape, M, O];
 
-  if (c !== undefined) {
-    return compute(compWithC, resultShape, {
-      a, b, c
-    }, uniforms);
-  } else {
-    return compute(comp, resultShape, {
-      a, b
-    }, uniforms);
+    const uniforms = {
+      M, N, O, rank,
+      aTranspose: input.aTranspose ? 1 : 0,
+      bTranspose: input.bTranspose ? 1 : 0,
+      alpha: input.alpha,
+      beta: input.beta
+    };
+
+    return this.compute(resultShape, {A: input.a, B: input.b}, uniforms);
+  }
+
+  compile(info: GemmInf) {
+    //TODO
+    super.compile(info);
+  }
+}
+
+export interface GemmCInfo extends GemmInfo {
+  shapeC?: number[];
+  widthC?: number;
+  heightC?: number;
+}
+
+export interface GemmCInput extends GemmInput {
+  c: GPUTensorI;
+}
+
+export class GemmCOperation<GPUTensor extends GPUTensorI> extends GemmOperation<GPUTensor, GemmCInfo, GemmCInput> {
+  getTextureNames(): string[] {
+    return ["A", "B", "C"];
+  }
+
+  getFragmentShader(info: GemmInfo): string {
+    return `
+    float process(int index[${this.maxRank}]) {
+      ${this.getMainBody()}
+
+      res += beta*_C(index);
+
+      return res;
+    }
+
+    ${this.getDefaultMain()}
+    `;
+  }
+
+  calc(input: GemmCInput): GPUTensor {
+    const rank = input.a.shape.length;
+
+    const M = input.aTranspose ? input.a.shape[rank - 1] : input.a.shape[rank - 2];
+    const N = input.aTranspose ? input.a.shape[rank - 2] : input.a.shape[rank - 1];
+    const O = input.bTranspose ? input.b.shape[rank - 2] : input.b.shape[rank - 1];
+
+    const batchShape = input.a.shape.slice(0, rank-2);
+    const resultShape = [...batchShape, M, O];
+
+    const uniforms = {
+      M, N, O, rank,
+      aTranspose: input.aTranspose ? 1 : 0,
+      bTranspose: input.bTranspose ? 1 : 0,
+      alpha: input.alpha,
+      beta: input.beta
+    };
+
+    return this.compute(resultShape, {A: input.a, B: input.b, C: input.c}, uniforms);
   }
 }

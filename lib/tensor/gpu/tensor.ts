@@ -7,7 +7,6 @@ import { sqrt } from '../../ops/gpu/sqrt';
 import { MatMulOperation } from '../../ops/gpu/matmul';
 import { defaultAllocator, gl } from './gl';
 import { MemoryEntry } from './memory';
-import { gemm } from '../../ops/gpu/gemm';
 import { transpose } from '../../ops/gpu/transpose';
 import { power } from '../../ops/gpu/power';
 import { repeat } from '../../ops/gpu/repeat';
@@ -41,6 +40,7 @@ import { ConcatOperation } from '../../ops/gpu/concat';
 import { CopyOperation } from '../../ops/gpu/copy';
 import { ExpandOperation } from '../../ops/gpu/expand';
 import { GatherOperation } from '../../ops/gpu/gather';
+import { GemmCOperation, GemmOperation } from '../../ops/gpu/gemm';
 
 
 export class GPUTensor extends Tensor implements GPUTensorI {
@@ -182,7 +182,11 @@ export class GPUTensor extends Tensor implements GPUTensorI {
     if (!(b instanceof GPUTensor && (c === undefined || c instanceof GPUTensor))) {
       throw new Error('Can only do gemm with CPU tensors');
     }
-    return gemm(this, b, aTranspose, bTranspose, alpha, beta, c as GPUTensor);
+    if (c === undefined) {
+      return defaultGemm.calc({a: this, b, aTranspose, bTranspose, alpha, beta});
+    } else {
+      return defaultGemmC.calc({a: this, b, c: c as GPUTensor, aTranspose, bTranspose, alpha, beta});
+    }
   }
 
   sum_impl(axes: number[], keepDims: boolean): Tensor {
@@ -306,6 +310,8 @@ export class GPUTensor extends Tensor implements GPUTensorI {
 const constructor: GPUTensorConstructor<GPUTensor> = (a: MemoryEntry,b: readonly number[]) => new GPUTensor(a,b);
 
 const defaultMatMul = new MatMulOperation(constructor);
+const defaultGemm = new GemmOperation(constructor);
+const defaultGemmC = new GemmCOperation(constructor);
 
 //Unary operations
 const defaultExp = new ExpOperation(constructor);
