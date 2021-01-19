@@ -17,7 +17,6 @@ import { copy } from '../../ops/gpu/copy';
 import { padOp } from '../../ops/gpu/pad';
 import { CPUTensor } from '../cpu/tensor';
 import { gather } from '../../ops/gpu/gather';
-import { floor } from '../../ops/gpu/floor';
 import { slice } from '../../ops/gpu/slice';
 import { upsample } from '../../ops/gpu/upsample';
 import REGL from 'regl';
@@ -41,6 +40,7 @@ import { MaxOperation } from '../../ops/gpu/max';
 import { MinOperation } from '../../ops/gpu/min';
 import { CeilOperation } from '../../ops/gpu/ceil';
 import { ClipOperation } from '../../ops/gpu/clip';
+import { FloorOperation } from '../../ops/gpu/floor';
 
 
 export class GPUTensor extends Tensor implements GPUTensorI {
@@ -129,7 +129,7 @@ export class GPUTensor extends Tensor implements GPUTensorI {
   }
 
   floor(): Tensor {
-    return floor(this);
+    return defaultFloor.calc({input: this});
   }
 
   ceil(): Tensor {
@@ -306,15 +306,26 @@ export class GPUTensor extends Tensor implements GPUTensorI {
 const constructor: GPUTensorConstructor<GPUTensor> = (a: MemoryEntry,b: readonly number[]) => new GPUTensor(a,b);
 
 const defaultMatMul = new MatMulOperation(constructor);
+
+//Unary operations
 const defaultExp = new ExpOperation(constructor);
+const defaultAbs = new AbsOperation(constructor);
+const defaultCeil = new CeilOperation(constructor);
+const defaultFloor = new FloorOperation(constructor);
+const defaultClip = new ClipOperation(constructor);
+
+//Convolutions
 const defaultConv = new ConvOperation(constructor);
 const defaultAveragePool = new AveragePoolOperation(constructor);
 const defaultConvBias = new ConvBiasOperation(constructor);
-const defaultAbs = new AbsOperation(constructor);
+
+//Binary operations
 const defaultAdd = new AddOperation(constructor);
 const defaultSubtract = new SubtractOperation(constructor);
 const defaultMultiply = new MultiplyOperation(constructor);
 const defaultDivide = new DivideOperation(constructor);
+
+//Reductions
 const defaultMean = new ReduceMeanOperation(constructor);
 const defaultMeanSquare = new ReduceMeanSquareOperation(constructor);
 const defaultSumSquare = new SumSquareOperation(constructor);
@@ -322,5 +333,3 @@ const defaultSum = new SumOperation(constructor);
 const defaultProduct = new ProductOperation(constructor);
 const defaultMax = new MaxOperation(constructor);
 const defaultMin = new MinOperation(constructor);
-const defaultCeil = new CeilOperation(constructor);
-const defaultClip = new ClipOperation(constructor);
