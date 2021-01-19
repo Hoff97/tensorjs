@@ -1,126 +1,134 @@
-import { DrawCommand } from "regl";
-import { GPUTensor } from "../../tensor/gpu/tensor";
+import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
+import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
 import { PadMode } from "../../types";
-import { buildComp, compute, copyPad, defaultMain, initIndex, maxRank } from "./util";
+import { Input, Operation } from "./operation";
 
-let compConst: DrawCommand;
-let compReflect: DrawCommand;
-let compEdge: DrawCommand;
 
-const fragmentShaderConst = `
-uniform int pads[${maxRank*2}];
-uniform float value;
+export interface PadInfo {
+  shapeX?: number[];
+  widthX?: number;
+  heightX?: number;
+  shapeOutput?: number[],
+  widthOutput?: number;
+  heightOutput?: number;
 
-float process(int index[${maxRank}]) {
-  float res = value;
-  int inputIx[${maxRank}];
-  ${initIndex('inputIx')}
-  int outOfBounds = 0;
-  for (int i = 0; i < ${maxRank}; i++) {
-    if (index[i] == -1) {
-      break;
-    }
-    inputIx[i] = index[i] - pads[i];
-    if (inputIx[i] < 0 || inputIx[i] >= shapex[i]) {
-      outOfBounds = 1;
-      break;
-    }
-  }
-
-  if (outOfBounds == 0) {
-    res = _x(inputIx);
-  }
-
-  return res;
+  pads?: number;
+  mode?: PadMode | number;
+  value?: number;
 }
 
-${defaultMain}
-`;
-
-const fragmentShaderReflect = `
-uniform int pads[${maxRank*2}];
-
-float process(int index[${maxRank}]) {
-  int inputIx[${maxRank}];
-  ${initIndex('inputIx')}
-  for (int i = 0; i < ${maxRank}; i++) {
-    if (index[i] == -1) {
-      break;
-    }
-    inputIx[i] = index[i] - pads[i];
-    if (inputIx[i] < 0) {
-      inputIx[i] = -inputIx[i];
-    } else if (inputIx[i] >= shapex[i]) {
-      inputIx[i] = 2*shapex[i] - inputIx[i] - 2;
-    }
-  }
-
-  return _x(inputIx);
+export interface PadInput {
+  input: GPUTensorI;
+  pads: number[];
+  mode: PadMode;
+  value: number;
 }
 
-${defaultMain}
-`;
+export class PadOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTensor, PadInfo, PadInput> {
+  constructor(tensorConstructor: GPUTensorConstructor<GPUTensor>, allocator?: GPUMemoryAllocator) {
+    super(tensorConstructor, allocator);
+  }
 
-const fragmentShaderEdge = `
-uniform int pads[${maxRank*2}];
+  getFragmentShader(info: PadInfo): string {
+    return `
+    float process(int index[${this.maxRank}]) {
+      int inputIx[${this.maxRank}];
+      ${this.initIndex('inputIx')}
+      if (mode == 0) {
+        float res = value;
 
-float process(int index[${maxRank}]) {
-  int inputIx[${maxRank}];
-  ${initIndex('inputIx')}
-  for (int i = 0; i < ${maxRank}; i++) {
-    if (index[i] == -1) {
-      break;
+        int outOfBounds = 0;
+        for (int i = 0; i < ${this.maxRank}; i++) {
+          if (index[i] == -1) {
+            break;
+          }
+          inputIx[i] = index[i] - pads[i];
+          if (inputIx[i] < 0 || inputIx[i] >= shapeX[i]) {
+            outOfBounds = 1;
+            break;
+          }
+        }
+
+        if (outOfBounds == 0) {
+          res = _X(inputIx);
+        }
+
+        return res;
+      } else if (mode == 1) {
+        for (int i = 0; i < ${this.maxRank}; i++) {
+          if (index[i] == -1) {
+            break;
+          }
+          inputIx[i] = index[i] - pads[i];
+          if (inputIx[i] < 0) {
+            inputIx[i] = -inputIx[i];
+          } else if (inputIx[i] >= shapeX[i]) {
+            inputIx[i] = 2*shapeX[i] - inputIx[i] - 2;
+          }
+        }
+
+        return _X(inputIx);
+      } else {
+        for (int i = 0; i < ${this.maxRank}; i++) {
+          if (index[i] == -1) {
+            break;
+          }
+          inputIx[i] = index[i] - pads[i];
+          if (inputIx[i] < 0) {
+            inputIx[i] = 0;
+          } else if (inputIx[i] >= shapeX[i]) {
+            inputIx[i] = shapeX[i] - 1;
+          }
+        }
+
+        return _X(inputIx);
+      }
     }
-    inputIx[i] = index[i] - pads[i];
-    if (inputIx[i] < 0) {
-      inputIx[i] = 0;
-    } else if (inputIx[i] >= shapex[i]) {
-      inputIx[i] = shapex[i] - 1;
+
+    ${this.getDefaultMain()}
+    `;
+  }
+
+  getTextureNames(): string[] {
+    return ["X"];
+  }
+
+  getVariables() {
+    return `
+    ${this.getVarModifier('pads')} int pads[${this.maxRank*2}];
+    ${this.getVarModifier('value')} float value;
+    ${this.getVarModifier('mode')} int mode;
+    `;
+  }
+
+  getUniformAttrs(): Input[] {
+    return [
+      { name: "value", type: "float" },
+      { name: "pads", length: this.maxRank*2 },
+      { name: "mode" }
+    ];
+  }
+
+  calc(input: PadInput): GPUTensor {
+    const rank = input.input.shape.length;
+
+    const resultShape = [...input.input.shape];
+    for (let i = 0; i < rank; i++) {
+      resultShape[i] += input.pads[i] + input.pads[i+rank];
     }
-  }
 
-  return _x(inputIx);
-}
-
-${defaultMain}
-`;
-
-function initComp() {
-  compConst = buildComp(['x'], fragmentShaderConst, [{name: 'pads', length: 2*maxRank}, {name: 'value'}]);
-  compReflect = buildComp(['x'], fragmentShaderReflect, [{name: 'pads', length: 2*maxRank}]);
-  compEdge = buildComp(['x'], fragmentShaderEdge, [{name: 'pads', length: 2*maxRank}]);
-}
-
-export function padOp(tensor: GPUTensor, pads: number[], mode: PadMode, value: number) {
-  if (compConst === undefined) {
-    initComp();
-  }
-
-  const rank = tensor.shape.length;
-
-  const resultShape = [...tensor.shape];
-  for (let i = 0; i < rank; i++) {
-    resultShape[i] += pads[i] + pads[i+rank];
-  }
-
-  if (mode === 'constant') {
-    return compute(compConst, resultShape, {
-      x: tensor,
-    }, {
-      pads: copyPad(pads, maxRank*2),
-      value
+    return this.compute(resultShape, {X: input.input}, {
+      pads: this.copyPad(input.pads, this.maxRank*2),
+      value: input.value,
+      mode: input.mode === "constant" ? 0 : input.mode === "reflect" ? 1 : 2
     });
-  } else if (mode === 'reflect') {
-    return compute(compReflect, resultShape, {
-      x: tensor,
-    }, {
-      pads: copyPad(pads, maxRank*2)
-    });
-  } else {
-    return compute(compEdge, resultShape, {
-      x: tensor,
-    }, {
-      pads: copyPad(pads, maxRank*2)
-    });
+  }
+
+  compile(info: PadInfo) {
+    if (info.shapeX !== undefined) {
+      this.maxRank = info.shapeX.length;
+    }
+
+    super.compile(info);
   }
 }

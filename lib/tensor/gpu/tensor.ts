@@ -5,7 +5,6 @@ import { compareShapes, getSize } from '../../util/shape';
 import { MatMulOperation } from '../../ops/gpu/matmul';
 import { defaultAllocator, gl } from './gl';
 import { MemoryEntry } from './memory';
-import { padOp } from '../../ops/gpu/pad';
 import { CPUTensor } from '../cpu/tensor';
 import { slice } from '../../ops/gpu/slice';
 import { upsample } from '../../ops/gpu/upsample';
@@ -41,6 +40,7 @@ import { SqrtOperation } from '../../ops/gpu/sqrt';
 import { LogOperation } from '../../ops/gpu/log';
 import { TransposeOperation } from '../../ops/gpu/transpose';
 import { RepeatOperation } from '../../ops/gpu/repeat';
+import { PadOperation } from '../../ops/gpu/pad';
 
 
 export class GPUTensor extends Tensor implements GPUTensorI {
@@ -284,7 +284,7 @@ export class GPUTensor extends Tensor implements GPUTensorI {
   }
 
   pad_impl(pads: number[], mode: PadMode, value: number): Tensor {
-    return padOp(this, pads, mode, value);
+    return defaultPad.calc({input: this, pads, mode, value});
   }
 
   gather(axis: number, indices: CPUTensor): Tensor {
@@ -326,6 +326,7 @@ const defaultLog = new LogOperation(constructor);
 const defaultConv = new ConvOperation(constructor);
 const defaultAveragePool = new AveragePoolOperation(constructor);
 const defaultConvBias = new ConvBiasOperation(constructor);
+const defaultPad = new PadOperation(constructor);
 
 //Binary operations
 const defaultAdd = new AddOperation(constructor);
