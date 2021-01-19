@@ -19,7 +19,6 @@ import { padOp } from '../../ops/gpu/pad';
 import { CPUTensor } from '../cpu/tensor';
 import { gather } from '../../ops/gpu/gather';
 import { floor } from '../../ops/gpu/floor';
-import { ceil } from '../../ops/gpu/ceil';
 import { slice } from '../../ops/gpu/slice';
 import { upsample } from '../../ops/gpu/upsample';
 import REGL from 'regl';
@@ -41,6 +40,7 @@ import { SumOperation } from '../../ops/gpu/sum';
 import { ProductOperation } from '../../ops/gpu/product';
 import { MaxOperation } from '../../ops/gpu/max';
 import { MinOperation } from '../../ops/gpu/min';
+import { CeilOperation } from '../../ops/gpu/ceil';
 
 
 export class GPUTensor extends Tensor implements GPUTensorI {
@@ -133,7 +133,7 @@ export class GPUTensor extends Tensor implements GPUTensorI {
   }
 
   ceil(): Tensor {
-    return ceil(this);
+    return defaultCeil.calc({input: this})
   }
 
   add_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor {
@@ -322,3 +322,4 @@ const defaultSum = new SumOperation(constructor);
 const defaultProduct = new ProductOperation(constructor);
 const defaultMax = new MaxOperation(constructor);
 const defaultMin = new MinOperation(constructor);
+const defaultCeil = new CeilOperation(constructor);
