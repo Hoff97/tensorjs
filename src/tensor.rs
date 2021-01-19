@@ -159,12 +159,16 @@ impl Tensor {
         let result_strides = compute_strides(&result_shape);
         let mut values = vec![0.0; result_size];
 
+        let self_strides = compute_strides_no_zero(&self.shape);
 
-        let step_size = self.strides[axes[axes.len() - 1]];
+        let step_size = self_strides[axes[axes.len() - 1]];
         let cont_size = step_size;
 
 
-        let input_ix_step_size = if axes[0] > 0 { self.strides[axes[0]-1] } else { self.size };
+        let mut input_ix_step_size = if axes[0] > 0 { self_strides[axes[0]-1] } else { self.size };
+        if input_ix_step_size == 0 {
+            input_ix_step_size = 1;
+        }
         let num_input_steps = self.size/input_ix_step_size;
 
         let mut input_start_ix;
