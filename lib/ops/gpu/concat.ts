@@ -1,47 +1,88 @@
-import { DrawCommand } from "regl";
-import { GPUTensor } from "../../tensor/gpu/tensor";
-import { buildComp, compute, defaultMain, maxRank } from "./util";
+import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
+import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
+import { Input, Operation } from "./operation";
 
-let comp: DrawCommand;
 
-const fragmentShader = `
-uniform int axis;
+export interface ConcatInfo {
+  shapeA?: number[];
+  widthA?: number;
+  heightA?: number;
 
-float process(int index[${maxRank}]) {
-  float res = 0.0;
-  for (int i = 0; i < ${maxRank}; i++) {
-    if (i == axis) {
-      if (index[i] >= shapeinputTensor1[i]) {
-        index[i] = index[i] - shapeinputTensor1[i];
-        res += _inputTensor2(index);
-      } else {
-        res += _inputTensor1(index);
+  shapeB?: number[];
+  widthB?: number;
+  heightB?: number;
+
+  shapeOutput?: number[],
+  widthOutput?: number;
+  heightOutput?: number;
+
+  axis: number;
+}
+
+export interface ConcatInput {
+  A: GPUTensorI;
+  B: GPUTensorI;
+  axis: number;
+}
+
+export class ConcatOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTensor, ConcatInfo, ConcatInput> {
+  constructor(tensorConstructor: GPUTensorConstructor<GPUTensor>, allocator?: GPUMemoryAllocator) {
+    super(tensorConstructor, allocator);
+  }
+
+  getVariables() {
+    return `
+    ${this.getVarModifier('axis')} int axis;
+    `;
+  }
+
+  getUniformAttrs(): Input[] {
+    return [
+      { name: "axis"}
+    ];
+  }
+
+  getFragmentShader(info: ConcatInfo): string {
+    return `
+    float process(int index[${this.maxRank}]) {
+      float res = 0.0;
+      for (int i = 0; i < ${this.maxRank}; i++) {
+        if (i == axis) {
+          if (index[i] >= shapeA[i]) {
+            index[i] = index[i] - shapeA[i];
+            res += _B(index);
+          } else {
+            res += _A(index);
+          }
+          break;
+        }
       }
-      break;
+      return res;
     }
-  }
-  return res;
-}
 
-${defaultMain}
-`;
-
-function initComp() {
-  comp = buildComp(['inputTensor1', 'inputTensor2'], fragmentShader, [{name: 'axis'}]);
-}
-
-export function concat(tensor1: GPUTensor, tensor2: GPUTensor, axis: number) {
-  if (comp === undefined) {
-    initComp();
+    ${this.getDefaultMain()}
+    `;
   }
 
-  const outputShape = [...tensor1.shape];
-  outputShape[axis] += tensor2.shape[axis];
+  getTextureNames(): string[] {
+    return ["A", "B"];
+  }
 
-  return compute(comp, outputShape, {
-    inputTensor1: tensor1,
-    inputTensor2: tensor2
-  }, {
-    axis
-  });
+  calc(input: ConcatInput): GPUTensor {
+    const outputShape = [...input.A.shape];
+    outputShape[input.axis] += input.B.shape[input.axis];
+
+    return this.compute(outputShape, {A: input.A, B: input.B}, {axis: input.axis});
+  }
+
+  compile(info: ConcatInfo) {
+    if (info.shapeA !== undefined) {
+      this.maxRank = info.shapeA.length;
+    }
+    if (info.shapeB !== undefined) {
+      this.maxRank = info.shapeB.length;
+    }
+
+    super.compile(info);
+  }
 }

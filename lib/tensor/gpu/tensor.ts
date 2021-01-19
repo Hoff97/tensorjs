@@ -7,13 +7,11 @@ import { sqrt } from '../../ops/gpu/sqrt';
 import { MatMulOperation } from '../../ops/gpu/matmul';
 import { defaultAllocator, gl } from './gl';
 import { MemoryEntry } from './memory';
-import { concat } from '../../ops/gpu/concat';
 import { gemm } from '../../ops/gpu/gemm';
 import { transpose } from '../../ops/gpu/transpose';
 import { power } from '../../ops/gpu/power';
 import { repeat } from '../../ops/gpu/repeat';
 import { expand } from '../../ops/gpu/expand';
-import { copy } from '../../ops/gpu/copy';
 import { padOp } from '../../ops/gpu/pad';
 import { CPUTensor } from '../cpu/tensor';
 import { gather } from '../../ops/gpu/gather';
@@ -41,6 +39,8 @@ import { MinOperation } from '../../ops/gpu/min';
 import { CeilOperation } from '../../ops/gpu/ceil';
 import { ClipOperation } from '../../ops/gpu/clip';
 import { FloorOperation } from '../../ops/gpu/floor';
+import { ConcatOperation } from '../../ops/gpu/concat';
+import { CopyOperation } from '../../ops/gpu/copy';
 
 
 export class GPUTensor extends Tensor implements GPUTensorI {
@@ -109,7 +109,7 @@ export class GPUTensor extends Tensor implements GPUTensorI {
   }
 
   copy(): Tensor {
-    return copy(this);
+    return defaultCopy.calc({input: this});
   }
 
   exp(): Tensor {
@@ -246,7 +246,7 @@ export class GPUTensor extends Tensor implements GPUTensorI {
 
   reshape_impl(shape: number[], _copy: boolean): Tensor {
     if (_copy) {
-      return copy(this, shape);
+      return defaultCopy.calc({input: this, outputShape: shape});
     } else {
       return new GPUTensor(this.memory, shape);
     }
@@ -256,7 +256,7 @@ export class GPUTensor extends Tensor implements GPUTensorI {
     if (!(tensor instanceof GPUTensor)) {
       throw new Error('Can only concat GPU tensor to GPU tensor');
     }
-    return concat(this, tensor, axis);
+    return defaultConcat.calc({A: this, B: tensor, axis});
   }
 
   transpose_impl(permutation: number[]): Tensor {
@@ -333,3 +333,7 @@ const defaultSum = new SumOperation(constructor);
 const defaultProduct = new ProductOperation(constructor);
 const defaultMax = new MaxOperation(constructor);
 const defaultMin = new MinOperation(constructor);
+
+//Util
+const defaultConcat = new ConcatOperation(constructor);
+const defaultCopy = new CopyOperation(constructor);
