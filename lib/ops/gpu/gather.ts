@@ -1,104 +1,143 @@
-import { DrawCommand } from "regl";
 import { CPUTensor } from "../../tensor/cpu/tensor";
-import { GPUTensor } from "../../tensor/gpu/tensor";
+import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
+import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
 import { computeStrides } from "../../util/shape";
-import { buildComp, compute, copyPad, defaultMain, maxRank, pad } from "./util";
+import { Input, Operation } from "./operation";
 
-let comp: DrawCommand;
 
-const gatherMaxIxSize = 10;
+export interface GatherInfo {
+  shapeX?: number[];
+  widthX?: number;
+  heightX?: number;
 
-const fragmentShader = `
-uniform int axis;
-uniform int indexValues[${gatherMaxIxSize}];
+  shapeOutput?: number[],
+  widthOutput?: number;
+  heightOutput?: number;
 
-uniform int mappedIndexStrides[${maxRank}];
-uniform int mappedInputStrides[${maxRank}];
-
-float process(int index[${maxRank}]) {
-  int inputPos = 0;
-  int indexPos = 0;
-
-  int strideAxis = 0;
-  for (int i = 0; i < ${maxRank}; i++) {
-    if (index[i] == -1) {
-      break;
-    }
-    if (i == axis) {
-      strideAxis = stridesx[i];
-    }
-    inputPos += mappedInputStrides[i]*index[i];
-    indexPos += mappedIndexStrides[i]*index[i];
-  }
-
-  for (int i = 0; i < ${gatherMaxIxSize}; i++) {
-    if (i == indexPos) {
-      inputPos += indexValues[i]*strideAxis;
-      break;
-    }
-  }
-
-  return getValueAtPos(inputPos, widthx, heightx, x);
+  axis?: number;
+  indexValues?: number[];
+  mappedInputStrides?: number[];
+  mappedIndexStrides?: number[];
 }
 
-${defaultMain}
-`;
-
-function initComp() {
-  comp = buildComp(['x'], fragmentShader, [
-    {name: 'axis'},
-    {name: 'indexValues', length: gatherMaxIxSize},
-    {name: 'mappedInputStrides', length: maxRank},
-    {name: 'mappedIndexStrides', length: maxRank}
-  ]);
+export interface GatherInput {
+  X: GPUTensorI;
+  indices: CPUTensor;
+  axis: number;
 }
 
-export function gather(x: GPUTensor, axis: number, indices: CPUTensor) {
-  if (indices.size > gatherMaxIxSize) {
-    throw new Error(`Gather on GPU can deal with at most ${gatherMaxIxSize} indices, input had ${indices.size}`);
+export class GatherOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTensor, GatherInfo, GatherInput> {
+  protected gatherMaxIxSize = 10;
+
+  constructor(tensorConstructor: GPUTensorConstructor<GPUTensor>, allocator?: GPUMemoryAllocator) {
+    super(tensorConstructor, allocator);
   }
 
-  if (comp === undefined) {
-    initComp();
+  getVariables() {
+    return `
+    ${this.getVarModifier('axis')} int axis;
+    ${this.getVarModifier('indexValues')} int indexValues[${this.gatherMaxIxSize}];
+
+    ${this.getVarModifier('mappedIndexStrides')} int mappedIndexStrides[${this.maxRank}];
+    ${this.getVarModifier('mappedInputStrides')} int mappedInputStrides[${this.maxRank}];
+    `;
   }
 
-  const r = x.shape.length;
-  const q = indices.shape.length;
-
-  const inputStrides = computeStrides(x.shape);
-  const indexStrides = computeStrides(indices.shape);
-
-  const resultRank = r + q - 1;
-  const resultShape = new Array(resultRank);
-
-  const mappedInputStrides = new Array(resultRank).fill(0);
-  const mappedIndexStrides = new Array(resultRank).fill(0);
-
-  for (let i = 0; i < axis; i++) {
-    resultShape[i] = x.shape[i];
-    mappedInputStrides[i] = inputStrides[i];
-
-    mappedIndexStrides[i] = 0;
-  }
-  for (let i = 0; i < q; i++) {
-    resultShape[i + axis] = indices.shape[i];
-    mappedIndexStrides[i + axis] = indexStrides[i];
-
-    mappedInputStrides[i + axis] = 0;
-  }
-  for (let i = axis + 1; i < r; i++) {
-    resultShape[i + q - 1] = x.shape[i];
-    mappedInputStrides[i + q - 1] = inputStrides[i];
-
-    mappedIndexStrides[i + q - 1] = 0;
+  getUniformAttrs(): Input[] {
+    return [
+      { name: "axis" },
+      { name: "indexValues", length: this.gatherMaxIxSize },
+      { name: "mappedInputStrides", length: this.maxRank },
+      { name: "mappedIndexStrides", length: this.maxRank }
+    ];
   }
 
-  return compute(comp, resultShape, {
-    x: x
-  }, {
-    axis,
-    indexValues: pad(Array.from(indices.values), gatherMaxIxSize),
-    mappedInputStrides: pad(mappedInputStrides),
-    mappedIndexStrides: pad(mappedIndexStrides)
-  });
+  getFragmentShader(info: GatherInfo): string {
+    return `
+    float process(int index[${this.maxRank}]) {
+      int inputPos = 0;
+      int indexPos = 0;
+
+      int strideAxis = 0;
+      for (int i = 0; i < ${this.maxRank}; i++) {
+        if (index[i] == -1) {
+          break;
+        }
+        if (i == axis) {
+          strideAxis = stridesX[i];
+        }
+        inputPos += mappedInputStrides[i]*index[i];
+        indexPos += mappedIndexStrides[i]*index[i];
+      }
+
+      for (int i = 0; i < ${this.gatherMaxIxSize}; i++) {
+        if (i == indexPos) {
+          inputPos += indexValues[i]*strideAxis;
+          break;
+        }
+      }
+
+      return getValueAtPos(inputPos, widthX, heightX, X);
+    }
+
+    ${this.getDefaultMain()}
+    `;
+  }
+
+  getTextureNames(): string[] {
+    return ["X"];
+  }
+
+  calc(input: GatherInput): GPUTensor {
+    if (input.indices.size > this.gatherMaxIxSize) {
+      throw new Error(`Gather on GPU can deal with at most ${this.gatherMaxIxSize} indices, input had ${input.indices.size}`);
+    }
+
+    const r = input.X.shape.length;
+    const q = input.indices.shape.length;
+
+    const inputStrides = computeStrides(input.X.shape);
+    const indexStrides = computeStrides(input.indices.shape);
+
+    const resultRank = r + q - 1;
+    const resultShape = new Array(resultRank);
+
+    const mappedInputStrides = new Array(resultRank).fill(0);
+    const mappedIndexStrides = new Array(resultRank).fill(0);
+
+    for (let i = 0; i < input.axis; i++) {
+      resultShape[i] = input.X.shape[i];
+      mappedInputStrides[i] = inputStrides[i];
+
+      mappedIndexStrides[i] = 0;
+    }
+    for (let i = 0; i < q; i++) {
+      resultShape[i + input.axis] = input.indices.shape[i];
+      mappedIndexStrides[i + input.axis] = indexStrides[i];
+
+      mappedInputStrides[i + input.axis] = 0;
+    }
+    for (let i = input.axis + 1; i < r; i++) {
+      resultShape[i + q - 1] = input.X.shape[i];
+      mappedInputStrides[i + q - 1] = inputStrides[i];
+
+      mappedIndexStrides[i + q - 1] = 0;
+    }
+
+    return this.compute(resultShape, {X: input.X}, {
+      axis: input.axis,
+      indexValues: this.pad(Array.from(input.indices.values), this.gatherMaxIxSize),
+      mappedInputStrides: this.pad(mappedInputStrides),
+      mappedIndexStrides: this.pad(mappedIndexStrides)
+    })
+  }
+
+  compile(info: GatherInfo) {
+    if (info.shapeX !== undefined) {
+      this.maxRank = info.shapeX.length;
+    }
+    // TODO!
+
+    super.compile(info);
+  }
 }

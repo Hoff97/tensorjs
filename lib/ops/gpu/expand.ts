@@ -1,27 +1,50 @@
-import { DrawCommand } from "regl";
-import { GPUTensor } from "../../tensor/gpu/tensor";
-import { buildComp, compute, defaultMain, maxRank } from "./util";
+import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
+import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
+import { Operation } from "./operation";
 
-let comp: DrawCommand;
 
-const fragmentShader = `
-float process(int index[${maxRank}]) {
-  return _x(index);
+export interface ExpandInfo {
+  shapeX?: number[];
+  widthX?: number;
+  heightX?: number;
+  shapeOutput?: number[],
+  widthOutput?: number;
+  heightOutput?: number;
 }
 
-${defaultMain}
-`;
-
-function initComp() {
-  comp = buildComp(['x'], fragmentShader);
+export interface ExpandInput {
+  input: GPUTensorI;
+  outputShape: readonly number[];
 }
 
-export function expand(tensor: GPUTensor, resultShape: readonly number[]) {
-  if (comp === undefined) {
-    initComp();
+export class ExpandOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTensor, ExpandInfo, ExpandInput> {
+  constructor(tensorConstructor: GPUTensorConstructor<GPUTensor>, allocator?: GPUMemoryAllocator) {
+    super(tensorConstructor, allocator);
   }
 
-  return compute(comp, resultShape, {
-    x: tensor,
-  });
+  getFragmentShader(info: ExpandInfo): string {
+    return `
+    float process(int index[${this.maxRank}]) {
+      return _X(index);
+    }
+
+    ${this.getDefaultMain()}
+    `;
+  }
+
+  getTextureNames(): string[] {
+    return ["X"];
+  }
+
+  calc(input: ExpandInput): GPUTensor {
+    return this.compute(input.outputShape, {X: input.input})
+  }
+
+  compile(info: ExpandInfo) {
+    if (info.shapeX !== undefined) {
+      this.maxRank = info.shapeX.length;
+    }
+
+    super.compile(info);
+  }
 }

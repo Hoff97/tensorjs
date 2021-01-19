@@ -11,10 +11,8 @@ import { gemm } from '../../ops/gpu/gemm';
 import { transpose } from '../../ops/gpu/transpose';
 import { power } from '../../ops/gpu/power';
 import { repeat } from '../../ops/gpu/repeat';
-import { expand } from '../../ops/gpu/expand';
 import { padOp } from '../../ops/gpu/pad';
 import { CPUTensor } from '../cpu/tensor';
-import { gather } from '../../ops/gpu/gather';
 import { slice } from '../../ops/gpu/slice';
 import { upsample } from '../../ops/gpu/upsample';
 import REGL from 'regl';
@@ -41,6 +39,8 @@ import { ClipOperation } from '../../ops/gpu/clip';
 import { FloorOperation } from '../../ops/gpu/floor';
 import { ConcatOperation } from '../../ops/gpu/concat';
 import { CopyOperation } from '../../ops/gpu/copy';
+import { ExpandOperation } from '../../ops/gpu/expand';
+import { GatherOperation } from '../../ops/gpu/gather';
 
 
 export class GPUTensor extends Tensor implements GPUTensorI {
@@ -276,7 +276,7 @@ export class GPUTensor extends Tensor implements GPUTensorI {
     if (compareShapes(this.shape, resultShape)) {
       return this.copy();
     }
-    return expand(this.reshape(_shape, false) as GPUTensor, resultShape);
+    return defaultExpand.calc({input: this.reshape(_shape, false) as GPUTensor, outputShape: resultShape});
   }
 
   pad_impl(pads: number[], mode: PadMode, value: number): Tensor {
@@ -284,7 +284,7 @@ export class GPUTensor extends Tensor implements GPUTensorI {
   }
 
   gather(axis: number, indices: CPUTensor): Tensor {
-    return gather(this, axis, indices);
+    return defaultGather.calc({X: this, axis, indices});
   }
 
   slice_impl(starts: number[], ends: number[], axes: number[]): Tensor {
@@ -337,3 +337,5 @@ const defaultMin = new MinOperation(constructor);
 //Util
 const defaultConcat = new ConcatOperation(constructor);
 const defaultCopy = new CopyOperation(constructor);
+const defaultExpand = new ExpandOperation(constructor);
+const defaultGather = new GatherOperation(constructor);
