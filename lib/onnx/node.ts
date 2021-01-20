@@ -1,6 +1,11 @@
 import Long from "long";
 import { onnx } from "onnx-proto";
 import { Tensor } from "../library";
+import { PrototypeTensor } from "../tensor/cpu/prototype";
+import { CPUTensor } from "../tensor/cpu/tensor";
+import { defaultAllocator } from "../tensor/gpu/gl";
+import { GPUMemoryAllocator, MemoryEntry } from "../tensor/gpu/memory";
+import { GPUTensor } from "../tensor/gpu/tensor";
 import { Attributes, Constants } from "./types";
 
 export abstract class OnnxNode {
@@ -10,6 +15,8 @@ export abstract class OnnxNode {
   public outputs: string[];
 
   public variableInputs: number;
+
+  protected allocator = defaultAllocator;
 
   constructor(attributes: Attributes, inputs: string[], outputs: string[], constants: Constants, onnxVersion: number) {
     for (let i = 0; i < attributes.length; i++) {
@@ -90,9 +97,34 @@ export abstract class OnnxNode {
     return undefined;
   }
 
+  setAllocator(allocator: GPUMemoryAllocator) {
+    this.allocator = allocator;
+  }
+
   async toCPU() {}
   async toWASM() {}
   async toGPU() {}
 
   abstract forward(inputs: Tensor[]): Promise<Tensor[]>;
+
+  allStaticCPU(inputs: Tensor[]) {
+    return inputs.every(x => x instanceof CPUTensor && x.values !== null);
+  }
+
+  getMemoryEntries(inputs: Tensor[]): MemoryEntry[] {
+    const res = inputs.every(x => (x instanceof PrototypeTensor && x.memory !== undefined) || (x instanceof GPUTensor && x.memory !== undefined));
+    if (!res) {
+      throw new Error('Not all tensors are tensors with gpu memory attached')
+    }
+    return inputs.map(x => (x as any).memory);
+  }
+
+  async defaultStaticForward(inputs: Tensor[]): Promise<{outputs: CPUTensor[]}> {
+    const outputs = await this.forward(inputs);
+    return {outputs: outputs as CPUTensor[]};
+  }
+
+  abstract staticForward(inputs: Tensor[], compile: boolean): Promise<{outputs: (CPUTensor | PrototypeTensor)[]}>;
+
+  abstract initializeForCompiling(): void;
 }
