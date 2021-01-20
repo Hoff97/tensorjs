@@ -307,49 +307,49 @@ export class GPUTensor extends Tensor implements GPUTensorI {
   }
 }
 
-const constructor: GPUTensorConstructor<GPUTensor> = (a: MemoryEntry,b: readonly number[]) => new GPUTensor(a,b);
+export const gpuConstructor: GPUTensorConstructor<GPUTensor> = (a: MemoryEntry,b: readonly number[]) => new GPUTensor(a,b);
 
-const defaultMatMul = new MatMulOperation(constructor);
-const defaultGemm = new GemmOperation(constructor);
-const defaultGemmC = new GemmCOperation(constructor);
+const defaultMatMul = new MatMulOperation(gpuConstructor);
+const defaultGemm = new GemmOperation(gpuConstructor);
+const defaultGemmC = new GemmCOperation(gpuConstructor);
 
 //Unary operations
-const defaultExp = new ExpOperation(constructor);
-const defaultAbs = new AbsOperation(constructor);
-const defaultCeil = new CeilOperation(constructor);
-const defaultFloor = new FloorOperation(constructor);
-const defaultClip = new ClipOperation(constructor);
-const defaultSqrt = new SqrtOperation(constructor);
-const defaultLog = new LogOperation(constructor);
+const defaultExp = new ExpOperation(gpuConstructor);
+const defaultAbs = new AbsOperation(gpuConstructor);
+const defaultCeil = new CeilOperation(gpuConstructor);
+const defaultFloor = new FloorOperation(gpuConstructor);
+const defaultClip = new ClipOperation(gpuConstructor);
+const defaultSqrt = new SqrtOperation(gpuConstructor);
+const defaultLog = new LogOperation(gpuConstructor);
 
 //Convolutions
-const defaultConv = new ConvOperation(constructor);
-const defaultAveragePool = new AveragePoolOperation(constructor);
-const defaultConvBias = new ConvBiasOperation(constructor);
-const defaultPad = new PadOperation(constructor);
-const defaultUpsample = new UpsampleOperation(constructor);
+const defaultConv = new ConvOperation(gpuConstructor);
+const defaultAveragePool = new AveragePoolOperation(gpuConstructor);
+const defaultConvBias = new ConvBiasOperation(gpuConstructor);
+const defaultPad = new PadOperation(gpuConstructor);
+const defaultUpsample = new UpsampleOperation(gpuConstructor);
 
 //Binary operations
-const defaultAdd = new AddOperation(constructor);
-const defaultSubtract = new SubtractOperation(constructor);
-const defaultMultiply = new MultiplyOperation(constructor);
-const defaultDivide = new DivideOperation(constructor);
-const defaultPower = new PowerOperation(constructor);
+const defaultAdd = new AddOperation(gpuConstructor);
+const defaultSubtract = new SubtractOperation(gpuConstructor);
+const defaultMultiply = new MultiplyOperation(gpuConstructor);
+const defaultDivide = new DivideOperation(gpuConstructor);
+const defaultPower = new PowerOperation(gpuConstructor);
 
 //Reductions
-const defaultMean = new ReduceMeanOperation(constructor);
-const defaultMeanSquare = new ReduceMeanSquareOperation(constructor);
-const defaultSumSquare = new SumSquareOperation(constructor);
-const defaultSum = new SumOperation(constructor);
-const defaultProduct = new ProductOperation(constructor);
-const defaultMax = new MaxOperation(constructor);
-const defaultMin = new MinOperation(constructor);
+const defaultMean = new ReduceMeanOperation(gpuConstructor);
+const defaultMeanSquare = new ReduceMeanSquareOperation(gpuConstructor);
+const defaultSumSquare = new SumSquareOperation(gpuConstructor);
+const defaultSum = new SumOperation(gpuConstructor);
+const defaultProduct = new ProductOperation(gpuConstructor);
+const defaultMax = new MaxOperation(gpuConstructor);
+const defaultMin = new MinOperation(gpuConstructor);
 
 //Util
-const defaultConcat = new ConcatOperation(constructor);
-const defaultCopy = new CopyOperation(constructor);
-const defaultExpand = new ExpandOperation(constructor);
-const defaultGather = new GatherOperation(constructor);
-const defaultTranspose = new TransposeOperation(constructor);
-const defaultRepeat = new RepeatOperation(constructor);
-const defaultSlice = new SliceOperation(constructor);
+const defaultConcat = new ConcatOperation(gpuConstructor);
+const defaultCopy = new CopyOperation(gpuConstructor);
+const defaultExpand = new ExpandOperation(gpuConstructor);
+const defaultGather = new GatherOperation(gpuConstructor);
+const defaultTranspose = new TransposeOperation(gpuConstructor);
+const defaultRepeat = new RepeatOperation(gpuConstructor);
+const defaultSlice = new SliceOperation(gpuConstructor);
