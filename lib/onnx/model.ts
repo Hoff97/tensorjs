@@ -1,6 +1,8 @@
 import Long from 'long';
 import {onnx} from 'onnx-proto';
+import { PrototypeTensor } from '../tensor/cpu/prototype';
 import { gl, glContext } from '../tensor/gpu/gl';
+import { GPUMemoryAllocator, MemoryEntry } from '../tensor/gpu/memory';
 import Tensor from '../types';
 import { toCPU, toGPU, toWASM } from '../util/convert';
 import { TENSOR_INT64 } from './definitions';
@@ -42,6 +44,8 @@ export class OnnxModel {
 
   private noConvertConstants: Set<string>;
   private noConvertNodes: Set<number>;
+
+  private allocator?: GPUMemoryAllocator;
 
   constructor(buffer: ArrayBuffer | Uint8Array, args?: ModelArgs) {
     let arr: Uint8Array;
@@ -147,44 +151,13 @@ export class OnnxModel {
 
     const nodesReady: number[] = [...this.defaultReady];
 
-    for (let i = 0; i < inputs.length; i++) {
-      intermediaryRes[this.inputs[i].name] = {
-        value: inputs[i],
-        used: 0
-      };
-
-      const inter = this.intermediaries[this.inputs[i].name];
-      for (let j = 0; j < inter.to.length; j++) {
-        const id = inter.to[j];
-        nodes[id].variableInputs++;
-
-        if (nodes[id].variableInputs === this.nodes[id].variableInputs) {
-          nodesReady.push(id);
-          delete nodes[id];
-        }
-      }
-    }
+    this.initializeForward(inputs, intermediaryRes, nodes, nodesReady);
 
     while(nodesReady.length > 0) {
-      const toDelete: string[] = [];
-
       const nodeId = nodesReady.shift();
       const node = this.nodes[nodeId];
 
-      const inputs: Tensor[] = [];
-      for (let i = 0; i < node.inputs.length; i++) {
-        const input = node.inputs[i];
-        if (this.constants[input] !== undefined) {
-          inputs.push(this.constants[input]);
-        } else {
-          const inter = intermediaryRes[input];
-          inter.used++;
-          if (inter.used === this.intermediaries[input].to.length && this.intermediaries[input].deletable) {
-            toDelete.push(input);
-          }
-          inputs.push(inter.value);
-        }
-      }
+      const {inputs, toDelete} = this.getInputsToNode(node, intermediaryRes);
 
       let outputs: Tensor[];
       try {
@@ -194,27 +167,8 @@ export class OnnxModel {
         throw e;
       }
       glContext.flush();
-      for (let i = 0; i < node.outputs.length; i++) {
-        const output = node.outputs[i];
-        intermediaryRes[output] = {
-          value: outputs[i],
-          used: 0
-        };
 
-        const inter = this.intermediaries[output];
-
-        if (inter !== undefined) {
-          for (let j = 0; j < inter.to.length; j++) {
-            const id = inter.to[j];
-            nodes[id].variableInputs++;
-
-            if (nodes[id].variableInputs === this.nodes[id].variableInputs) {
-              nodesReady.push(id);
-              delete nodes[id];
-            }
-          }
-        }
-      }
+      this.propagateResults(node, intermediaryRes, outputs, nodes, nodesReady);
 
       for (let i = 0; i < toDelete.length; i++) {
         if (!this.inputSet.has(toDelete[i])) {
@@ -237,6 +191,74 @@ export class OnnxModel {
     }
 
     return outputs;
+  }
+
+  protected initializeForward(inputs: Tensor[], intermediaryRes: {[name: string]: IntermediaryRes},
+                              nodes: {[id: number]: {variableInputs: number}},
+                              nodesReady: number[]) {
+    for (let i = 0; i < inputs.length; i++) {
+      intermediaryRes[this.inputs[i].name] = {
+        value: inputs[i],
+        used: 0
+      };
+
+      const inter = this.intermediaries[this.inputs[i].name];
+      for (let j = 0; j < inter.to.length; j++) {
+        const id = inter.to[j];
+        nodes[id].variableInputs++;
+
+        if (nodes[id].variableInputs === this.nodes[id].variableInputs) {
+          nodesReady.push(id);
+          delete nodes[id];
+        }
+      }
+    }
+  }
+
+  protected getInputsToNode(node: OnnxNode, intermediaryRes: {[name: string]: IntermediaryRes}) {
+    const inputs: Tensor[] = [];
+    const toDelete: string[] = [];
+    for (let i = 0; i < node.inputs.length; i++) {
+      const input = node.inputs[i];
+      if (this.constants[input] !== undefined) {
+        inputs.push(this.constants[input]);
+      } else {
+        const inter = intermediaryRes[input];
+        inter.used++;
+        if (inter.used === this.intermediaries[input].to.length && this.intermediaries[input].deletable) {
+          toDelete.push(input);
+        }
+        inputs.push(inter.value);
+      }
+    }
+
+    return {inputs, toDelete};
+  }
+
+  protected propagateResults(node: OnnxNode, intermediaryRes: {[name: string]: IntermediaryRes},
+                             outputs: Tensor[], nodes: {[id: number]: {variableInputs: number}},
+                             nodesReady: number[]) {
+    for (let i = 0; i < node.outputs.length; i++) {
+      const output = node.outputs[i];
+      intermediaryRes[output] = {
+        value: outputs[i],
+        used: 0
+      };
+
+      const inter = this.intermediaries[output];
+
+      if (inter !== undefined) {
+        for (let j = 0; j < inter.to.length; j++) {
+          const id = inter.to[j];
+          nodes[id].variableInputs++;
+
+          if (nodes[id].variableInputs === this.nodes[id].variableInputs) {
+            nodesReady.push(id);
+            delete nodes[id];
+          }
+        }
+      }
+    }
   }
 
   public getNodeWithOutput(output: string) {
@@ -297,6 +319,68 @@ export class OnnxModel {
     for (let i of this.nodeIds) {
       if (!this.noConvertNodes.has(i)) {
         await this.nodes[i].toGPU();
+      }
+    }
+  }
+
+  setAllocator(allocator: GPUMemoryAllocator) {
+    this.allocator = allocator;
+    for (let id of this.nodeIds) {
+      this.nodes[id].setAllocator(this.allocator);
+    }
+  }
+
+  async compileForInputs(inputs: Tensor[]) {
+    if (this.allocator === undefined) {
+      this.setAllocator(new GPUMemoryAllocator(gl));
+    }
+
+    for (let id of this.nodeIds) {
+      this.nodes[id].initializeForCompiling();
+    }
+
+    this.staticForward(inputs, false);
+    this.staticForward(inputs, false);
+
+    this.staticForward(inputs, true);
+  }
+
+  async staticForward(inputs: Tensor[], compile: boolean) {
+    const intermediaryRes: {[name: string]: IntermediaryRes} = {};
+
+    const nodes: {[id: number]: {variableInputs: number}} = {};
+    for (let i of this.nodeIds) {
+      nodes[i] = {
+        variableInputs: 0
+      }
+    }
+
+    const nodesReady: number[] = [...this.defaultReady];
+
+    this.initializeForward(inputs, intermediaryRes, nodes, nodesReady);
+
+    while(nodesReady.length > 0) {
+      const nodeId = nodesReady.shift();
+      const node = this.nodes[nodeId];
+
+      const {inputs, toDelete} = this.getInputsToNode(node, intermediaryRes);
+
+      let { outputs } = await node.staticForward(inputs, compile);
+
+      glContext.flush();
+
+      this.propagateResults(node, intermediaryRes, outputs, nodes, nodesReady);
+
+      for (let i = 0; i < toDelete.length; i++) {
+        if (!this.inputSet.has(toDelete[i])) {
+          const inter = intermediaryRes[toDelete[i]];
+
+          if (inter.value instanceof PrototypeTensor) {
+            this.allocator.deallocate(inter.value.memory);
+          }
+
+          delete intermediaryRes[toDelete[i]];
+        }
       }
     }
   }
