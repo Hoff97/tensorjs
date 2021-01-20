@@ -80,6 +80,10 @@ export class ClipOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTe
     });
   }
 
+  getOutputShape(input: ClipInput): readonly number[] {
+    return input.input.shape;
+  }
+
   compile(info: ClipInfo) {
     if (info.shapeX !== undefined) {
       this.maxRank = info.shapeX.length;

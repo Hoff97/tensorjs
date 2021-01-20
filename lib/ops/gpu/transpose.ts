@@ -56,10 +56,7 @@ export class TransposeOperation<GPUTensor extends GPUTensorI> extends Operation<
   calc(input: TransposeInput): GPUTensor {
     const rank = input.A.shape.length;
 
-    const outputShape = new Array(rank);
-    for (let i = 0; i < rank; i++) {
-      outputShape[i] = input.A.shape[input.permutation[i]];
-    }
+    const outputShape = this.getOutputShape(input);
 
     const inputStrides = computeStrides(input.A.shape);
     const mappedStrides = new Array(rank);
@@ -68,6 +65,17 @@ export class TransposeOperation<GPUTensor extends GPUTensorI> extends Operation<
     }
 
     return this.compute(outputShape, {A: input.A}, {mappedStrides: this.pad(mappedStrides)});
+  }
+
+  getOutputShape(input: TransposeInput): readonly number[] {
+    const rank = input.A.shape.length;
+
+    const outputShape = new Array(rank);
+    for (let i = 0; i < rank; i++) {
+      outputShape[i] = input.A.shape[input.permutation[i]];
+    }
+
+    return outputShape;
   }
 
   compile(info: TransposeInfo) {

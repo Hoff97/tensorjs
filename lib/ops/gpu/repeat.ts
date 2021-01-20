@@ -58,17 +58,23 @@ export class RepeatOperation<GPUTensor extends GPUTensorI> extends Operation<GPU
     `;
   }
 
-  getTextureNames(): string[] {
-    return ["A"];
-  }
-
-  calc(input: RepeatInput): GPUTensor {
+  getOutputShape(input: RepeatInput): readonly number[] {
     const rank = input.A.shape.length;
 
     const outputShape = new Array(rank);
     for (let i = 0; i < rank; i++) {
       outputShape[i] = input.A.shape[i] * input.repeats[i];
     }
+
+    return outputShape;
+  }
+
+  getTextureNames(): string[] {
+    return ["A"];
+  }
+
+  calc(input: RepeatInput): GPUTensor {
+    const outputShape = this.getOutputShape(input);
 
     return this.compute(outputShape, {A: input.A}, {repeats: this.copyPad(input.repeats)});
   }

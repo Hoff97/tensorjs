@@ -126,6 +126,11 @@ export abstract class PoolOperation<GPUTensor extends GPUTensorI> extends Operat
     });
   }
 
+  getOutputShape(input: PoolInput): readonly number[] {
+    const [outputShape, ixMap] = poolResultShape(input.X.shape, input.axes, input.keepDims);
+    return outputShape;
+  }
+
   compile(info: PoolInfo) {
     if (info.shapeX !== undefined && info.axes !== undefined && info.keepDims !== undefined) {
       const [outputShape, ixMap] = poolResultShape(info.shapeX, info.axes, info.keepDims);

@@ -110,6 +110,16 @@ export class PadOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTen
   }
 
   calc(input: PadInput): GPUTensor {
+    const resultShape = this.getOutputShape(input);
+
+    return this.compute(resultShape, {X: input.input}, {
+      pads: this.copyPad(input.pads, this.maxRank*2),
+      value: input.value,
+      mode: input.mode === "constant" ? 0 : input.mode === "reflect" ? 1 : 2
+    });
+  }
+
+  getOutputShape(input: PadInput): readonly number[] {
     const rank = input.input.shape.length;
 
     const resultShape = [...input.input.shape];
@@ -117,11 +127,7 @@ export class PadOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTen
       resultShape[i] += input.pads[i] + input.pads[i+rank];
     }
 
-    return this.compute(resultShape, {X: input.input}, {
-      pads: this.copyPad(input.pads, this.maxRank*2),
-      value: input.value,
-      mode: input.mode === "constant" ? 0 : input.mode === "reflect" ? 1 : 2
-    });
+    return resultShape;
   }
 
   compile(info: PadInfo) {

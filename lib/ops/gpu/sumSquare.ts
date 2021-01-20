@@ -1,5 +1,5 @@
 import { GPUTensorI } from "../../tensor/gpu/interface";
-import { PoolOperation } from "./pool";
+import { PoolInput, PoolOperation } from "./pool";
 
 export class SumSquareOperation<GPUTensor extends GPUTensorI> extends PoolOperation<GPUTensor> {
   update(a: string, b: string): string {

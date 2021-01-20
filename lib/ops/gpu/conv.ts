@@ -172,6 +172,19 @@ export class ConvOperation<GPUTensor extends GPUTensorI, ConvInf extends ConvInf
     })
   }
 
+  getOutputShape(input: ConvIn): readonly number[] {
+    const N = input.X.shape[0];
+    const D = input.X.shape.slice(2);
+    const W = input.W.shape.slice(2);
+    const M = input.W.shape[0];
+
+    const R = outputDimsSize(D, W, input.pads.slice(0, input.pads.length/2), input.pads.slice(input.pads.length/2), input.dilations, input.strides);
+    let outputShape = [N, M];
+    outputShape = outputShape.concat(R);
+
+    return outputShape;
+  }
+
   compile(info: ConvInf) {
     if (info.shapeW !== undefined) {
       info.CG = info.shapeW[1];

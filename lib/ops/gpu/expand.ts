@@ -40,6 +40,10 @@ export class ExpandOperation<GPUTensor extends GPUTensorI> extends Operation<GPU
     return this.compute(input.outputShape, {X: input.input})
   }
 
+  getOutputShape(input: ExpandInput): readonly number[] {
+    return input.outputShape;
+  }
+
   compile(info: ExpandInfo) {
     if (info.shapeX !== undefined) {
       this.maxRank = info.shapeX.length;

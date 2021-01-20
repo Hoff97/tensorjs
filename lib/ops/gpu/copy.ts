@@ -37,12 +37,17 @@ export class CopyOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTe
   }
 
   calc(input: CopyInput): GPUTensor {
+    const shape = this.getOutputShape(input);
+
+    return this.compute(shape, {X: input.input})
+  }
+
+  getOutputShape(input: CopyInput): readonly number[] {
     let shape = input.outputShape;
     if (shape === undefined) {
       shape = input.input.shape;
     }
-
-    return this.compute(shape, {X: input.input})
+    return shape;
   }
 
   compile(info: CopyInfo) {

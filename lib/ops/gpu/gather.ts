@@ -132,6 +132,26 @@ export class GatherOperation<GPUTensor extends GPUTensorI> extends Operation<GPU
     })
   }
 
+  getOutputShape(input: GatherInput): readonly number[] {
+    const r = input.X.shape.length;
+    const q = input.indices.shape.length;
+
+    const resultRank = r + q - 1;
+    const resultShape = new Array(resultRank);
+
+    for (let i = 0; i < input.axis; i++) {
+      resultShape[i] = input.X.shape[i];
+    }
+    for (let i = 0; i < q; i++) {
+      resultShape[i + input.axis] = input.indices.shape[i];
+    }
+    for (let i = input.axis + 1; i < r; i++) {
+      resultShape[i + q - 1] = input.X.shape[i];
+    }
+
+    return resultShape;
+  }
+
   compile(info: GatherInfo) {
     if (info.shapeX !== undefined) {
       this.maxRank = info.shapeX.length;

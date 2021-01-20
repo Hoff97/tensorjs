@@ -3,7 +3,7 @@ import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
 import { Operation } from "./operation";
 
 
-export interface AbsInfo {
+export interface UnaryOpInfo {
   shapeX?: number[];
   widthX?: number;
   heightX?: number;
@@ -12,21 +12,23 @@ export interface AbsInfo {
   heightOutput?: number;
 }
 
-export interface AbsInput {
+export interface UnaryOpInput {
   input: GPUTensorI;
 }
 
-export class AbsOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTensor, AbsInfo, AbsInput> {
+export abstract class UnaryOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTensor, UnaryOpInfo, UnaryOpInput> {
   constructor(tensorConstructor: GPUTensorConstructor<GPUTensor>, allocator?: GPUMemoryAllocator) {
     super(tensorConstructor, allocator);
   }
 
-  getFragmentShader(info: AbsInfo): string {
+  abstract operation(input: string): string;
+
+  getFragmentShader(info: UnaryOpInfo): string {
     return `
     void main() {
       initVars();
 
-      gl_FragColor = abs(texture2D(X, uv));
+      gl_FragColor = ${this.operation('texture2D(X, uv)')};
     }
     `;
   }
@@ -35,19 +37,19 @@ export class AbsOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTen
     return ["X"];
   }
 
-  calc(input: AbsInput): GPUTensor {
+  calc(input: UnaryOpInput): GPUTensor {
     return this.compute(input.input.shape, {X: input.input})
   }
 
-  compile(info: AbsInfo) {
+  getOutputShape(input: UnaryOpInput): readonly number[] {
+    return input.input.shape;
+  }
+
+  compile(info: UnaryOpInfo) {
     if (info.shapeX !== undefined) {
       this.maxRank = info.shapeX.length;
     }
 
     super.compile(info);
-  }
-
-  getOutputShape(input: AbsInput): readonly number[] {
-    return input.input.shape;
   }
 }

@@ -166,6 +166,18 @@ export class GemmOperation<GPUTensor extends GPUTensorI, GemmInf extends GemmInf
     return this.compute(resultShape, {A: input.a, B: input.b}, uniforms);
   }
 
+  getOutputShape(input: GemmIn): readonly number[] {
+    const rank = input.a.shape.length;
+
+    const M = input.aTranspose ? input.a.shape[rank - 1] : input.a.shape[rank - 2];
+    const O = input.bTranspose ? input.b.shape[rank - 2] : input.b.shape[rank - 1];
+
+    const batchShape = input.a.shape.slice(0, rank-2);
+    const resultShape = [...batchShape, M, O];
+
+    return resultShape;
+  }
+
   compile(info: GemmInf) {
     //TODO
     super.compile(info);

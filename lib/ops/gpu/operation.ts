@@ -511,4 +511,6 @@ export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictB
   }
 
   abstract calc(input: InputType): GPUTensor;
+
+  abstract getOutputShape(input: InputType): readonly number[];
 }

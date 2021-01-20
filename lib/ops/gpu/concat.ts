@@ -69,10 +69,15 @@ export class ConcatOperation<GPUTensor extends GPUTensorI> extends Operation<GPU
   }
 
   calc(input: ConcatInput): GPUTensor {
-    const outputShape = [...input.A.shape];
-    outputShape[input.axis] += input.B.shape[input.axis];
+    const outputShape = this.getOutputShape(input);
 
     return this.compute(outputShape, {A: input.A, B: input.B}, {axis: input.axis});
+  }
+
+  getOutputShape(input: ConcatInput): readonly number[] {
+    const outputShape = [...input.A.shape];
+    outputShape[input.axis] += input.B.shape[input.axis];
+    return outputShape;
   }
 
   compile(info: ConcatInfo) {

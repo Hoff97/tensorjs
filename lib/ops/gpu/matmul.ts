@@ -66,9 +66,13 @@ export class MatMulOperation<GPUTensor extends GPUTensorI> extends Operation<GPU
   }
 
   calc(input: MatMulInput): GPUTensor {
-    const outputShape = [input.A.shape[0], input.B.shape[1]];
+    const outputShape = this.getOutputShape(input);
 
     return this.compute(outputShape, {A: input.A, B: input.B})
+  }
+
+  getOutputShape(input: MatMulInput): readonly number[] {
+    return [input.A.shape[0], input.B.shape[1]];
   }
 
   compile(info: MatMulInfo) {

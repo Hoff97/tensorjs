@@ -80,6 +80,21 @@ export class SliceOperation<GPUTensor extends GPUTensorI> extends Operation<GPUT
     });
   }
 
+  getOutputShape(input: SliceInput): readonly number[] {
+    const rank = input.X.shape.length;
+
+    const resultShape = [...input.X.shape];
+    let axIx = 0;
+    for (let i = 0; i < rank && axIx < input.axes.length; i++) {
+      if (i == input.axes[axIx]) {
+        resultShape[i] = input.ends[axIx] - input.starts[axIx];
+        axIx++;
+      }
+    }
+
+    return resultShape;
+  }
+
   compile(info: SliceInfo) {
     if (info.shapeX !== undefined) {
       this.maxRank = info.shapeX.length;

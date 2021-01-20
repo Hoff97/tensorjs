@@ -63,6 +63,14 @@ export class UpsampleOperation<GPUTensor extends GPUTensorI> extends Operation<G
   }
 
   calc(input: UpsampleInput): GPUTensor {
+    const resultShape = this.getOutputShape(input);
+
+    return this.compute(resultShape, {X: input.X}, {
+      scales: this.copyPad(input.scales)
+    });
+  }
+
+  getOutputShape(input: UpsampleInput): readonly number[] {
     const rank = input.X.shape.length;
 
     const resultShape = [...input.X.shape];
@@ -70,9 +78,7 @@ export class UpsampleOperation<GPUTensor extends GPUTensorI> extends Operation<G
       resultShape[i] = Math.floor(resultShape[i] * input.scales[i]);
     }
 
-    return this.compute(resultShape, {X: input.X}, {
-      scales: this.copyPad(input.scales)
-    });
+    return resultShape;
   }
 
   compile(info: UpsampleInfo) {

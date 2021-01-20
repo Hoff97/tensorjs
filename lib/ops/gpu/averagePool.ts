@@ -155,6 +155,20 @@ export class AveragePoolOperation<GPUTensor extends GPUTensorI> extends Operatio
     })
   }
 
+  getOutputShape(input: AveragePoolInput): readonly number[] {
+    const N = input.X.shape[0];
+    const C = input.X.shape[1];
+    const D = input.X.shape.slice(2);
+
+    const kernelSize = getSize(input.kernelShape);
+
+    const R = outputDimsSize(D, input.kernelShape, input.pads.slice(0, input.pads.length/2), input.pads.slice(input.pads.length/2), new Array(D.length).fill(1), input.strides);
+    let outputShape = [N, C];
+    outputShape = outputShape.concat(R);
+
+    return outputShape;
+  }
+
   compile(info: AveragePoolInfo) {
     if (info.shapeX !== undefined) {
       info.dataRank = info.shapeX.length - 2;
