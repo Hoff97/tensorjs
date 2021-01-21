@@ -1,11 +1,11 @@
-import { BinaryOperation } from "../../ops/gpu/binaryOperation";
-import { PrototypeTensor } from "../../tensor/cpu/prototype";
-import { CPUTensor } from "../../tensor/cpu/tensor";
-import { GPUTensor } from "../../tensor/gpu/tensor";
-import Tensor from "../../types";
-import { getSize } from "../../util/shape";
-import { OnnxNode } from "../node";
-import { Attributes, Constants } from "../types";
+import { BinaryOperation } from "../../../ops/gpu/binaryOperation";
+import { PrototypeTensor } from "../../../tensor/cpu/prototype";
+import { CPUTensor } from "../../../tensor/cpu/tensor";
+import { GPUTensor } from "../../../tensor/gpu/tensor";
+import Tensor from "../../../types";
+import { getSize } from "../../../util/shape";
+import { OnnxNode } from "../../node";
+import { Attributes, Constants } from "../../types";
 
 export abstract class BinaryNode extends OnnxNode {
   private operation?: BinaryOperation<GPUTensor>;

@@ -1,8 +1,8 @@
-import { AddOperation } from "../../ops/gpu/add";
-import { BinaryOperation } from "../../ops/gpu/binaryOperation";
-import { gpuConstructor, GPUTensor } from "../../tensor/gpu/tensor";
-import Tensor from "../../types";
-import { Attributes, Constants } from "../types";
+import { AddOperation } from "../../../ops/gpu/add";
+import { BinaryOperation } from "../../../ops/gpu/binaryOperation";
+import { gpuConstructor, GPUTensor } from "../../../tensor/gpu/tensor";
+import Tensor from "../../../types";
+import { Attributes, Constants } from "../../types";
 import { BinaryNode } from "./binaryNode";
 
 export class AddNode extends BinaryNode {

@@ -1,8 +1,8 @@
-import { BinaryOperation } from "../../ops/gpu/binaryOperation";
-import { DivideOperation } from "../../ops/gpu/divide";
-import { gpuConstructor, GPUTensor } from "../../tensor/gpu/tensor";
-import Tensor from "../../types";
-import { Attributes, Constants } from "../types";
+import { BinaryOperation } from "../../../ops/gpu/binaryOperation";
+import { DivideOperation } from "../../../ops/gpu/divide";
+import { gpuConstructor, GPUTensor } from "../../../tensor/gpu/tensor";
+import Tensor from "../../../types";
+import { Attributes, Constants } from "../../types";
 import { BinaryNode } from "./binaryNode";
 
 export class DivNode extends BinaryNode {

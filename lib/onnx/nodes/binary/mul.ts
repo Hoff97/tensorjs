@@ -1,8 +1,8 @@
-import { BinaryOperation } from "../../ops/gpu/binaryOperation";
-import { MultiplyOperation } from "../../ops/gpu/multiply";
-import { gpuConstructor, GPUTensor } from "../../tensor/gpu/tensor";
-import types from "../../types";
-import { Attributes, Constants } from "../types";
+import { BinaryOperation } from "../../../ops/gpu/binaryOperation";
+import { MultiplyOperation } from "../../../ops/gpu/multiply";
+import { gpuConstructor, GPUTensor } from "../../../tensor/gpu/tensor";
+import types from "../../../types";
+import { Attributes, Constants } from "../../types";
 import { BinaryNode } from "./binaryNode";
 
 export class MulNode extends BinaryNode {
