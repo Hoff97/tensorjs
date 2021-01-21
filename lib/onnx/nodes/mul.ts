@@ -1,21 +1,22 @@
-import { GPUTensor } from "../../tensor/gpu/tensor";
-import Tensor from "../../types";
-import { toGPU } from "../../util/convert";
-import { OnnxNode } from "../node";
+import { BinaryOperation } from "../../ops/gpu/binaryOperation";
+import { MultiplyOperation } from "../../ops/gpu/multiply";
+import { gpuConstructor, GPUTensor } from "../../tensor/gpu/tensor";
+import types from "../../types";
 import { Attributes, Constants } from "../types";
+import { BinaryNode } from "./binaryNode";
 
-export class MulNode extends OnnxNode {
+export class MulNode extends BinaryNode {
   constructor(attributes: Attributes, inputs: string[], outputs: string[], constants: Constants, onnxVersion: number) {
     super(attributes, inputs, outputs, constants, onnxVersion);
+
+    this.name = 'Mul';
   }
 
-  async forward(inputs: Tensor[]): Promise<Tensor[]> {
-    if (this.onnxVersion < 13 && this.onnxVersion >= 7) {
-      const a = inputs[0];
-      const b = inputs[1];
+  compute(a: types, b: types): types {
+    return a.multiply(b);
+  }
 
-      return [a.multiply(b)];
-    }
-    throw new Error(`Add not implemented for onnx version ${this.onnxVersion}`);
+  getOperation(): BinaryOperation<GPUTensor> {
+    return new MultiplyOperation(gpuConstructor, this.allocator);
   }
 }

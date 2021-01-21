@@ -1,18 +1,22 @@
+import { BinaryOperation } from "../../ops/gpu/binaryOperation";
+import { DivideOperation } from "../../ops/gpu/divide";
+import { gpuConstructor, GPUTensor } from "../../tensor/gpu/tensor";
 import Tensor from "../../types";
-import { OnnxNode } from "../node";
 import { Attributes, Constants } from "../types";
+import { BinaryNode } from "./binaryNode";
 
-export class DivNode extends OnnxNode {
+export class DivNode extends BinaryNode {
   constructor(attributes: Attributes, inputs: string[], outputs: string[], constants: Constants, onnxVersion: number) {
     super(attributes, inputs, outputs, constants, onnxVersion);
+
+    this.name = 'Div';
   }
 
-  async forward(inputs: Tensor[]): Promise<Tensor[]> {
-    if (this.onnxVersion < 13 && this.onnxVersion >= 7) {
-      const a = inputs[0];
-      const b = inputs[1];
-      return [a.divide(b)];
-    }
-    throw new Error(`Add not implemented for onnx version ${this.onnxVersion}`);
+  compute(a: Tensor, b: Tensor): Tensor {
+    return a.divide(b);
+  }
+
+  getOperation(): BinaryOperation<GPUTensor> {
+    return new DivideOperation(gpuConstructor, this.allocator);
   }
 }

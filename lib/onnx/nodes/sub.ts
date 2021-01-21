@@ -1,18 +1,22 @@
+import { BinaryOperation } from "../../ops/gpu/binaryOperation";
+import { SubtractOperation } from "../../ops/gpu/subtract";
+import { gpuConstructor, GPUTensor } from "../../tensor/gpu/tensor";
 import Tensor from "../../types";
-import { OnnxNode } from "../node";
 import { Attributes, Constants } from "../types";
+import { BinaryNode } from "./binaryNode";
 
-export class SubNode extends OnnxNode {
+export class SubNode extends BinaryNode {
   constructor(attributes: Attributes, inputs: string[], outputs: string[], constants: Constants, onnxVersion: number) {
     super(attributes, inputs, outputs, constants, onnxVersion);
+
+    this.name = 'Sub';
   }
 
-  async forward(inputs: Tensor[]): Promise<Tensor[]> {
-    if (this.onnxVersion < 13 && this.onnxVersion >= 7) {
-      const a = inputs[0];
-      const b = inputs[1];
-      return [a.subtract(b)];
-    }
-    throw new Error(`Add not implemented for onnx version ${this.onnxVersion}`);
+  compute(a: Tensor, b: Tensor): Tensor {
+    return a.subtract(b);
+  }
+
+  getOperation(): BinaryOperation<GPUTensor> {
+    return new SubtractOperation(gpuConstructor, this.allocator);
   }
 }
