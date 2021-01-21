@@ -1,14 +1,14 @@
-import { ExpOperation } from "../../ops/gpu/exp";
-import { PrototypeTensor } from "../../tensor/cpu/prototype";
-import { CPUTensor } from "../../tensor/cpu/tensor";
-import { gpuConstructor, GPUTensor } from "../../tensor/gpu/tensor";
-import Tensor from "../../types";
-import { getSize } from "../../util/shape";
-import { OnnxNode } from "../node";
-import { Attributes, Constants } from "../types";
+import { UnaryOperation } from "../../../ops/gpu/unaryOperation";
+import { PrototypeTensor } from "../../../tensor/cpu/prototype";
+import { CPUTensor } from "../../../tensor/cpu/tensor";
+import { GPUTensor } from "../../../tensor/gpu/tensor";
+import Tensor from "../../../types";
+import { getSize } from "../../../util/shape";
+import { OnnxNode } from "../../node";
+import { Attributes, Constants } from "../../types";
 
-export class ExpNode extends OnnxNode {
-  protected operation?: ExpOperation<GPUTensor>;
+export abstract class UnaryNode extends OnnxNode {
+  protected operation?: UnaryOperation<GPUTensor>;
 
   protected compiled: boolean = false;
 
@@ -16,11 +16,13 @@ export class ExpNode extends OnnxNode {
     super(attributes, inputs, outputs, constants, onnxVersion);
   }
 
+  abstract compute(x: Tensor): Tensor;
+
   async forward(inputs: Tensor[]): Promise<Tensor[]> {
     const x = inputs[0];
 
     if (!this.compiled) {
-      return [x.exp()];
+      return [this.compute(x)];
     } else {
       return [this.operation.calc({input: x as GPUTensor})];
     }
@@ -57,7 +59,9 @@ export class ExpNode extends OnnxNode {
     };
   }
 
+  abstract getOperation(): UnaryOperation<GPUTensor>;
+
   initializeForCompiling(): void {
-    this.operation = new ExpOperation(gpuConstructor, this.allocator);
+    this.operation = this.getOperation();
   }
 }
