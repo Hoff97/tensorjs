@@ -75,9 +75,9 @@ export abstract class ReduceNode extends OnnxNode {
         const [aMem] = this.getMemoryEntries(inputs);
 
         const info = {
-          shapeA: a.getShape(),
-          widthA: aMem.width,
-          heightA: aMem.height,
+          shapeX: a.getShape(),
+          widthX: aMem.width,
+          heightX: aMem.height,
           shapeOutput: resultShape,
           widthOutput: memory.width,
           heightOutput: memory.height,

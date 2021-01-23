@@ -155,6 +155,8 @@ export abstract class PoolOperation<GPUTensor extends GPUTensorI> extends Operat
 
       delete info['keepDims'];
       delete info['axes'];
+
+      this.maxRank = info.shapeX.length;
     }
 
     super.compile(info);

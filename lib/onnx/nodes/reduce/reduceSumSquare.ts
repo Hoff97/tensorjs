@@ -1,24 +1,22 @@
+import { PoolOperation } from "../../../ops/gpu/pool";
+import { SumSquareOperation } from "../../../ops/gpu/sumSquare";
+import { gpuConstructor, GPUTensor } from "../../../tensor/gpu/tensor";
+import types from "../../../types";
 import Tensor from "../.././types";
 import { OnnxNode } from "../../node";
 import { Attributes, Constants } from "../../types";
+import { ReduceNode } from "./reduceNode";
 
-export class ReduceSumSquareNode extends OnnxNode {
-  private axes?: number[];
-  private keepDims?: boolean;
-
+export class ReduceSumSquareNode extends ReduceNode {
   constructor(attributes: Attributes, inputs: string[], outputs: string[], constants: Constants, onnxVersion: number) {
     super(attributes, inputs, outputs, constants, onnxVersion);
-
-    this.axes = this.getAttributeInts("axes");
-    const keep = this.getAttributeInt("keepdims");
-
-    this.keepDims = keep === 1 || keep === undefined;
   }
 
-  async forward(inputs: Tensor[]): Promise<Tensor[]> {
-    if (this.onnxVersion < 11) {
-      return [inputs[0].sumSquare(this.axes, this.keepDims)];
-    }
-    throw new Error(`Reduce mean is not implemented for onnx version ${this.onnxVersion}`);
+  calc(input: types): types {
+    return input.sumSquare(this.axes, this.keepDims);
+  }
+
+  getOperation(): PoolOperation<GPUTensor> {
+    return new SumSquareOperation(gpuConstructor, this.allocator);
   }
 }

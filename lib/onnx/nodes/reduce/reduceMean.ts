@@ -1,24 +1,23 @@
+import { PoolOperation } from "../../../ops/gpu/pool";
+import { ReduceMeanOperation } from "../../../ops/gpu/reduceMean";
+import { gpuConstructor, GPUTensor } from "../../../tensor/gpu/tensor";
 import Tensor from "../../../types";
 import { OnnxNode } from "../../node";
 import { Attributes, Constants } from "../../types";
+import { ReduceNode } from "./reduceNode";
 
-export class ReduceMeanNode extends OnnxNode {
-  private axes?: number[];
-  private keepDims?: boolean;
-
+export class ReduceMeanNode extends ReduceNode {
   constructor(attributes: Attributes, inputs: string[], outputs: string[], constants: Constants, onnxVersion: number) {
     super(attributes, inputs, outputs, constants, onnxVersion);
 
-    this.axes = this.getAttributeInts("axes");
-    const keep = this.getAttributeInt("keepdims");
-
-    this.keepDims = keep === 1 || keep === undefined;
+    this.name = 'ReduceMean';
   }
 
-  async forward(inputs: Tensor[]): Promise<Tensor[]> {
-    if (this.onnxVersion < 11) {
-      return [inputs[0].reduceMean(this.axes, this.keepDims)];
-    }
-    throw new Error(`Reduce mean is not implemented for onnx version ${this.onnxVersion}`);
+  calc(input: Tensor): Tensor {
+    return input.reduceMean(this.axes, this.keepDims);
+  }
+
+  getOperation(): PoolOperation<GPUTensor> {
+    return new ReduceMeanOperation(gpuConstructor, this.allocator);
   }
 }
