@@ -4,19 +4,19 @@ import { Input, Operation } from "./operation";
 
 
 export interface ConcatInfo {
-  shapeA?: number[];
+  shapeA?: readonly number[];
   widthA?: number;
   heightA?: number;
 
-  shapeB?: number[];
+  shapeB?: readonly number[];
   widthB?: number;
   heightB?: number;
 
-  shapeOutput?: number[],
+  shapeOutput?: readonly number[],
   widthOutput?: number;
   heightOutput?: number;
 
-  axis: number;
+  axis?: number;
 }
 
 export interface ConcatInput {
