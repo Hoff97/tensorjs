@@ -7,19 +7,19 @@ import { Input, Operation } from "./operation";
 
 
 export interface ConvInfo {
-  shapeX?: number[];
+  shapeX?: readonly number[];
   widthX?: number;
   heightX?: number;
-  shapeW?: number[];
+  shapeW?: readonly number[];
   widthW?: number;
   heightW?: number;
-  shapeOutput?: number[],
+  shapeOutput?: readonly number[],
   widthOutput?: number;
   heightOutput?: number;
 
-  pads?: number[];
-  dilations?: number[];
-  strides?: number[];
+  pads?: readonly number[];
+  dilations?: readonly number[];
+  strides?: readonly number[];
 
   CG?: number;
   kernelSize?: number;
@@ -30,9 +30,9 @@ export interface ConvInfo {
 export interface ConvInput {
   X: GPUTensorI;
   W: GPUTensorI;
-  pads: number[];
-  dilations: number[];
-  strides: number[];
+  pads: readonly number[];
+  dilations: readonly number[];
+  strides: readonly number[];
 }
 
 export class ConvOperation<GPUTensor extends GPUTensorI, ConvInf extends ConvInfo = ConvInfo, ConvIn extends ConvInput = ConvInput> extends Operation<GPUTensor, ConvInf, ConvIn> {
