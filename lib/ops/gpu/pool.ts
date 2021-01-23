@@ -6,14 +6,14 @@ import { Input, Operation } from "./operation";
 
 
 export interface PoolInfo {
-  shapeX?: number[];
+  shapeX?: readonly number[];
   widthX?: number;
   heightX?: number;
-  shapeOutput?: number[],
+  shapeOutput?: readonly number[],
   widthOutput?: number;
   heightOutput?: number;
 
-  axes?: number[];
+  axes?: readonly number[];
   keepDims?: boolean;
 
   mappedInputStrides?: number[];

@@ -1,6 +1,6 @@
-import Tensor from "../../types";
-import { OnnxNode } from "../node";
-import { Attributes, Constants } from "../types";
+import Tensor from "../../../types";
+import { OnnxNode } from "../../node";
+import { Attributes, Constants } from "../../types";
 
 export class ReduceMeanNode extends OnnxNode {
   private axes?: number[];

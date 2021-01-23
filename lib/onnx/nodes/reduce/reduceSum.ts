@@ -1,8 +1,8 @@
-import Tensor from "../../types";
-import { OnnxNode } from "../node";
-import { Attributes, Constants } from "../types";
+import Tensor from "../../../types";
+import { OnnxNode } from "../../node";
+import { Attributes, Constants } from "../../types";
 
-export class ReduceMaxNode extends OnnxNode {
+export class ReduceSumNode extends OnnxNode {
   private axes?: number[];
   private keepDims?: boolean;
 
@@ -17,8 +17,8 @@ export class ReduceMaxNode extends OnnxNode {
 
   async forward(inputs: Tensor[]): Promise<Tensor[]> {
     if (this.onnxVersion < 11) {
-      return [inputs[0].max(this.axes, this.keepDims)];
+      return [inputs[0].sum(this.axes, this.keepDims)];
     }
-    throw new Error(`Reduce max is not implemented for onnx version ${this.onnxVersion}`);
+    throw new Error(`Reduce mean is not implemented for onnx version ${this.onnxVersion}`);
   }
 }
