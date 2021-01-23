@@ -130,7 +130,7 @@ export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictB
           if (type === "int") {
             inits += `\n${k} = ${info[k]};`;
           } else {
-            inits += `\n${k} = ${info[k]};`; // TODO: Format float
+            inits += `\n${k} = ${(info[k] as number).toPrecision(20)};`; // TODO: Format float
           }
         }
       }
