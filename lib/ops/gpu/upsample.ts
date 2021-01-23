@@ -5,19 +5,19 @@ import { Input, Operation } from "./operation";
 
 
 export interface UpsampleInfo {
-  shapeX?: number[];
+  shapeX?: readonly number[];
   widthX?: number;
   heightX?: number;
-  shapeOutput?: number[],
+  shapeOutput?: readonly number[],
   widthOutput?: number;
   heightOutput?: number;
 
-  scales?: number[];
+  scales?: readonly number[];
 }
 
 export interface UpsampleInput {
   X: GPUTensorI;
-  scales: number[];
+  scales: readonly number[];
 }
 
 export class UpsampleOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTensor, UpsampleInfo, UpsampleInput> {

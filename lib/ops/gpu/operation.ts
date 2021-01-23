@@ -130,7 +130,7 @@ export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictB
           if (type === "int") {
             inits += `\n${k} = ${info[k]};`;
           } else {
-            inits += `\n${k} = ${(info[k] as number).toPrecision(20)};`; // TODO: Format float
+            inits += `\n${k} = ${(info[k] as number).toPrecision(20)};`;
           }
         }
       }
@@ -151,13 +151,24 @@ export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictB
     if (len === undefined) {
       len = this.maxRank;
     }
+
+    const type = this.getVarType(name);
+
     if (pad === undefined) {
-      pad = '-1';
+      if (type === "int") {
+        pad = '-1';
+      } else if (type === "float") {
+        pad = '-1.0';
+      }
     }
     let res = '';
     for (let i = 0; i < len; i++) {
       if (i < values.length) {
-        res += `\n ${name}[${i}] = ${values[i]};`
+        if (type === "int") {
+          res += `\n ${name}[${i}] = ${values[i]};`;
+        } else if (type === 'float') {
+          res += `\n ${name}[${i}] = ${(values[i] as number).toPrecision(20)};`
+        }
       } else {
         res += `\n ${name}[${i}] = ${pad};`
       }
