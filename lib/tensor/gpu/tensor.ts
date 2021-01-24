@@ -8,7 +8,6 @@ import { MemoryEntry } from './memory';
 import { CPUTensor } from '../cpu/tensor';
 import REGL from 'regl';
 import { toTexture } from '../../ops/gpu/toTexture';
-import { normalize } from '../../ops/gpu/normalize';
 import { ExpOperation } from '../../ops/gpu/exp';
 import { GPUTensorConstructor, GPUTensorI } from './interface';
 import { ConvBiasOperation, ConvOperation } from '../../ops/gpu/conv';
@@ -41,6 +40,7 @@ import { RepeatOperation } from '../../ops/gpu/repeat';
 import { PadOperation } from '../../ops/gpu/pad';
 import { SliceOperation } from '../../ops/gpu/slice';
 import { UpsampleOperation } from '../../ops/gpu/upsample';
+import { NormalizeOperation } from '../../ops/gpu/normalize';
 
 
 export class GPUTensor extends Tensor implements GPUTensorI {
@@ -303,7 +303,15 @@ export class GPUTensor extends Tensor implements GPUTensorI {
     if (!(mean instanceof GPUTensor) || !(variance instanceof GPUTensor) || !(scale instanceof GPUTensor) || !(bias instanceof GPUTensor)) {
       throw new Error('Can only normalize with CPU tensors');
     }
-    return normalize(this, mean, variance, epsilon, scale, bias);
+
+    return defaultNormalize.calc({
+      X: this,
+      Mean: mean,
+      Variance: variance,
+      Scale: scale,
+      Bias: bias,
+      epsilon
+    });
   }
 }
 
@@ -353,3 +361,4 @@ const defaultGather = new GatherOperation(gpuConstructor);
 const defaultTranspose = new TransposeOperation(gpuConstructor);
 const defaultRepeat = new RepeatOperation(gpuConstructor);
 const defaultSlice = new SliceOperation(gpuConstructor);
+const defaultNormalize = new NormalizeOperation(gpuConstructor);
