@@ -8,8 +8,8 @@ import { OnnxNode } from "../node";
 import { Attributes, Constants } from "../types";
 
 export class ClipNode extends OnnxNode {
-  private min?: number;
-  private max?: number;
+  protected min?: number;
+  protected max?: number;
 
   private compiled = false;
   private operation?: ClipOperation<GPUTensor>;
