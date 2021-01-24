@@ -5,12 +5,19 @@ import { Input, Operation } from "./operation";
 
 
 export interface SliceInfo {
-  shapeX?: number[];
+  shapeX?: readonly number[];
   widthX?: number;
   heightX?: number;
-  shapeOutput?: number[],
+
+  shapeOutput?: readonly number[],
   widthOutput?: number;
   heightOutput?: number;
+
+  starts?: readonly number[];
+  ends?: readonly number[];
+  axes?: readonly number[];
+
+  offsets?: number[];
 }
 
 export interface SliceInput {
@@ -57,7 +64,7 @@ export class SliceOperation<GPUTensor extends GPUTensorI> extends Operation<GPUT
 
   getUniformAttrs(): Input[] {
     return [
-      { name: "offsets", length: this.maxRank*2 }
+      { name: "offsets", length: this.maxRank }
     ];
   }
 
@@ -98,6 +105,25 @@ export class SliceOperation<GPUTensor extends GPUTensorI> extends Operation<GPUT
   compile(info: SliceInfo) {
     if (info.shapeX !== undefined) {
       this.maxRank = info.shapeX.length;
+
+      if (info.axes !== undefined && info.starts !== undefined && info.starts !== undefined) {
+        const rank = info.shapeX.length;
+
+        const offsets: number[] = new Array(rank).fill(0);
+        let axIx = 0;
+        for (let i = 0; i < rank && axIx < info.axes.length; i++) {
+          if (i == info.axes[axIx]) {
+            offsets[i] = info.starts[axIx];
+            axIx++;
+          }
+        }
+
+        info.offsets = offsets;
+
+        delete info['starts'];
+        delete info['ends'];
+        delete info['axes'];
+      }
     }
 
     super.compile(info);
