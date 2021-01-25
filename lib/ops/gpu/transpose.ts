@@ -5,21 +5,21 @@ import { Input, Operation } from "./operation";
 
 
 export interface TransposeInfo {
-  shapeA?: number[];
+  shapeA?: readonly number[];
   widthA?: number;
   heightA?: number;
 
-  shapeOutput?: number[],
+  shapeOutput?: readonly number[],
   widthOutput?: number;
   heightOutput?: number;
 
-  permutation?: number[];
-  mappedStrides?: number[];
+  permutation?: readonly number[];
+  mappedStrides?: readonly number[];
 }
 
 export interface TransposeInput {
   A: GPUTensorI;
-  permutation: number[];
+  permutation: readonly number[];
 }
 
 export class TransposeOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTensor, TransposeInfo, TransposeInput> {
@@ -81,6 +81,20 @@ export class TransposeOperation<GPUTensor extends GPUTensorI> extends Operation<
   compile(info: TransposeInfo) {
     if (info.shapeA !== undefined) {
       this.maxRank = info.shapeA.length;
+
+      if (info.permutation !== undefined) {
+        const rank = info.shapeA.length;
+
+        const inputStrides = computeStrides(info.shapeA);
+        const mappedStrides = new Array(rank);
+        for (let i = 0; i < rank; i++) {
+          mappedStrides[i] = inputStrides[info.permutation[i]];
+        }
+
+        info.mappedStrides = mappedStrides;
+
+        delete info['permutation'];
+      }
     }
 
     super.compile(info);
