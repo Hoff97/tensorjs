@@ -5,14 +5,14 @@ import { Input, Operation } from "./operation";
 
 
 export interface PadInfo {
-  shapeX?: number[];
+  shapeX?: readonly number[];
   widthX?: number;
   heightX?: number;
-  shapeOutput?: number[],
+  shapeOutput?: readonly number[],
   widthOutput?: number;
   heightOutput?: number;
 
-  pads?: number;
+  pads?: number[];
   mode?: PadMode | number;
   value?: number;
 }
@@ -109,13 +109,17 @@ export class PadOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTen
     ];
   }
 
+  getModeFlag(mode: PadMode) {
+    return mode === "constant" ? 0 : mode === "reflect" ? 1 : 2;
+  }
+
   calc(input: PadInput): GPUTensor {
     const resultShape = this.getOutputShape(input);
 
     return this.compute(resultShape, {X: input.input}, {
       pads: this.copyPad(input.pads, this.maxRank*2),
       value: input.value,
-      mode: input.mode === "constant" ? 0 : input.mode === "reflect" ? 1 : 2
+      mode: this.getModeFlag(input.mode)
     });
   }
 
@@ -133,6 +137,10 @@ export class PadOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTen
   compile(info: PadInfo) {
     if (info.shapeX !== undefined) {
       this.maxRank = info.shapeX.length;
+    }
+
+    if (info.mode !== undefined) {
+      info.mode = this.getModeFlag(info.mode as any);
     }
 
     super.compile(info);
