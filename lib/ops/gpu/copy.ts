@@ -4,10 +4,10 @@ import { Operation } from "./operation";
 
 
 export interface CopyInfo {
-  shapeX?: number[];
+  shapeX?: readonly number[];
   widthX?: number;
   heightX?: number;
-  shapeOutput?: number[],
+  shapeOutput?: readonly number[],
   widthOutput?: number;
   heightOutput?: number;
 }
