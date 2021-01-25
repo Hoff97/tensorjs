@@ -2,8 +2,6 @@ import { PoolOperation } from "../../../ops/gpu/pool";
 import { SumSquareOperation } from "../../../ops/gpu/sumSquare";
 import { gpuConstructor, GPUTensor } from "../../../tensor/gpu/tensor";
 import types from "../../../types";
-import Tensor from "../.././types";
-import { OnnxNode } from "../../node";
 import { Attributes, Constants } from "../../types";
 import { ReduceNode } from "./reduceNode";
 

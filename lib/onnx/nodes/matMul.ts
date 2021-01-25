@@ -27,7 +27,7 @@ export class MatMulNode extends OnnxNode {
       if (!this.compiled) {
         return [A.gemm(B)];
       } else {
-        return [this.operation.calc({a: A, b: B, aTranspose: false, bTranspose: false, alpha: 1, beta: 1})];
+        return [this.operation.calc({a: A as GPUTensor, b: B as GPUTensor, aTranspose: false, bTranspose: false, alpha: 1, beta: 1})];
       }
     }
     throw new Error(`Matmul with onnx version ${this.onnxVersion} not yet implemented`);

@@ -157,7 +157,7 @@ export class InstanceNormalizationNode extends OnnxNode {
 
           axes: reduceAxes, keepDims: true
         };
-        this.reduceMeanOperation.compile(info);
+        this.reduceMeanOperation.compile(meanInfo);
 
         const diffInfo: BinaryOpInfo = {
           shapeA: x.getShape(),
