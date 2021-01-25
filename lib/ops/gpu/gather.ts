@@ -6,13 +6,15 @@ import { Input, Operation } from "./operation";
 
 
 export interface GatherInfo {
-  shapeX?: number[];
+  shapeX?: readonly number[];
   widthX?: number;
   heightX?: number;
 
-  shapeOutput?: number[],
+  shapeOutput?: readonly number[],
   widthOutput?: number;
   heightOutput?: number;
+
+  indices?: CPUTensor;
 
   axis?: number;
   indexValues?: number[];
@@ -37,7 +39,6 @@ export class GatherOperation<GPUTensor extends GPUTensorI> extends Operation<GPU
     return `
     ${this.getVarModifier('axis')} int axis;
     ${this.getVarModifier('indexValues')} int indexValues[${this.gatherMaxIxSize}];
-
     ${this.getVarModifier('mappedIndexStrides')} int mappedIndexStrides[${this.maxRank}];
     ${this.getVarModifier('mappedInputStrides')} int mappedInputStrides[${this.maxRank}];
     `;
@@ -155,8 +156,46 @@ export class GatherOperation<GPUTensor extends GPUTensorI> extends Operation<GPU
   compile(info: GatherInfo) {
     if (info.shapeX !== undefined) {
       this.maxRank = info.shapeX.length;
+
+      if (info.indices !== undefined && info.axis !== undefined) {
+        const r = info.shapeX.length;
+        const q = info.indices.shape.length;
+
+        const inputStrides = computeStrides(info.shapeX);
+        const indexStrides = computeStrides(info.indices.shape);
+
+        const resultRank = r + q - 1;
+        const resultShape = new Array(resultRank);
+
+        const mappedInputStrides = new Array(resultRank).fill(0);
+        const mappedIndexStrides = new Array(resultRank).fill(0);
+
+        for (let i = 0; i < info.axis; i++) {
+          resultShape[i] = info.shapeX[i];
+          mappedInputStrides[i] = inputStrides[i];
+
+          mappedIndexStrides[i] = 0;
+        }
+        for (let i = 0; i < q; i++) {
+          resultShape[i + info.axis] = info.indices.shape[i];
+          mappedIndexStrides[i + info.axis] = indexStrides[i];
+
+          mappedInputStrides[i + info.axis] = 0;
+        }
+        for (let i = info.axis + 1; i < r; i++) {
+          resultShape[i + q - 1] = info.shapeX[i];
+          mappedInputStrides[i + q - 1] = inputStrides[i];
+
+          mappedIndexStrides[i + q - 1] = 0;
+        }
+
+        info.mappedIndexStrides = mappedIndexStrides;
+        info.mappedInputStrides = mappedInputStrides;
+        info.indexValues = Array.from(info.indices.values);
+
+        delete info['indices'];
+      }
     }
-    // TODO!
 
     super.compile(info);
   }
