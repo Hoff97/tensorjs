@@ -7,17 +7,26 @@ import { Input, Operation } from "./operation";
 
 
 export interface GemmInfo {
-  shapeA?: number[];
+  shapeA?: readonly number[];
   widthA?: number;
   heightA?: number;
-  shapeB?: number[];
+  shapeB?: readonly number[];
   widthB?: number;
   heightB?: number;
-  shapeOutput?: number[],
+  shapeOutput?: readonly number[],
   widthOutput?: number;
   heightOutput?: number;
 
-  //TODO
+  aTranspose?: boolean | number;
+  bTranspose?: boolean | number;
+  alpha?: number;
+  beta?: number;
+
+  M?: number;
+  N?: number;
+  O?: number;
+
+  rank?: number;
 }
 
 export interface GemmInput {
@@ -179,7 +188,30 @@ export class GemmOperation<GPUTensor extends GPUTensorI, GemmInf extends GemmInf
   }
 
   compile(info: GemmInf) {
-    //TODO
+    if (info.shapeA !== undefined) {
+      const rank = info.shapeA.length;
+      info.rank = rank;
+      this.maxRank = rank;
+
+      if (info.aTranspose !== undefined) {
+        const M = info.aTranspose ? info.shapeA[rank - 1] : info.shapeA[rank - 2];
+        const N = info.aTranspose ? info.shapeA[rank - 2] : info.shapeA[rank - 1];
+
+        info.M = M;
+        info.N = N;
+
+        info.aTranspose = info.aTranspose ? 1 : 0;
+      }
+    }
+
+    if (info.shapeB !== undefined && info.bTranspose !== undefined) {
+      const rank = info.shapeB.length;
+      const O = info.bTranspose ? info.shapeB[rank - 2] : info.shapeB[rank - 1];
+
+      info.O = O;
+      info.bTranspose = info.bTranspose ? 1 : 0;
+    }
+
     super.compile(info);
   }
 }

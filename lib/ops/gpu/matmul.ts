@@ -1,14 +1,15 @@
 import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
 import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
 import { Operation } from "./operation";
+
 export interface MatMulInfo {
-  shapeA?: number[];
+  shapeA?: readonly number[];
   widthA?: number;
   heightA?: number;
-  shapeB?: number[];
+  shapeB?: readonly number[];
   widthB?: number;
   heightB?: number;
-  shapeOutput?: number[],
+  shapeOutput?: readonly number[],
   widthOutput?: number;
   heightOutput?: number;
 }
