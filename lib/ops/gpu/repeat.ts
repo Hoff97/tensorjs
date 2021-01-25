@@ -5,20 +5,20 @@ import { Input, Operation } from "./operation";
 
 
 export interface RepeatInfo {
-  shapeA?: number[];
+  shapeA?: readonly number[];
   widthA?: number;
   heightA?: number;
 
-  shapeOutput?: number[],
+  shapeOutput?: readonly number[],
   widthOutput?: number;
   heightOutput?: number;
 
-  repeats?: number[];
+  repeats?: readonly number[];
 }
 
 export interface RepeatInput {
   A: GPUTensorI;
-  repeats: number[];
+  repeats: readonly number[];
 }
 
 export class RepeatOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTensor, RepeatInfo, RepeatInput> {
