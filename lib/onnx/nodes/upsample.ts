@@ -72,7 +72,7 @@ export class UpsampleNode extends OnnxNode {
     const memory = this.allocator.allocate(getSize(resultShape));
 
     if (compile) {
-      const [xMem] = this.getMemoryEntries(inputs);
+      const xMem = (x as any).memory;
 
       const info: UpsampleInfo = {
         shapeX: x.getShape(),

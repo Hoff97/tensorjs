@@ -34,6 +34,5 @@ export class CastNode extends OnnxNode {
   }
 
   initializeForCompiling(): void {
-    throw new Error("Method not implemented.");
   }
 }
