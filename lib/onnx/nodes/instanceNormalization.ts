@@ -227,7 +227,7 @@ export class InstanceNormalizationNode extends OnnxNode {
         outputs: [new PrototypeTensor(resultShape, memory)]
       };
     }
-    throw new Error(`Slice is not implemented for onnx version ${this.onnxVersion}`);
+    throw new Error(`InstanceNorm is not implemented for onnx version ${this.onnxVersion}`);
   }
 
   initializeForCompiling(): void {

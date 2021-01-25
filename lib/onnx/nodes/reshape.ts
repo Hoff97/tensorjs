@@ -99,7 +99,7 @@ export class ReshapeNode extends OnnxNode {
         outputs: [new PrototypeTensor(resultShape, memory)]
       };
     }
-    throw new Error(`Slice is not implemented for onnx version ${this.onnxVersion}`);
+    throw new Error(`Reshape is not implemented for onnx version ${this.onnxVersion}`);
   }
 
   initializeForCompiling(): void {
