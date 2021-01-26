@@ -85,10 +85,10 @@ export class SoftmaxNode extends OnnxNode {
     const sum = this.sumOperation.calc({X: exp, axes: [1], keepDims: true});
     const result = this.divideOperation.calc({A: exp as GPUTensor, B: sum, outputShape: reshaped.getShape()});
 
-    max.delete();
-    normalized.delete();
-    exp.delete();
-    sum.delete();
+    max.delete(this.allocator);
+    normalized.delete(this.allocator);
+    exp.delete(this.allocator);
+    sum.delete(this.allocator);
 
     return [result.reshape(shapeX, false)];
   }

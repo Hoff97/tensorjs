@@ -100,9 +100,9 @@ export class InstanceNormalizationNode extends OnnxNode {
       epsilon: this.epsilon
     });
 
-    mean.delete();
-    diff.delete();
-    variance.delete();
+    mean.delete(this.allocator);
+    diff.delete(this.allocator);
+    variance.delete(this.allocator);
 
     return [result];
   }

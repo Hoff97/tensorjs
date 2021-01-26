@@ -462,7 +462,7 @@ export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictB
     }
 
     const resultSize = getSize(resultShape);
-    let result = defaultAllocator.allocate(resultSize);
+    let result = this.allocator.allocate(resultSize);
 
     const inputTextures: {[name: string]: Framebuffer2D} = {};
     for (let name in inputTensors) {

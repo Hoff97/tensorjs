@@ -2,7 +2,8 @@ import Long from 'long';
 import {onnx} from 'onnx-proto';
 import { PrototypeTensor } from '../tensor/cpu/prototype';
 import { gl, glContext } from '../tensor/gpu/gl';
-import { GPUMemoryAllocator, MemoryEntry } from '../tensor/gpu/memory';
+import { GPUMemoryAllocator } from '../tensor/gpu/memory';
+import { GPUTensor } from '../tensor/gpu/tensor';
 import Tensor from '../types';
 import { toCPU, toGPU, toWASM } from '../util/convert';
 import { TENSOR_INT64 } from './definitions';
@@ -45,7 +46,7 @@ export class OnnxModel {
   private noConvertConstants: Set<string>;
   private noConvertNodes: Set<number>;
 
-  private allocator?: GPUMemoryAllocator;
+  public allocator?: GPUMemoryAllocator;
 
   constructor(buffer: ArrayBuffer | Uint8Array, args?: ModelArgs) {
     let arr: Uint8Array;
@@ -160,12 +161,13 @@ export class OnnxModel {
       const {inputs, toDelete} = this.getInputsToNode(node, intermediaryRes);
 
       let outputs: Tensor[];
-      try {
+      /*try {
         outputs = await node.forward(inputs);
       } catch (e) {
         console.error(`Error occurred in node ${nodeId} with inputs ${node.inputs} from nodes ${node.inputs.map(x => this.getNodeWithOutput(x))}`);
         throw e;
-      }
+      }*/
+      outputs = await node.forward(inputs);
       glContext.flush();
 
       this.propagateResults(node, intermediaryRes, outputs, nodes, nodesReady);
@@ -173,7 +175,11 @@ export class OnnxModel {
       for (let i = 0; i < toDelete.length; i++) {
         if (!this.inputSet.has(toDelete[i])) {
           const inter = intermediaryRes[toDelete[i]];
-          inter.value.delete();
+          if (this.allocator !== undefined && inter.value instanceof GPUTensor) {
+            this.allocator.deallocate(inter.value.memory);
+          } else {
+            inter.value.delete();
+          }
           delete intermediaryRes[toDelete[i]];
         }
       }
@@ -225,7 +231,7 @@ export class OnnxModel {
       } else {
         const inter = intermediaryRes[input];
         inter.used++;
-        if (inter.used === this.intermediaries[input].to.length && this.intermediaries[input].deletable) {
+        if (inter.used >= this.intermediaries[input].to.length && this.intermediaries[input].deletable) {
           toDelete.push(input);
         }
         inputs.push(inter.value);

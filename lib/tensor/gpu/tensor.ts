@@ -4,7 +4,7 @@ import { compareShapes, getSize } from '../../util/shape';
 
 import { MatMulOperation } from '../../ops/gpu/matmul';
 import { defaultAllocator, gl } from './gl';
-import { MemoryEntry } from './memory';
+import { GPUMemoryAllocator, MemoryEntry } from './memory';
 import { CPUTensor } from '../cpu/tensor';
 import REGL from 'regl';
 import { toTexture } from '../../ops/gpu/toTexture';
@@ -102,9 +102,13 @@ export class GPUTensor extends Tensor implements GPUTensorI {
     return this;
   }
 
-  delete(): void {
+  delete(allocator?: GPUMemoryAllocator): void {
     this.deleted = true;
-    defaultAllocator.deallocate(this.memory);
+    if (allocator !== undefined) {
+      allocator.deallocate(this.memory);
+    } else {
+      defaultAllocator.deallocate(this.memory);
+    }
     this.memory = undefined;
   }
 

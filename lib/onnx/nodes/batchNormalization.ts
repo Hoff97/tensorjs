@@ -100,7 +100,7 @@ export class BatchNormalizationNode extends OnnxNode {
         B: scaled,
         outputShape: x.getShape()
       });
-      scaled.delete();
+      scaled.delete(this.allocator);
 
       return [result];
     } else {
@@ -194,6 +194,8 @@ export class BatchNormalizationNode extends OnnxNode {
           widthOutput: resultMemory.width,
           heightOutput: resultMemory.height
         });
+
+        this.compiled = true;
       }
 
       this.allocator.deallocate(intermediateMemory);

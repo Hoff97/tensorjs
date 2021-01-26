@@ -44,7 +44,7 @@ export class ConcatNode extends OnnxNode {
           A: result as any, B: inputs[i] as any, axis: this.axis
         })
         if (i > 1) {
-          result.delete();
+          (result as GPUTensor).delete(this.allocator);
         }
         result = newRes;
       }
