@@ -92,4 +92,8 @@ export class TileNode extends OnnxNode {
   initializeForCompiling(): void {
     this.operation = new RepeatOperation(gpuConstructor, this.allocator);
   }
+
+  getType() {
+    return 'Tile';
+  }
 }

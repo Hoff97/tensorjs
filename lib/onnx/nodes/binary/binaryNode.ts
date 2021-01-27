@@ -81,4 +81,8 @@ export abstract class BinaryNode extends OnnxNode {
   initializeForCompiling(): void {
     this.operation = this.getOperation();
   }
+
+  getType() {
+    return this.name;
+  }
 }

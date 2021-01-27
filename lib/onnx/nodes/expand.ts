@@ -94,4 +94,8 @@ export class ExpandNode extends OnnxNode {
   initializeForCompiling(): void {
     this.operation = new ExpandOperation(gpuConstructor, this.allocator);
   }
+
+  getType() {
+    return 'Expand';
+  }
 }

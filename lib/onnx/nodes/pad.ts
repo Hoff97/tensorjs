@@ -81,4 +81,8 @@ export class PadNode extends OnnxNode {
   initializeForCompiling(): void {
     this.operation = new PadOperation(gpuConstructor, this.allocator);
   }
+
+  getType() {
+    return 'Pad';
+  }
 }

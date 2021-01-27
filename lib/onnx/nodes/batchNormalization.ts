@@ -17,8 +17,8 @@ export class BatchNormalizationNode extends OnnxNode {
 
   private epsTensor: Tensor;
 
-  private scale?: Tensor;
-  private bias?: Tensor;
+  public scale?: Tensor;
+  public bias?: Tensor;
 
   private compiled = false;
 
@@ -277,5 +277,9 @@ export class BatchNormalizationNode extends OnnxNode {
       this.scale = await toGPU(this.scale);
       this.bias = await toGPU(this.bias);
     }
+  }
+
+  getType() {
+    return 'BatchNormalization';
   }
 }

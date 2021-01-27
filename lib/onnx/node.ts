@@ -127,4 +127,6 @@ export abstract class OnnxNode {
   abstract staticForward(inputs: Tensor[], compile: boolean): Promise<{outputs: (CPUTensor | PrototypeTensor)[]}>;
 
   abstract initializeForCompiling(): void;
+
+  abstract getType(): string;
 }

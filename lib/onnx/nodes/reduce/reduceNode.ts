@@ -103,4 +103,8 @@ export abstract class ReduceNode extends OnnxNode {
   initializeForCompiling(): void {
     this.operation = this.getOperation();
   }
+
+  getType() {
+    return this.name;
+  }
 }

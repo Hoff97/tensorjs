@@ -43,4 +43,8 @@ export class ConstantOfShapeNode extends OnnxNode {
 
   initializeForCompiling(): void {
   }
+
+  getType() {
+    return 'ConstantOfShape';
+  }
 }

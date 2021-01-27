@@ -45,4 +45,8 @@ export class ConstantNode extends OnnxNode {
   async toGPU() {
     this.tensor = await toGPU(this.tensor);
   }
+
+  getType() {
+    return 'Constant';
+  }
 }

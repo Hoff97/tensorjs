@@ -105,4 +105,8 @@ export class ReshapeNode extends OnnxNode {
   initializeForCompiling(): void {
     this.operation = new CopyOperation(gpuConstructor, this.allocator);
   }
+
+  getType() {
+    return 'Reshape';
+  }
 }

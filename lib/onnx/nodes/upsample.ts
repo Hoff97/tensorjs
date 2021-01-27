@@ -97,4 +97,8 @@ export class UpsampleNode extends OnnxNode {
   initializeForCompiling(): void {
     this.operation = new UpsampleOperation(gpuConstructor, this.allocator);
   }
+
+  getType() {
+    return 'Upsample';
+  }
 }

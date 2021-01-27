@@ -85,4 +85,8 @@ export class ClipNode extends OnnxNode {
   initializeForCompiling(): void {
     this.operation = new ClipOperation(gpuConstructor, this.allocator);
   }
+
+  getType() {
+    return 'Clip';
+  }
 }

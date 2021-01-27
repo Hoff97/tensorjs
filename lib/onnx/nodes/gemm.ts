@@ -140,4 +140,8 @@ export class GemmNode extends OnnxNode {
       }
     }
   }
+
+  getType() {
+    return 'Gemm';
+  }
 }

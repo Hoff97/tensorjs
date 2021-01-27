@@ -154,4 +154,8 @@ export class ConvNode extends OnnxNode {
       }
     }
   }
+
+  getType() {
+    return 'Conv';
+  }
 }

@@ -217,4 +217,8 @@ export class SoftmaxNode extends OnnxNode {
     this.sumOperation = new SumOperation(gpuConstructor, this.allocator);
     this.divideOperation = new DivideOperation(gpuConstructor, this.allocator);
   }
+
+  getType() {
+    return 'Softmax';
+  }
 }

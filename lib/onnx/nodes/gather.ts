@@ -82,4 +82,8 @@ export class GatherNode extends OnnxNode {
   initializeForCompiling(): void {
     this.operation = new GatherOperation(gpuConstructor, this.allocator);
   }
+
+  getType() {
+    return 'Gather';
+  }
 }

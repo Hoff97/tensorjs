@@ -35,4 +35,8 @@ export class CastNode extends OnnxNode {
 
   initializeForCompiling(): void {
   }
+
+  getType() {
+    return 'Cast';
+  }
 }

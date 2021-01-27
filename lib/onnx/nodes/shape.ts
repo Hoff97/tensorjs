@@ -33,4 +33,8 @@ export class ShapeNode extends OnnxNode {
 
   initializeForCompiling(): void {
   }
+
+  getType() {
+    return 'Shape';
+  }
 }

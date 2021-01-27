@@ -80,4 +80,8 @@ export class TransposeNode extends OnnxNode {
   initializeForCompiling(): void {
     this.operation = new TransposeOperation(gpuConstructor, this.allocator);
   }
+
+  getType() {
+    return 'Transpose';
+  }
 }

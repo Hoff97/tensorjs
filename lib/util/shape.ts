@@ -17,7 +17,11 @@ export function computeStrides(shape: ReadonlyArray<number>) {
     return [];
   }
   if (rank === 1) {
-    return [1];
+    if (shape[0] === 1) {
+      return [0];
+    } else {
+      return [1];
+    }
   }
 
   const strides = new Array(rank);

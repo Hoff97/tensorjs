@@ -12,6 +12,8 @@ export abstract class UnaryNode extends OnnxNode {
 
   protected compiled: boolean = false;
 
+  protected name: string;
+
   constructor(attributes: Attributes, inputs: string[], outputs: string[], constants: Constants, onnxVersion: number) {
     super(attributes, inputs, outputs, constants, onnxVersion);
   }
@@ -63,5 +65,9 @@ export abstract class UnaryNode extends OnnxNode {
 
   initializeForCompiling(): void {
     this.operation = this.getOperation();
+  }
+
+  getType() {
+    return this.name;
   }
 }

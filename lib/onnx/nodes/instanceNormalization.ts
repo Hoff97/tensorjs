@@ -236,4 +236,8 @@ export class InstanceNormalizationNode extends OnnxNode {
     this.reduceMeanSquareOperation = new ReduceMeanSquareOperation(gpuConstructor, this.allocator);
     this.normalizeOperation = new NormalizeOperation(gpuConstructor, this.allocator);
   }
+
+  getType() {
+    return 'InstanceNormalization';
+  }
 }

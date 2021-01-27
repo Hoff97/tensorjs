@@ -82,4 +82,8 @@ export class MatMulNode extends OnnxNode {
   initializeForCompiling(): void {
     this.operation = new GemmOperation(gpuConstructor, this.allocator);
   }
+
+  getType() {
+    return 'MatMul';
+  }
 }

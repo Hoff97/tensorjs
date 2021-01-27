@@ -110,4 +110,8 @@ export class SliceNode extends OnnxNode {
   initializeForCompiling(): void {
     this.operation = new SliceOperation(gpuConstructor, this.allocator);
   }
+
+  getType() {
+    return 'Slice';
+  }
 }

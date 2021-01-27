@@ -9,3 +9,9 @@ export type NodeConstructor = (attributes: Attributes,
                                constants: Constants,
                                onnxVersion: number) => OnnxNode;
 export type Constants = {[name: string]: Tensor};
+
+export interface OnnxModelI {
+  getNodes(): {[id: number]: OnnxNode};
+
+  getNodeWithInput(output: string): number;
+}

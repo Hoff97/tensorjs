@@ -10,4 +10,8 @@ export class ReluNode extends ClipNode {
     this.max = undefined;
     this.min = 0;
   }
+
+  getType() {
+    return 'Relu';
+  }
 }

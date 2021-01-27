@@ -120,4 +120,8 @@ export class ConcatNode extends OnnxNode {
       }
     }
   }
+
+  getType() {
+    return 'Concat';
+  }
 }
