@@ -6,16 +6,17 @@ import { GPUMemoryAllocator } from '../tensor/gpu/memory';
 import { GPUTensor } from '../tensor/gpu/tensor';
 import Tensor from '../types';
 import { toCPU, toGPU, toWASM } from '../util/convert';
-import { TENSOR_INT64 } from './definitions';
 import { OnnxNode } from './node';
-import { ConcatNode } from './nodes/concat';
 import { ConstantNode } from './nodes/constant';
+import { defaultOptimizations } from './optimizations/default';
 import { nodeResolve } from './resolve';
 import { Constants } from './types';
 import { createTensor } from './util';
 
+export type NodeId = number;
+
 interface Intermediary {
-  to: number[];
+  to: NodeId[];
   deletable: boolean;
 }
 
@@ -26,25 +27,29 @@ interface IntermediaryRes {
 
 interface ModelArgs {
   noConvertConstants?: string[];
-  noConvertNodes?: number[];
+  noConvertNodes?: NodeId[];
 }
 
 export class OnnxModel {
   private version: number;
-  public inputs: onnx.IValueInfoProto[];
   private inputSet: Set<string> = new Set();
   private outputs: string[];
 
   private nodes: {[id: number]: OnnxNode} = {};
-  private nodeIds: number[] = [];
-  private defaultReady: number[] = [];
+  private nodeIds: NodeId[] = [];
+  private defaultReady: NodeId[] = [];
 
   private intermediaries: {[name: string]: Intermediary} = {};
 
   private constants: Constants = {};
 
   private noConvertConstants: Set<string>;
-  private noConvertNodes: Set<number>;
+  private noConvertNodes: Set<NodeId>;
+
+  private modelProto: onnx.ModelProto;
+
+
+  public inputs: onnx.IValueInfoProto[];
 
   public allocator?: GPUMemoryAllocator;
 
@@ -55,24 +60,24 @@ export class OnnxModel {
     } else {
       arr = buffer;
     }
-    const modelProto = onnx.ModelProto.decode(arr);
+    this.modelProto = onnx.ModelProto.decode(arr);
 
-    let ver = modelProto.opsetImport[0].version;
+    let ver = this.modelProto.opsetImport[0].version;
     if (Long.isLong(ver)) {
       ver = (ver as Long).toNumber();
     }
 
     this.version = ver;
 
-    this.inputs = modelProto.graph.input;
+    this.inputs = this.modelProto.graph.input;
     for (let i = 0; i < this.inputs.length; i++) {
       this.inputSet.add(this.inputs[i].name);
     }
-    this.outputs = modelProto.graph.output.map(x => x.name);
+    this.outputs = this.modelProto.graph.output.map(x => x.name);
 
-    this.initializer(modelProto.graph.initializer);
+    this.initializer(this.modelProto.graph.initializer);
 
-    this.initNodes(modelProto);
+    this.initNodes(this.modelProto);
 
     if (args === undefined) {
       args = {};
@@ -150,7 +155,7 @@ export class OnnxModel {
       }
     }
 
-    const nodesReady: number[] = [...this.defaultReady];
+    const nodesReady: NodeId[] = [...this.defaultReady];
 
     this.initializeForward(inputs, intermediaryRes, nodes, nodesReady);
 
@@ -201,7 +206,7 @@ export class OnnxModel {
 
   protected initializeForward(inputs: Tensor[], intermediaryRes: {[name: string]: IntermediaryRes},
                               nodes: {[id: number]: {variableInputs: number}},
-                              nodesReady: number[]) {
+                              nodesReady: NodeId[]) {
     for (let i = 0; i < inputs.length; i++) {
       intermediaryRes[this.inputs[i].name] = {
         value: inputs[i],
@@ -243,7 +248,7 @@ export class OnnxModel {
 
   protected propagateResults(node: OnnxNode, intermediaryRes: {[name: string]: IntermediaryRes},
                              outputs: Tensor[], nodes: {[id: number]: {variableInputs: number}},
-                             nodesReady: number[]) {
+                             nodesReady: NodeId[]) {
     for (let i = 0; i < node.outputs.length; i++) {
       const output = node.outputs[i];
       intermediaryRes[output] = {
@@ -265,26 +270,6 @@ export class OnnxModel {
         }
       }
     }
-  }
-
-  public getNodeWithOutput(output: string) {
-    for (let id of this.nodeIds) {
-      if (this.nodes[id].outputs.findIndex(x => x === output) !== -1) {
-        return id;
-      }
-    }
-  }
-
-  public resolveConstant(name: string) {
-    if (this.constants[name] !== undefined) {
-      return this.constants[name];
-    }
-    const nodeIdOut = this.getNodeWithOutput(name);
-    const nodeOut = this.nodes[nodeIdOut];
-    if (nodeOut instanceof ConstantNode) {
-      return nodeOut.tensor;
-    }
-    return undefined;
   }
 
   async toCPU() {
@@ -361,7 +346,7 @@ export class OnnxModel {
       }
     }
 
-    const nodesReady: number[] = [...this.defaultReady];
+    const nodesReady: NodeId[] = [...this.defaultReady];
 
     this.initializeForward(inputs, intermediaryRes, nodes, nodesReady);
 
@@ -389,5 +374,52 @@ export class OnnxModel {
         }
       }
     }
+  }
+
+  public optimize() {
+    for (let optimization of defaultOptimizations) {
+      const applications = optimization.findApplications(this);
+
+      for (let application of applications) {
+        const nodes = application.map(x => this.nodes[x]);
+        const newNode = optimization.apply(nodes, (name) => this.resolveConstant(name));
+
+        console.log(newNode);
+      }
+    }
+  }
+
+  // Utility functions
+
+  public getNodeWithOutput(output: string) {
+    for (let id of this.nodeIds) {
+      if (this.nodes[id].outputs.findIndex(x => x === output) !== -1) {
+        return id;
+      }
+    }
+  }
+
+  public getNodeWithInput(output: string) {
+    for (let id of this.nodeIds) {
+      if (this.nodes[id].inputs.findIndex(x => x === output) !== -1) {
+        return id;
+      }
+    }
+  }
+
+  public resolveConstant(name: string) {
+    if (this.constants[name] !== undefined) {
+      return this.constants[name];
+    }
+    const nodeIdOut = this.getNodeWithOutput(name);
+    const nodeOut = this.nodes[nodeIdOut];
+    if (nodeOut instanceof ConstantNode) {
+      return nodeOut.tensor;
+    }
+    return undefined;
+  }
+
+  getNodes() {
+    return this.nodes;
   }
 }
