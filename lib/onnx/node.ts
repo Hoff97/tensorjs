@@ -9,14 +9,15 @@ import { GPUTensor } from "../tensor/gpu/tensor";
 import { Attributes, Constants } from "./types";
 
 export abstract class OnnxNode {
-  protected attributes: {[name: string]: onnx.IAttributeProto} = {};
   protected onnxVersion: number;
+
+  protected allocator = defaultAllocator;
+
   public inputs: string[];
   public outputs: string[];
 
   public variableInputs: number;
-
-  protected allocator = defaultAllocator;
+  public attributes: {[name: string]: onnx.IAttributeProto} = {};
 
   constructor(attributes: Attributes, inputs: string[], outputs: string[], constants: Constants, onnxVersion: number) {
     for (let i = 0; i < attributes.length; i++) {

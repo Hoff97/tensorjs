@@ -48,6 +48,7 @@ export class OnnxModel {
 
   private modelProto: onnx.ModelProto;
 
+  private nodeIdCounter = 10000;
 
   public inputs: onnx.IValueInfoProto[];
 
@@ -214,6 +215,7 @@ export class OnnxModel {
       };
 
       const inter = this.intermediaries[this.inputs[i].name];
+
       for (let j = 0; j < inter.to.length; j++) {
         const id = inter.to[j];
         nodes[id].variableInputs++;
@@ -380,12 +382,84 @@ export class OnnxModel {
     for (let optimization of defaultOptimizations) {
       const applications = optimization.findApplications(this);
 
-      for (let application of applications) {
-        const nodes = application.map(x => this.nodes[x]);
-        const newNode = optimization.apply(nodes, (name) => this.resolveConstant(name));
+      for (let nodeIds of applications) {
+        const nodes = nodeIds.map(x => this.nodes[x]);
+        const newNode = optimization.apply(nodes, (name) => this.resolveConstant(name), this.constants, this.version);
 
-        console.log(newNode);
+        const outputs = new Set(newNode.outputs);
+
+        for (let nodeId of nodeIds) {
+          this.removeNode(nodeId, outputs);
+        }
+
+        this.insertNode(newNode);
       }
+    }
+
+    this.prune();
+  }
+
+  private prune() {
+    while (true) {
+      const nodesToDelete = this.pruneIntermediaries();
+
+      if (nodesToDelete.size > 0) {
+        nodesToDelete.forEach(id => {
+          this.removeNode(id, new Set());
+        });
+      } else {
+        break;
+      }
+    }
+  }
+
+  private pruneIntermediaries() {
+    const nodesToDelete = new Set<number>();
+
+    const intermediariesToDelete: string[] = [];
+
+    for (let id in this.intermediaries) {
+      const intermediary = this.intermediaries[id];
+      if (intermediary.to.length === 0) {
+        intermediariesToDelete.push(id);
+        const nodeId = this.getNodeWithOutput(id);
+        if (nodeId !== undefined) {
+          nodesToDelete.add(nodeId);
+        }
+      }
+    }
+
+    for (let id of intermediariesToDelete) {
+      delete this.intermediaries[id];
+    }
+
+    return nodesToDelete;
+  }
+
+  private removeNode(nodeId: number, preserveIntermediaries: Set<string>) {
+    const node = this.nodes[nodeId];
+    for (let input of node.inputs) {
+      if (this.intermediaries[input] !== undefined) {
+        this.intermediaries[input].to = this.intermediaries[input].to.filter(x => x.toString() !== nodeId.toString());
+      }
+    }
+    if (!preserveIntermediaries.has(node.outputs[0])) {
+      delete this.intermediaries[node.outputs[0]];
+    }
+
+    this.nodeIds = this.nodeIds.filter(x => x.toString() !== nodeId.toString());
+    delete this.nodes[nodeId];
+    // TODO: Clean up GPU/WASM memory of the nodes here
+  }
+
+  private insertNode(node: OnnxNode) {
+    const id = this.nodeIdCounter++;
+
+    this.nodeIds.push(id);
+    this.nodes[id] = node;
+
+    for (let input of node.inputs) {
+      this.intermediaries[input].to.push(id);
     }
   }
 

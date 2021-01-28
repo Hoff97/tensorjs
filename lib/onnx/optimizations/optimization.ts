@@ -1,7 +1,7 @@
 import Tensor from '../../types';
 import { NodeId, OnnxModel } from '../model';
 import { OnnxNode } from '../node';
-import { OnnxModelI } from '../types';
+import { Constants, OnnxModelI } from '../types';
 
 
 export abstract class Optimization {
@@ -15,7 +15,7 @@ export abstract class Optimization {
    */
   abstract findApplications(model: OnnxModelI): NodeId[][];
 
-  abstract apply(nodes: OnnxNode[], resolveConstant: (name: string) => Tensor): OnnxNode;
+  abstract apply(nodes: OnnxNode[], resolveConstant: (name: string) => Tensor, constants: Constants, onnxVersion: number): OnnxNode;
 }
 
 export abstract class SequenceOptimization extends Optimization {

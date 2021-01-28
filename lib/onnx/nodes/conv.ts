@@ -1,8 +1,10 @@
 import { ConvBiasOperation, ConvInfo, ConvInput, ConvOperation } from "../../ops/gpu/conv";
 import { PrototypeTensor } from "../../tensor/cpu/prototype";
 import { CPUTensor } from "../../tensor/cpu/tensor";
+import { MemoryEntry } from "../../tensor/gpu/memory";
 import { gpuConstructor, GPUTensor } from "../../tensor/gpu/tensor";
 import Tensor from "../../types";
+import { toCPU, toGPU, toWASM } from "../../util/convert";
 import { getSize } from "../../util/shape";
 import { OnnxNode } from "../node";
 import { Attributes, Constants } from "../types";
@@ -17,7 +19,14 @@ export class ConvNode extends OnnxNode {
 
   private operation?: ConvOperation<GPUTensor>;
 
-  constructor(attributes: Attributes, inputs: string[], outputs: string[], constants: Constants, onnxVersion: number) {
+  private kernel?: Tensor;
+  private bias?: Tensor;
+
+  constructor(attributes: Attributes, inputs: string[],
+              outputs: string[], constants: Constants,
+              onnxVersion: number,
+              kernel?: Tensor,
+              bias?: Tensor) {
     super(attributes, inputs, outputs, constants, onnxVersion);
 
     const autoPad = this.getAttributeString('autoPad');
@@ -29,14 +38,17 @@ export class ConvNode extends OnnxNode {
     this.dilations = this.getAttributeInts('dilations');
     this.pads = this.getAttributeInts('pads');
     this.strides = this.getAttributeInts('strides');
+
+    this.kernel = kernel;
+    this.bias = bias;
   }
 
   async forward(inputs: Tensor[]): Promise<Tensor[]> {
-    if (!this.compiled) {
-      const x = inputs[0];
-      const w = inputs[1];
-      const b = inputs.length > 2 ? inputs[2] : undefined;
+    const x = inputs[0];
+    const w = this.kernel !== undefined ? this.kernel : inputs[1];
+    const b = inputs.length > 2 ? inputs[2] : this.bias;
 
+    if (!this.compiled) {
       return [x.conv(w, b, this.dilations, this.group, this.pads, this.strides)];
     } else {
       const rank = inputs[0].getShape().length - 2;
@@ -45,14 +57,14 @@ export class ConvNode extends OnnxNode {
       const strides = this.getStrides(rank);
 
       let input: ConvInput = {
-        X: inputs[0] as GPUTensor,
-        W: inputs[1] as GPUTensor,
+        X: x as GPUTensor,
+        W: w as GPUTensor,
         pads, dilations, strides
       };
 
-      if (inputs.length > 2) {
+      if (b !== undefined) {
         //@ts-ignore
-        input['B'] = inputs[2];
+        input['B'] = b;
       }
 
       return [this.operation.calc(input)];
@@ -79,6 +91,19 @@ export class ConvNode extends OnnxNode {
     } return new Array(rank).fill(1);
   }
 
+  getMemoryEntries(inputs: Tensor[]): MemoryEntry[] {
+    const memories = super.getMemoryEntries(inputs);
+    if (this.kernel === undefined) {
+      return memories;
+    } else {
+      memories.push((this.kernel as GPUTensor).memory);
+      if (this.bias !== undefined) {
+        memories.push((this.bias as GPUTensor).memory);
+      }
+    }
+    return memories;
+  }
+
   async staticForward(inputs: Tensor[], compile: boolean): Promise<{ outputs: (CPUTensor | PrototypeTensor)[]; }> {
     if (this.allStaticCPU(inputs)) {
       return this.defaultStaticForward(inputs);
@@ -89,9 +114,8 @@ export class ConvNode extends OnnxNode {
     }
 
     const x = inputs[0];
-    const w = inputs[1];
-
-    const bias = inputs.length > 2 ? inputs[2] : undefined;
+    const w = this.kernel !== undefined ? this.kernel : inputs[1];
+    const bias = inputs.length > 2 ? inputs[2] : this.bias;
 
     const rank = x.getShape().length - 2;
     const dilations = this.getDilations(rank);
@@ -99,8 +123,8 @@ export class ConvNode extends OnnxNode {
     const strides = this.getStrides(rank);
 
     const resultShape = this.operation.getOutputShape({
-      X: inputs[0] as any,
-      W: inputs[1] as any,
+      X: x as any,
+      W: w as any,
       pads, dilations, strides
     });
     const memory = this.allocator.allocate(getSize(resultShape));
@@ -147,15 +171,50 @@ export class ConvNode extends OnnxNode {
 
   initializeForCompiling(inputs?: Tensor[]): void {
     if (inputs !== undefined) {
-      if (inputs.length === 2) {
-        this.operation = new ConvOperation(gpuConstructor, this.allocator);
-      } else if(inputs.length === 3) {
-        this.operation = new ConvBiasOperation(gpuConstructor, this.allocator);
+      if (this.kernel === undefined) {
+        if (inputs.length === 2) {
+          this.operation = new ConvOperation(gpuConstructor, this.allocator);
+        } else if(inputs.length === 3) {
+          this.operation = new ConvBiasOperation(gpuConstructor, this.allocator);
+        }
+      } else {
+        if (this.bias === undefined) {
+          this.operation = new ConvOperation(gpuConstructor, this.allocator);
+        } else {
+          this.operation = new ConvBiasOperation(gpuConstructor, this.allocator);
+        }
       }
     }
   }
 
   getType() {
     return 'Conv';
+  }
+
+  async toCPU() {
+    if (this.kernel !== undefined) {
+      this.kernel = await toCPU(this.kernel);
+    }
+    if (this.bias !== undefined) {
+      this.bias = await toCPU(this.bias);
+    }
+  }
+
+  async toWASM() {
+    if (this.kernel !== undefined) {
+      this.kernel = await toWASM(this.kernel);
+    }
+    if (this.bias !== undefined) {
+      this.bias = await toWASM(this.bias);
+    }
+  }
+
+  async toGPU() {
+    if (this.kernel !== undefined) {
+      this.kernel = await toGPU(this.kernel);
+    }
+    if (this.bias !== undefined) {
+      this.bias = await toGPU(this.bias);
+    }
   }
 }
