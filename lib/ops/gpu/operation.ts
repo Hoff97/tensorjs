@@ -1,8 +1,10 @@
 import { DrawCommand, Framebuffer2D } from "regl";
+import { ConvNode } from "../../onnx/nodes/conv";
 import { defaultAllocator, gl } from "../../tensor/gpu/gl";
 import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
 import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
 import { computeStrides, getSize } from "../../util/shape";
+import { ConvBiasOperation, ConvOperation } from "./conv";
 
 export const defaultMaxRank = 10;
 export const defaultMaxIterations = 10000000;
@@ -245,7 +247,7 @@ export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictB
     }).join('\n');
   }
 
-  getCompleteFragmentShader(info: Info) {
+  getCompleteFragmentShader(info: Info): string {
     const fragShader = this.getFragmentShader(info);
 
     const variableDecls = this.getVariableDeclarations(info);
@@ -254,7 +256,7 @@ export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictB
     const utilFunctions = this.getUtilFunctions();
     const textureFunctions = this.getTextureFunctions();
 
-    return `
+    const result = `
     precision highp float;
 
     ${variableDecls}
@@ -267,6 +269,8 @@ export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictB
     }
 
     ${fragShader}`;
+
+    return result;
   }
 
   getUniforms(info: Info) {

@@ -4,6 +4,7 @@ import { outputDimsSize } from "../util/conv";
 import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
 import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
 import { Input, Operation } from "./operation";
+import { Activation } from "../../types";
 
 
 export interface ConvInfo {
@@ -25,6 +26,7 @@ export interface ConvInfo {
   kernelSize?: number;
   dataRank?: number;
   C?: number;
+  activation?: Activation | number;
 }
 
 export interface ConvInput {
@@ -33,6 +35,7 @@ export interface ConvInput {
   pads: readonly number[];
   dilations: readonly number[];
   strides: readonly number[];
+  activation: Activation;
 }
 
 export class ConvOperation<GPUTensor extends GPUTensorI, ConvInf extends ConvInfo = ConvInfo, ConvIn extends ConvInput = ConvInput> extends Operation<GPUTensor, ConvInf, ConvIn> {
@@ -116,6 +119,7 @@ export class ConvOperation<GPUTensor extends GPUTensorI, ConvInf extends ConvInf
     ${this.getVarModifier('dilations')} int dilations[${this.maxRank}];
     ${this.getVarModifier('pads')} int pads[${this.maxRank}];
     ${this.getVarModifier('strides')} int strides[${this.maxRank}];
+    ${this.getVarModifier('activation')} int activation;
     `;
   }
 
@@ -125,6 +129,10 @@ export class ConvOperation<GPUTensor extends GPUTensorI, ConvInf extends ConvInf
       float res = 0.0;
 
       ${this.getMainBody()}
+
+      if (activation == 1) {
+        res = max(0.0, res);
+      }
 
       return res;
     }
@@ -145,8 +153,17 @@ export class ConvOperation<GPUTensor extends GPUTensorI, ConvInf extends ConvInf
       { name: "dataRank" },
       { name: "pads", length: this.maxRank*2 },
       { name: "strides", length: this.maxRank },
-      { name: "dilations", length: this.maxRank }
+      { name: "dilations", length: this.maxRank },
+      { name: "activation" }
     ];
+  }
+
+  getActivationFlag(activation: Activation) {
+    if (activation === "id") {
+      return 0;
+    } else if (activation === "relu") {
+      return 1;
+    }
   }
 
   calc(input: ConvInput): GPUTensor {
@@ -168,7 +185,8 @@ export class ConvOperation<GPUTensor extends GPUTensorI, ConvInf extends ConvInf
       dataRank: D.length,
       pads: this.copyPad(input.pads, this.maxRank*2),
       strides: this.copyPad(input.strides),
-      dilations: this.copyPad(input.dilations)
+      dilations: this.copyPad(input.dilations),
+      activation: this.getActivationFlag(input.activation)
     })
   }
 
@@ -197,6 +215,9 @@ export class ConvOperation<GPUTensor extends GPUTensorI, ConvInf extends ConvInf
       info.dataRank = info.shapeX.length - 2;
 
       this.maxRank = info.shapeX.length;
+    }
+    if (info.activation !== undefined && typeof info.activation === "string") {
+      info.activation = this.getActivationFlag(info.activation);
     }
 
     super.compile(info);
@@ -231,6 +252,10 @@ export class ConvBiasOperation<GPUTensor extends GPUTensorI> extends ConvOperati
 
       ${this.getMainBody()}
 
+      if (activation == 1) {
+        res = max(0.0, res);
+      }
+
       return res;
     }
 
@@ -261,7 +286,8 @@ export class ConvBiasOperation<GPUTensor extends GPUTensorI> extends ConvOperati
       dataRank: D.length,
       pads: this.copyPad(input.pads, this.maxRank*2),
       strides: this.copyPad(input.strides),
-      dilations: this.copyPad(input.dilations)
+      dilations: this.copyPad(input.dilations),
+      activation: this.getActivationFlag(input.activation)
     })
   }
 

@@ -34,7 +34,7 @@ export abstract class SequenceOptimization extends Optimization {
     for (let nodeId in Object.keys(nodes)) {
       const node = nodes[nodeId];
 
-      if (node.getType() === this.nodeTypes[0]) {
+      if (node !== undefined && node.getType() === this.nodeTypes[0]) {
         const app = this.checkApplication(model, nodeId);
         if (app !== undefined) {
           results.push(app as any);

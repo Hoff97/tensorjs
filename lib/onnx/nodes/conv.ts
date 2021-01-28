@@ -3,7 +3,7 @@ import { PrototypeTensor } from "../../tensor/cpu/prototype";
 import { CPUTensor } from "../../tensor/cpu/tensor";
 import { MemoryEntry } from "../../tensor/gpu/memory";
 import { gpuConstructor, GPUTensor } from "../../tensor/gpu/tensor";
-import Tensor from "../../types";
+import Tensor, { Activation } from "../../types";
 import { toCPU, toGPU, toWASM } from "../../util/convert";
 import { getSize } from "../../util/shape";
 import { OnnxNode } from "../node";
@@ -19,20 +19,28 @@ export class ConvNode extends OnnxNode {
 
   private operation?: ConvOperation<GPUTensor>;
 
-  private kernel?: Tensor;
-  private bias?: Tensor;
+  public kernel?: Tensor;
+  public bias?: Tensor;
+
+  private activation: Activation;
 
   constructor(attributes: Attributes, inputs: string[],
               outputs: string[], constants: Constants,
               onnxVersion: number,
               kernel?: Tensor,
-              bias?: Tensor) {
+              bias?: Tensor,
+              activation?: Activation) {
     super(attributes, inputs, outputs, constants, onnxVersion);
 
     const autoPad = this.getAttributeString('autoPad');
     if (autoPad !== undefined) {
       throw new Error('Autopad in conv not supported yet');
     }
+
+    if (activation === undefined) {
+      activation = "id";
+    }
+    this.activation = activation;
 
     this.group = this.getAttributeInt('group') || 1;
     this.dilations = this.getAttributeInts('dilations');
@@ -49,7 +57,7 @@ export class ConvNode extends OnnxNode {
     const b = inputs.length > 2 ? inputs[2] : this.bias;
 
     if (!this.compiled) {
-      return [x.conv(w, b, this.dilations, this.group, this.pads, this.strides)];
+      return [x.conv(w, b, this.dilations, this.group, this.pads, this.strides, this.activation)];
     } else {
       const rank = inputs[0].getShape().length - 2;
       const dilations = this.getDilations(rank);
@@ -59,7 +67,8 @@ export class ConvNode extends OnnxNode {
       let input: ConvInput = {
         X: x as GPUTensor,
         W: w as GPUTensor,
-        pads, dilations, strides
+        pads, dilations, strides,
+        activation: this.activation
       };
 
       if (b !== undefined) {
@@ -125,7 +134,8 @@ export class ConvNode extends OnnxNode {
     const resultShape = this.operation.getOutputShape({
       X: x as any,
       W: w as any,
-      pads, dilations, strides
+      pads, dilations, strides,
+      activation: this.activation
     });
     const memory = this.allocator.allocate(getSize(resultShape));
 
@@ -144,6 +154,8 @@ export class ConvNode extends OnnxNode {
         shapeOutput: resultShape,
         widthOutput: memory.width,
         heightOutput: memory.height,
+
+        activation: this.activation,
 
         pads, dilations, strides
       };

@@ -1,4 +1,4 @@
-import Tensor, { PadMode } from '../../types';
+import Tensor, { Activation, PadMode } from '../../types';
 
 import { compareShapes, getSize } from '../../util/shape';
 
@@ -221,7 +221,7 @@ export class GPUTensor extends Tensor implements GPUTensorI {
     return defaultMin.calc({X: this, axes, keepDims});
   }
 
-  conv_impl(kernel: Tensor, dilations: number[], group: number, pads: number[], strides: number[], bias?: Tensor): Tensor {
+  conv_impl(kernel: Tensor, dilations: number[], group: number, pads: number[], strides: number[], bias?: Tensor, activation?: Activation): Tensor {
     if (!(kernel instanceof GPUTensor) || (bias !== undefined && !(bias instanceof GPUTensor))) {
       throw new Error('Can only do convolution of GPU tensor with GPU tensor');
     }
@@ -230,14 +230,16 @@ export class GPUTensor extends Tensor implements GPUTensorI {
       return defaultConv.calc({
         X: this,
         W: kernel,
-        pads, dilations, strides
+        pads, dilations, strides,
+        activation
       });
     } else {
       return defaultConvBias.calc({
         X: this,
         W: kernel,
         B: bias as GPUTensor,
-        pads, dilations, strides
+        pads, dilations, strides,
+        activation
       });
     }
   }
