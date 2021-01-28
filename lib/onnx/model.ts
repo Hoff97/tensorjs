@@ -4,7 +4,7 @@ import { PrototypeTensor } from '../tensor/cpu/prototype';
 import { gl, glContext } from '../tensor/gpu/gl';
 import { GPUMemoryAllocator } from '../tensor/gpu/memory';
 import { GPUTensor } from '../tensor/gpu/tensor';
-import Tensor from '../types';
+import Tensor, { Precision } from '../types';
 import { toCPU, toGPU, toWASM } from '../util/convert';
 import { OnnxNode } from './node';
 import { ConstantNode } from './nodes/constant';
@@ -28,6 +28,7 @@ interface IntermediaryRes {
 interface ModelArgs {
   noConvertConstants?: string[];
   noConvertNodes?: NodeId[];
+  precision?: Precision;
 }
 
 export class OnnxModel {
@@ -50,11 +51,21 @@ export class OnnxModel {
 
   private nodeIdCounter = 10000;
 
-  public inputs: onnx.IValueInfoProto[];
+  private precision: Precision;
 
+  public inputs: onnx.IValueInfoProto[];
   public allocator?: GPUMemoryAllocator;
 
   constructor(buffer: ArrayBuffer | Uint8Array, args?: ModelArgs) {
+    if (args === undefined) {
+      args = {};
+    }
+
+    this.noConvertConstants = new Set<string>(args.noConvertConstants !== undefined ? args.noConvertConstants : []);
+    this.noConvertNodes = new Set<number>(args.noConvertNodes !== undefined ? args.noConvertNodes : []);
+
+    this.precision = args.precision || 32;
+
     let arr: Uint8Array;
     if (buffer instanceof ArrayBuffer) {
       arr = new Uint8Array(buffer);
@@ -79,13 +90,6 @@ export class OnnxModel {
     this.initializer(this.modelProto.graph.initializer);
 
     this.initNodes(this.modelProto);
-
-    if (args === undefined) {
-      args = {};
-    }
-
-    this.noConvertConstants = new Set<string>(args.noConvertConstants !== undefined ? args.noConvertConstants : []);
-    this.noConvertNodes = new Set<number>(args.noConvertNodes !== undefined ? args.noConvertNodes : []);
   }
 
   private initNodes(modelProto: onnx.ModelProto) {
@@ -305,13 +309,13 @@ export class OnnxModel {
   async toGPU() {
     for (let i in this.constants) {
       if (!this.noConvertConstants.has(i)) {
-        this.constants[i] = await toGPU(this.constants[i]);
+        this.constants[i] = await toGPU(this.constants[i], this.precision);
       }
     }
 
     for (let i of this.nodeIds) {
       if (!this.noConvertNodes.has(i)) {
-        await this.nodes[i].toGPU();
+        await this.nodes[i].toGPU(this.precision);
       }
     }
   }
@@ -358,7 +362,7 @@ export class OnnxModel {
 
       const {inputs, toDelete} = this.getInputsToNode(node, intermediaryRes);
 
-      let { outputs } = await node.staticForward(inputs, compile);
+      let { outputs } = await node.staticForward(inputs, compile, this.precision);
 
       glContext.flush();
 

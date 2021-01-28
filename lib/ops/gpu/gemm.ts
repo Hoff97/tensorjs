@@ -4,6 +4,7 @@ import { outputDimsSize } from "../util/conv";
 import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
 import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
 import { Input, Operation } from "./operation";
+import { Precision } from "../../types";
 
 
 export interface GemmInfo {
@@ -187,7 +188,7 @@ export class GemmOperation<GPUTensor extends GPUTensorI, GemmInf extends GemmInf
     return resultShape;
   }
 
-  compile(info: GemmInf) {
+  compile(info: GemmInf, precision: Precision) {
     if (info.shapeA !== undefined) {
       const rank = info.shapeA.length;
       info.rank = rank;
@@ -212,7 +213,7 @@ export class GemmOperation<GPUTensor extends GPUTensorI, GemmInf extends GemmInf
       info.bTranspose = info.bTranspose ? 1 : 0;
     }
 
-    super.compile(info);
+    super.compile(info, precision);
   }
 }
 

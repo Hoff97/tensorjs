@@ -9,7 +9,7 @@ import { UnaryOpInfo } from "../../ops/gpu/unaryOperation";
 import { PrototypeTensor } from "../../tensor/cpu/prototype";
 import { CPUTensor } from "../../tensor/cpu/tensor";
 import { gpuConstructor, GPUTensor } from "../../tensor/gpu/tensor";
-import Tensor from "../../types";
+import Tensor, { Precision } from "../../types";
 import { OnnxNode } from "../node";
 import { Attributes, Constants } from "../types";
 
@@ -101,7 +101,7 @@ export class SoftmaxNode extends OnnxNode {
     }
   }
 
-  async staticForward(inputs: Tensor[], compile: boolean): Promise<{ outputs: (CPUTensor | PrototypeTensor)[]; }> {
+  async staticForward(inputs: Tensor[], compile: boolean, precision: Precision): Promise<{ outputs: (CPUTensor | PrototypeTensor)[]; }> {
     if (this.allStaticCPU(inputs)) {
       return this.defaultStaticForward(inputs);
     }
@@ -121,11 +121,11 @@ export class SoftmaxNode extends OnnxNode {
     const sh2 = shapeX.slice(ax).reduce((x,y) => x*y, 1);
     const newShape = [sh1, sh2];
 
-    const maxMemory = this.allocator.allocate(sh1);
-    const normalizedMemory = this.allocator.allocate(sh1*sh2);
-    const expMemory = this.allocator.allocate(sh1*sh2);
-    const sumMemory = this.allocator.allocate(sh1);
-    const memory = this.allocator.allocate(sh1*sh2);
+    const maxMemory = this.allocator.allocate(sh1, precision);
+    const normalizedMemory = this.allocator.allocate(sh1*sh2, precision);
+    const expMemory = this.allocator.allocate(sh1*sh2, precision);
+    const sumMemory = this.allocator.allocate(sh1, precision);
+    const memory = this.allocator.allocate(sh1*sh2, precision);
 
     if (compile) {
       const [xMem] = this.getMemoryEntries(inputs);
@@ -141,7 +141,7 @@ export class SoftmaxNode extends OnnxNode {
 
         axes: [1], keepDims: true
       };
-      this.maxOperation.compile(infoMax);
+      this.maxOperation.compile(infoMax, precision);
 
       const infoSub: BinaryOpInfo = {
         shapeA: [sh1, sh2],
@@ -156,7 +156,7 @@ export class SoftmaxNode extends OnnxNode {
         widthOutput: normalizedMemory.width,
         heightOutput: normalizedMemory.height,
       };
-      this.subtractOperation.compile(infoSub);
+      this.subtractOperation.compile(infoSub, precision);
 
       const infoExp: UnaryOpInfo = {
         shapeX: [sh1, sh2],
@@ -167,7 +167,7 @@ export class SoftmaxNode extends OnnxNode {
         widthOutput: expMemory.width,
         heightOutput: expMemory.height
       };
-      this.expOperation.compile(infoExp);
+      this.expOperation.compile(infoExp, precision);
 
       const infoSum: PoolInfo = {
         shapeX: [sh1, sh2],
@@ -180,7 +180,7 @@ export class SoftmaxNode extends OnnxNode {
 
         axes: [1], keepDims: true
       };
-      this.sumOperation.compile(infoSum);
+      this.sumOperation.compile(infoSum, precision);
 
       const infoDivide: BinaryOpInfo = {
         shapeA: [sh1, sh2],
@@ -195,7 +195,7 @@ export class SoftmaxNode extends OnnxNode {
         widthOutput: memory.width,
         heightOutput: memory.height,
       };
-      this.divideOperation.compile(infoDivide);
+      this.divideOperation.compile(infoDivide, precision);
 
       this.compiled = true;
     }

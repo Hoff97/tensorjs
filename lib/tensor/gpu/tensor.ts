@@ -1,4 +1,4 @@
-import Tensor, { Activation, PadMode } from '../../types';
+import Tensor, { Activation, PadMode, Precision } from '../../types';
 
 import { compareShapes, getSize } from '../../util/shape';
 
@@ -7,7 +7,6 @@ import { defaultAllocator, gl } from './gl';
 import { GPUMemoryAllocator, MemoryEntry } from './memory';
 import { CPUTensor } from '../cpu/tensor';
 import REGL from 'regl';
-import { toTexture } from '../../ops/gpu/toTexture';
 import { ExpOperation } from '../../ops/gpu/exp';
 import { GPUTensorConstructor, GPUTensorI } from './interface';
 import { ConvBiasOperation, ConvOperation } from '../../ops/gpu/conv';
@@ -52,24 +51,26 @@ export class GPUTensor extends Tensor implements GPUTensorI {
 
   public deleted: boolean = false;
 
-  constructor(values: Float32Array | MemoryEntry, shape: readonly number[]) {
+  public precision: Precision;
+
+  constructor(values: Float32Array | MemoryEntry, shape: readonly number[], precision: Precision) {
     super();
 
     this.size = getSize(shape);
     this.shape = shape;
 
     if (values instanceof Float32Array) {
-      this.memory = defaultAllocator.allocateTexture(values);
+      this.memory = defaultAllocator.allocateTexture(values, precision);
     } else {
       this.memory = values;
     }
   }
 
-  static fromData(data: REGL.TextureImageData) {
+  static fromData(data: REGL.TextureImageData, precision: Precision) {
     const texture = gl.texture({
       data: data,
       format: "rgba",
-      type: "float"
+      type: precision === 32 ? "float" : "half float"
     });
 
     const memory = defaultAllocator.allocateFramebuffer(texture);
@@ -77,11 +78,7 @@ export class GPUTensor extends Tensor implements GPUTensorI {
     const width = texture.width;
     const height = texture.height;
 
-    return new GPUTensor(memory, [height, width, 4]);
-  }
-
-  toTexture(): GPUTensor {
-    return toTexture(this);
+    return new GPUTensor(memory, [height, width, 4], precision);
   }
 
   getValues(): Promise<Float32Array> {
@@ -258,7 +255,7 @@ export class GPUTensor extends Tensor implements GPUTensorI {
     if (_copy) {
       return defaultCopy.calc({input: this, outputShape: shape});
     } else {
-      return new GPUTensor(this.memory, shape);
+      return new GPUTensor(this.memory, shape, this.precision);
     }
   }
 
@@ -321,7 +318,7 @@ export class GPUTensor extends Tensor implements GPUTensorI {
   }
 }
 
-export const gpuConstructor: GPUTensorConstructor<GPUTensor> = (a: MemoryEntry,b: readonly number[]) => new GPUTensor(a,b);
+export const gpuConstructor: GPUTensorConstructor<GPUTensor> = (a: MemoryEntry,b: readonly number[], precision: Precision) => new GPUTensor(a,b,precision);
 
 const defaultMatMul = new MatMulOperation(gpuConstructor);
 const defaultGemm = new GemmOperation(gpuConstructor);

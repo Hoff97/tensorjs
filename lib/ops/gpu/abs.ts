@@ -1,5 +1,6 @@
 import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
 import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
+import { Precision } from "../../types";
 import { Operation } from "./operation";
 
 
@@ -39,12 +40,12 @@ export class AbsOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTen
     return this.compute(input.input.shape, {X: input.input})
   }
 
-  compile(info: AbsInfo) {
+  compile(info: AbsInfo, precision: Precision) {
     if (info.shapeX !== undefined) {
       this.maxRank = info.shapeX.length;
     }
 
-    super.compile(info);
+    super.compile(info, precision);
   }
 
   getOutputShape(input: AbsInput): readonly number[] {

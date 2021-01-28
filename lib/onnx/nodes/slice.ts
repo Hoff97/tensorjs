@@ -2,7 +2,7 @@ import { SliceInfo, SliceOperation } from "../../ops/gpu/slice";
 import { PrototypeTensor } from "../../tensor/cpu/prototype";
 import { CPUTensor } from "../../tensor/cpu/tensor";
 import { gpuConstructor, GPUTensor } from "../../tensor/gpu/tensor";
-import Tensor from "../../types";
+import Tensor, { Precision } from "../../types";
 import { getSize } from "../../util/shape";
 import { OnnxNode } from "../node";
 import { Attributes, Constants } from "../types";
@@ -51,7 +51,7 @@ export class SliceNode extends OnnxNode {
     return axes;
   }
 
-  async staticForward(inputs: Tensor[], compile: boolean): Promise<{ outputs: (CPUTensor | PrototypeTensor)[]; }> {
+  async staticForward(inputs: Tensor[], compile: boolean, precision: Precision): Promise<{ outputs: (CPUTensor | PrototypeTensor)[]; }> {
     if (this.allStaticCPU(inputs)) {
       return this.defaultStaticForward(inputs);
     }
@@ -76,7 +76,7 @@ export class SliceNode extends OnnxNode {
 
       const resultShape = this.operation.getOutputShape({X: x as GPUTensor, axes, ends: this.ends, starts: this.starts});
 
-      const memory = this.allocator.allocate(getSize(resultShape));
+      const memory = this.allocator.allocate(getSize(resultShape), precision);
 
       if (compile) {
         const [xMem] = this.getMemoryEntries(inputs);
@@ -95,7 +95,7 @@ export class SliceNode extends OnnxNode {
           ends: this.ends
         };
 
-        this.operation.compile(info);
+        this.operation.compile(info, precision);
 
         this.compiled = true;
       }

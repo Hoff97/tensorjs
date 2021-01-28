@@ -1,6 +1,7 @@
 import { CPUTensor } from "../../tensor/cpu/tensor";
 import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
 import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
+import { Precision } from "../../types";
 import { computeStrides } from "../../util/shape";
 import { Input, Operation } from "./operation";
 
@@ -153,7 +154,7 @@ export class GatherOperation<GPUTensor extends GPUTensorI> extends Operation<GPU
     return resultShape;
   }
 
-  compile(info: GatherInfo) {
+  compile(info: GatherInfo, precision: Precision) {
     if (info.shapeX !== undefined) {
       this.maxRank = info.shapeX.length;
 
@@ -197,6 +198,6 @@ export class GatherOperation<GPUTensor extends GPUTensorI> extends Operation<GPU
       }
     }
 
-    super.compile(info);
+    super.compile(info, precision);
   }
 }

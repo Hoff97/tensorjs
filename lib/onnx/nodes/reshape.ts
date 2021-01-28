@@ -2,7 +2,7 @@ import { CopyInfo, CopyOperation } from "../../ops/gpu/copy";
 import { PrototypeTensor } from "../../tensor/cpu/prototype";
 import { CPUTensor } from "../../tensor/cpu/tensor";
 import { gpuConstructor, GPUTensor } from "../../tensor/gpu/tensor";
-import Tensor from "../../types";
+import Tensor, { Precision } from "../../types";
 import { getSize } from "../../util/shape";
 import { OnnxNode } from "../node";
 import { Attributes, Constants } from "../types";
@@ -45,7 +45,7 @@ export class ReshapeNode extends OnnxNode {
     throw new Error(`Reshape with onnx version ${this.onnxVersion} not yet implemented`);
   }
 
-  async staticForward(inputs: Tensor[], compile: boolean): Promise<{ outputs: (CPUTensor | PrototypeTensor)[]; }> {
+  async staticForward(inputs: Tensor[], compile: boolean, precision: Precision): Promise<{ outputs: (CPUTensor | PrototypeTensor)[]; }> {
     if (this.allStaticCPU(inputs)) {
       return this.defaultStaticForward(inputs);
     }
@@ -75,7 +75,7 @@ export class ReshapeNode extends OnnxNode {
 
       this.resultShape = resultShape;
 
-      const memory = this.allocator.allocate(getSize(resultShape));
+      const memory = this.allocator.allocate(getSize(resultShape), precision);
 
       if (compile) {
         const xMem = (x as any).memory;
@@ -90,7 +90,7 @@ export class ReshapeNode extends OnnxNode {
           heightOutput: memory.height,
         };
 
-        this.operation.compile(info);
+        this.operation.compile(info, precision);
 
         this.compiled = true;
       }

@@ -1,5 +1,6 @@
 import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
 import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
+import { Precision } from "../../types";
 import { Operation } from "./operation";
 
 export interface MatMulInfo {
@@ -76,13 +77,13 @@ export class MatMulOperation<GPUTensor extends GPUTensorI> extends Operation<GPU
     return [input.A.shape[0], input.B.shape[1]];
   }
 
-  compile(info: MatMulInfo) {
+  compile(info: MatMulInfo, precision: Precision) {
     if (info.shapeA !== undefined) {
       this.maxIterations = info.shapeA[1]
     } else if (info.shapeB !== undefined) {
       this.maxIterations = info.shapeB[0]
     }
 
-    super.compile(info);
+    super.compile(info, precision);
   }
 }

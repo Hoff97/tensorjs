@@ -2,7 +2,7 @@ import { PadInfo, PadOperation } from "../../ops/gpu/pad";
 import { PrototypeTensor } from "../../tensor/cpu/prototype";
 import { CPUTensor } from "../../tensor/cpu/tensor";
 import { gpuConstructor, GPUTensor } from "../../tensor/gpu/tensor";
-import Tensor, { PadMode } from "../../types";
+import Tensor, { PadMode, Precision } from "../../types";
 import { getSize } from "../../util/shape";
 import { OnnxNode } from "../node";
 import { Attributes, Constants } from "../types";
@@ -40,7 +40,7 @@ export class PadNode extends OnnxNode {
     throw new Error(`Pad not implemented for onnx version ${this.onnxVersion}`);
   }
 
-  async staticForward(inputs: Tensor[], compile: boolean): Promise<{ outputs: (CPUTensor | PrototypeTensor)[]; }> {
+  async staticForward(inputs: Tensor[], compile: boolean, precision: Precision): Promise<{ outputs: (CPUTensor | PrototypeTensor)[]; }> {
     if (this.allStaticCPU(inputs)) {
       return this.defaultStaticForward(inputs);
     }
@@ -49,7 +49,7 @@ export class PadNode extends OnnxNode {
       const x = inputs[0];
 
       const resultShape = this.operation.getOutputShape({input: x as GPUTensor, mode: this.mode, pads: this.pads, value: this.value});
-      const memory = this.allocator.allocate(getSize(resultShape));
+      const memory = this.allocator.allocate(getSize(resultShape), precision);
 
       if (compile) {
         const [xMem] = this.getMemoryEntries(inputs);
@@ -66,7 +66,7 @@ export class PadNode extends OnnxNode {
           mode: this.mode, pads: this.pads, value: this.value
         };
 
-        this.operation.compile(info);
+        this.operation.compile(info, precision);
 
         this.compiled = true;
       }

@@ -3,8 +3,8 @@ import { ConvNode } from "../../onnx/nodes/conv";
 import { defaultAllocator, gl } from "../../tensor/gpu/gl";
 import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
 import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
+import { Precision } from "../../types";
 import { computeStrides, getSize } from "../../util/shape";
-import { ConvBiasOperation, ConvOperation } from "./conv";
 
 export const defaultMaxRank = 10;
 export const defaultMaxIterations = 10000000;
@@ -30,6 +30,8 @@ export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictB
   protected maxRank: number;
 
   protected drawCommand: DrawCommand;
+
+  protected precision: Precision;
 
   private copyCounter = 0;
 
@@ -247,7 +249,7 @@ export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictB
     }).join('\n');
   }
 
-  getCompleteFragmentShader(info: Info): string {
+  getCompleteFragmentShader(info: Info, precision: 32 | 16): string {
     const fragShader = this.getFragmentShader(info);
 
     const variableDecls = this.getVariableDeclarations(info);
@@ -257,7 +259,7 @@ export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictB
     const textureFunctions = this.getTextureFunctions();
 
     const result = `
-    precision highp float;
+    precision ${this.precisionString(precision)} float;
 
     ${variableDecls}
 
@@ -269,6 +271,8 @@ export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictB
     }
 
     ${fragShader}`;
+
+    console.log(result);
 
     return result;
   }
@@ -425,15 +429,19 @@ export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictB
     }`;
   }
 
-  getDrawCommand(info: Info): DrawCommand {
-    const fragShader = this.getCompleteFragmentShader(info);
+  precisionString(precision: 32 | 16) {
+    return precision === 32 ? "highp" : "mediump";
+  }
+
+  getDrawCommand(info: Info, precision: 32 | 16): DrawCommand {
+    const fragShader = this.getCompleteFragmentShader(info, precision);
 
     const uniforms = this.getUniforms(info);
 
     const result = gl({
       frag: fragShader,
       vert: `
-        precision highp float;
+        precision ${this.precisionString(precision)} float;
         attribute vec2 position;
         varying vec2 uv;
         void main() {
@@ -454,19 +462,21 @@ export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictB
     return result;
   }
 
-  compile(info: Info) {
+  compile(info: Info, precision: 32 | 16) {
     this.registerStatics(info);
 
-    this.drawCommand = this.getDrawCommand(info);
+    this.precision = precision;
+
+    this.drawCommand = this.getDrawCommand(info, precision);
   }
 
   compute(resultShape: readonly number[], inputTensors: {[name: string]: GPUTensorI}, inputs?: any) {
     if (this.drawCommand === undefined) {
-      this.compile({} as any);
+      this.compile({} as any, 32);
     }
 
     const resultSize = getSize(resultShape);
-    let result = this.allocator.allocate(resultSize);
+    let result = this.allocator.allocate(resultSize, this.precision);
 
     const inputTextures: {[name: string]: Framebuffer2D} = {};
     for (let name in inputTensors) {
@@ -514,7 +524,7 @@ export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictB
       ...inputs
     });
 
-    return this.gpuTensorConstructor(result, resultShape);
+    return this.gpuTensorConstructor(result, resultShape, this.precision);
   }
 
   abstract getFragmentShader(info: Info): string;

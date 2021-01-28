@@ -2,7 +2,7 @@ import { RepeatInfo, RepeatOperation } from "../../ops/gpu/repeat";
 import { PrototypeTensor } from "../../tensor/cpu/prototype";
 import { CPUTensor } from "../../tensor/cpu/tensor";
 import { gpuConstructor, GPUTensor } from "../../tensor/gpu/tensor";
-import Tensor from "../../types";
+import Tensor, { Precision } from "../../types";
 import { getSize } from "../../util/shape";
 import { OnnxNode } from "../node";
 import { Attributes, Constants } from "../types";
@@ -41,7 +41,7 @@ export class TileNode extends OnnxNode {
     throw new Error(`Tile with onnx version ${this.onnxVersion} not yet implemented`);
   }
 
-  async staticForward(inputs: Tensor[], compile: boolean): Promise<{ outputs: (CPUTensor | PrototypeTensor)[]; }> {
+  async staticForward(inputs: Tensor[], compile: boolean, precision: Precision): Promise<{ outputs: (CPUTensor | PrototypeTensor)[]; }> {
     if (this.allStaticCPU(inputs)) {
       return this.defaultStaticForward(inputs);
     }
@@ -60,7 +60,7 @@ export class TileNode extends OnnxNode {
       }
 
       const resultShape = this.operation.getOutputShape({A: x as any, repeats: _repeats});
-      const memory = this.allocator.allocate(getSize(resultShape));
+      const memory = this.allocator.allocate(getSize(resultShape), precision);
 
       if (compile) {
         const xMem = (x as any).memory;
@@ -77,7 +77,7 @@ export class TileNode extends OnnxNode {
           repeats: _repeats
         };
 
-        this.operation.compile(info);
+        this.operation.compile(info, precision);
 
         this.compiled = true;
       }

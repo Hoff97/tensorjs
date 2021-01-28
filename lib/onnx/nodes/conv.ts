@@ -3,7 +3,7 @@ import { PrototypeTensor } from "../../tensor/cpu/prototype";
 import { CPUTensor } from "../../tensor/cpu/tensor";
 import { MemoryEntry } from "../../tensor/gpu/memory";
 import { gpuConstructor, GPUTensor } from "../../tensor/gpu/tensor";
-import Tensor, { Activation } from "../../types";
+import Tensor, { Activation, Precision } from "../../types";
 import { toCPU, toGPU, toWASM } from "../../util/convert";
 import { getSize } from "../../util/shape";
 import { OnnxNode } from "../node";
@@ -113,7 +113,7 @@ export class ConvNode extends OnnxNode {
     return memories;
   }
 
-  async staticForward(inputs: Tensor[], compile: boolean): Promise<{ outputs: (CPUTensor | PrototypeTensor)[]; }> {
+  async staticForward(inputs: Tensor[], compile: boolean, precision: Precision): Promise<{ outputs: (CPUTensor | PrototypeTensor)[]; }> {
     if (this.allStaticCPU(inputs)) {
       return this.defaultStaticForward(inputs);
     }
@@ -137,7 +137,7 @@ export class ConvNode extends OnnxNode {
       pads, dilations, strides,
       activation: this.activation
     });
-    const memory = this.allocator.allocate(getSize(resultShape));
+    const memory = this.allocator.allocate(getSize(resultShape), precision);
 
     if (compile) {
       const memories = this.getMemoryEntries(inputs);
@@ -171,7 +171,7 @@ export class ConvNode extends OnnxNode {
         } as any;
       }
 
-      this.operation.compile(info);
+      this.operation.compile(info, precision);
 
       this.compiled = true;
     }
@@ -221,12 +221,12 @@ export class ConvNode extends OnnxNode {
     }
   }
 
-  async toGPU() {
+  async toGPU(precision: Precision) {
     if (this.kernel !== undefined) {
-      this.kernel = await toGPU(this.kernel);
+      this.kernel = await toGPU(this.kernel, precision);
     }
     if (this.bias !== undefined) {
-      this.bias = await toGPU(this.bias);
+      this.bias = await toGPU(this.bias, precision);
     }
   }
 }

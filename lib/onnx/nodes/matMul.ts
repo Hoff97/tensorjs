@@ -2,7 +2,7 @@ import { GemmInfo, GemmOperation } from "../../ops/gpu/gemm";
 import { PrototypeTensor } from "../../tensor/cpu/prototype";
 import { CPUTensor } from "../../tensor/cpu/tensor";
 import { gpuConstructor, GPUTensor } from "../../tensor/gpu/tensor";
-import Tensor from "../../types";
+import Tensor, { Precision } from "../../types";
 import { getSize } from "../../util/shape";
 import { OnnxNode } from "../node";
 import { Attributes, Constants } from "../types";
@@ -33,7 +33,7 @@ export class MatMulNode extends OnnxNode {
     throw new Error(`Matmul with onnx version ${this.onnxVersion} not yet implemented`);
   }
 
-  async staticForward(inputs: Tensor[], compile: boolean): Promise<{ outputs: (CPUTensor | PrototypeTensor)[]; }> {
+  async staticForward(inputs: Tensor[], compile: boolean, precision: Precision): Promise<{ outputs: (CPUTensor | PrototypeTensor)[]; }> {
     if (this.allStaticCPU(inputs)) {
       return this.defaultStaticForward(inputs);
     }
@@ -43,7 +43,7 @@ export class MatMulNode extends OnnxNode {
       const b = inputs[1];
 
       const resultShape = this.operation.getOutputShape({a: a as any, b: b as any, aTranspose: false, bTranspose: false, alpha: 1, beta: 1});
-      const memory = this.allocator.allocate(getSize(resultShape));
+      const memory = this.allocator.allocate(getSize(resultShape), precision);
 
       if (compile) {
         const [aMem, bMem] = this.getMemoryEntries(inputs);
@@ -67,7 +67,7 @@ export class MatMulNode extends OnnxNode {
           beta: 1
         };
 
-        this.operation.compile(info);
+        this.operation.compile(info, precision);
 
         this.compiled = true;
       }

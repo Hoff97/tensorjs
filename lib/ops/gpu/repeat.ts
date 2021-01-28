@@ -1,5 +1,6 @@
 import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
 import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
+import { Precision } from "../../types";
 import { computeStrides } from "../../util/shape";
 import { Input, Operation } from "./operation";
 
@@ -79,11 +80,11 @@ export class RepeatOperation<GPUTensor extends GPUTensorI> extends Operation<GPU
     return this.compute(outputShape, {A: input.A}, {repeats: this.copyPad(input.repeats)});
   }
 
-  compile(info: RepeatInfo) {
+  compile(info: RepeatInfo, precision: Precision) {
     if (info.shapeA !== undefined) {
       this.maxRank = info.shapeA.length;
     }
 
-    super.compile(info);
+    super.compile(info, precision);
   }
 }

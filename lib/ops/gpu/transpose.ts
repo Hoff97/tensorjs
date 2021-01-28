@@ -1,5 +1,6 @@
 import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
 import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
+import { Precision } from "../../types";
 import { computeStrides } from "../../util/shape";
 import { Input, Operation } from "./operation";
 
@@ -78,7 +79,7 @@ export class TransposeOperation<GPUTensor extends GPUTensorI> extends Operation<
     return outputShape;
   }
 
-  compile(info: TransposeInfo) {
+  compile(info: TransposeInfo, precision: Precision) {
     if (info.shapeA !== undefined) {
       this.maxRank = info.shapeA.length;
 
@@ -97,6 +98,6 @@ export class TransposeOperation<GPUTensor extends GPUTensorI> extends Operation<
       }
     }
 
-    super.compile(info);
+    super.compile(info, precision);
   }
 }

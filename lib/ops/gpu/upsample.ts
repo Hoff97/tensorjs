@@ -1,6 +1,6 @@
 import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
 import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
-import { PadMode } from "../../types";
+import { PadMode, Precision } from "../../types";
 import { Input, Operation } from "./operation";
 
 
@@ -81,11 +81,11 @@ export class UpsampleOperation<GPUTensor extends GPUTensorI> extends Operation<G
     return resultShape;
   }
 
-  compile(info: UpsampleInfo) {
+  compile(info: UpsampleInfo, precision: Precision) {
     if (info.shapeX !== undefined) {
       this.maxRank = info.shapeX.length;
     }
 
-    super.compile(info);
+    super.compile(info, precision);
   }
 }

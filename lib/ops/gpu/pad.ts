@@ -1,6 +1,6 @@
 import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
 import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
-import { PadMode } from "../../types";
+import { PadMode, Precision } from "../../types";
 import { Input, Operation } from "./operation";
 
 
@@ -134,7 +134,7 @@ export class PadOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTen
     return resultShape;
   }
 
-  compile(info: PadInfo) {
+  compile(info: PadInfo, precision: Precision) {
     if (info.shapeX !== undefined) {
       this.maxRank = info.shapeX.length;
     }
@@ -143,6 +143,6 @@ export class PadOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTen
       info.mode = this.getModeFlag(info.mode as any);
     }
 
-    super.compile(info);
+    super.compile(info, precision);
   }
 }

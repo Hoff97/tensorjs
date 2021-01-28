@@ -1,5 +1,6 @@
 import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
 import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
+import { Precision } from "../../types";
 import { Input, Operation } from "./operation";
 
 
@@ -88,11 +89,11 @@ export class NormalizeOperation<GPUTensor extends GPUTensorI> extends Operation<
     }, { epsilon: input.epsilon });
   }
 
-  compile(info: NormalizeOpInfo) {
+  compile(info: NormalizeOpInfo, precision: Precision) {
     if (info.shapeX !== undefined) {
       this.maxRank = info.shapeX.length;
     }
 
-    super.compile(info);
+    super.compile(info, precision);
   }
 }

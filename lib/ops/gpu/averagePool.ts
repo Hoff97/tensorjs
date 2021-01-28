@@ -4,6 +4,7 @@ import { outputDimsSize } from "../util/conv";
 import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
 import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
 import { Input, Operation } from "./operation";
+import { Precision } from "../../types";
 
 
 export interface AveragePoolInfo {
@@ -169,7 +170,7 @@ export class AveragePoolOperation<GPUTensor extends GPUTensorI> extends Operatio
     return outputShape;
   }
 
-  compile(info: AveragePoolInfo) {
+  compile(info: AveragePoolInfo, precision: Precision) {
     if (info.shapeX !== undefined) {
       info.dataRank = info.shapeX.length - 2;
 
@@ -181,6 +182,6 @@ export class AveragePoolOperation<GPUTensor extends GPUTensorI> extends Operatio
       info.includePad = 0;
     }
 
-    super.compile(info);
+    super.compile(info, precision);
   }
 }

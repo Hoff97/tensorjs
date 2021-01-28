@@ -2,7 +2,7 @@ import { ClipInfo, ClipOperation } from "../../ops/gpu/clip";
 import { PrototypeTensor } from "../../tensor/cpu/prototype";
 import { CPUTensor } from "../../tensor/cpu/tensor";
 import { gpuConstructor, GPUTensor } from "../../tensor/gpu/tensor";
-import Tensor from "../../types";
+import Tensor, { Precision } from "../../types";
 import { getSize } from "../../util/shape";
 import { OnnxNode } from "../node";
 import { Attributes, Constants } from "../types";
@@ -42,7 +42,7 @@ export class ClipNode extends OnnxNode {
     }
   }
 
-  async staticForward(inputs: Tensor[], compile: boolean): Promise<{ outputs: (CPUTensor | PrototypeTensor)[]; }> {
+  async staticForward(inputs: Tensor[], compile: boolean, precision: Precision): Promise<{ outputs: (CPUTensor | PrototypeTensor)[]; }> {
     if (this.allStaticCPU(inputs)) {
       return this.defaultStaticForward(inputs);
     }
@@ -51,7 +51,7 @@ export class ClipNode extends OnnxNode {
       const a = inputs[0];
       const resultShape = a.getShape();
 
-      const memory = this.allocator.allocate(getSize(resultShape));
+      const memory = this.allocator.allocate(getSize(resultShape), precision);
 
       if (compile) {
         const [aMem] = this.getMemoryEntries(inputs);
@@ -70,7 +70,7 @@ export class ClipNode extends OnnxNode {
           doMax: this.max !== undefined ? 1 : 0,
         };
 
-        this.operation.compile(info);
+        this.operation.compile(info, precision);
 
         this.compiled = true;
       }

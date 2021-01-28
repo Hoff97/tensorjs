@@ -14,7 +14,7 @@ function setup() {
 
   gl = REGL({
     gl: glContext,
-    extensions: ['OES_texture_float', 'WEBGL_color_buffer_float']
+    extensions: ['OES_texture_float', 'WEBGL_color_buffer_float', 'OES_texture_half_float']
   });
 
   defaultAllocator = new GPUMemoryAllocator(gl);

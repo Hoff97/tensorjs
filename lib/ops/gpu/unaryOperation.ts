@@ -1,5 +1,6 @@
 import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
 import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
+import { Precision } from "../../types";
 import { Operation } from "./operation";
 
 
@@ -45,11 +46,11 @@ export abstract class UnaryOperation<GPUTensor extends GPUTensorI> extends Opera
     return input.input.shape;
   }
 
-  compile(info: UnaryOpInfo) {
+  compile(info: UnaryOpInfo, precision: Precision) {
     if (info.shapeX !== undefined) {
       this.maxRank = info.shapeX.length;
     }
 
-    super.compile(info);
+    super.compile(info, precision);
   }
 }

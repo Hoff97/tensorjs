@@ -8,7 +8,7 @@ import { PrototypeTensor } from "../../tensor/cpu/prototype";
 import { CPUTensor } from "../../tensor/cpu/tensor";
 import { glContext } from "../../tensor/gpu/gl";
 import { gpuConstructor, GPUTensor } from "../../tensor/gpu/tensor";
-import Tensor from "../../types";
+import Tensor, { Precision } from "../../types";
 import { toCPU, toGPU, toWASM } from "../../util/convert";
 import { getSize } from "../../util/shape";
 import { OnnxNode } from "../node";
@@ -115,7 +115,7 @@ export class InstanceNormalizationNode extends OnnxNode {
     }
   }
 
-  async staticForward(inputs: Tensor[], compile: boolean): Promise<{ outputs: (CPUTensor | PrototypeTensor)[]; }> {
+  async staticForward(inputs: Tensor[], compile: boolean, precision: Precision): Promise<{ outputs: (CPUTensor | PrototypeTensor)[]; }> {
     if (this.allStaticCPU(inputs)) {
       return this.defaultStaticForward(inputs);
     }
@@ -138,10 +138,10 @@ export class InstanceNormalizationNode extends OnnxNode {
 
       const resultShape = x.getShape();
 
-      const meanMemory = this.allocator.allocate(getSize(reduceShape));
-      const diffMemory = this.allocator.allocate(getSize(x.getShape()));
-      const varianceMemory = this.allocator.allocate(getSize(reduceShape));
-      const memory = this.allocator.allocate(getSize(resultShape));
+      const meanMemory = this.allocator.allocate(getSize(reduceShape), precision);
+      const diffMemory = this.allocator.allocate(getSize(x.getShape()), precision);
+      const varianceMemory = this.allocator.allocate(getSize(reduceShape), precision);
+      const memory = this.allocator.allocate(getSize(resultShape), precision);
 
       if (compile) {
         const [xMem, scaleMem, biasMem] = this.getMemoryEntries(inputs);
@@ -157,7 +157,7 @@ export class InstanceNormalizationNode extends OnnxNode {
 
           axes: reduceAxes, keepDims: true
         };
-        this.reduceMeanOperation.compile(meanInfo);
+        this.reduceMeanOperation.compile(meanInfo, precision);
 
         const diffInfo: BinaryOpInfo = {
           shapeA: x.getShape(),
@@ -172,7 +172,7 @@ export class InstanceNormalizationNode extends OnnxNode {
           widthOutput: diffMemory.width,
           heightOutput: diffMemory.height
         };
-        this.subtractOperation.compile(diffInfo);
+        this.subtractOperation.compile(diffInfo, precision);
 
         const varInfo: PoolInfo = {
           shapeX: x.getShape(),
@@ -185,7 +185,7 @@ export class InstanceNormalizationNode extends OnnxNode {
 
           axes: reduceAxes, keepDims: true
         };
-        this.reduceMeanSquareOperation.compile(varInfo);
+        this.reduceMeanSquareOperation.compile(varInfo, precision);
 
         const normInfo: NormalizeOpInfo = {
           shapeX: x.getShape(),
@@ -214,7 +214,7 @@ export class InstanceNormalizationNode extends OnnxNode {
 
           epsilon: this.epsilon
         };
-        this.normalizeOperation.compile(normInfo);
+        this.normalizeOperation.compile(normInfo, precision);
 
         this.compiled = true;
       }

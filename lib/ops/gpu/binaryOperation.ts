@@ -1,5 +1,6 @@
 import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
 import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
+import { Precision } from "../../types";
 import { Operation } from "./operation";
 
 
@@ -50,7 +51,7 @@ export abstract class BinaryOperation<GPUTensor extends GPUTensorI> extends Oper
     return this.compute(input.outputShape, {A: input.A, B: input.B})
   }
 
-  compile(info: BinaryOpInfo) {
+  compile(info: BinaryOpInfo, precision: Precision) {
     if (info.shapeA !== undefined) {
       this.maxRank = info.shapeA.length;
     }
@@ -58,6 +59,6 @@ export abstract class BinaryOperation<GPUTensor extends GPUTensorI> extends Oper
       this.maxRank = info.shapeB.length;
     }
 
-    super.compile(info);
+    super.compile(info, precision);
   }
 }

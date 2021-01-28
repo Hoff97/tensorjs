@@ -6,6 +6,7 @@ import { CPUTensor } from "../tensor/cpu/tensor";
 import { defaultAllocator } from "../tensor/gpu/gl";
 import { GPUMemoryAllocator, MemoryEntry } from "../tensor/gpu/memory";
 import { GPUTensor } from "../tensor/gpu/tensor";
+import { Precision } from "../types";
 import { Attributes, Constants } from "./types";
 
 export abstract class OnnxNode {
@@ -104,7 +105,7 @@ export abstract class OnnxNode {
 
   async toCPU() {}
   async toWASM() {}
-  async toGPU() {}
+  async toGPU(precision: Precision) {}
 
   abstract forward(inputs: Tensor[]): Promise<Tensor[]>;
 
@@ -125,7 +126,7 @@ export abstract class OnnxNode {
     return {outputs: outputs as CPUTensor[]};
   }
 
-  abstract staticForward(inputs: Tensor[], compile: boolean): Promise<{outputs: (CPUTensor | PrototypeTensor)[]}>;
+  abstract staticForward(inputs: Tensor[], compile: boolean, precision: 32 | 16): Promise<{outputs: (CPUTensor | PrototypeTensor)[]}>;
 
   abstract initializeForCompiling(): void;
 

@@ -4,7 +4,7 @@ import { outputDimsSize } from "../util/conv";
 import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
 import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
 import { Input, Operation } from "./operation";
-import { Activation } from "../../types";
+import { Activation, Precision } from "../../types";
 
 
 export interface ConvInfo {
@@ -203,7 +203,7 @@ export class ConvOperation<GPUTensor extends GPUTensorI, ConvInf extends ConvInf
     return outputShape;
   }
 
-  compile(info: ConvInf) {
+  compile(info: ConvInf, precision: Precision) {
     if (info.shapeW !== undefined) {
       info.CG = info.shapeW[1];
       info.kernelSize = getSize(info.shapeW.slice(2));
@@ -220,7 +220,7 @@ export class ConvOperation<GPUTensor extends GPUTensorI, ConvInf extends ConvInf
       info.activation = this.getActivationFlag(info.activation);
     }
 
-    super.compile(info);
+    super.compile(info, precision);
   }
 }
 
@@ -289,9 +289,5 @@ export class ConvBiasOperation<GPUTensor extends GPUTensorI> extends ConvOperati
       dilations: this.copyPad(input.dilations),
       activation: this.getActivationFlag(input.activation)
     })
-  }
-
-  compile(info: ConvBiasInfo) {
-    super.compile(info);
   }
 }

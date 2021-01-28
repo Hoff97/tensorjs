@@ -3,7 +3,7 @@ import { PoolOperation } from "../../../ops/gpu/pool";
 import { PrototypeTensor } from "../../../tensor/cpu/prototype";
 import { CPUTensor } from "../../../tensor/cpu/tensor";
 import { GPUTensor } from "../../../tensor/gpu/tensor";
-import types from "../../../types";
+import types, { Precision } from "../../../types";
 import { getSize } from "../../../util/shape";
 import { OnnxNode } from "../../node";
 import { Attributes, Constants } from "../../types";
@@ -57,7 +57,7 @@ export abstract class ReduceNode extends OnnxNode {
     throw new Error(`${this.name} is not implemented for onnx version ${this.onnxVersion}`);
   }
 
-  async staticForward(inputs: types[], compile: boolean): Promise<{ outputs: (CPUTensor | PrototypeTensor)[]; }> {
+  async staticForward(inputs: types[], compile: boolean, precision: Precision): Promise<{ outputs: (CPUTensor | PrototypeTensor)[]; }> {
     if (this.allStaticCPU(inputs)) {
       return this.defaultStaticForward(inputs);
     }
@@ -69,7 +69,7 @@ export abstract class ReduceNode extends OnnxNode {
 
       const resultShape = this.operation.getOutputShape({X: a as any, axes, keepDims: this.keepDims});
 
-      const memory = this.allocator.allocate(getSize(resultShape));
+      const memory = this.allocator.allocate(getSize(resultShape), precision);
 
       if (compile) {
         const [aMem] = this.getMemoryEntries(inputs);
@@ -86,7 +86,7 @@ export abstract class ReduceNode extends OnnxNode {
           keepDims: this.keepDims
         };
 
-        this.operation.compile(info);
+        this.operation.compile(info, precision);
 
         this.compiled = true;
       }

@@ -402,3 +402,5 @@ export default abstract class Tensor {
 }
 
 export type Activation = "id" | "relu";
+
+export type Precision = 16 | 32;

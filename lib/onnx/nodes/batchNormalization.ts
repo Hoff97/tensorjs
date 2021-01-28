@@ -2,7 +2,7 @@ import { NormalizeOperation, NormalizeOpInfo } from "../../ops/gpu/normalize";
 import { PrototypeTensor } from "../../tensor/cpu/prototype";
 import { CPUTensor } from "../../tensor/cpu/tensor";
 import { gpuConstructor, GPUTensor } from "../../tensor/gpu/tensor";
-import Tensor from "../../types";
+import Tensor, { Precision } from "../../types";
 import { toCPU, toGPU, toWASM } from "../../util/convert";
 import { getSize } from "../../util/shape";
 import { OnnxNode } from "../node";
@@ -107,7 +107,7 @@ export class BatchNormalizationNode extends OnnxNode {
     }
   }
 
-  async staticForward(inputs: Tensor[], compile: boolean): Promise<{ outputs: (CPUTensor | PrototypeTensor)[]; }> {
+  async staticForward(inputs: Tensor[], compile: boolean, precision: 32 | 16): Promise<{ outputs: (CPUTensor | PrototypeTensor)[]; }> {
     if (this.allStaticCPU(inputs)) {
       return this.defaultStaticForward(inputs);
     }
@@ -118,7 +118,7 @@ export class BatchNormalizationNode extends OnnxNode {
 
     let resultMemory;
 
-    resultMemory = this.allocator.allocate(getSize(resultShape));
+    resultMemory = this.allocator.allocate(getSize(resultShape), precision);
 
     if (compile) {
       const [xMem, scaleMem, biasMem, meanMem, varianceMem] = this.getMemoryEntries(inputs);
@@ -155,7 +155,7 @@ export class BatchNormalizationNode extends OnnxNode {
         epsilon: this.epsilon
       };
 
-      this.normOperation.compile(info);
+      this.normOperation.compile(info, precision);
 
       this.compiled = true;
     }
@@ -181,7 +181,7 @@ export class BatchNormalizationNode extends OnnxNode {
     this.epsTensor = await toWASM(this.epsTensor);
   }
 
-  async toGPU() {
-    this.epsTensor = await toGPU(this.epsTensor);
+  async toGPU(precision: Precision) {
+    this.epsTensor = await toGPU(this.epsTensor, precision);
   }
 }

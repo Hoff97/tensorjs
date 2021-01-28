@@ -1,6 +1,5 @@
 import Tensor from "../../types";
 import { OnnxNode } from "../node";
-import { BatchNormalizationNode } from "../nodes/batchNormalization";
 import { ConvNode } from "../nodes/conv";
 import { ReluNode } from "../nodes/relu";
 import { Constants } from "../types";

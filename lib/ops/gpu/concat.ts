@@ -1,5 +1,6 @@
 import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
 import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
+import { Precision } from "../../types";
 import { Input, Operation } from "./operation";
 
 
@@ -50,9 +51,9 @@ export class ConcatOperation<GPUTensor extends GPUTensorI> extends Operation<GPU
         if (i == axis) {
           if (index[i] >= shapeA[i]) {
             index[i] = index[i] - shapeA[i];
-            res += _B(index);
+            res = _B(index);
           } else {
-            res += _A(index);
+            res = _A(index);
           }
           break;
         }
@@ -80,7 +81,7 @@ export class ConcatOperation<GPUTensor extends GPUTensorI> extends Operation<GPU
     return outputShape;
   }
 
-  compile(info: ConcatInfo) {
+  compile(info: ConcatInfo, precision: Precision) {
     if (info.shapeA !== undefined) {
       this.maxRank = info.shapeA.length;
     }
@@ -88,6 +89,92 @@ export class ConcatOperation<GPUTensor extends GPUTensorI> extends Operation<GPU
       this.maxRank = info.shapeB.length;
     }
 
-    super.compile(info);
+    super.compile(info, precision);
+  }
+}
+
+export interface Concat3Info extends ConcatInfo {
+  shapeC?: readonly number[];
+  widthC?: number;
+  heightC?: number;
+}
+
+export interface Concat3Input extends ConcatInput {
+  C: GPUTensorI
+}
+
+export class Concat3Operation<GPUTensor extends GPUTensorI> extends Operation<GPUTensor, Concat3Info, Concat3Input> {
+  constructor(tensorConstructor: GPUTensorConstructor<GPUTensor>, allocator?: GPUMemoryAllocator) {
+    super(tensorConstructor, allocator);
+  }
+
+  getVariables() {
+    return `
+    ${this.getVarModifier('axis')} int axis;
+    `;
+  }
+
+  getUniformAttrs(): Input[] {
+    return [
+      { name: "axis"}
+    ];
+  }
+
+  getFragmentShader(info: ConcatInfo): string {
+    return `
+    float process(int index[${this.maxRank}]) {
+      float res = 0.0;
+      for (int i = 0; i < ${this.maxRank}; i++) {
+        if (i == axis) {
+          if (index[i] >= shapeA[i]) {
+            index[i] = index[i] - shapeA[i];
+            if (index[i] >= shapeB[i]) {
+              index[i] = index[i] - shapeB[i];
+              res = _C(index);
+            } else {
+              res = _B(index);
+            }
+          } else {
+            res = _A(index);
+          }
+          break;
+        }
+      }
+      return res;
+    }
+
+    ${this.getDefaultMain()}
+    `;
+  }
+
+  getTextureNames(): string[] {
+    return ["A", "B", "C"];
+  }
+
+  calc(input: Concat3Input): GPUTensor {
+    const outputShape = this.getOutputShape(input);
+
+    return this.compute(outputShape, {A: input.A, B: input.B, C: input.C}, {axis: input.axis});
+  }
+
+  getOutputShape(input: Concat3Input): readonly number[] {
+    const outputShape = [...input.A.shape];
+    outputShape[input.axis] += input.B.shape[input.axis];
+    outputShape[input.axis] += input.C.shape[input.axis];
+    return outputShape;
+  }
+
+  compile(info: Concat3Info, precision: Precision) {
+    if (info.shapeA !== undefined) {
+      this.maxRank = info.shapeA.length;
+    }
+    if (info.shapeB !== undefined) {
+      this.maxRank = info.shapeB.length;
+    }
+    if (info.shapeC !== undefined) {
+      this.maxRank = info.shapeC.length;
+    }
+
+    super.compile(info, precision);
   }
 }

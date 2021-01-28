@@ -1,6 +1,6 @@
 import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
 import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
-import { PadMode } from "../../types";
+import { PadMode, Precision } from "../../types";
 import { Input, Operation } from "./operation";
 
 
@@ -102,7 +102,7 @@ export class SliceOperation<GPUTensor extends GPUTensorI> extends Operation<GPUT
     return resultShape;
   }
 
-  compile(info: SliceInfo) {
+  compile(info: SliceInfo, precision: Precision) {
     if (info.shapeX !== undefined) {
       this.maxRank = info.shapeX.length;
 
@@ -126,6 +126,6 @@ export class SliceOperation<GPUTensor extends GPUTensorI> extends Operation<GPUT
       }
     }
 
-    super.compile(info);
+    super.compile(info, precision);
   }
 }

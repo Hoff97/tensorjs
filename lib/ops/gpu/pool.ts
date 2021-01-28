@@ -1,5 +1,6 @@
 import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
 import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
+import { Precision } from "../../types";
 import { computeStrides } from "../../util/shape";
 import { poolResultShape } from "../util/pool";
 import { Input, Operation } from "./operation";
@@ -131,7 +132,7 @@ export abstract class PoolOperation<GPUTensor extends GPUTensorI> extends Operat
     return outputShape;
   }
 
-  compile(info: PoolInfo) {
+  compile(info: PoolInfo, precision: Precision) {
     if (info.shapeX !== undefined && info.axes !== undefined && info.keepDims !== undefined) {
       const [outputShape, ixMap] = poolResultShape(info.shapeX, info.axes, info.keepDims);
 
@@ -159,6 +160,6 @@ export abstract class PoolOperation<GPUTensor extends GPUTensorI> extends Operat
       this.maxRank = info.shapeX.length;
     }
 
-    super.compile(info);
+    super.compile(info, precision);
   }
 }

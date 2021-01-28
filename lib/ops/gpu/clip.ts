@@ -1,5 +1,6 @@
 import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
 import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
+import { Precision } from "../../types";
 import { Input, Operation } from "./operation";
 
 
@@ -84,11 +85,11 @@ export class ClipOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTe
     return input.input.shape;
   }
 
-  compile(info: ClipInfo) {
+  compile(info: ClipInfo, precision: Precision) {
     if (info.shapeX !== undefined) {
       this.maxRank = info.shapeX.length;
     }
 
-    super.compile(info);
+    super.compile(info, precision);
   }
 }

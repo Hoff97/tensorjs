@@ -1,5 +1,7 @@
 import REGL, { Framebuffer2D, Regl } from "regl";
+import { Precision } from "../../types";
 import { AVLTree } from "../../util/avl";
+import { halfPrecision } from "../../util/float16";
 import { primeFactors } from "../../util/math";
 
 export interface MemoryEntry {
@@ -32,7 +34,7 @@ export class GPUMemoryAllocator {
     this.maxSizeFactor = maxSizeFactor || 2;
   }
 
-  allocate(size: number): MemoryEntry {
+  allocate(size: number, precision: 32 | 16): MemoryEntry {
     let upperBound = size*this.maxSizeFactor;
     const texSize = Math.ceil(size/4)*4;
     if (texSize < upperBound) {
@@ -49,7 +51,7 @@ export class GPUMemoryAllocator {
         height: height,
         depthStencil: false,
         colorFormat: 'rgba',
-        colorType: 'float'
+        colorType: precision === 32 ? 'float' : 'half float'
       });
 
       const memoryEntry: MemoryEntry = {
@@ -73,7 +75,7 @@ export class GPUMemoryAllocator {
     this.tree.insert(entry.size, entry);
   }
 
-  allocateTexture(values: Float32Array): MemoryEntry {
+  allocateTexture(values: Float32Array, precision: Precision): MemoryEntry {
     const textureSize = Math.ceil(values.length/4);
     const {width, height} = this.getTextureDims(textureSize);
     const arraySize = width*height*4;
@@ -90,8 +92,8 @@ export class GPUMemoryAllocator {
       width: width,
       height: height,
       format: 'rgba',
-      type: 'float',
-      data: vals,
+      type: precision === 32 ? 'float' : 'half float',
+      data: precision === 32 ? vals : halfPrecision(vals),
     });
 
     const framebuffer = this.regl.framebuffer({
@@ -110,14 +112,14 @@ export class GPUMemoryAllocator {
     }
   }
 
-  allocateOfDimensions(width: number, height: number): MemoryEntry {
+  allocateOfDimensions(width: number, height: number, precision: Precision): MemoryEntry {
     const arraySize = width*height*4;
 
     const texture = this.regl.texture({
       width: width,
       height: height,
       format: 'rgba',
-      type: 'float',
+      type: precision === 32 ? 'float' : 'half float',
     });
 
     const framebuffer = this.regl.framebuffer({

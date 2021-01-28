@@ -2,7 +2,7 @@ import { ConcatInfo, ConcatOperation } from "../../ops/gpu/concat";
 import { PrototypeTensor } from "../../tensor/cpu/prototype";
 import { CPUTensor } from "../../tensor/cpu/tensor";
 import { gpuConstructor, GPUTensor } from "../../tensor/gpu/tensor";
-import Tensor from "../../types";
+import Tensor, { Precision } from "../../types";
 import { getSize } from "../../util/shape";
 import { OnnxNode } from "../node";
 import { Attributes, Constants } from "../types";
@@ -23,7 +23,8 @@ export class ConcatNode extends OnnxNode {
 
   async forward(inputs: Tensor[]): Promise<Tensor[]> {
     if (inputs.length > 2) {
-      console.warn(`Concat with more than 2 tensors is currently slow. Doing concat with ${inputs.length} tensors`);
+      // This logging seems to slow down the operation more than the operation itself
+      //console.warn(`Concat with more than 2 tensors is currently slow. Doing concat with ${inputs.length} tensors`);
     }
 
     if (!this.compiled) {
@@ -53,7 +54,7 @@ export class ConcatNode extends OnnxNode {
     }
   }
 
-  async staticForward(inputs: Tensor[], compile: boolean): Promise<{ outputs: (CPUTensor | PrototypeTensor)[]; }> {
+  async staticForward(inputs: Tensor[], compile: boolean, precision: Precision): Promise<{ outputs: (CPUTensor | PrototypeTensor)[]; }> {
     if (this.allStaticCPU(inputs)) {
       return this.defaultStaticForward(inputs);
     }
@@ -73,7 +74,7 @@ export class ConcatNode extends OnnxNode {
 
         //@ts-ignore
         const newResShape = this.operations[i-1].getOutputShape({A: {shape: resShape}, B: b, axis: this.axis});
-        const newMemory = this.allocator.allocate(getSize(newResShape));
+        const newMemory = this.allocator.allocate(getSize(newResShape), precision);
 
         if (compile) {
           const info: ConcatInfo = {
@@ -92,7 +93,7 @@ export class ConcatNode extends OnnxNode {
             axis: this.axis
           };
 
-          this.operations[i-1].compile(info);
+          this.operations[i-1].compile(info, precision);
 
           this.compiled = true;
         }

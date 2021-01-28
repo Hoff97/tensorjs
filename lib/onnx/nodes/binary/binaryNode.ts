@@ -2,7 +2,7 @@ import { BinaryOperation } from "../../../ops/gpu/binaryOperation";
 import { PrototypeTensor } from "../../../tensor/cpu/prototype";
 import { CPUTensor } from "../../../tensor/cpu/tensor";
 import { GPUTensor } from "../../../tensor/gpu/tensor";
-import Tensor from "../../../types";
+import Tensor, { Precision } from "../../../types";
 import { getSize } from "../../../util/shape";
 import { OnnxNode } from "../../node";
 import { Attributes, Constants } from "../../types";
@@ -36,7 +36,7 @@ export abstract class BinaryNode extends OnnxNode {
     throw new Error(`${this.name} not implemented for onnx version ${this.onnxVersion}`);
   }
 
-  async staticForward(inputs: Tensor[], compile?: boolean): Promise<{ outputs: (CPUTensor | PrototypeTensor)[]}> {
+  async staticForward(inputs: Tensor[], compile: boolean, precision: Precision): Promise<{ outputs: (CPUTensor | PrototypeTensor)[]}> {
     if (this.allStaticCPU(inputs)) {
       return this.defaultStaticForward(inputs as CPUTensor[]);
     }
@@ -47,7 +47,7 @@ export abstract class BinaryNode extends OnnxNode {
 
       const [_a,_b,resultShape] = a.alignShapes(a.getShape(), b.getShape());
 
-      const memory = this.allocator.allocate(getSize(resultShape));
+      const memory = this.allocator.allocate(getSize(resultShape), precision);
 
       if (compile) {
         const [aMem, bMem] = this.getMemoryEntries(inputs);
@@ -64,7 +64,7 @@ export abstract class BinaryNode extends OnnxNode {
           heightOutput: memory.height
         };
 
-        this.operation.compile(info);
+        this.operation.compile(info, precision);
 
         this.compiled = true;
       }
