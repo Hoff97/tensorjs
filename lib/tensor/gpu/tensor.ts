@@ -68,7 +68,7 @@ export class GPUTensor extends Tensor implements GPUTensorI {
       type: precision === 32 ? "float" : "half float"
     });
 
-    const memory = defaultAllocator.allocateFramebuffer(texture);
+    const memory = defaultAllocator.allocateFramebuffer(texture, precision);
 
     const width = texture.width;
     const height = texture.height;

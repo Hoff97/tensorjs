@@ -9,12 +9,13 @@ export interface MemoryEntry {
   size: number;
 
   frameBuffer: Framebuffer2D;
+  precision: Precision;
 
   id: number;
 }
 
 export class GPUMemoryAllocator {
-  private tree: AVLTree<number,  MemoryEntry>;
+  private trees: {[precision: number]: AVLTree<number,  MemoryEntry>};
 
   private entryId: number;
 
@@ -23,9 +24,14 @@ export class GPUMemoryAllocator {
   private maxSizeFactor: number;
 
   constructor(regl: Regl, maxSizeFactor?: number) {
-    this.tree = new AVLTree({
-      compareValues: (a: MemoryEntry, b: MemoryEntry) => a.id === b.id
-    });
+    this.trees = {
+      16: new AVLTree({
+        compareValues: (a: MemoryEntry, b: MemoryEntry) => a.id === b.id
+      }),
+      32: new AVLTree({
+        compareValues: (a: MemoryEntry, b: MemoryEntry) => a.id === b.id
+      })
+    };
 
     this.regl = regl;
     this.entryId = 0;
@@ -40,7 +46,7 @@ export class GPUMemoryAllocator {
       upperBound = texSize;
     }
 
-    const results = this.tree.betweenBoundsFirst({gte: size, lte: upperBound});
+    const results = this.trees[precision].betweenBoundsFirst({gte: size, lte: upperBound});
     if (results.length === 0) {
       const textureSize = Math.ceil(size / 4);
       const {width, height} = this.getTextureDims(textureSize);
@@ -58,20 +64,21 @@ export class GPUMemoryAllocator {
         height: height,
         size: width*height*4,
         frameBuffer: framebuffer,
-        id: this.entryId++
+        id: this.entryId++,
+        precision: precision
       };
 
       return memoryEntry;
     } else {
       const first = results[0];
-      this.tree.deleteFirst(first.key);
+      this.trees[precision].deleteFirst(first.key);
 
       return first.value;
     }
   }
 
   deallocate(entry: MemoryEntry) {
-    this.tree.insert(entry.size, entry);
+    this.trees[entry.precision].insert(entry.size, entry);
   }
 
   allocateTexture(values: Float32Array, precision: Precision): MemoryEntry {
@@ -107,7 +114,8 @@ export class GPUMemoryAllocator {
       height: height,
       size: arraySize,
       frameBuffer: framebuffer,
-      id: this.entryId++
+      id: this.entryId++,
+      precision: precision
     }
   }
 
@@ -133,11 +141,12 @@ export class GPUMemoryAllocator {
       height: height,
       size: arraySize,
       frameBuffer: framebuffer,
-      id: this.entryId++
+      id: this.entryId++,
+      precision: precision
     }
   }
 
-  allocateFramebuffer(texture: REGL.Texture2D): MemoryEntry {
+  allocateFramebuffer(texture: REGL.Texture2D, precision: Precision): MemoryEntry {
     const framebuffer = this.regl.framebuffer({
       color: texture,
       width: texture.width,
@@ -150,7 +159,8 @@ export class GPUMemoryAllocator {
       height: texture.height,
       size: texture.width*texture.height*4,
       frameBuffer: framebuffer,
-      id: this.entryId++
+      id: this.entryId++,
+      precision: precision
     }
   }
 
