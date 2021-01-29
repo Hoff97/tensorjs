@@ -452,8 +452,8 @@ export class OnnxModel {
     }
 
     this.nodeIds = this.nodeIds.filter(x => x.toString() !== nodeId.toString());
+    this.nodes[nodeId].delete();
     delete this.nodes[nodeId];
-    // TODO: Clean up GPU/WASM memory of the nodes here
   }
 
   private insertNode(node: OnnxNode) {
