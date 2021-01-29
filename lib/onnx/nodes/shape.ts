@@ -37,4 +37,6 @@ export class ShapeNode extends OnnxNode {
   getType() {
     return 'Shape';
   }
+
+  delete(): void {}
 }

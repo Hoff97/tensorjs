@@ -106,4 +106,6 @@ export class UnsqueezeNode extends OnnxNode {
   getType() {
     return 'Unsqueeze';
   }
+
+  delete(): void {}
 }

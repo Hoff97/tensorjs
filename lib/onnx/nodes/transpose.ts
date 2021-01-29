@@ -84,4 +84,6 @@ export class TransposeNode extends OnnxNode {
   getType() {
     return 'Transpose';
   }
+
+  delete(): void {}
 }

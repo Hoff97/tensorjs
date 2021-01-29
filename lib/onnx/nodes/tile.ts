@@ -96,4 +96,6 @@ export class TileNode extends OnnxNode {
   getType() {
     return 'Tile';
   }
+
+  delete(): void {}
 }

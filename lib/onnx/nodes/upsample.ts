@@ -101,4 +101,6 @@ export class UpsampleNode extends OnnxNode {
   getType() {
     return 'Upsample';
   }
+
+  delete(): void {}
 }

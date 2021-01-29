@@ -109,4 +109,6 @@ export class ReshapeNode extends OnnxNode {
   getType() {
     return 'Reshape';
   }
+
+  delete(): void {}
 }

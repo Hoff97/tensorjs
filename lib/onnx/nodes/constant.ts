@@ -49,4 +49,8 @@ export class ConstantNode extends OnnxNode {
   getType() {
     return 'Constant';
   }
+
+  delete(): void {
+    this.tensor.delete();
+  }
 }

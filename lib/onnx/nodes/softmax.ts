@@ -221,4 +221,6 @@ export class SoftmaxNode extends OnnxNode {
   getType() {
     return 'Softmax';
   }
+
+  delete(): void {}
 }

@@ -85,4 +85,6 @@ export class PadNode extends OnnxNode {
   getType() {
     return 'Pad';
   }
+
+  delete(): void {}
 }

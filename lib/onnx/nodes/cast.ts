@@ -39,4 +39,6 @@ export class CastNode extends OnnxNode {
   getType() {
     return 'Cast';
   }
+
+  delete(): void {}
 }

@@ -184,4 +184,8 @@ export class BatchNormalizationNode extends OnnxNode {
   async toGPU(precision: Precision) {
     this.epsTensor = await toGPU(this.epsTensor, precision);
   }
+
+  delete(): void {
+    this.epsTensor.delete();
+  }
 }

@@ -131,4 +131,6 @@ export abstract class OnnxNode {
   abstract initializeForCompiling(): void;
 
   abstract getType(): string;
+
+  abstract delete(): void;
 }

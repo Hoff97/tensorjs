@@ -239,4 +239,6 @@ export class InstanceNormalizationNode extends OnnxNode {
   getType() {
     return 'InstanceNormalization';
   }
+
+  delete(): void {}
 }

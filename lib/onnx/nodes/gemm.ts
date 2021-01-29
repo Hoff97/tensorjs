@@ -144,4 +144,6 @@ export class GemmNode extends OnnxNode {
   getType() {
     return 'Gemm';
   }
+
+  delete(): void {}
 }

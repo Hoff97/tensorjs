@@ -98,4 +98,6 @@ export class ExpandNode extends OnnxNode {
   getType() {
     return 'Expand';
   }
+
+  delete(): void {}
 }

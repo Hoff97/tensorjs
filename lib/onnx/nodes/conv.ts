@@ -229,4 +229,14 @@ export class ConvNode extends OnnxNode {
       this.bias = await toGPU(this.bias, precision);
     }
   }
+
+
+  delete(): void {
+    if (this.kernel !== undefined) {
+      this.kernel.delete();
+    }
+    if (this.bias !== undefined) {
+      this.bias.delete();
+    }
+  }
 }

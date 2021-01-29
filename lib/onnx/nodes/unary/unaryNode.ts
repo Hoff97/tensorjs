@@ -70,4 +70,6 @@ export abstract class UnaryNode extends OnnxNode {
   getType() {
     return this.name;
   }
+
+  delete(): void {}
 }

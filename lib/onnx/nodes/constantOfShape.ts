@@ -1,7 +1,5 @@
 import { PrototypeTensor } from "../../tensor/cpu/prototype";
 import { CPUTensor } from "../../tensor/cpu/tensor";
-import { GPUTensor } from "../../tensor/gpu/tensor";
-import { WASMTensor } from "../../tensor/wasm/tensor";
 import Tensor from "../../types";
 import { getSize } from "../../util/shape";
 import { OnnxNode } from "../node";
@@ -46,5 +44,9 @@ export class ConstantOfShapeNode extends OnnxNode {
 
   getType() {
     return 'ConstantOfShape';
+  }
+
+  delete(): void {
+    this.tensor.delete();
   }
 }

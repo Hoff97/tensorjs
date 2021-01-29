@@ -107,4 +107,6 @@ export abstract class ReduceNode extends OnnxNode {
   getType() {
     return this.name;
   }
+
+  delete(): void {}
 }

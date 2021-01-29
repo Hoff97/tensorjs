@@ -86,4 +86,6 @@ export class GatherNode extends OnnxNode {
   getType() {
     return 'Gather';
   }
+
+  delete(): void {}
 }

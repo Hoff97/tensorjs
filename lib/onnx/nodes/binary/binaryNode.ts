@@ -85,4 +85,6 @@ export abstract class BinaryNode extends OnnxNode {
   getType() {
     return this.name;
   }
+
+  delete(): void {}
 }

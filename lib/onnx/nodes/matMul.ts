@@ -86,4 +86,6 @@ export class MatMulNode extends OnnxNode {
   getType() {
     return 'MatMul';
   }
+
+  delete(): void {}
 }

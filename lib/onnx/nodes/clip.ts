@@ -89,4 +89,6 @@ export class ClipNode extends OnnxNode {
   getType() {
     return 'Clip';
   }
+
+  delete(): void {}
 }

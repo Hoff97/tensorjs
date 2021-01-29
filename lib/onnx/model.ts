@@ -497,7 +497,20 @@ export class OnnxModel {
     return undefined;
   }
 
-  getNodes() {
+  public getNodes() {
     return this.nodes;
+  }
+
+  public delete() {
+    for (let c in this.constants) {
+      this.constants[c].delete();
+    }
+
+    for (let nodeId of this.nodeIds) {
+      this.nodes[nodeId].delete();
+    }
+
+    // TODO: If this model uses a nondefault allocator, all framebuffers should
+    // probably transferred to the default allocator
   }
 }

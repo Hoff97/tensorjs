@@ -114,4 +114,6 @@ export class SliceNode extends OnnxNode {
   getType() {
     return 'Slice';
   }
+
+  delete(): void {}
 }
