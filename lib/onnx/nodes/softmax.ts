@@ -123,9 +123,9 @@ export class SoftmaxNode extends OnnxNode {
 
     const maxMemory = this.allocator.allocate(sh1, precision);
     const normalizedMemory = this.allocator.allocate(sh1*sh2, precision);
-    const expMemory = this.allocator.allocate(sh1*sh2, precision);
-    const sumMemory = this.allocator.allocate(sh1, precision);
-    const memory = this.allocator.allocate(sh1*sh2, precision);
+    const expMemory = this.allocator.allocate(sh1*sh2, 32);
+    const sumMemory = this.allocator.allocate(sh1, 32);
+    const memory = this.allocator.allocate(sh1*sh2, 32);
 
     if (compile) {
       const [xMem] = this.getMemoryEntries(inputs);
@@ -167,7 +167,7 @@ export class SoftmaxNode extends OnnxNode {
         widthOutput: expMemory.width,
         heightOutput: expMemory.height
       };
-      this.expOperation.compile(infoExp, precision);
+      this.expOperation.compile(infoExp, 32);
 
       const infoSum: PoolInfo = {
         shapeX: [sh1, sh2],
@@ -180,7 +180,7 @@ export class SoftmaxNode extends OnnxNode {
 
         axes: [1], keepDims: true
       };
-      this.sumOperation.compile(infoSum, precision);
+      this.sumOperation.compile(infoSum, 32);
 
       const infoDivide: BinaryOpInfo = {
         shapeA: [sh1, sh2],
@@ -195,7 +195,7 @@ export class SoftmaxNode extends OnnxNode {
         widthOutput: memory.width,
         heightOutput: memory.height,
       };
-      this.divideOperation.compile(infoDivide, precision);
+      this.divideOperation.compile(infoDivide, 32);
 
       this.compiled = true;
     }
