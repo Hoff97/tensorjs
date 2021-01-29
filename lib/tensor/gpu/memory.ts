@@ -34,7 +34,7 @@ export class GPUMemoryAllocator {
     this.maxSizeFactor = maxSizeFactor || 2;
   }
 
-  allocate(size: number, precision: 32 | 16): MemoryEntry {
+  allocate(size: number, precision: Precision): MemoryEntry {
     let upperBound = size*this.maxSizeFactor;
     const texSize = Math.ceil(size/4)*4;
     if (texSize < upperBound) {

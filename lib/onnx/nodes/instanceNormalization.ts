@@ -9,7 +9,6 @@ import { CPUTensor } from "../../tensor/cpu/tensor";
 import { glContext } from "../../tensor/gpu/gl";
 import { gpuConstructor, GPUTensor } from "../../tensor/gpu/tensor";
 import Tensor, { Precision } from "../../types";
-import { toCPU, toGPU, toWASM } from "../../util/convert";
 import { getSize } from "../../util/shape";
 import { OnnxNode } from "../node";
 import { Attributes, Constants } from "../types";

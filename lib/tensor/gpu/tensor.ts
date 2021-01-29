@@ -47,17 +47,12 @@ export class GPUTensor extends Tensor implements GPUTensorI {
 
   public size: number;
 
-  public shape: readonly number[];
-
   public deleted: boolean = false;
 
-  public precision: Precision;
-
-  constructor(values: Float32Array | MemoryEntry, shape: readonly number[], precision: Precision) {
+  constructor(values: Float32Array | MemoryEntry, public shape: readonly number[], public precision: Precision) {
     super();
 
     this.size = getSize(shape);
-    this.shape = shape;
 
     if (values instanceof Float32Array) {
       this.memory = defaultAllocator.allocateTexture(values, precision);

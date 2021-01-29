@@ -107,7 +107,7 @@ export class BatchNormalizationNode extends OnnxNode {
     }
   }
 
-  async staticForward(inputs: Tensor[], compile: boolean, precision: 32 | 16): Promise<{ outputs: (CPUTensor | PrototypeTensor)[]; }> {
+  async staticForward(inputs: Tensor[], compile: boolean, precision: Precision): Promise<{ outputs: (CPUTensor | PrototypeTensor)[]; }> {
     if (this.allStaticCPU(inputs)) {
       return this.defaultStaticForward(inputs);
     }

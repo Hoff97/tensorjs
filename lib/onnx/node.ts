@@ -126,7 +126,7 @@ export abstract class OnnxNode {
     return {outputs: outputs as CPUTensor[]};
   }
 
-  abstract staticForward(inputs: Tensor[], compile: boolean, precision: 32 | 16): Promise<{outputs: (CPUTensor | PrototypeTensor)[]}>;
+  abstract staticForward(inputs: Tensor[], compile: boolean, precision: Precision): Promise<{outputs: (CPUTensor | PrototypeTensor)[]}>;
 
   abstract initializeForCompiling(): void;
 

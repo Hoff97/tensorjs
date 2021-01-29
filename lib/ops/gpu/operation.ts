@@ -249,7 +249,7 @@ export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictB
     }).join('\n');
   }
 
-  getCompleteFragmentShader(info: Info, precision: 32 | 16): string {
+  getCompleteFragmentShader(info: Info, precision: Precision): string {
     const fragShader = this.getFragmentShader(info);
 
     const variableDecls = this.getVariableDeclarations(info);
@@ -271,8 +271,6 @@ export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictB
     }
 
     ${fragShader}`;
-
-    console.log(result);
 
     return result;
   }
@@ -429,11 +427,11 @@ export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictB
     }`;
   }
 
-  precisionString(precision: 32 | 16) {
+  precisionString(precision: Precision) {
     return precision === 32 ? "highp" : "mediump";
   }
 
-  getDrawCommand(info: Info, precision: 32 | 16): DrawCommand {
+  getDrawCommand(info: Info, precision: Precision): DrawCommand {
     const fragShader = this.getCompleteFragmentShader(info, precision);
 
     const uniforms = this.getUniforms(info);
@@ -462,7 +460,7 @@ export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictB
     return result;
   }
 
-  compile(info: Info, precision: 32 | 16) {
+  compile(info: Info, precision: Precision) {
     this.registerStatics(info);
 
     this.precision = precision;

@@ -336,10 +336,10 @@ export class OnnxModel {
       this.nodes[id].initializeForCompiling();
     }
 
-    this.staticForward(inputs, false);
-    this.staticForward(inputs, false);
+    await this.staticForward(inputs, false);
+    await this.staticForward(inputs, false);
 
-    this.staticForward(inputs, true);
+    await this.staticForward(inputs, true);
   }
 
   async staticForward(inputs: Tensor[], compile: boolean) {
