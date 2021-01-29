@@ -2,7 +2,7 @@ import { CPUTensor } from '../lib/tensor/cpu/tensor';
 import { OnnxModel } from '../lib/onnx/model';
 import { toCPU, toGPU, toWASM } from '../lib/util/convert';
 
-import { enabledTests } from './enabledTests';
+import { enabledTests } from './data/enabledTests';
 import { onnx } from 'onnx-proto';
 import { createTensor } from '../lib/onnx/util';
 import Tensor from '../lib/types';
@@ -58,9 +58,9 @@ for (let opset of opsetVersions) {
             }
           } else if (backend === 'GPU') {
             await model.toGPU();
-            out = await toGPU(output);
+            out = await toGPU(output, 32);
             for (let i = 0; i < inputs.length; i++) {
-              inputsDevice.push(await toGPU(inputs[i]));
+              inputsDevice.push(await toGPU(inputs[i], 32));
             }
           } else {
             model.toWASM();
