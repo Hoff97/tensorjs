@@ -16,12 +16,12 @@ export const models: ModelData[] = [
     zipped: false,
     inputData: false,
     inputsShape: [[1,3,240,320]]
-  }/*,
+  },
   {
     name: "mosaic",
     fileName: "mosaic-9.tar.gz",
     url: "https://github.com/onnx/models/raw/master/vision/style_transfer/fast_neural_style/model/mosaic-9.tar.gz",
     zipped: true,
     inputData: true
-  }*/
+  }
 ];
