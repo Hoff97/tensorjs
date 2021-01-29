@@ -1,7 +1,6 @@
 import REGL, { Framebuffer2D, Regl } from "regl";
 import { Precision } from "../../types";
 import { AVLTree } from "../../util/avl";
-import { halfPrecision } from "../../util/float16";
 import { primeFactors } from "../../util/math";
 
 export interface MemoryEntry {
@@ -93,7 +92,7 @@ export class GPUMemoryAllocator {
       height: height,
       format: 'rgba',
       type: precision === 32 ? 'float' : 'half float',
-      data: precision === 32 ? vals : halfPrecision(vals),
+      data: precision === 32 ? vals : Array.from(vals),
     });
 
     const framebuffer = this.regl.framebuffer({
