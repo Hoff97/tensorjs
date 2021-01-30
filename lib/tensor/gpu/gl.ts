@@ -1,5 +1,6 @@
 import REGL from 'regl';
-import { GPUMemoryAllocator } from './memory';
+import { AVLTree } from '../../util/datastructs/avl';
+import { GPUMemoryAllocator, MemoryEntry } from './memory';
 
 const canvas = document.createElement("canvas");
 
@@ -17,7 +18,11 @@ function setup() {
     extensions: ['OES_texture_float', 'WEBGL_color_buffer_float', 'OES_texture_half_float']
   });
 
-  defaultAllocator = new GPUMemoryAllocator(gl);
+  defaultAllocator = new GPUMemoryAllocator(gl, () => {
+    return new AVLTree({
+      compareValues: (a: MemoryEntry, b: MemoryEntry) => a.id === b.id
+    });
+  });
 }
 
 setup();

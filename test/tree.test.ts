@@ -1,4 +1,4 @@
-import { AVLTree } from "../lib/util/avl";
+import { AVLTree } from "../lib/util/datastructs/avl";
 
 describe('Create and insert', () => {
   it('should have zero keys in the beginning', () => {

@@ -1,6 +1,7 @@
-import { BSTOptions, BinarySearchTree, SearchQuery } from "./bst";
+import { BSTOptions, BinarySearchTree } from "./bst";
+import { OrderedDict, SearchQuery } from "./types";
 
-export class AVLTree<K, V> {
+export class AVLTree<K, V> implements OrderedDict<K, V> {
   private tree: _AVLTree<K,V>;
   constructor(options: BSTOptions<K,V>) {
     this.tree = new _AVLTree(options);

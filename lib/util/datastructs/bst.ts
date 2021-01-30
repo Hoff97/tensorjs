@@ -1,8 +1,8 @@
+import { QueryResult, SearchQuery } from "./types";
+
 export type Comparison<K> = (a: K, b: K) => number;
 
 export type EqComparison<V> = (a: V, b: V) => boolean;
-
-export type QueryResult<K,V> = {key: K, value: V}[];
 
 export interface BSTOptions<K, V> {
   unique?: boolean;
@@ -11,13 +11,6 @@ export interface BSTOptions<K, V> {
   compareKeys?: Comparison<K>;
   compareValues?: EqComparison<V>;
   parent?: BinarySearchTree<K,V>;
-}
-
-export interface SearchQuery<K> {
-  gt?: K;
-  gte?: K;
-  lt?: K;
-  lte?: K;
 }
 
 /*

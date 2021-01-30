@@ -1,6 +1,7 @@
 import REGL, { Framebuffer2D, Regl } from "regl";
 import { Precision } from "../../types";
-import { AVLTree } from "../../util/avl";
+import { AVLTree } from "../../util/datastructs/avl";
+import { OrderedDict } from "../../util/datastructs/types";
 import { primeFactors } from "../../util/math";
 
 export interface MemoryEntry {
@@ -20,7 +21,7 @@ export interface Size {
 }
 
 export class GPUMemoryAllocator {
-  private trees: {[precision: number]: AVLTree<number,  MemoryEntry>};
+  private trees: {[precision: number]: OrderedDict<number,  MemoryEntry>};
 
   private entryId: number;
 
@@ -28,14 +29,12 @@ export class GPUMemoryAllocator {
 
   private maxSizeFactor: number;
 
-  constructor(regl: Regl, maxSizeFactor?: number) {
+  constructor(regl: Regl,
+              orderedDictConstructor: () => OrderedDict<number,  MemoryEntry>,
+              maxSizeFactor?: number) {
     this.trees = {
-      16: new AVLTree({
-        compareValues: (a: MemoryEntry, b: MemoryEntry) => a.id === b.id
-      }),
-      32: new AVLTree({
-        compareValues: (a: MemoryEntry, b: MemoryEntry) => a.id === b.id
-      })
+      16: orderedDictConstructor(),
+      32: orderedDictConstructor()
     };
 
     this.regl = regl;
@@ -77,6 +76,8 @@ export class GPUMemoryAllocator {
     } else {
       const first = results[0];
       this.trees[precision].deleteFirst(first.key);
+
+      console.log('Allocated', first.value.size - size);
 
       return first.value;
     }
