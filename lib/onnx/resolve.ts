@@ -32,6 +32,7 @@ import { TransposeNode } from "./nodes/transpose";
 import { UnsqueezeNode } from "./nodes/unsqueeze";
 import { UpsampleNode } from "./nodes/upsample";
 import { NodeConstructor } from "./types";
+import { GlobalAveragePoolNode } from "./nodes/globalAveragePool";
 
 export const nodeResolve: {[opType: string]: NodeConstructor} = {
   'Conv': (attributes, inputs, outputs, constants, onnxVersion) => new ConvNode(attributes, inputs, outputs, constants, onnxVersion),
@@ -67,4 +68,5 @@ export const nodeResolve: {[opType: string]: NodeConstructor} = {
   'Upsample': (attributes, inputs, outputs, constants, onnxVersion) => new UpsampleNode(attributes, inputs, outputs, constants, onnxVersion),
   'Transpose': (attributes, inputs, outputs, constants, onnxVersion) => new TransposeNode(attributes, inputs, outputs, constants, onnxVersion),
   'Softmax': (attributes, inputs, outputs, constants, onnxVersion) => new SoftmaxNode(attributes, inputs, outputs, constants, onnxVersion),
+  'GlobalAveragePool': (attributes, inputs, outputs, constants, onnxVersion) => new GlobalAveragePoolNode(attributes, inputs, outputs, constants, onnxVersion),
 };
