@@ -71,6 +71,10 @@ export class SliceOperation<GPUTensor extends GPUTensorI> extends Operation<GPUT
   }
 
   calc(input: SliceInput): GPUTensor {
+    if (this.fullyStatic) {
+      return this.compute(this.outputShape, {X: input.X});
+    }
+
     const rank = input.X.shape.length;
 
     const resultShape = [...input.X.shape];
@@ -159,5 +163,9 @@ export class SliceOperation<GPUTensor extends GPUTensorI> extends Operation<GPUT
 
       offsets
     };
+  }
+
+  getInputInfoString(input: SliceInput): string {
+    return `${input.X.shape}-${input.axes}-${input.starts}-${input.ends}`;
   }
 }

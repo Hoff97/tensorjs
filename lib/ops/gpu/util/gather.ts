@@ -92,6 +92,10 @@ export class GatherOperation<GPUTensor extends GPUTensorI> extends Operation<GPU
   }
 
   calc(input: GatherInput): GPUTensor {
+    if (this.fullyStatic) {
+      return this.compute(this.outputShape, {X: input.X});
+    }
+
     if (input.indices.size > this.gatherMaxIxSize) {
       throw new Error(`Gather on GPU can deal with at most ${this.gatherMaxIxSize} indices, input had ${input.indices.size}`);
     }
@@ -251,5 +255,9 @@ export class GatherOperation<GPUTensor extends GPUTensorI> extends Operation<GPU
       mappedIndexStrides,
       mappedInputStrides
     };
+  }
+
+  getInputInfoString(input: GatherInput): string {
+    return `${input.X.shape}-${input.axis}-${Array.from(input.indices.values)}-${input.indices.shape}`;
   }
 }

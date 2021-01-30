@@ -35,6 +35,9 @@ export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictB
 
   private copyCounter = 0;
 
+  protected fullyStatic = false;
+  protected outputShape?: readonly number[];
+
   constructor(tensorConstructor: GPUTensorConstructor<GPUTensor>, allocator?: GPUMemoryAllocator, maxRank?: number) {
     if (allocator === undefined) {
       allocator = defaultAllocator;
@@ -49,6 +52,9 @@ export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictB
   }
 
   registerStatics(info: Info) {
+    let staticTextures = 0;
+    let staticVars = 0;
+
     for (let key in info) {
       if (key.startsWith('shape')) {
         const texName = key.slice('shape'.length);
@@ -56,9 +62,18 @@ export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictB
         this.statics.add(`size${texName}`);
         this.statics.add(`rank${texName}`);
         this.statics.add(`strides${texName}`);
+        staticTextures++;
       } else {
         this.statics.add(key);
+        if (!key.startsWith('width') && !key.startsWith('height')) {
+          staticVars++;
+        }
       }
+    }
+
+    if (staticTextures - 1 === this.getTextureNames().length && staticVars === this.getUniformAttrs().length) {
+      this.fullyStatic = true;
+      this.outputShape = info["shapeOutput"];
     }
   }
 
@@ -480,40 +495,42 @@ export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictB
     for (let name in inputTensors) {
       inputTextures[name] = inputTensors[name].memory.frameBuffer
     }
-   if (inputs === undefined) {
+    if (inputs === undefined) {
       inputs = {};
     }
 
-    for (let name in inputTensors) {
-      if (!this.statics.has(`shape${name}`)) {
-        inputs[`size${name}`] = inputTensors[name].size;
-        inputs[`strides${name}`] = this.pad(computeStrides(inputTensors[name].shape));
-        inputs[`shape${name}`] = this.copyPad(inputTensors[name].shape);
-        inputs[`rank${name}`] = inputTensors[name].shape.length;
+    if (!this.fullyStatic) {
+      for (let name in inputTensors) {
+        if (!this.statics.has(`shape${name}`)) {
+          inputs[`size${name}`] = inputTensors[name].size;
+          inputs[`strides${name}`] = this.pad(computeStrides(inputTensors[name].shape));
+          inputs[`shape${name}`] = this.copyPad(inputTensors[name].shape);
+          inputs[`rank${name}`] = inputTensors[name].shape.length;
+        }
+
+        if (!this.statics.has(`width${name}`)) {
+          inputs[`width${name}`] = inputTensors[name].memory.width;
+        }
+
+        if (!this.statics.has(`height${name}`)) {
+          inputs[`height${name}`] = inputTensors[name].memory.height;
+        }
       }
 
-      if (!this.statics.has(`width${name}`)) {
-        inputs[`width${name}`] = inputTensors[name].memory.width;
+      if (!this.statics.has('shapeOutput')) {
+        inputs['sizeOutput'] = resultSize;
+        inputs['stridesOutput'] = this.pad(computeStrides(resultShape));
+        inputs['shapeOutput'] = this.copyPad(resultShape);
+        inputs['rankOutput'] = resultShape.length;
       }
 
-      if (!this.statics.has(`height${name}`)) {
-        inputs[`height${name}`] = inputTensors[name].memory.height;
+      if (!this.statics.has('widthOutput')) {
+        inputs['widthOutput'] = result.width;
       }
-    }
 
-    if (!this.statics.has('shapeOutput')) {
-      inputs['sizeOutput'] = resultSize;
-      inputs['stridesOutput'] = this.pad(computeStrides(resultShape));
-      inputs['shapeOutput'] = this.copyPad(resultShape);
-      inputs['rankOutput'] = resultShape.length;
-    }
-
-    if (!this.statics.has('widthOutput')) {
-      inputs['widthOutput'] = result.width;
-    }
-
-    if (!this.statics.has('heightOutput')) {
-      inputs['heightOutput'] = result.height;
+      if (!this.statics.has('heightOutput')) {
+        inputs['heightOutput'] = result.height;
+      }
     }
 
     this.drawCommand({
@@ -538,4 +555,6 @@ export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictB
   abstract getOutputShape(input: InputType): readonly number[];
 
   abstract getCompilationInfo(input: InputType, precision: Precision): Info;
+
+  abstract getInputInfoString(input: InputType): string;
 }

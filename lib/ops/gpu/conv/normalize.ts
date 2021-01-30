@@ -131,4 +131,9 @@ export class NormalizeOperation<GPUTensor extends GPUTensorI> extends Operation<
       epsilon: input.epsilon
     };
   }
+
+  getInputInfoString(input: NormalizeOpInput): string {
+    // TODO: Format epsilon with enough precision?
+    return `${input.X.shape}-${input.Mean.shape}-${input.Variance.shape}-${input.Scale.shape}-${input.Bias.shape}-${input.epsilon}`;
+  }
 }

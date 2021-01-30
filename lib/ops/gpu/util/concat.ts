@@ -72,6 +72,10 @@ export class ConcatOperation<GPUTensor extends GPUTensorI> extends Operation<GPU
   }
 
   calc(input: ConcatInput): GPUTensor {
+    if (this.fullyStatic) {
+      return this.compute(this.outputShape, {A: input.A, B: input.B});
+    }
+
     const outputShape = this.getOutputShape(input);
 
     return this.compute(outputShape, {A: input.A, B: input.B}, {axis: input.axis});
@@ -113,5 +117,9 @@ export class ConcatOperation<GPUTensor extends GPUTensorI> extends Operation<GPU
 
       axis: input.axis
     }
+  }
+
+  getInputInfoString(input: ConcatInput): string {
+    return `${input.A.shape}-${input.B.shape}-${input.axis}`;
   }
 }

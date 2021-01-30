@@ -76,6 +76,10 @@ export class RepeatOperation<GPUTensor extends GPUTensorI> extends Operation<GPU
   }
 
   calc(input: RepeatInput): GPUTensor {
+    if (this.fullyStatic) {
+      return this.compute(this.outputShape, {A: input.A});
+    }
+
     const outputShape = this.getOutputShape(input);
 
     return this.compute(outputShape, {A: input.A}, {repeats: this.copyPad(input.repeats)});
@@ -104,5 +108,9 @@ export class RepeatOperation<GPUTensor extends GPUTensorI> extends Operation<GPU
 
       repeats: input.repeats
     };
+  }
+
+  getInputInfoString(input: RepeatInput): string {
+    return `${input.A.shape}-${input.repeats}`;
   }
 }

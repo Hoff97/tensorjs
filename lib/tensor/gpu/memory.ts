@@ -77,8 +77,6 @@ export class GPUMemoryAllocator {
       const first = results[0];
       this.trees[precision].deleteFirst(first.key);
 
-      console.log('Allocated', first.value.size - size);
-
       return first.value;
     }
   }

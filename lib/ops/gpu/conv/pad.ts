@@ -116,6 +116,9 @@ export class PadOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTen
   }
 
   calc(input: PadInput): GPUTensor {
+    if (this.fullyStatic) {
+      return this.compute(this.outputShape, {X: input.input });
+    }
     const resultShape = this.getOutputShape(input);
 
     return this.compute(resultShape, {X: input.input}, {
@@ -165,5 +168,10 @@ export class PadOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTen
       mode: this.getModeFlag(input.mode),
       value: input.value
     };
+  }
+
+  getInputInfoString(input: PadInput): string {
+    //TODO: Format value with enough precision?
+    return `${input.input.shape}-${input.pads}-${input.mode}-${input.value}`;
   }
 }

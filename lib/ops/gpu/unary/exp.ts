@@ -1,6 +1,6 @@
 import { GPUTensorConstructor, GPUTensorI } from "../../../tensor/gpu/interface";
 import { GPUMemoryAllocator } from "../../../tensor/gpu/memory";
-import { UnaryOperation } from "./unaryOperation";
+import { UnaryOperation, UnaryOpInput } from "./unaryOperation";
 
 
 export class ExpOperation<GPUTensor extends GPUTensorI> extends UnaryOperation<GPUTensor> {

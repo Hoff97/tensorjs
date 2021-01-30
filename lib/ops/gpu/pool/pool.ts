@@ -106,6 +106,10 @@ export abstract class PoolOperation<GPUTensor extends GPUTensorI> extends Operat
   }
 
   calc(input: PoolInput): GPUTensor {
+    if (this.fullyStatic) {
+      return this.compute(this.outputShape, {X: input.X});
+    }
+
     const [outputShape, ixMap] = poolResultShape(input.X.shape, input.axes, input.keepDims);
 
     const inputStrides = computeStrides(input.X.shape);
@@ -195,5 +199,9 @@ export abstract class PoolOperation<GPUTensor extends GPUTensorI> extends Operat
       sumDims,
       sumSize
     };
+  }
+
+  getInputInfoString(input: PoolInput): string {
+    return `${input.X.shape}-${input.axes}-${input.keepDims}`;
   }
 }

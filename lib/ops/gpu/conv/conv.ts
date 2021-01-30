@@ -168,6 +168,10 @@ export class ConvOperation<GPUTensor extends GPUTensorI, ConvInf extends ConvInf
   }
 
   calc(input: ConvInput): GPUTensor {
+    if (this.fullyStatic) {
+      return this.compute(this.outputShape, {X: input.X, W: input.W});
+    }
+
     const N = input.X.shape[0];
     const C = input.X.shape[1];
     const D = input.X.shape.slice(2);
@@ -257,6 +261,10 @@ export class ConvOperation<GPUTensor extends GPUTensorI, ConvInf extends ConvInf
       activation: this.getActivationFlag(input.activation)
     } as ConvInf;
   }
+
+  getInputInfoString(input: ConvInput): string {
+    return `${input.X.shape}-${input.W.shape}-${input.dilations}-${input.pads}-${input.dilations}-${input.strides}-${input.activation}`;
+  }
 }
 
 
@@ -336,5 +344,9 @@ export class ConvBiasOperation<GPUTensor extends GPUTensorI> extends ConvOperati
       widthB: input.B.memory.width,
       heightB: input.B.memory.height
     };
+  }
+
+  getInputInfoString(input: ConvBiasInput): string {
+    return `${super.getInputInfoString(input)}-${input.B.shape}`;
   }
 }

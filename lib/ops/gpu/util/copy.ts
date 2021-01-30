@@ -75,4 +75,8 @@ export class CopyOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTe
       heightOutput: outputSize.height
     };
   }
+
+  getInputInfoString(input: CopyInput): string {
+    return `${input.input}-${this.getOutputShape(input)}`;
+  }
 }

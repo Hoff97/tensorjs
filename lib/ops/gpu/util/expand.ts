@@ -69,4 +69,8 @@ export class ExpandOperation<GPUTensor extends GPUTensorI> extends Operation<GPU
       heightOutput: outputSize.height
     };
   }
+
+  getInputInfoString(input: ExpandInput): string {
+    return `${input.input.shape}-${input.outputShape}`;
+  }
 }

@@ -157,6 +157,10 @@ export class GemmOperation<GPUTensor extends GPUTensorI, GemmInf extends GemmInf
   }
 
   calc(input: GemmInput): GPUTensor {
+    if (this.fullyStatic) {
+      return this.compute(this.outputShape, {A: input.a, B: input.b});
+    }
+
     const rank = input.a.shape.length;
 
     const M = input.aTranspose ? input.a.shape[rank - 1] : input.a.shape[rank - 2];
@@ -252,6 +256,11 @@ export class GemmOperation<GPUTensor extends GPUTensorI, GemmInf extends GemmInf
 
     return info as GemmInf;
   }
+
+  getInputInfoString(input: GemmIn): string {
+    //TODO: Check precision of alpha and beta
+    return `${input.a.shape}-${input.b.shape}-${input.aTranspose}-${input.bTranspose}-${input.alpha}-${input.beta}`;
+  }
 }
 
 export interface GemmCInfo extends GemmInfo {
@@ -284,6 +293,10 @@ export class GemmCOperation<GPUTensor extends GPUTensorI> extends GemmOperation<
   }
 
   calc(input: GemmCInput): GPUTensor {
+    if (this.fullyStatic) {
+      return this.compute(this.outputShape, {A: input.a, B: input.b, C: input.c});
+    }
+
     const rank = input.a.shape.length;
 
     const M = input.aTranspose ? input.a.shape[rank - 1] : input.a.shape[rank - 2];
@@ -316,5 +329,9 @@ export class GemmCOperation<GPUTensor extends GPUTensorI> extends GemmOperation<
     };
 
     return info;
+  }
+
+  getInputInfoString(input: GemmCInput): string {
+    return `${super.getInputInfoString(input)}-${input.c.shape}`;
   }
 }

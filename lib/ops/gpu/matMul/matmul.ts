@@ -107,4 +107,8 @@ export class MatMulOperation<GPUTensor extends GPUTensorI> extends Operation<GPU
       heightOutput: outputSize.height
     };
   }
+
+  getInputInfoString(input: MatMulInput): string {
+    return `${input.A.shape}-${input.B.shape}`;
+  }
 }

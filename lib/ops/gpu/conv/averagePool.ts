@@ -138,6 +138,9 @@ export class AveragePoolOperation<GPUTensor extends GPUTensorI> extends Operatio
   }
 
   calc(input: AveragePoolInput): GPUTensor {
+    if (this.fullyStatic) {
+      return this.compute(this.outputShape, {X: input.X});
+    }
     const N = input.X.shape[0];
     const C = input.X.shape[1];
     const D = input.X.shape.slice(2);
@@ -208,5 +211,9 @@ export class AveragePoolOperation<GPUTensor extends GPUTensorI> extends Operatio
       dataRank: input.X.shape.length - 2,
       includePad: input.includePad ? 1 : 0
     };
+  }
+
+  getInputInfoString(input: AveragePoolInput): string {
+    return `${input.X.shape}-${input.kernelShape}-${input.pads}-${input.strides}-${input.includePad}`;
   }
 }

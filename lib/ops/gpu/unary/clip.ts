@@ -74,6 +74,10 @@ export class ClipOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTe
   }
 
   calc(input: ClipInput): GPUTensor {
+    if (this.fullyStatic) {
+      return this.compute(this.outputShape, {X: input.input});
+    }
+
     return this.compute(input.input.shape, {X: input.input}, {
       minVal: input.minVal !== undefined ? input.minVal : 0,
       maxVal: input.maxVal !== undefined ? input.maxVal : 0,
@@ -110,5 +114,9 @@ export class ClipOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTe
       doMin: input.minVal !== undefined ? 1 : 0,
       doMax: input.maxVal !== undefined ? 1 : 0
     }
+  }
+
+  getInputInfoString(input: ClipInput): string {
+    return `${input.input.shape}-${input.minVal}-${input.maxVal}`;
   }
 }

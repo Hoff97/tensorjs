@@ -69,4 +69,8 @@ export abstract class UnaryOperation<GPUTensor extends GPUTensorI> extends Opera
       heightOutput: outputSize.height
     };
   }
+
+  getInputInfoString(input: UnaryOpInput): string {
+    return `${input.input.shape}`;
+  }
 }

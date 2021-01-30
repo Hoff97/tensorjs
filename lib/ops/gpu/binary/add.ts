@@ -1,7 +1,6 @@
 import { GPUTensorConstructor, GPUTensorI } from "../../../tensor/gpu/interface";
 import { GPUMemoryAllocator } from "../../../tensor/gpu/memory";
-import { Precision } from "../../../types";
-import { BinaryOperation, BinaryOpInfo, BinaryOpInput } from "./binaryOperation";
+import { BinaryOperation, BinaryOpInput } from "./binaryOperation";
 
 export class AddOperation<GPUTensor extends GPUTensorI> extends BinaryOperation<GPUTensor> {
   constructor(tensorConstructor: GPUTensorConstructor<GPUTensor>, allocator?: GPUMemoryAllocator) {

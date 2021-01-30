@@ -56,6 +56,10 @@ export class TransposeOperation<GPUTensor extends GPUTensorI> extends Operation<
   }
 
   calc(input: TransposeInput): GPUTensor {
+    if (this.fullyStatic) {
+      return this.compute(this.outputShape, {A: input.A});
+    }
+
     const rank = input.A.shape.length;
 
     const outputShape = this.getOutputShape(input);
@@ -125,5 +129,9 @@ export class TransposeOperation<GPUTensor extends GPUTensorI> extends Operation<
 
       mappedStrides
     };
+  }
+
+  getInputInfoString(input: TransposeInput): string {
+    return `${input.A.shape}-${input.permutation}`;
   }
 }

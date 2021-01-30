@@ -79,4 +79,8 @@ export abstract class BinaryOperation<GPUTensor extends GPUTensorI> extends Oper
       heightOutput: outputSize.height
     };
   }
+
+  getInputInfoString(input: BinaryOpInput): string {
+    return `${input.A.shape}-${input.B.shape}`;
+  }
 }
