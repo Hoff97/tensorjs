@@ -1,4 +1,4 @@
-import { UpsampleInfo, UpsampleOperation } from "../../ops/gpu/upsample";
+import { UpsampleInfo, UpsampleOperation } from "../../ops/gpu/conv/upsample";
 import { PrototypeTensor } from "../../tensor/cpu/prototype";
 import { CPUTensor } from "../../tensor/cpu/tensor";
 import { gpuConstructor, GPUTensor } from "../../tensor/gpu/tensor";

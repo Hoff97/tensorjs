@@ -1,11 +1,11 @@
-import { getSize } from "../../util/shape";
-import { outputDimsSize } from "../util/conv";
+import { getSize } from "../../../util/shape";
+import { outputDimsSize } from "../../util/conv";
 
-import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
-import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
-import { Input, Operation } from "./operation";
-import { Precision } from "../../types";
-import { defaultAllocator } from "../../tensor/gpu/gl";
+import { GPUTensorConstructor, GPUTensorI } from "../../../tensor/gpu/interface";
+import { GPUMemoryAllocator } from "../../../tensor/gpu/memory";
+import { Input, Operation } from "../operation";
+import { Precision } from "../../../types";
+import { defaultAllocator } from "../../../tensor/gpu/gl";
 
 
 export interface AveragePoolInfo {

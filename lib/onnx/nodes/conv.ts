@@ -1,4 +1,4 @@
-import { ConvBiasOperation, ConvInfo, ConvInput, ConvOperation } from "../../ops/gpu/conv";
+import { ConvBiasOperation, ConvInfo, ConvInput, ConvOperation } from "../../ops/gpu/conv/conv";
 import { PrototypeTensor } from "../../tensor/cpu/prototype";
 import { CPUTensor } from "../../tensor/cpu/tensor";
 import { MemoryEntry } from "../../tensor/gpu/memory";

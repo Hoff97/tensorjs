@@ -1,4 +1,4 @@
-import { SliceInfo, SliceOperation } from "../../ops/gpu/slice";
+import { SliceInfo, SliceOperation } from "../../ops/gpu/util/slice";
 import { PrototypeTensor } from "../../tensor/cpu/prototype";
 import { CPUTensor } from "../../tensor/cpu/tensor";
 import { gpuConstructor, GPUTensor } from "../../tensor/gpu/tensor";

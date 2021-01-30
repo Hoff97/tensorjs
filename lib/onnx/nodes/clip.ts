@@ -1,4 +1,4 @@
-import { ClipInfo, ClipOperation } from "../../ops/gpu/clip";
+import { ClipInfo, ClipOperation } from "../../ops/gpu/unary/clip";
 import { PrototypeTensor } from "../../tensor/cpu/prototype";
 import { CPUTensor } from "../../tensor/cpu/tensor";
 import { gpuConstructor, GPUTensor } from "../../tensor/gpu/tensor";

@@ -1,4 +1,4 @@
-import { GemmInfo, GemmOperation } from "../../ops/gpu/gemm";
+import { GemmInfo, GemmOperation } from "../../ops/gpu/matMul/gemm";
 import { PrototypeTensor } from "../../tensor/cpu/prototype";
 import { CPUTensor } from "../../tensor/cpu/tensor";
 import { gpuConstructor, GPUTensor } from "../../tensor/gpu/tensor";

@@ -1,4 +1,4 @@
-import { ExpandInfo, ExpandOperation } from "../../ops/gpu/expand";
+import { ExpandInfo, ExpandOperation } from "../../ops/gpu/util/expand";
 import { PrototypeTensor } from "../../tensor/cpu/prototype";
 import { CPUTensor } from "../../tensor/cpu/tensor";
 import { gpuConstructor, GPUTensor } from "../../tensor/gpu/tensor";

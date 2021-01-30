@@ -1,4 +1,4 @@
-import { ConcatInfo, ConcatOperation } from "../../ops/gpu/concat";
+import { ConcatInfo, ConcatOperation } from "../../ops/gpu/util/concat";
 import { PrototypeTensor } from "../../tensor/cpu/prototype";
 import { CPUTensor } from "../../tensor/cpu/tensor";
 import { gpuConstructor, GPUTensor } from "../../tensor/gpu/tensor";

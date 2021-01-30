@@ -2,20 +2,20 @@ import Tensor, { Activation, PadMode, Precision } from '../../types';
 
 import { compareShapes, getSize } from '../../util/shape';
 
-import { MatMulOperation } from '../../ops/gpu/matmul';
+import { MatMulOperation } from '../../ops/gpu/matMul/matmul';
 import { defaultAllocator, gl } from './gl';
 import { GPUMemoryAllocator, MemoryEntry } from './memory';
 import { CPUTensor } from '../cpu/tensor';
 import REGL from 'regl';
 import { ExpOperation } from '../../ops/gpu/unary/exp';
 import { GPUTensorConstructor, GPUTensorI } from './interface';
-import { ConvBiasOperation, ConvOperation } from '../../ops/gpu/conv';
+import { ConvBiasOperation, ConvOperation } from '../../ops/gpu/conv/conv';
 import { AbsOperation } from '../../ops/gpu/unary/abs';
 import { AddOperation } from '../../ops/gpu/binary/add';
 import { MultiplyOperation } from '../../ops/gpu/binary/multiply';
 import { SubtractOperation } from '../../ops/gpu/binary/subtract';
 import { DivideOperation } from '../../ops/gpu/binary/divide';
-import { AveragePoolOperation } from '../../ops/gpu/averagePool';
+import { AveragePoolOperation } from '../../ops/gpu/conv/averagePool';
 import { ReduceMeanOperation } from '../../ops/gpu/pool/reduceMean';
 import { ReduceMeanSquareOperation } from '../../ops/gpu/pool/reduceMeanSquare';
 import { SumSquareOperation } from '../../ops/gpu/pool/sumSquare';
@@ -24,22 +24,22 @@ import { ProductOperation } from '../../ops/gpu/pool/product';
 import { MaxOperation } from '../../ops/gpu/pool/max';
 import { MinOperation } from '../../ops/gpu/pool/min';
 import { CeilOperation } from '../../ops/gpu/unary/ceil';
-import { ClipOperation } from '../../ops/gpu/clip';
+import { ClipOperation } from '../../ops/gpu/unary/clip';
 import { FloorOperation } from '../../ops/gpu/unary/floor';
-import { ConcatOperation } from '../../ops/gpu/concat';
-import { CopyOperation } from '../../ops/gpu/copy';
-import { ExpandOperation } from '../../ops/gpu/expand';
-import { GatherOperation } from '../../ops/gpu/gather';
-import { GemmCOperation, GemmOperation } from '../../ops/gpu/gemm';
+import { ConcatOperation } from '../../ops/gpu/util/concat';
+import { CopyOperation } from '../../ops/gpu/util/copy';
+import { ExpandOperation } from '../../ops/gpu/util/expand';
+import { GatherOperation } from '../../ops/gpu/util/gather';
+import { GemmCOperation, GemmOperation } from '../../ops/gpu/matMul/gemm';
 import { PowerOperation } from '../../ops/gpu/binary/power';
 import { SqrtOperation } from '../../ops/gpu/unary/sqrt';
 import { LogOperation } from '../../ops/gpu/unary/log';
-import { TransposeOperation } from '../../ops/gpu/transpose';
-import { RepeatOperation } from '../../ops/gpu/repeat';
-import { PadOperation } from '../../ops/gpu/pad';
-import { SliceOperation } from '../../ops/gpu/slice';
-import { UpsampleOperation } from '../../ops/gpu/upsample';
-import { NormalizeOperation } from '../../ops/gpu/normalize';
+import { TransposeOperation } from '../../ops/gpu/util/transpose';
+import { RepeatOperation } from '../../ops/gpu/util/repeat';
+import { PadOperation } from '../../ops/gpu/conv/pad';
+import { SliceOperation } from '../../ops/gpu/util/slice';
+import { UpsampleOperation } from '../../ops/gpu/conv/upsample';
+import { NormalizeOperation } from '../../ops/gpu/conv/normalize';
 
 
 export class GPUTensor extends Tensor implements GPUTensorI {

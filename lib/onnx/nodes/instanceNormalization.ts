@@ -1,5 +1,5 @@
 import { BinaryOpInfo } from "../../ops/gpu/binary/binaryOperation";
-import { NormalizeOperation, NormalizeOpInfo } from "../../ops/gpu/normalize";
+import { NormalizeOperation, NormalizeOpInfo } from "../../ops/gpu/conv/normalize";
 import { PoolInfo } from "../../ops/gpu/pool/pool";
 import { ReduceMeanOperation } from "../../ops/gpu/pool/reduceMean";
 import { ReduceMeanSquareOperation } from "../../ops/gpu/pool/reduceMeanSquare";

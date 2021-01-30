@@ -1,9 +1,9 @@
-import { defaultAllocator } from "../../tensor/gpu/gl";
-import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
-import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
-import { Precision } from "../../types";
-import { getSize } from "../../util/shape";
-import { Operation } from "./operation";
+import { defaultAllocator } from "../../../tensor/gpu/gl";
+import { GPUTensorConstructor, GPUTensorI } from "../../../tensor/gpu/interface";
+import { GPUMemoryAllocator } from "../../../tensor/gpu/memory";
+import { Precision } from "../../../types";
+import { getSize } from "../../../util/shape";
+import { Operation } from "../operation";
 
 
 export interface ExpandInfo {

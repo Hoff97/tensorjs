@@ -1,4 +1,4 @@
-import { PadInfo, PadOperation } from "../../ops/gpu/pad";
+import { PadInfo, PadOperation } from "../../ops/gpu/conv/pad";
 import { PrototypeTensor } from "../../tensor/cpu/prototype";
 import { CPUTensor } from "../../tensor/cpu/tensor";
 import { gpuConstructor, GPUTensor } from "../../tensor/gpu/tensor";

@@ -1,10 +1,10 @@
-import { CPUTensor } from "../../tensor/cpu/tensor";
-import { defaultAllocator } from "../../tensor/gpu/gl";
-import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
-import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
-import { Precision } from "../../types";
-import { computeStrides, getSize } from "../../util/shape";
-import { Input, Operation } from "./operation";
+import { CPUTensor } from "../../../tensor/cpu/tensor";
+import { defaultAllocator } from "../../../tensor/gpu/gl";
+import { GPUTensorConstructor, GPUTensorI } from "../../../tensor/gpu/interface";
+import { GPUMemoryAllocator } from "../../../tensor/gpu/memory";
+import { Precision } from "../../../types";
+import { computeStrides, getSize } from "../../../util/shape";
+import { Input, Operation } from "../operation";
 
 
 export interface GatherInfo {

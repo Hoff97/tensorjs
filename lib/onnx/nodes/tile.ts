@@ -1,4 +1,4 @@
-import { RepeatInfo, RepeatOperation } from "../../ops/gpu/repeat";
+import { RepeatInfo, RepeatOperation } from "../../ops/gpu/util/repeat";
 import { PrototypeTensor } from "../../tensor/cpu/prototype";
 import { CPUTensor } from "../../tensor/cpu/tensor";
 import { gpuConstructor, GPUTensor } from "../../tensor/gpu/tensor";

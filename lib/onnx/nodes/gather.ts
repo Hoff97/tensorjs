@@ -1,4 +1,4 @@
-import { GatherInfo, GatherOperation } from "../../ops/gpu/gather";
+import { GatherInfo, GatherOperation } from "../../ops/gpu/util/gather";
 import { PrototypeTensor } from "../../tensor/cpu/prototype";
 import { CPUTensor } from "../../tensor/cpu/tensor";
 import { gpuConstructor, GPUTensor } from "../../tensor/gpu/tensor";
