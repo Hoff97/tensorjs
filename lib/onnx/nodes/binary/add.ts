@@ -15,8 +15,4 @@ export class AddNode extends BinaryNode {
   compute(a: Tensor, b: Tensor): Tensor {
     return a.add(b);
   }
-
-  getOperation(): BinaryOperation<GPUTensor> {
-    return new AddOperation(gpuConstructor, this.allocator);
-  }
 }

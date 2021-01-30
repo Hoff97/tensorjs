@@ -15,8 +15,4 @@ export class SubNode extends BinaryNode {
   compute(a: Tensor, b: Tensor): Tensor {
     return a.subtract(b);
   }
-
-  getOperation(): BinaryOperation<GPUTensor> {
-    return new SubtractOperation(gpuConstructor, this.allocator);
-  }
 }

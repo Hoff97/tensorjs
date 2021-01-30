@@ -15,8 +15,4 @@ export class ReduceSumNode extends ReduceNode {
   calc(input: Tensor): Tensor {
     return input.sum(this.axes, this.keepDims);
   }
-
-  getOperation(): PoolOperation<GPUTensor> {
-    return new SumOperation(gpuConstructor, this.allocator);
-  }
 }

@@ -15,8 +15,4 @@ export class ReduceSumSquareNode extends ReduceNode {
   calc(input: types): types {
     return input.sumSquare(this.axes, this.keepDims);
   }
-
-  getOperation(): PoolOperation<GPUTensor> {
-    return new SumSquareOperation(gpuConstructor, this.allocator);
-  }
 }

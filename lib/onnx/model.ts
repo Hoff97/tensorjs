@@ -55,7 +55,6 @@ export class OnnxModel {
   private precision: Precision;
 
   public inputs: onnx.IValueInfoProto[];
-  public allocator?: GPUMemoryAllocator;
 
   constructor(buffer: ArrayBuffer | Uint8Array, args?: ModelArgs) {
     if (args === undefined) {
@@ -172,13 +171,12 @@ export class OnnxModel {
       const {inputs, toDelete} = this.getInputsToNode(node, intermediaryRes);
 
       let outputs: Tensor[];
-      /*try {
+      try {
         outputs = await node.forward(inputs);
       } catch (e) {
         console.error(`Error occurred in node ${nodeId} with inputs ${node.inputs} from nodes ${node.inputs.map(x => this.getNodeWithOutput(x))}`);
         throw e;
-      }*/
-      outputs = await node.forward(inputs);
+      }
       glContext.flush();
 
       this.propagateResults(node, intermediaryRes, outputs, nodes, nodesReady);
@@ -186,11 +184,7 @@ export class OnnxModel {
       for (let i = 0; i < toDelete.length; i++) {
         if (!this.inputSet.has(toDelete[i])) {
           const inter = intermediaryRes[toDelete[i]];
-          if (this.allocator !== undefined && inter.value instanceof GPUTensor) {
-            this.allocator.deallocate(inter.value.memory);
-          } else {
-            inter.value.delete();
-          }
+          inter.value.delete();
           delete intermediaryRes[toDelete[i]];
         }
       }
@@ -317,68 +311,6 @@ export class OnnxModel {
     for (let i of this.nodeIds) {
       if (!this.noConvertNodes.has(i)) {
         await this.nodes[i].toGPU(this.precision);
-      }
-    }
-  }
-
-  setAllocator(allocator: GPUMemoryAllocator) {
-    this.allocator = allocator;
-    for (let id of this.nodeIds) {
-      this.nodes[id].setAllocator(this.allocator);
-    }
-  }
-
-  async compileForInputs(inputs: Tensor[]) {
-    if (this.allocator === undefined) {
-      this.setAllocator(new GPUMemoryAllocator(gl, new Dict((key: number) => key) as any));
-    }
-
-    for (let id of this.nodeIds) {
-      this.nodes[id].initializeForCompiling();
-    }
-
-    await this.staticForward(inputs, false);
-    await this.staticForward(inputs, false);
-
-    await this.staticForward(inputs, true);
-  }
-
-  async staticForward(inputs: Tensor[], compile: boolean) {
-    const intermediaryRes: {[name: string]: IntermediaryRes} = {};
-
-    const nodes: {[id: number]: {variableInputs: number}} = {};
-    for (let i of this.nodeIds) {
-      nodes[i] = {
-        variableInputs: 0
-      }
-    }
-
-    const nodesReady: NodeId[] = [...this.defaultReady];
-
-    this.initializeForward(inputs, intermediaryRes, nodes, nodesReady);
-
-    while(nodesReady.length > 0) {
-      const nodeId = nodesReady.shift();
-      const node = this.nodes[nodeId];
-
-      const {inputs, toDelete} = this.getInputsToNode(node, intermediaryRes);
-
-      let { outputs } = await node.staticForward(inputs, compile, this.precision);
-
-      glContext.flush();
-
-      this.propagateResults(node, intermediaryRes, outputs, nodes, nodesReady);
-
-      for (let i = 0; i < toDelete.length; i++) {
-        if (!this.inputSet.has(toDelete[i])) {
-          const inter = intermediaryRes[toDelete[i]];
-
-          if (inter.value instanceof PrototypeTensor) {
-            this.allocator.deallocate(inter.value.memory);
-          }
-
-          delete intermediaryRes[toDelete[i]];
-        }
       }
     }
   }
@@ -510,8 +442,5 @@ export class OnnxModel {
     for (let nodeId of this.nodeIds) {
       this.nodes[nodeId].delete();
     }
-
-    // TODO: If this model uses a nondefault allocator, all framebuffers should
-    // probably transferred to the default allocator
   }
 }

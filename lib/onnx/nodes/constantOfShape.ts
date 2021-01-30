@@ -1,4 +1,3 @@
-import { PrototypeTensor } from "../../tensor/cpu/prototype";
 import { CPUTensor } from "../../tensor/cpu/tensor";
 import Tensor from "../../types";
 import { getSize } from "../../util/shape";
@@ -33,13 +32,6 @@ export class ConstantOfShapeNode extends OnnxNode {
     const values = new Float32Array(size).fill(this.tensor.get(0));
 
     return [new CPUTensor(shape, values, this.tensor.type)];
-  }
-
-  staticForward(inputs: Tensor[], compile: boolean): Promise<{ outputs: (CPUTensor | PrototypeTensor)[]; }> {
-    return this.defaultStaticForward(inputs);
-  }
-
-  initializeForCompiling(): void {
   }
 
   getType() {

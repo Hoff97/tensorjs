@@ -1,6 +1,3 @@
-import { FloorOperation } from "../../../ops/gpu/unary/floor";
-import { UnaryOperation } from "../../../ops/gpu/unary/unaryOperation";
-import { gpuConstructor, GPUTensor } from "../../../tensor/gpu/tensor";
 import Tensor from "../../../types";
 import { Attributes, Constants } from "../../types";
 import { UnaryNode } from "./unaryNode";
@@ -14,9 +11,5 @@ export class FloorNode extends UnaryNode {
 
   compute(x: Tensor): Tensor {
     return x.floor();
-  }
-
-  getOperation(): UnaryOperation<GPUTensor> {
-    return new FloorOperation(gpuConstructor, this.allocator);
   }
 }

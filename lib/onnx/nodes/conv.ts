@@ -15,10 +15,6 @@ export class ConvNode extends OnnxNode {
   private pads?: number[];
   private strides?: number[];
 
-  private compiled = false;
-
-  private operation?: ConvOperation<GPUTensor>;
-
   public kernel?: Tensor;
   public bias?: Tensor;
 
@@ -56,28 +52,7 @@ export class ConvNode extends OnnxNode {
     const w = this.kernel !== undefined ? this.kernel : inputs[1];
     const b = inputs.length > 2 ? inputs[2] : this.bias;
 
-    if (!this.compiled) {
-      return [x.conv(w, b, this.dilations, this.group, this.pads, this.strides, this.activation)];
-    } else {
-      const rank = inputs[0].getShape().length - 2;
-      const dilations = this.getDilations(rank);
-      const pads = this.getPads(rank);
-      const strides = this.getStrides(rank);
-
-      let input: ConvInput = {
-        X: x as GPUTensor,
-        W: w as GPUTensor,
-        pads, dilations, strides,
-        activation: this.activation
-      };
-
-      if (b !== undefined) {
-        //@ts-ignore
-        input['B'] = b;
-      }
-
-      return [this.operation.calc(input)];
-    }
+    return [x.conv(w, b, this.dilations, this.group, this.pads, this.strides, this.activation)];
   }
 
   getDilations(rank: number) {
@@ -98,105 +73,6 @@ export class ConvNode extends OnnxNode {
     if (this.strides !== undefined) {
       return this.strides;
     } return new Array(rank).fill(1);
-  }
-
-  getMemoryEntries(inputs: Tensor[]): MemoryEntry[] {
-    const memories = super.getMemoryEntries(inputs);
-    if (this.kernel === undefined) {
-      return memories;
-    } else {
-      memories.push((this.kernel as GPUTensor).memory);
-      if (this.bias !== undefined) {
-        memories.push((this.bias as GPUTensor).memory);
-      }
-    }
-    return memories;
-  }
-
-  async staticForward(inputs: Tensor[], compile: boolean, precision: Precision): Promise<{ outputs: (CPUTensor | PrototypeTensor)[]; }> {
-    if (this.allStaticCPU(inputs)) {
-      return this.defaultStaticForward(inputs);
-    }
-
-    if (this.operation === undefined) {
-      this.initializeForCompiling(inputs);
-    }
-
-    const x = inputs[0];
-    const w = this.kernel !== undefined ? this.kernel : inputs[1];
-    const bias = inputs.length > 2 ? inputs[2] : this.bias;
-
-    const rank = x.getShape().length - 2;
-    const dilations = this.getDilations(rank);
-    const pads = this.getPads(rank);
-    const strides = this.getStrides(rank);
-
-    const resultShape = this.operation.getOutputShape({
-      X: x as any,
-      W: w as any,
-      pads, dilations, strides,
-      activation: this.activation
-    });
-    const memory = this.allocator.allocate(getSize(resultShape), precision);
-
-    if (compile) {
-      const memories = this.getMemoryEntries(inputs);
-      const memX = memories[0];
-      const memW = memories[1];
-
-      let info: ConvInfo = {
-        shapeX: x.getShape(),
-        widthX: memX.width,
-        heightX: memX.height,
-        shapeW: w.getShape(),
-        widthW: memW.width,
-        heightW: memW.height,
-        shapeOutput: resultShape,
-        widthOutput: memory.width,
-        heightOutput: memory.height,
-
-        activation: this.activation,
-
-        pads, dilations, strides
-      };
-
-      if (bias !== undefined) {
-        const memB = memories[2];
-
-        info = {
-          ...info,
-          shapeB: bias.getShape(),
-          heightB: memB.height,
-          widthB: memB.width
-        } as any;
-      }
-
-      this.operation.compile(info, precision);
-
-      this.compiled = true;
-    }
-
-    return {
-      outputs: [new PrototypeTensor(resultShape, memory)]
-    };
-  }
-
-  initializeForCompiling(inputs?: Tensor[]): void {
-    if (inputs !== undefined) {
-      if (this.kernel === undefined) {
-        if (inputs.length === 2) {
-          this.operation = new ConvOperation(gpuConstructor, this.allocator);
-        } else if(inputs.length === 3) {
-          this.operation = new ConvBiasOperation(gpuConstructor, this.allocator);
-        }
-      } else {
-        if (this.bias === undefined) {
-          this.operation = new ConvOperation(gpuConstructor, this.allocator);
-        } else {
-          this.operation = new ConvBiasOperation(gpuConstructor, this.allocator);
-        }
-      }
-    }
   }
 
   getType() {

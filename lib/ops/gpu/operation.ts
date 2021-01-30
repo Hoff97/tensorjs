@@ -321,13 +321,15 @@ export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictB
 
     const uniforms: any = {};
     for (let uniformAttr of uniformAttrs) {
-      if (uniformAttr.length !== undefined) {
-        for (let i = 0; i < uniformAttr.length; i++) {
-          const name = `${uniformAttr.name}[${i}]`
-          uniforms[name] = gl.prop(name as never);
+      if (info[uniformAttr.name] === undefined) {
+        if (uniformAttr.length !== undefined) {
+          for (let i = 0; i < uniformAttr.length; i++) {
+            const name = `${uniformAttr.name}[${i}]`
+            uniforms[name] = gl.prop(name as never);
+          }
+        } else {
+          uniforms[uniformAttr.name] = gl.prop(uniformAttr.name as never);
         }
-      } else {
-        uniforms[uniformAttr.name] = gl.prop(uniformAttr.name as never);
       }
     }
 

@@ -12,10 +12,6 @@ export abstract class ReduceNode extends OnnxNode {
   protected axes?: number[];
   protected keepDims?: boolean;
 
-  protected compiled: boolean = false;
-
-  protected operation?: PoolOperation<GPUTensor>;
-
   protected name: string;
 
   constructor(attributes: Attributes, inputs: string[], outputs: string[], constants: Constants, onnxVersion: number) {
@@ -46,62 +42,9 @@ export abstract class ReduceNode extends OnnxNode {
   async forward(inputs: types[]): Promise<types[]> {
     if (this.onnxVersion < 11) {
 
-      if (!this.compiled) {
-        return [this.calc(inputs[0])];
-      } else {
-        const axes = this.getAxes(inputs[0]);
-
-        return [this.operation.calc({X: inputs[0] as GPUTensor, axes, keepDims: this.keepDims})];
-      }
+      return [this.calc(inputs[0])];
     }
     throw new Error(`${this.name} is not implemented for onnx version ${this.onnxVersion}`);
-  }
-
-  async staticForward(inputs: types[], compile: boolean, precision: Precision): Promise<{ outputs: (CPUTensor | PrototypeTensor)[]; }> {
-    if (this.allStaticCPU(inputs)) {
-      return this.defaultStaticForward(inputs);
-    }
-
-    if (this.onnxVersion < 11) {
-      const a = inputs[0];
-
-      const axes = this.getAxes(a);
-
-      const resultShape = this.operation.getOutputShape({X: a as any, axes, keepDims: this.keepDims});
-
-      const memory = this.allocator.allocate(getSize(resultShape), precision);
-
-      if (compile) {
-        const [aMem] = this.getMemoryEntries(inputs);
-
-        const info = {
-          shapeX: a.getShape(),
-          widthX: aMem.width,
-          heightX: aMem.height,
-          shapeOutput: resultShape,
-          widthOutput: memory.width,
-          heightOutput: memory.height,
-
-          axes,
-          keepDims: this.keepDims
-        };
-
-        this.operation.compile(info, precision);
-
-        this.compiled = true;
-      }
-
-      return {
-        outputs: [new PrototypeTensor(resultShape, memory)]
-      };
-    }
-    throw new Error(`${this.name} is not implemented for onnx version ${this.onnxVersion}`);
-  }
-
-  abstract getOperation(): PoolOperation<GPUTensor>;
-
-  initializeForCompiling(): void {
-    this.operation = this.getOperation();
   }
 
   getType() {

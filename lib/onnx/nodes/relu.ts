@@ -1,5 +1,3 @@
-import Tensor from "../../types";
-import { OnnxNode } from "../node";
 import { Attributes, Constants } from "../types";
 import { ClipNode } from "./clip";
 

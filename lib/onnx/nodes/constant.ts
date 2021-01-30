@@ -1,5 +1,3 @@
-import { PrototypeTensor } from "../../tensor/cpu/prototype";
-import { CPUTensor } from "../../tensor/cpu/tensor";
 import Tensor, { Precision } from "../../types";
 import { toCPU, toGPU, toWASM } from "../../util/convert";
 import { OnnxNode } from "../node";
@@ -23,16 +21,6 @@ export class ConstantNode extends OnnxNode {
       return [this.tensor];
     }
     throw new Error('Constant with onnx version >= 11 not yet implemented');
-  }
-
-  async staticForward(inputs: Tensor[], compile: boolean): Promise<{ outputs: (CPUTensor | PrototypeTensor)[]; }> {
-    if (this.onnxVersion < 11) {
-      return { outputs: [this.tensor as any] };
-    }
-    throw new Error('Constant with onnx version >= 11 not yet implemented');
-  }
-
-  initializeForCompiling(): void {
   }
 
   async toCPU() {

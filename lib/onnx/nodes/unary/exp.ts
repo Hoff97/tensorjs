@@ -1,6 +1,3 @@
-import { ExpOperation } from "../../../ops/gpu/unary/exp";
-import { UnaryOperation } from "../../../ops/gpu/unary/unaryOperation";
-import { gpuConstructor, GPUTensor } from "../../../tensor/gpu/tensor";
 import Tensor from "../../../types";
 import { Attributes, Constants } from "../../types";
 import { UnaryNode } from "./unaryNode";
@@ -14,9 +11,5 @@ export class ExpNode extends UnaryNode {
 
   compute(x: Tensor): Tensor {
     return x.exp();
-  }
-
-  getOperation(): UnaryOperation<GPUTensor> {
-    return new ExpOperation(gpuConstructor, this.allocator);
   }
 }

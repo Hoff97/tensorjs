@@ -95,13 +95,9 @@ export class GPUTensor extends Tensor implements GPUTensorI {
     return this;
   }
 
-  delete(allocator?: GPUMemoryAllocator): void {
+  delete(): void {
     this.deleted = true;
-    if (allocator !== undefined) {
-      allocator.deallocate(this.memory);
-    } else {
-      defaultAllocator.deallocate(this.memory);
-    }
+    defaultAllocator.deallocate(this.memory);
     this.memory = undefined;
   }
 

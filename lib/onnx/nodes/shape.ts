@@ -20,20 +20,6 @@ export class ShapeNode extends OnnxNode {
     throw new Error(`Shape not implemented for onnx version ${this.onnxVersion}`);
   }
 
-  async staticForward(inputs: Tensor[], compile: boolean): Promise<{ outputs: (CPUTensor | PrototypeTensor)[]; }> {
-    if (this.onnxVersion < 13) {
-      const a = inputs[0];
-
-      const shape = a.getShape();
-
-      return { outputs: [new CPUTensor([shape.length], [...shape], "int")] };
-    }
-    throw new Error(`Shape not implemented for onnx version ${this.onnxVersion}`);
-  }
-
-  initializeForCompiling(): void {
-  }
-
   getType() {
     return 'Shape';
   }

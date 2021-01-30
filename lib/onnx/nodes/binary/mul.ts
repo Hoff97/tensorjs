@@ -15,8 +15,4 @@ export class MulNode extends BinaryNode {
   compute(a: types, b: types): types {
     return a.multiply(b);
   }
-
-  getOperation(): BinaryOperation<GPUTensor> {
-    return new MultiplyOperation(gpuConstructor, this.allocator);
-  }
 }

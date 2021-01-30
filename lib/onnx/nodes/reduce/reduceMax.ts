@@ -15,8 +15,4 @@ export class ReduceMaxNode extends ReduceNode {
   calc(input: Tensor): Tensor {
     return input.max(this.axes, this.keepDims);
   }
-
-  getOperation(): PoolOperation<GPUTensor> {
-    return new MaxOperation(gpuConstructor, this.allocator);
-  }
 }

@@ -16,8 +16,4 @@ export class ReduceMeanNode extends ReduceNode {
   calc(input: Tensor): Tensor {
     return input.reduceMean(this.axes, this.keepDims);
   }
-
-  getOperation(): PoolOperation<GPUTensor> {
-    return new ReduceMeanOperation(gpuConstructor, this.allocator);
-  }
 }

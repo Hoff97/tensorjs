@@ -15,8 +15,4 @@ export class DivNode extends BinaryNode {
   compute(a: Tensor, b: Tensor): Tensor {
     return a.divide(b);
   }
-
-  getOperation(): BinaryOperation<GPUTensor> {
-    return new DivideOperation(gpuConstructor, this.allocator);
-  }
 }
