@@ -27,7 +27,7 @@ import { CeilOperation } from '../../ops/gpu/unary/ceil';
 import { ClipOperation } from '../../ops/gpu/unary/clip';
 import { FloorOperation } from '../../ops/gpu/unary/floor';
 import { ConcatOperation } from '../../ops/gpu/util/concat';
-import { CopyOperation } from '../../ops/gpu/util/copy';
+import { CopyInfo, CopyInput, CopyOperation } from '../../ops/gpu/util/copy';
 import { ExpandOperation } from '../../ops/gpu/util/expand';
 import { GatherOperation } from '../../ops/gpu/util/gather';
 import { GemmCOperation, GemmOperation } from '../../ops/gpu/matMul/gemm';
@@ -40,6 +40,7 @@ import { PadOperation } from '../../ops/gpu/conv/pad';
 import { SliceOperation } from '../../ops/gpu/util/slice';
 import { UpsampleOperation } from '../../ops/gpu/conv/upsample';
 import { NormalizeOperation } from '../../ops/gpu/conv/normalize';
+import { Dispatcher } from '../../ops/gpu/dispatcher';
 
 
 export class GPUTensor extends Tensor implements GPUTensorI {
@@ -104,74 +105,74 @@ export class GPUTensor extends Tensor implements GPUTensorI {
     this.memory = undefined;
   }
 
-  copy(): Tensor {
-    return defaultCopy.calc({input: this});
+  copy(precision?: Precision): Tensor {
+    return defaultCopyD.calc({input: this}, precision ? precision : this.precision) as GPUTensor;
   }
 
   exp(): Tensor {
-    return defaultExp.calc({input: this}) as any;
+    return defaultExpD.calc({input: this}, this.precision) as GPUTensor;
   }
 
   log(): Tensor {
-    return defaultLog.calc({input: this}) as any;
+    return defaultLogD.calc({input: this}, this.precision) as GPUTensor;
   }
 
   sqrt(): Tensor {
-    return defaultSqrt.calc({input: this}) as any;
+    return defaultSqrtD.calc({input: this}, this.precision) as GPUTensor;
   }
 
   abs(): Tensor {
-    return defaultAbs.calc({input: this});
+    return defaultAbsD.calc({input: this}, this.precision) as GPUTensor;
   }
 
   floor(): Tensor {
-    return defaultFloor.calc({input: this});
+    return defaultFloorD.calc({input: this}, this.precision) as GPUTensor;
   }
 
   ceil(): Tensor {
-    return defaultCeil.calc({input: this})
+    return defaultCeilD.calc({input: this}, this.precision) as GPUTensor
   }
 
   add_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor {
     if (!(tensor instanceof GPUTensor) || !(th instanceof GPUTensor)) {
       throw new Error('Can only add GPU tensor to GPU tensor');
     }
-    return defaultAdd.calc({A: th, B: tensor, outputShape: resultShape});
+    return defaultAddD.calc({A: th, B: tensor, outputShape: resultShape}, this.precision) as GPUTensor;
   }
 
   subtract_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor {
     if (!(tensor instanceof GPUTensor) || !(th instanceof GPUTensor)) {
       throw new Error('Can only subtract GPU tensor from GPU tensor');
     }
-    return defaultSubtract.calc({A: th, B: tensor, outputShape: resultShape});
+    return defaultSubtractD.calc({A: th, B: tensor, outputShape: resultShape}, this.precision) as GPUTensor;
   }
 
   multiply_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor {
     if (!(tensor instanceof GPUTensor) || !(th instanceof GPUTensor)) {
       throw new Error('Can only multiply GPU tensor with GPU tensor');
     }
-    return defaultMultiply.calc({A: th, B: tensor, outputShape: resultShape});
+    return defaultMultiplyD.calc({A: th, B: tensor, outputShape: resultShape}, this.precision) as GPUTensor;
   }
 
   divide_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor {
     if (!(tensor instanceof GPUTensor) || !(th instanceof GPUTensor)) {
       throw new Error('Can only divide GPU tensor by GPU tensor');
     }
-    return defaultDivide.calc({A: th, B: tensor, outputShape: resultShape});
+    return defaultDivideD.calc({A: th, B: tensor, outputShape: resultShape}, this.precision) as GPUTensor;
   }
 
   power_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor {
     if (!(tensor instanceof GPUTensor) || !(th instanceof GPUTensor)) {
       throw new Error('Can only take GPU tensor to power of GPU tensor');
     }
-    return defaultPower.calc({A: th, B: tensor, outputShape: resultShape});
+    return defaultPowerD.calc({A: th, B: tensor, outputShape: resultShape}, this.precision) as GPUTensor;
   }
 
   matMul(tensor: Tensor): Tensor {
     if (!(tensor instanceof GPUTensor)) {
       throw new Error('Can only matrix multiply GPU tensor to GPU tensor');
     }
-    return defaultMatMul.calc({A: this, B: tensor});
+    return defaultMatMulD.calc({A: this, B: tensor}, this.precision) as GPUTensor;
   }
 
   gemm_impl(b: Tensor, aTranspose: boolean, bTranspose: boolean, alpha: number, beta: number, c?: Tensor): Tensor {
@@ -179,38 +180,38 @@ export class GPUTensor extends Tensor implements GPUTensorI {
       throw new Error('Can only do gemm with CPU tensors');
     }
     if (c === undefined) {
-      return defaultGemm.calc({a: this, b, aTranspose, bTranspose, alpha, beta});
+      return defaultGemmD.calc({a: this, b, aTranspose, bTranspose, alpha, beta}, this.precision) as GPUTensor;
     } else {
-      return defaultGemmC.calc({a: this, b, c: c as GPUTensor, aTranspose, bTranspose, alpha, beta});
+      return defaultGemmCD.calc({a: this, b, c: c as GPUTensor, aTranspose, bTranspose, alpha, beta}, this.precision) as GPUTensor;
     }
   }
 
   sum_impl(axes: number[], keepDims: boolean): Tensor {
-    return defaultSum.calc({X: this, axes, keepDims});
+    return defaultSumD.calc({X: this, axes, keepDims}, this.precision) as GPUTensor;
   }
 
   sumSquare_impl(axes: number[], keepDims: boolean): Tensor {
-    return defaultSumSquare.calc({X: this, axes, keepDims});
+    return defaultSumSquareD.calc({X: this, axes, keepDims}, this.precision) as GPUTensor;
   }
 
   reduceMean_impl(axes: number[], keepDims: boolean): Tensor {
-    return defaultMean.calc({X: this, axes, keepDims});
+    return defaultMeanD.calc({X: this, axes, keepDims}, this.precision) as GPUTensor;
   }
 
   reduceMeanSquare_impl(axes: number[], keepDims: boolean): Tensor {
-    return defaultMeanSquare.calc({X: this, axes, keepDims});
+    return defaultMeanSquareD.calc({X: this, axes, keepDims}, this.precision) as GPUTensor;
   }
 
   product_impl(axes: number[], keepDims: boolean): Tensor {
-    return defaultProduct.calc({X: this, axes, keepDims});
+    return defaultProductD.calc({X: this, axes, keepDims}, this.precision) as GPUTensor;
   }
 
   max_impl(axes: number[], keepDims: boolean): Tensor {
-    return defaultMax.calc({X: this, axes, keepDims});
+    return defaultMaxD.calc({X: this, axes, keepDims}, this.precision) as GPUTensor;
   }
 
   min_impl(axes: number[], keepDims: boolean): Tensor {
-    return defaultMin.calc({X: this, axes, keepDims});
+    return defaultMinD.calc({X: this, axes, keepDims}, this.precision) as GPUTensor;
   }
 
   conv_impl(kernel: Tensor, dilations: number[], group: number, pads: number[], strides: number[], bias?: Tensor, activation?: Activation): Tensor {
@@ -219,36 +220,36 @@ export class GPUTensor extends Tensor implements GPUTensorI {
     }
 
     if (bias === undefined) {
-      return defaultConv.calc({
+      return defaultConvD.calc({
         X: this,
         W: kernel,
         pads, dilations, strides,
         activation
-      });
+      }, this.precision) as GPUTensor;
     } else {
-      return defaultConvBias.calc({
+      return defaultConvBiasD.calc({
         X: this,
         W: kernel,
         B: bias as GPUTensor,
         pads, dilations, strides,
         activation
-      });
+      }, this.precision) as GPUTensor;
     }
   }
 
   averagePool_impl(kernelShape: number[], pads: number[], strides: number[], includePad: boolean): Tensor {
-    return defaultAveragePool.calc({
+    return defaultAveragePoolD.calc({
       X: this,
       includePad,
       kernelShape,
       pads,
       strides
-    });
+    }, this.precision) as GPUTensor;
   }
 
   reshape_impl(shape: number[], _copy: boolean): Tensor {
     if (_copy) {
-      return defaultCopy.calc({input: this, outputShape: shape});
+      return defaultCopyD.calc({input: this, outputShape: shape}, this.precision) as GPUTensor;
     } else {
       return new GPUTensor(this.memory, shape, this.precision);
     }
@@ -258,19 +259,19 @@ export class GPUTensor extends Tensor implements GPUTensorI {
     if (!(tensor instanceof GPUTensor)) {
       throw new Error('Can only concat GPU tensor to GPU tensor');
     }
-    return defaultConcat.calc({A: this, B: tensor, axis});
+    return defaultConcatD.calc({A: this, B: tensor, axis}, this.precision) as GPUTensor;
   }
 
   transpose_impl(permutation: number[]): Tensor {
-    return defaultTranspose.calc({A: this, permutation});
+    return defaultTransposeD.calc({A: this, permutation}, this.precision) as GPUTensor;
   }
 
   clip(min?: number, max?: number): Tensor {
-    return defaultClip.calc({input: this, minVal: min, maxVal: max});
+    return defaultClipD.calc({input: this, minVal: min, maxVal: max}, this.precision) as GPUTensor;
   }
 
   repeat(repeats: number[]): Tensor {
-    return defaultRepeat.calc({A: this, repeats});
+    return defaultRepeatD.calc({A: this, repeats}, this.precision) as GPUTensor;
   }
 
   expand(shape: number[]): Tensor {
@@ -278,23 +279,23 @@ export class GPUTensor extends Tensor implements GPUTensorI {
     if (compareShapes(this.shape, resultShape)) {
       return this.copy();
     }
-    return defaultExpand.calc({input: this.reshape(_shape, false) as GPUTensor, outputShape: resultShape});
+    return defaultExpandD.calc({input: this.reshape(_shape, false) as GPUTensor, outputShape: resultShape}, this.precision) as GPUTensor;
   }
 
   pad_impl(pads: number[], mode: PadMode, value: number): Tensor {
-    return defaultPad.calc({input: this, pads, mode, value});
+    return defaultPadD.calc({input: this, pads, mode, value}, this.precision) as GPUTensor;
   }
 
   gather(axis: number, indices: CPUTensor): Tensor {
-    return defaultGather.calc({X: this, axis, indices});
+    return defaultGatherD.calc({X: this, axis, indices}, this.precision) as GPUTensor;
   }
 
   slice_impl(starts: number[], ends: number[], axes: number[]): Tensor {
-    return defaultSlice.calc({X: this, starts, ends, axes});
+    return defaultSliceD.calc({X: this, starts, ends, axes}, this.precision) as GPUTensor;
   }
 
   upsample(scales: number[]): Tensor {
-    return defaultUpsample.calc({X: this, scales});
+    return defaultUpsampleD.calc({X: this, scales}, this.precision) as GPUTensor;
   }
 
   normalize(mean: Tensor, variance: Tensor, epsilon: number, scale: Tensor, bias: Tensor): Tensor {
@@ -302,61 +303,96 @@ export class GPUTensor extends Tensor implements GPUTensorI {
       throw new Error('Can only normalize with CPU tensors');
     }
 
-    return defaultNormalize.calc({
+    return defaultNormalizeD.calc({
       X: this,
       Mean: mean,
       Variance: variance,
       Scale: scale,
       Bias: bias,
       epsilon
-    });
+    }, this.precision) as GPUTensor;
   }
 }
 
 export const gpuConstructor: GPUTensorConstructor<GPUTensor> = (a: MemoryEntry,b: readonly number[], precision: Precision) => new GPUTensor(a,b,precision);
 
-const defaultMatMul = new MatMulOperation(gpuConstructor);
-const defaultGemm = new GemmOperation(gpuConstructor);
-const defaultGemmC = new GemmCOperation(gpuConstructor);
+const defaultMatMulD = new Dispatcher(() => new MatMulOperation(gpuConstructor));
+//const defaultMatMul = new MatMulOperation(gpuConstructor);
+const defaultGemmD = new Dispatcher(() => new GemmOperation(gpuConstructor));
+//const defaultGemm = new GemmOperation(gpuConstructor);
+const defaultGemmCD = new Dispatcher(() => new GemmCOperation(gpuConstructor));
+//const defaultGemmC = new GemmCOperation(gpuConstructor);
 
 //Unary operations
-const defaultExp = new ExpOperation(gpuConstructor);
-const defaultAbs = new AbsOperation(gpuConstructor);
-const defaultCeil = new CeilOperation(gpuConstructor);
-const defaultFloor = new FloorOperation(gpuConstructor);
-const defaultClip = new ClipOperation(gpuConstructor);
-const defaultSqrt = new SqrtOperation(gpuConstructor);
-const defaultLog = new LogOperation(gpuConstructor);
+const defaultExpD = new Dispatcher(() => new ExpOperation(gpuConstructor));
+//const defaultExp = new ExpOperation(gpuConstructor);
+const defaultAbsD = new Dispatcher(() => new AbsOperation(gpuConstructor));
+//const defaultAbs = new AbsOperation(gpuConstructor);
+const defaultCeilD = new Dispatcher(() => new CeilOperation(gpuConstructor));
+//const defaultCeil = new CeilOperation(gpuConstructor);
+const defaultFloorD = new Dispatcher(() => new FloorOperation(gpuConstructor));
+//const defaultFloor = new FloorOperation(gpuConstructor);
+const defaultClipD = new Dispatcher(() => new ClipOperation(gpuConstructor));
+//const defaultClip = new ClipOperation(gpuConstructor);
+const defaultSqrtD = new Dispatcher(() => new SqrtOperation(gpuConstructor));
+//const defaultSqrt = new SqrtOperation(gpuConstructor);
+const defaultLogD = new Dispatcher(() => new LogOperation(gpuConstructor));
+//const defaultLog = new LogOperation(gpuConstructor);
 
 //Convolutions
-const defaultConv = new ConvOperation(gpuConstructor);
-const defaultAveragePool = new AveragePoolOperation(gpuConstructor);
-const defaultConvBias = new ConvBiasOperation(gpuConstructor);
-const defaultPad = new PadOperation(gpuConstructor);
-const defaultUpsample = new UpsampleOperation(gpuConstructor);
+const defaultConvD = new Dispatcher(() => new ConvOperation(gpuConstructor));
+//const defaultConv = new ConvOperation(gpuConstructor);
+const defaultAveragePoolD = new Dispatcher(() => new AveragePoolOperation(gpuConstructor));
+//const defaultAveragePool = new AveragePoolOperation(gpuConstructor);
+const defaultConvBiasD = new Dispatcher(() => new ConvBiasOperation(gpuConstructor));
+//const defaultConvBias = new ConvBiasOperation(gpuConstructor);
+const defaultPadD = new Dispatcher(() => new PadOperation(gpuConstructor));
+//const defaultPad = new PadOperation(gpuConstructor);
+const defaultUpsampleD = new Dispatcher(() => new UpsampleOperation(gpuConstructor));
+//const defaultUpsample = new UpsampleOperation(gpuConstructor);
 
 //Binary operations
-const defaultAdd = new AddOperation(gpuConstructor);
-const defaultSubtract = new SubtractOperation(gpuConstructor);
-const defaultMultiply = new MultiplyOperation(gpuConstructor);
-const defaultDivide = new DivideOperation(gpuConstructor);
-const defaultPower = new PowerOperation(gpuConstructor);
+const defaultAddD = new Dispatcher(() => new AddOperation(gpuConstructor));
+//const defaultAdd = new AddOperation(gpuConstructor);
+const defaultSubtractD = new Dispatcher(() => new SubtractOperation(gpuConstructor));
+//const defaultSubtract = new SubtractOperation(gpuConstructor);
+const defaultMultiplyD = new Dispatcher(() => new MultiplyOperation(gpuConstructor));
+//const defaultMultiply = new MultiplyOperation(gpuConstructor);
+const defaultDivideD = new Dispatcher(() => new DivideOperation(gpuConstructor));
+//const defaultDivide = new DivideOperation(gpuConstructor);
+const defaultPowerD = new Dispatcher(() => new PowerOperation(gpuConstructor));
+//const defaultPower = new PowerOperation(gpuConstructor);
 
 //Reductions
-const defaultMean = new ReduceMeanOperation(gpuConstructor);
-const defaultMeanSquare = new ReduceMeanSquareOperation(gpuConstructor);
-const defaultSumSquare = new SumSquareOperation(gpuConstructor);
-const defaultSum = new SumOperation(gpuConstructor);
-const defaultProduct = new ProductOperation(gpuConstructor);
-const defaultMax = new MaxOperation(gpuConstructor);
-const defaultMin = new MinOperation(gpuConstructor);
+const defaultMeanD = new Dispatcher(() => new ReduceMeanOperation(gpuConstructor));
+//const defaultMean = new ReduceMeanOperation(gpuConstructor);
+const defaultMeanSquareD = new Dispatcher(() => new ReduceMeanSquareOperation(gpuConstructor));
+//const defaultMeanSquare = new ReduceMeanSquareOperation(gpuConstructor);
+const defaultSumSquareD = new Dispatcher(() => new SumSquareOperation(gpuConstructor));
+//const defaultSumSquare = new SumSquareOperation(gpuConstructor);
+const defaultSumD = new Dispatcher(() => new SumOperation(gpuConstructor));
+//const defaultSum = new SumOperation(gpuConstructor);
+const defaultProductD = new Dispatcher(() => new ProductOperation(gpuConstructor));
+//const defaultProduct = new ProductOperation(gpuConstructor);
+const defaultMaxD = new Dispatcher(() => new MaxOperation(gpuConstructor));
+//const defaultMax = new MaxOperation(gpuConstructor);
+const defaultMinD = new Dispatcher(() => new MinOperation(gpuConstructor));
+//const defaultMin = new MinOperation(gpuConstructor);
 
 //Util
-const defaultConcat = new ConcatOperation(gpuConstructor);
-const defaultCopy = new CopyOperation(gpuConstructor);
-const defaultExpand = new ExpandOperation(gpuConstructor);
-const defaultGather = new GatherOperation(gpuConstructor);
-const defaultTranspose = new TransposeOperation(gpuConstructor);
-const defaultRepeat = new RepeatOperation(gpuConstructor);
-const defaultSlice = new SliceOperation(gpuConstructor);
-const defaultNormalize = new NormalizeOperation(gpuConstructor);
+const defaultConcatD = new Dispatcher(() => new ConcatOperation(gpuConstructor));
+//const defaultConcat = new ConcatOperation(gpuConstructor);
+const defaultCopyD = new Dispatcher(() => new CopyOperation(gpuConstructor));
+//const defaultCopy = new CopyOperation(gpuConstructor);
+const defaultExpandD = new Dispatcher(() => new ExpandOperation(gpuConstructor));
+//const defaultExpand = new ExpandOperation(gpuConstructor);
+const defaultGatherD = new Dispatcher(() => new GatherOperation(gpuConstructor));
+//const defaultGather = new GatherOperation(gpuConstructor);
+const defaultTransposeD = new Dispatcher(() => new TransposeOperation(gpuConstructor));
+//const defaultTranspose = new TransposeOperation(gpuConstructor);
+const defaultRepeatD = new Dispatcher(() => new RepeatOperation(gpuConstructor));
+//const defaultRepeat = new RepeatOperation(gpuConstructor);
+const defaultSliceD = new Dispatcher(() => new SliceOperation(gpuConstructor));
+//const defaultSlice = new SliceOperation(gpuConstructor);
+const defaultNormalizeD = new Dispatcher(() => new NormalizeOperation(gpuConstructor));
+//const defaultNormalize = new NormalizeOperation(gpuConstructor);
