@@ -1,6 +1,8 @@
+import { defaultAllocator } from "../../tensor/gpu/gl";
 import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
 import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
 import { Precision } from "../../types";
+import { getSize } from "../../util/shape";
 import { Input, Operation } from "./operation";
 
 
@@ -29,7 +31,7 @@ export interface NormalizeOpInfo {
   widthOutput?: number;
   heightOutput?: number;
 
-  epsilon: number;
+  epsilon?: number;
 }
 
 export interface NormalizeOpInput {
@@ -95,5 +97,38 @@ export class NormalizeOperation<GPUTensor extends GPUTensorI> extends Operation<
     }
 
     super.compile(info, precision);
+  }
+
+  getCompilationInfo(input: NormalizeOpInput, precision: Precision): NormalizeOpInfo {
+    const outputShape = this.getOutputShape(input);
+    const outputSize = defaultAllocator.getAllocationDimensions(getSize(outputShape), precision);
+
+    return {
+      shapeX: input.X.shape,
+      widthX: input.X.memory.width,
+      heightX: input.X.memory.height,
+
+      shapeBias: input.Bias.shape,
+      widthBias: input.Bias.memory.width,
+      heightBias: input.Bias.memory.height,
+
+      shapeMean: input.Mean.shape,
+      widthMean: input.Mean.memory.width,
+      heightMean: input.Mean.memory.height,
+
+      shapeScale: input.Scale.shape,
+      widthScale: input.Scale.memory.width,
+      heightScale: input.Scale.memory.height,
+
+      shapeVariance: input.Variance.shape,
+      widthVariance: input.Variance.memory.width,
+      heightVariance: input.Variance.memory.height,
+
+      shapeOutput: outputShape,
+      widthOutput: outputSize.width,
+      heightOutput: outputSize.height,
+
+      epsilon: input.epsilon
+    };
   }
 }

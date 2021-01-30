@@ -5,21 +5,22 @@ import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
 import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
 import { Input, Operation } from "./operation";
 import { Precision } from "../../types";
+import { defaultAllocator } from "../../tensor/gpu/gl";
 
 
 export interface AveragePoolInfo {
-  shapeX?: number[];
+  shapeX?: readonly number[];
   widthX?: number;
   heightX?: number;
 
-  kernelShape?: number[];
+  kernelShape?: readonly number[];
 
-  shapeOutput?: number[],
+  shapeOutput?: readonly number[],
   widthOutput?: number;
   heightOutput?: number;
 
-  pads?: number[];
-  strides?: number[];
+  pads?: readonly number[];
+  strides?: readonly number[];
 
   kernelSize?: number;
   dataRank?: number;
@@ -161,8 +162,6 @@ export class AveragePoolOperation<GPUTensor extends GPUTensorI> extends Operatio
     const C = input.X.shape[1];
     const D = input.X.shape.slice(2);
 
-    const kernelSize = getSize(input.kernelShape);
-
     const R = outputDimsSize(D, input.kernelShape, input.pads.slice(0, input.pads.length/2), input.pads.slice(input.pads.length/2), new Array(D.length).fill(1), input.strides);
     let outputShape = [N, C];
     outputShape = outputShape.concat(R);
@@ -183,5 +182,31 @@ export class AveragePoolOperation<GPUTensor extends GPUTensorI> extends Operatio
     }
 
     super.compile(info, precision);
+  }
+
+  getCompilationInfo(input: AveragePoolInput, precision: Precision): AveragePoolInfo {
+    const outputShape = this.getOutputShape(input);
+    const outputSize = defaultAllocator.getAllocationDimensions(getSize(outputShape), precision);
+
+    const kernelSize = getSize(input.kernelShape);
+
+    return {
+      shapeX: input.X.shape,
+      widthX: input.X.memory.width,
+      heightX: input.X.memory.height,
+
+      kernelShape: input.kernelShape,
+
+      shapeOutput: outputShape,
+      widthOutput: outputSize.width,
+      heightOutput: outputSize.height,
+
+      pads: input.pads,
+      strides: input.strides,
+
+      kernelSize: kernelSize,
+      dataRank: input.X.shape.length - 2,
+      includePad: input.includePad ? 1 : 0
+    };
   }
 }

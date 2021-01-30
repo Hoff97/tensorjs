@@ -1,6 +1,8 @@
+import { defaultAllocator } from "../../../tensor/gpu/gl";
 import { GPUTensorConstructor, GPUTensorI } from "../../../tensor/gpu/interface";
 import { GPUMemoryAllocator } from "../../../tensor/gpu/memory";
 import { Precision } from "../../../types";
+import { getSize } from "../../../util/shape";
 import { Operation } from "./../operation";
 
 
@@ -60,5 +62,21 @@ export abstract class BinaryOperation<GPUTensor extends GPUTensorI> extends Oper
     }
 
     super.compile(info, precision);
+  }
+
+  getCompilationInfo(input: BinaryOpInput, precision: Precision): BinaryOpInfo {
+    const outputSize = defaultAllocator.getAllocationDimensions(getSize(input.outputShape), precision);
+
+    return {
+      shapeA: input.A.shape,
+      widthA: input.A.memory.width,
+      heightA: input.A.memory.height,
+      shapeB: input.B.shape,
+      widthB: input.B.memory.width,
+      heightB: input.B.memory.height,
+      shapeOutput: input.outputShape,
+      widthOutput: outputSize.width,
+      heightOutput: outputSize.height
+    };
   }
 }

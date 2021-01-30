@@ -14,6 +14,11 @@ export interface MemoryEntry {
   id: number;
 }
 
+export interface Size {
+  width: number;
+  height: number;
+}
+
 export class GPUMemoryAllocator {
   private trees: {[precision: number]: AVLTree<number,  MemoryEntry>};
 
@@ -74,6 +79,27 @@ export class GPUMemoryAllocator {
       this.trees[precision].deleteFirst(first.key);
 
       return first.value;
+    }
+  }
+
+  getAllocationDimensions(size: number, precision: Precision): Size {
+    let upperBound = size*this.maxSizeFactor;
+    const texSize = Math.ceil(size/4)*4;
+    if (texSize < upperBound) {
+      upperBound = texSize;
+    }
+
+    const results = this.trees[precision].betweenBoundsFirst({gte: size, lte: upperBound});
+    if (results.length === 0) {
+      const textureSize = Math.ceil(size / 4);
+      return this.getTextureDims(textureSize);
+    } else {
+      const first = results[0];
+
+      return {
+        width: first.value.width,
+        height: first.value.height
+      }
     }
   }
 
@@ -164,7 +190,7 @@ export class GPUMemoryAllocator {
     }
   }
 
-  private getTextureDims(size: number) {
+  private getTextureDims(size: number): Size {
     const factors = primeFactors(size);
     let width = 1;
     let height = 1;

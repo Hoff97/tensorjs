@@ -5,6 +5,7 @@ import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
 import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
 import { Input, Operation } from "./operation";
 import { Precision } from "../../types";
+import { defaultAllocator } from "../../tensor/gpu/gl";
 
 
 export interface GemmInfo {
@@ -215,10 +216,46 @@ export class GemmOperation<GPUTensor extends GPUTensorI, GemmInf extends GemmInf
 
     super.compile(info, precision);
   }
+
+  getCompilationInfo(input: GemmIn, precision: Precision): GemmInf {
+    const outputShape = this.getOutputShape(input);
+    const outputSize = defaultAllocator.getAllocationDimensions(getSize(outputShape), precision);
+
+    const rank = input.a.shape.length;
+
+    const M = input.aTranspose ? input.a.shape[rank - 1] : input.a.shape[rank - 2];
+    const N = input.aTranspose ? input.a.shape[rank - 2] : input.a.shape[rank - 1];
+    const O = input.bTranspose ? input.b.shape[rank - 2] : input.b.shape[rank - 1];
+
+    const info: GemmInfo = {
+      shapeA: input.a.shape,
+      widthA: input.a.memory.width,
+      heightA: input.a.memory.height,
+
+      shapeB: input.b.shape,
+      widthB: input.b.memory.width,
+      heightB: input.b.memory.height,
+
+      shapeOutput: outputShape,
+      widthOutput: outputSize.width,
+      heightOutput: outputSize.height,
+
+      M, N, O,
+
+      aTranspose: input.aTranspose ? 1 : 0,
+      bTranspose: input.bTranspose ? 1 : 0,
+      alpha: input.alpha,
+      beta: input.beta,
+
+      rank
+    };
+
+    return info as GemmInf;
+  }
 }
 
 export interface GemmCInfo extends GemmInfo {
-  shapeC?: number[];
+  shapeC?: readonly number[];
   widthC?: number;
   heightC?: number;
 }
@@ -265,5 +302,19 @@ export class GemmCOperation<GPUTensor extends GPUTensorI> extends GemmOperation<
     };
 
     return this.compute(resultShape, {A: input.a, B: input.b, C: input.c}, uniforms);
+  }
+
+  getCompilationInfo(input: GemmCInput, precision: Precision): GemmCInfo {
+    const inf = super.getCompilationInfo(input, precision);
+
+    const info: GemmCInfo = {
+      ...inf,
+
+      shapeC: input.c.shape,
+      widthC: input.c.memory.width,
+      heightC: input.c.memory.height
+    };
+
+    return info;
   }
 }

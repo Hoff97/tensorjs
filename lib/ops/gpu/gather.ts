@@ -1,8 +1,9 @@
 import { CPUTensor } from "../../tensor/cpu/tensor";
+import { defaultAllocator } from "../../tensor/gpu/gl";
 import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
 import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
 import { Precision } from "../../types";
-import { computeStrides } from "../../util/shape";
+import { computeStrides, getSize } from "../../util/shape";
 import { Input, Operation } from "./operation";
 
 
@@ -199,5 +200,56 @@ export class GatherOperation<GPUTensor extends GPUTensorI> extends Operation<GPU
     }
 
     super.compile(info, precision);
+  }
+
+  getCompilationInfo(input: GatherInput, precision: Precision): GatherInfo {
+    const outputShape = this.getOutputShape(input);
+    const outputSize = defaultAllocator.getAllocationDimensions(getSize(outputShape), precision);
+
+    const r = input.X.shape.length;
+    const q = input.indices.shape.length;
+
+    const inputStrides = computeStrides(input.X.shape);
+    const indexStrides = computeStrides(input.indices.shape);
+
+    const resultRank = r + q - 1;
+    const resultShape = new Array(resultRank);
+
+    const mappedInputStrides = new Array(resultRank).fill(0);
+    const mappedIndexStrides = new Array(resultRank).fill(0);
+
+    for (let i = 0; i < input.axis; i++) {
+      resultShape[i] = input.X.shape[i];
+      mappedInputStrides[i] = inputStrides[i];
+
+      mappedIndexStrides[i] = 0;
+    }
+    for (let i = 0; i < q; i++) {
+      resultShape[i + input.axis] = input.indices.shape[i];
+      mappedIndexStrides[i + input.axis] = indexStrides[i];
+
+      mappedInputStrides[i + input.axis] = 0;
+    }
+    for (let i = input.axis + 1; i < r; i++) {
+      resultShape[i + q - 1] = input.X.shape[i];
+      mappedInputStrides[i + q - 1] = inputStrides[i];
+
+      mappedIndexStrides[i + q - 1] = 0;
+    }
+
+    return {
+      shapeX: input.X.shape,
+      widthX: input.X.memory.width,
+      heightX: input.X.memory.height,
+
+      shapeOutput: outputShape,
+      widthOutput: outputSize.width,
+      heightOutput: outputSize.height,
+
+      axis: input.axis,
+      indexValues: Array.from(input.indices.values),
+      mappedIndexStrides,
+      mappedInputStrides
+    };
   }
 }

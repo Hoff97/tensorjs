@@ -1,3 +1,4 @@
+import { defaultAllocator } from "../../tensor/gpu/gl";
 import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
 import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
 import { Precision } from "../../types";
@@ -91,5 +92,23 @@ export class ClipOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTe
     }
 
     super.compile(info, precision);
+  }
+
+  getCompilationInfo(input: ClipInput, precision: Precision): ClipInfo {
+    const outputSize = defaultAllocator.getAllocationDimensions(input.input.size, precision);
+
+    return {
+      shapeX: input.input.shape,
+      widthX: input.input.memory.width,
+      heightX: input.input.memory.height,
+      shapeOutput: input.input.shape,
+      widthOutput: outputSize.width,
+      heightOutput: outputSize.height,
+
+      minVal: input.minVal !== undefined ? input.minVal : 0,
+      maxVal: input.maxVal !== undefined ? input.maxVal : 0,
+      doMin: input.minVal !== undefined ? 1 : 0,
+      doMax: input.maxVal !== undefined ? 1 : 0
+    }
   }
 }

@@ -1,6 +1,8 @@
+import { defaultAllocator } from "../../tensor/gpu/gl";
 import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
 import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
 import { PadMode, Precision } from "../../types";
+import { getSize } from "../../util/shape";
 import { Input, Operation } from "./operation";
 
 
@@ -87,5 +89,22 @@ export class UpsampleOperation<GPUTensor extends GPUTensorI> extends Operation<G
     }
 
     super.compile(info, precision);
+  }
+
+  getCompilationInfo(input: UpsampleInput, precision: Precision): UpsampleInfo {
+    const outputShape = this.getOutputShape(input);
+    const outputSize = defaultAllocator.getAllocationDimensions(getSize(outputShape), precision);
+
+    return {
+      shapeX: input.X.shape,
+      widthX: input.X.memory.width,
+      heightX: input.X.memory.height,
+
+      shapeOutput: outputShape,
+      widthOutput: outputSize.width,
+      heightOutput: outputSize.height,
+
+      scales: input.scales
+    };
   }
 }

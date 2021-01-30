@@ -1,6 +1,8 @@
+import { defaultAllocator } from "../../tensor/gpu/gl";
 import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
 import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
 import { PadMode, Precision } from "../../types";
+import { getSize } from "../../util/shape";
 import { Input, Operation } from "./operation";
 
 
@@ -127,5 +129,35 @@ export class SliceOperation<GPUTensor extends GPUTensorI> extends Operation<GPUT
     }
 
     super.compile(info, precision);
+  }
+
+  getCompilationInfo(input: SliceInput, precision: Precision): SliceInfo {
+    const outputShape = this.getOutputShape(input);
+    const outputSize = defaultAllocator.getAllocationDimensions(getSize(outputShape), precision);
+
+    const rank = input.X.shape.length;
+
+    const resultShape = [...input.X.shape];
+    const offsets: number[] = new Array(rank).fill(0);
+    let axIx = 0;
+    for (let i = 0; i < rank && axIx < input.axes.length; i++) {
+      if (i == input.axes[axIx]) {
+        resultShape[i] = input.ends[axIx] - input.starts[axIx];
+        offsets[i] = input.starts[axIx];
+        axIx++;
+      }
+    }
+
+    return {
+      shapeX: input.X.shape,
+      widthX: input.X.memory.width,
+      heightX: input.X.memory.height,
+
+      shapeOutput: outputShape,
+      widthOutput: outputSize.width,
+      heightOutput: outputSize.height,
+
+      offsets
+    };
   }
 }

@@ -5,6 +5,7 @@ import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
 import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
 import { Input, Operation } from "./operation";
 import { Activation, Precision } from "../../types";
+import { defaultAllocator } from "../../tensor/gpu/gl";
 
 
 export interface ConvInfo {
@@ -222,6 +223,40 @@ export class ConvOperation<GPUTensor extends GPUTensorI, ConvInf extends ConvInf
 
     super.compile(info, precision);
   }
+
+  getCompilationInfo(input: ConvIn, precision: Precision): ConvInf {
+    const outputShape = this.getOutputShape(input);
+    const outputSize = defaultAllocator.getAllocationDimensions(getSize(outputShape), precision);
+
+    const kernelSize = getSize(input.W.shape.slice(2));
+
+    const C = input.X.shape[1];
+    const D = input.X.shape.slice(2);
+
+    return {
+      shapeX: input.X.shape,
+      widthX: input.X.memory.width,
+      heightX: input.X.memory.height,
+
+      shapeW: input.W.shape,
+      widthW: input.W.memory.width,
+      heightW: input.W.memory.height,
+
+      shapeOutput: outputShape,
+      widthOutput: outputSize.width,
+      heightOutput: outputSize.height,
+
+      pads: input.pads,
+      dilations: input.dilations,
+      strides: input.strides,
+
+      CG: input.W.shape[1],
+      kernelSize: kernelSize,
+      dataRank: D.length,
+      C: C,
+      activation: this.getActivationFlag(input.activation)
+    } as ConvInf;
+  }
 }
 
 
@@ -230,7 +265,7 @@ export interface ConvBiasInput extends ConvInput {
 }
 
 export interface ConvBiasInfo extends ConvInfo {
-  shapeB?: number[];
+  shapeB?: readonly number[];
   widthB?: number;
   heightB?: number;
 }
@@ -289,5 +324,17 @@ export class ConvBiasOperation<GPUTensor extends GPUTensorI> extends ConvOperati
       dilations: this.copyPad(input.dilations),
       activation: this.getActivationFlag(input.activation)
     })
+  }
+
+  getCompilationInfo(input: ConvBiasInput, precision: Precision): ConvBiasInfo {
+    const info = super.getCompilationInfo(input, precision);
+
+    return {
+      ...info,
+
+      shapeB: input.B.shape,
+      widthB: input.B.memory.width,
+      heightB: input.B.memory.height
+    };
   }
 }

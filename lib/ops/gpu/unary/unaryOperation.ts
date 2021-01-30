@@ -1,6 +1,8 @@
+import { defaultAllocator } from "../../../tensor/gpu/gl";
 import { GPUTensorConstructor, GPUTensorI } from "../../../tensor/gpu/interface";
 import { GPUMemoryAllocator } from "../../../tensor/gpu/memory";
 import { Precision } from "../../../types";
+import { getSize } from "../../../util/shape";
 import { Operation } from "../operation";
 
 
@@ -52,5 +54,19 @@ export abstract class UnaryOperation<GPUTensor extends GPUTensorI> extends Opera
     }
 
     super.compile(info, precision);
+  }
+
+  getCompilationInfo(input: UnaryOpInput, precision: Precision): UnaryOpInfo {
+    const outputShape = this.getOutputShape(input);
+    const outputSize = defaultAllocator.getAllocationDimensions(getSize(outputShape), precision);
+
+    return {
+      shapeX: input.input.shape,
+      widthX: input.input.memory.width,
+      heightX: input.input.memory.height,
+      shapeOutput: this.getOutputShape(input),
+      widthOutput: outputSize.width,
+      heightOutput: outputSize.height
+    };
   }
 }

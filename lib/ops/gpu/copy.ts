@@ -1,6 +1,8 @@
+import { defaultAllocator } from "../../tensor/gpu/gl";
 import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
 import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
 import { Precision } from "../../types";
+import { getSize } from "../../util/shape";
 import { Operation } from "./operation";
 
 
@@ -57,5 +59,20 @@ export class CopyOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTe
     }
 
     super.compile(info, precision);
+  }
+
+  getCompilationInfo(input: CopyInput, precision: Precision): CopyInfo {
+    const outputShape = this.getOutputShape(input);
+    const outputSize = defaultAllocator.getAllocationDimensions(getSize(outputShape), precision);
+
+    return {
+      shapeX: input.input.shape,
+      widthX: input.input.memory.width,
+      heightX: input.input.memory.height,
+
+      shapeOutput: outputShape,
+      widthOutput: outputSize.width,
+      heightOutput: outputSize.height
+    };
   }
 }

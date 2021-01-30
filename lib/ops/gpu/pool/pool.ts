@@ -1,7 +1,8 @@
+import { defaultAllocator } from "../../../tensor/gpu/gl";
 import { GPUTensorConstructor, GPUTensorI } from "../../../tensor/gpu/interface";
 import { GPUMemoryAllocator } from "../../../tensor/gpu/memory";
 import { Precision } from "../../../types";
-import { computeStrides } from "../../../util/shape";
+import { computeStrides, getSize } from "../../../util/shape";
 import { poolResultShape } from "../../util/pool";
 import { Input, Operation } from "../operation";
 
@@ -161,5 +162,38 @@ export abstract class PoolOperation<GPUTensor extends GPUTensorI> extends Operat
     }
 
     super.compile(info, precision);
+  }
+
+  getCompilationInfo(input: PoolInput, precision: Precision): PoolInfo {
+    const [outputShape, ixMap] = poolResultShape(input.X.shape, input.axes, input.keepDims);
+
+    const inputStrides = computeStrides(input.X.shape);
+    const mappedInputStrides = [];
+    for (let i of ixMap) {
+      mappedInputStrides.push(inputStrides[i])
+    }
+
+    let sumSize = 1;
+    const sumDims: number[] = new Array(input.X.shape.length).fill(0);
+    for (let i = 0; i < input.axes.length; i++) {
+      sumDims[input.axes[i]] = 1;
+      sumSize *= input.X.shape[input.axes[i]];
+    }
+
+    const outputSize = defaultAllocator.getAllocationDimensions(getSize(outputShape), precision);
+
+    return {
+      shapeX: input.X.shape,
+      widthX: input.X.memory.width,
+      heightX: input.X.memory.height,
+
+      shapeOutput: outputShape,
+      widthOutput: outputSize.width,
+      heightOutput: outputSize.height,
+
+      mappedInputStrides,
+      sumDims,
+      sumSize
+    };
   }
 }

@@ -1,7 +1,8 @@
+import { defaultAllocator } from "../../tensor/gpu/gl";
 import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
 import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
 import { Precision } from "../../types";
-import { computeStrides } from "../../util/shape";
+import { computeStrides, getSize } from "../../util/shape";
 import { Input, Operation } from "./operation";
 
 
@@ -99,5 +100,30 @@ export class TransposeOperation<GPUTensor extends GPUTensorI> extends Operation<
     }
 
     super.compile(info, precision);
+  }
+
+  getCompilationInfo(input: TransposeInput, precision: Precision): TransposeInfo {
+    const outputShape = this.getOutputShape(input);
+    const outputSize = defaultAllocator.getAllocationDimensions(getSize(outputShape), precision);
+
+    const rank = input.A.shape.length;
+
+    const inputStrides = computeStrides(input.A.shape);
+    const mappedStrides = new Array(rank);
+    for (let i = 0; i < rank; i++) {
+      mappedStrides[i] = inputStrides[input.permutation[i]];
+    }
+
+    return {
+      shapeA: input.A.shape,
+      widthA: input.A.memory.width,
+      heightA: input.A.memory.height,
+
+      shapeOutput: outputShape,
+      widthOutput: outputSize.width,
+      heightOutput: outputSize.height,
+
+      mappedStrides
+    };
   }
 }

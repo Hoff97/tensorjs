@@ -10,7 +10,7 @@ import REGL from 'regl';
 import { ExpOperation } from '../../ops/gpu/unary/exp';
 import { GPUTensorConstructor, GPUTensorI } from './interface';
 import { ConvBiasOperation, ConvOperation } from '../../ops/gpu/conv';
-import { AbsOperation } from '../../ops/gpu/abs';
+import { AbsOperation } from '../../ops/gpu/unary/abs';
 import { AddOperation } from '../../ops/gpu/binary/add';
 import { MultiplyOperation } from '../../ops/gpu/binary/multiply';
 import { SubtractOperation } from '../../ops/gpu/binary/subtract';

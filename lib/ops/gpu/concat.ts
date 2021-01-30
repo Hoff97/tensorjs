@@ -1,6 +1,8 @@
+import { defaultAllocator } from "../../tensor/gpu/gl";
 import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
 import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
 import { Precision } from "../../types";
+import { getSize } from "../../util/shape";
 import { Input, Operation } from "./operation";
 
 
@@ -90,5 +92,26 @@ export class ConcatOperation<GPUTensor extends GPUTensorI> extends Operation<GPU
     }
 
     super.compile(info, precision);
+  }
+
+  getCompilationInfo(input: ConcatInput, precision: Precision): ConcatInfo {
+    const outputShape = this.getOutputShape(input);
+    const outputSize = defaultAllocator.getAllocationDimensions(getSize(outputShape), precision);
+
+    return {
+      shapeA: input.A.shape,
+      widthA: input.A.memory.width,
+      heightA: input.A.memory.height,
+
+      shapeB: input.B.shape,
+      widthB: input.B.memory.width,
+      heightB: input.B.memory.height,
+
+      shapeOutput: outputShape,
+      widthOutput: outputSize.width,
+      heightOutput: outputSize.height,
+
+      axis: input.axis
+    }
   }
 }
