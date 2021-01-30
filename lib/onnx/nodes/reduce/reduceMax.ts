@@ -1,8 +1,7 @@
-import { MaxOperation } from "../../../ops/gpu/max";
-import { PoolOperation } from "../../../ops/gpu/pool";
+import { MaxOperation } from "../../../ops/gpu/pool/max";
+import { PoolOperation } from "../../../ops/gpu/pool/pool";
 import { gpuConstructor, GPUTensor } from "../../../tensor/gpu/tensor";
 import Tensor from "../../../types";
-import { OnnxNode } from "../../node";
 import { Attributes, Constants } from "../../types";
 import { ReduceNode } from "./reduceNode";
 

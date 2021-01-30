@@ -1,5 +1,5 @@
-import { GPUTensorI } from "../../tensor/gpu/interface";
-import { Precision } from "../../types";
+import { GPUTensorI } from "../../../tensor/gpu/interface";
+import { Precision } from "../../../types";
 import { PoolInfo, PoolOperation } from "./pool";
 
 export class SumSquareOperation<GPUTensor extends GPUTensorI> extends PoolOperation<GPUTensor> {

@@ -1,9 +1,9 @@
-import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
-import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
-import { Precision } from "../../types";
-import { computeStrides } from "../../util/shape";
-import { poolResultShape } from "../util/pool";
-import { Input, Operation } from "./operation";
+import { GPUTensorConstructor, GPUTensorI } from "../../../tensor/gpu/interface";
+import { GPUMemoryAllocator } from "../../../tensor/gpu/memory";
+import { Precision } from "../../../types";
+import { computeStrides } from "../../../util/shape";
+import { poolResultShape } from "../../util/pool";
+import { Input, Operation } from "../operation";
 
 
 export interface PoolInfo {

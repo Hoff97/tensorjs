@@ -1,9 +1,9 @@
-import { BinaryOpInfo } from "../../ops/gpu/binaryOperation";
+import { BinaryOpInfo } from "../../ops/gpu/binary/binaryOperation";
 import { NormalizeOperation, NormalizeOpInfo } from "../../ops/gpu/normalize";
-import { PoolInfo } from "../../ops/gpu/pool";
-import { ReduceMeanOperation } from "../../ops/gpu/reduceMean";
-import { ReduceMeanSquareOperation } from "../../ops/gpu/reduceMeanSquare";
-import { SubtractOperation } from "../../ops/gpu/subtract";
+import { PoolInfo } from "../../ops/gpu/pool/pool";
+import { ReduceMeanOperation } from "../../ops/gpu/pool/reduceMean";
+import { ReduceMeanSquareOperation } from "../../ops/gpu/pool/reduceMeanSquare";
+import { SubtractOperation } from "../../ops/gpu/binary/subtract";
 import { PrototypeTensor } from "../../tensor/cpu/prototype";
 import { CPUTensor } from "../../tensor/cpu/tensor";
 import { glContext } from "../../tensor/gpu/gl";

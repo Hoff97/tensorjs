@@ -1,4 +1,4 @@
-import { GPUTensorI } from "../../tensor/gpu/interface";
+import { GPUTensorI } from "../../../tensor/gpu/interface";
 import { PoolOperation } from "./pool";
 
 export class ReduceMeanSquareOperation<GPUTensor extends GPUTensorI> extends PoolOperation<GPUTensor> {

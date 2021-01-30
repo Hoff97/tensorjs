@@ -1,5 +1,5 @@
-import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
-import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
+import { GPUTensorConstructor, GPUTensorI } from "../../../tensor/gpu/interface";
+import { GPUMemoryAllocator } from "../../../tensor/gpu/memory";
 import { BinaryOperation } from "./binaryOperation";
 
 export class MultiplyOperation<GPUTensor extends GPUTensorI> extends BinaryOperation<GPUTensor> {

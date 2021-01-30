@@ -1,5 +1,5 @@
 import { Tensor } from "../../../library";
-import { PoolOperation } from "../../../ops/gpu/pool";
+import { PoolOperation } from "../../../ops/gpu/pool/pool";
 import { PrototypeTensor } from "../../../tensor/cpu/prototype";
 import { CPUTensor } from "../../../tensor/cpu/tensor";
 import { GPUTensor } from "../../../tensor/gpu/tensor";

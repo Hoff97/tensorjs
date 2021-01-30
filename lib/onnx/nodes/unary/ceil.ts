@@ -1,5 +1,5 @@
-import { CeilOperation } from "../../../ops/gpu/ceil";
-import { UnaryOperation } from "../../../ops/gpu/unaryOperation";
+import { CeilOperation } from "../../../ops/gpu/unary/ceil";
+import { UnaryOperation } from "../../../ops/gpu/unary/unaryOperation";
 import { gpuConstructor, GPUTensor } from "../../../tensor/gpu/tensor";
 import Tensor from "../../../types";
 import { Attributes, Constants } from "../../types";

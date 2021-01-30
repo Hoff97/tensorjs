@@ -1,5 +1,5 @@
-import { PoolOperation } from "../../../ops/gpu/pool";
-import { ReduceMeanOperation } from "../../../ops/gpu/reduceMean";
+import { PoolOperation } from "../../../ops/gpu/pool/pool";
+import { ReduceMeanOperation } from "../../../ops/gpu/pool/reduceMean";
 import { gpuConstructor, GPUTensor } from "../../../tensor/gpu/tensor";
 import Tensor from "../../../types";
 import { OnnxNode } from "../../node";

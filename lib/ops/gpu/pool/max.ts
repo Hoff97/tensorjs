@@ -1,4 +1,4 @@
-import { GPUTensorI } from "../../tensor/gpu/interface";
+import { GPUTensorI } from "../../../tensor/gpu/interface";
 import { PoolOperation } from "./pool";
 
 export class MaxOperation<GPUTensor extends GPUTensorI> extends PoolOperation<GPUTensor> {

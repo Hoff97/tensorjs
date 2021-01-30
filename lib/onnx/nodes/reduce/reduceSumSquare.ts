@@ -1,5 +1,5 @@
-import { PoolOperation } from "../../../ops/gpu/pool";
-import { SumSquareOperation } from "../../../ops/gpu/sumSquare";
+import { PoolOperation } from "../../../ops/gpu/pool/pool";
+import { SumSquareOperation } from "../../../ops/gpu/pool/sumSquare";
 import { gpuConstructor, GPUTensor } from "../../../tensor/gpu/tensor";
 import types from "../../../types";
 import { Attributes, Constants } from "../../types";

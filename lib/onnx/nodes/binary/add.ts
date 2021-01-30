@@ -1,5 +1,5 @@
-import { AddOperation } from "../../../ops/gpu/add";
-import { BinaryOperation } from "../../../ops/gpu/binaryOperation";
+import { AddOperation } from "../../../ops/gpu/binary/add";
+import { BinaryOperation } from "../../../ops/gpu/binary/binaryOperation";
 import { gpuConstructor, GPUTensor } from "../../../tensor/gpu/tensor";
 import Tensor from "../../../types";
 import { Attributes, Constants } from "../../types";

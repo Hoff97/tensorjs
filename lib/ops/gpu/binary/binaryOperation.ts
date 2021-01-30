@@ -1,7 +1,7 @@
-import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
-import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
-import { Precision } from "../../types";
-import { Operation } from "./operation";
+import { GPUTensorConstructor, GPUTensorI } from "../../../tensor/gpu/interface";
+import { GPUMemoryAllocator } from "../../../tensor/gpu/memory";
+import { Precision } from "../../../types";
+import { Operation } from "./../operation";
 
 
 export interface BinaryOpInfo {

@@ -1,4 +1,4 @@
-import { UnaryOperation } from "../../../ops/gpu/unaryOperation";
+import { UnaryOperation } from "../../../ops/gpu/unary/unaryOperation";
 import { PrototypeTensor } from "../../../tensor/cpu/prototype";
 import { CPUTensor } from "../../../tensor/cpu/tensor";
 import { GPUTensor } from "../../../tensor/gpu/tensor";
