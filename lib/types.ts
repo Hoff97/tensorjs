@@ -298,7 +298,7 @@ export default abstract class Tensor {
       const cRank = cShape.length;
 
       cShape = [...new Array(aRank - cRank).fill(1), ...cShape];
-      c = c.reshape(cShape);
+      c = c.reshape(cShape, false);
     }
 
     return this.gemm_impl(b, aTranspose, bTranspose, alpha, beta, c);
@@ -401,6 +401,6 @@ export default abstract class Tensor {
   abstract normalize(mean: Tensor, variance: Tensor, epsilon: number, scale: Tensor, bias: Tensor): Tensor;
 }
 
-export type Activation = "id" | "relu";
+export type Activation = "id" | "relu" | "relu6";
 
 export type Precision = 16 | 32;

@@ -50,6 +50,7 @@ export abstract class SequenceOptimization extends Optimization {
 
     const nodeSeq = [nodeId];
     let lastNode = nodes[nodeId as any];
+    const nodeInstances = [lastNode];
     for (let i = 1; i < this.nodeTypes.length; i++) {
       const nextNodeId = model.getNodeWithInput(lastNode.outputs[0]);
       if (nextNodeId !== undefined) {
@@ -58,6 +59,7 @@ export abstract class SequenceOptimization extends Optimization {
         if (nextNode.getType() === this.nodeTypes[i]) {
           nodeSeq.push(nextNodeId as any);
           lastNode = nextNode;
+          nodeInstances.push(lastNode);
         } else {
           return undefined;
         }
@@ -65,6 +67,14 @@ export abstract class SequenceOptimization extends Optimization {
         return undefined;
       }
     }
-    return nodeSeq;
+    if (this.canApply(nodeInstances)) {
+      return nodeSeq;
+    } else {
+      return undefined;
+    }
+  }
+
+  canApply(nodes: OnnxNode[]) {
+    return true;
   }
 }

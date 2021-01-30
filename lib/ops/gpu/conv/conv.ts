@@ -133,6 +133,8 @@ export class ConvOperation<GPUTensor extends GPUTensorI, ConvInf extends ConvInf
 
       if (activation == 1) {
         res = max(0.0, res);
+      } else if (activation == 2) {
+        res = max(0.0, min(res,6));
       }
 
       return res;
@@ -164,6 +166,8 @@ export class ConvOperation<GPUTensor extends GPUTensorI, ConvInf extends ConvInf
       return 0;
     } else if (activation === "relu") {
       return 1;
+    } else if (activation === "relu6") {
+      return 2;
     }
   }
 

@@ -3,8 +3,8 @@ import { OnnxNode } from "../node";
 import { Attributes, Constants } from "../types";
 
 export class ClipNode extends OnnxNode {
-  protected min?: number;
-  protected max?: number;
+  public min?: number;
+  public max?: number;
 
   constructor(attributes: Attributes, inputs: string[], outputs: string[], constants: Constants, onnxVersion: number) {
     super(attributes, inputs, outputs, constants, onnxVersion);
