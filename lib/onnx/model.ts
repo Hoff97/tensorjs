@@ -6,6 +6,7 @@ import { GPUMemoryAllocator } from '../tensor/gpu/memory';
 import { GPUTensor } from '../tensor/gpu/tensor';
 import Tensor, { Precision } from '../types';
 import { toCPU, toGPU, toWASM } from '../util/convert';
+import { Dict } from '../util/datastructs/dict';
 import { OnnxNode } from './node';
 import { ConstantNode } from './nodes/constant';
 import { defaultOptimizations } from './optimizations/default';
@@ -329,7 +330,7 @@ export class OnnxModel {
 
   async compileForInputs(inputs: Tensor[]) {
     if (this.allocator === undefined) {
-      this.setAllocator(new GPUMemoryAllocator(gl));
+      this.setAllocator(new GPUMemoryAllocator(gl, new Dict((key: number) => key) as any));
     }
 
     for (let id of this.nodeIds) {

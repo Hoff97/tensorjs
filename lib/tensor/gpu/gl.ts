@@ -1,5 +1,6 @@
 import REGL from 'regl';
 import { AVLTree } from '../../util/datastructs/avl';
+import { Dict } from '../../util/datastructs/dict';
 import { GPUMemoryAllocator, MemoryEntry } from './memory';
 
 const canvas = document.createElement("canvas");
@@ -19,9 +20,7 @@ function setup() {
   });
 
   defaultAllocator = new GPUMemoryAllocator(gl, () => {
-    return new AVLTree({
-      compareValues: (a: MemoryEntry, b: MemoryEntry) => a.id === b.id
-    });
+    return new Dict((key: number) => key);
   });
 }
 
