@@ -1,5 +1,4 @@
 import REGL from 'regl';
-import { AVLTree } from '../../util/datastructs/avl';
 import { Dict } from '../../util/datastructs/dict';
 import { GPUMemoryAllocator, MemoryEntry } from './memory';
 

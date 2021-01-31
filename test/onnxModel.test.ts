@@ -8,11 +8,12 @@ import { GPUTensor } from '../lib/tensor/gpu/tensor';
 
 import { ModelData, models } from './data/models';
 import { getSize } from '../lib/util/shape';
-import { defaultAllocator } from '../lib/tensor/gpu/gl';
 
 const epsilon = 0.1;
 
 const modelArgs = {
+  "superresolution": {
+  },
   "ultraface": {
   },
   "mosaic": {
@@ -92,8 +93,6 @@ if (run) {
       it(`Should work on GPU`, async () => {
         const { model, inputs, output } = await loadData(modelData, 32);
 
-        model.allocator = defaultAllocator;
-
         await model.toGPU();
 
         const result1 = (await model.forward(inputs))[0];
@@ -106,45 +105,14 @@ if (run) {
         cleanup(model, inputs, output);
       });
 
-      it(`Should work on GPU when precompiled`, async () => {
+      it(`Should work on GPU when optimized`, async () => {
         const { model, inputs, output } = await loadData(modelData, 32);
 
         const modelCompiled = model;
-
-        modelCompiled.allocator = defaultAllocator;
-
-        await modelCompiled.toGPU();
-
-        await modelCompiled.compileForInputs(inputs);
-        const result1 = (await modelCompiled.forward(inputs))[0];
-
-        if (output !== undefined) {
-          expect(await result1.compare(output, epsilon)).toBeTrue();
-        } else {
-          const { model, inputs, output } = await loadData(modelData, 32);
-
-          await model.toGPU();
-          const result2 = (await model.forward(inputs))[0];
-          expect(await result1.compare(result2, epsilon)).toBeTrue();
-
-          cleanup(model, inputs, output);
-        }
-
-        result1.delete();
-        cleanup(modelCompiled, inputs, output);
-      });
-
-      it(`Should work on GPU when optimized and compiled`, async () => {
-        const { model, inputs, output } = await loadData(modelData, 32);
-
-        const modelCompiled = model;
-
-        modelCompiled.allocator = defaultAllocator;
 
         await modelCompiled.toGPU();
 
         modelCompiled.optimize();
-        await modelCompiled.compileForInputs(inputs);
         const result1 = (await modelCompiled.forward(inputs))[0];
 
         if (output !== undefined) {
@@ -168,22 +136,19 @@ if (run) {
 
         const modelCompiled = model;
 
-        modelCompiled.allocator = defaultAllocator;
-
         await modelCompiled.toGPU();
 
         modelCompiled.optimize();
-        await modelCompiled.compileForInputs(inputs);
         const result1 = (await modelCompiled.forward(inputs))[0];
 
         if (output !== undefined) {
-          expect(await result1.copy().compare(output.copy(), epsilon*2)).toBeTrue();
+          expect(await (result1 as GPUTensor).copy(32).compare((output as GPUTensor).copy(32), epsilon*2)).toBeTrue();
         } else {
           const { model, inputs, output } = await loadData(modelData, 32);
 
           await model.toGPU();
           const result2 = (await model.forward(inputs))[0];
-          expect(await result1.copy().compare(result2.copy(), epsilon*2)).toBeTrue();
+          expect(await (result1 as GPUTensor).copy(32).compare((result2 as GPUTensor).copy(32), epsilon*2)).toBeTrue();
 
           cleanup(model, inputs, output);
         }

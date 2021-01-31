@@ -10,6 +10,13 @@ export interface ModelData {
 
 export const models: ModelData[] = [
   {
+    name: "super_resolution",
+    fileName: "super-resolution-10.tar.gz",
+    url: "https://github.com/onnx/models/raw/master/vision/super_resolution/sub_pixel_cnn_2016/model/super-resolution-10.tar.gz",
+    zipped: true,
+    inputData: true
+  },
+  {
     name: "ultraface",
     fileName: "version-RFB-320.onnx",
     url: "https://github.com/onnx/models/raw/master/vision/body_analysis/ultraface/models/version-RFB-320.onnx",

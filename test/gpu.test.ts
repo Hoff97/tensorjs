@@ -16,7 +16,7 @@ describe(`GPU create tensor`, () => {
     const arr = new Float32Array([1.,2.,3.,4.]);
     const tensor = new GPUTensor(arr, [2,2], 16);
 
-    expect(await tensor.copy().getValues()).toEqual(arr);
+    expect(await tensor.copy(32).getValues()).toEqual(arr);
   });
 });
 
