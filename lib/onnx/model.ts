@@ -23,8 +23,22 @@ interface IntermediaryRes {
 }
 
 interface ModelArgs {
+  /**
+   * Constants that should not be transferred to another device.
+   *
+   * Useful for operations that should only happen only on the CPU
+   */
   noConvertConstants?: string[];
+  /**
+   * Nodes that should not be transferred to another device
+   *
+   * Useful for operations that should only happen only on the CPU
+   */
   noConvertNodes?: NodeId[];
+
+  /**
+   * Precision that should be used. Only has an effect on GPU.
+   */
   precision?: Precision;
 }
 
@@ -52,6 +66,12 @@ export class OnnxModel {
 
   public inputs: onnx.IValueInfoProto[];
 
+  /**
+   * Builds a new onnx model
+   *
+   * @param buffer Onnx model
+   * @param args Optional arguments for the model
+   */
   constructor(buffer: ArrayBuffer | Uint8Array, args?: ModelArgs) {
     if (args === undefined) {
       args = {};
@@ -146,6 +166,13 @@ export class OnnxModel {
     }
   }
 
+  /**
+   * Do a forward pass for the specified inputs
+   *
+   * @param wait Number of milliseconds to wait between each layer. This
+   *             is especially useful, if your model is complex and
+   *             you dont want your model to block your whole application.
+   */
   async forward(inputs: Tensor[], wait?: number): Promise<Tensor[]> {
     const intermediaryRes: {[name: string]: IntermediaryRes} = {};
 
@@ -269,6 +296,9 @@ export class OnnxModel {
     }
   }
 
+  /**
+   * Transfer the model to the CPU
+   */
   async toCPU() {
     for (let i in this.constants) {
       if (!this.noConvertConstants.has(i)) {
@@ -283,6 +313,9 @@ export class OnnxModel {
     }
   }
 
+  /**
+   * Transfer the model to WASM
+   */
   async toWASM() {
     for (let i in this.constants) {
       if (!this.noConvertConstants.has(i)) {
@@ -297,6 +330,9 @@ export class OnnxModel {
     }
   }
 
+  /**
+   * Transfer the model to the GPU
+   */
   async toGPU() {
     for (let i in this.constants) {
       if (!this.noConvertConstants.has(i)) {
@@ -311,6 +347,9 @@ export class OnnxModel {
     }
   }
 
+  /**
+   * Optimize the model.
+   */
   public optimize() {
     for (let optimization of defaultOptimizations) {
       const applications = optimization.findApplications(this);
@@ -430,6 +469,11 @@ export class OnnxModel {
     return this.nodes;
   }
 
+  /**
+   * Deletes the model
+   *
+   * This will release the memory/framebuffers (depending on the backend)
+   */
   public delete() {
     for (let c in this.constants) {
       this.constants[c].delete();
