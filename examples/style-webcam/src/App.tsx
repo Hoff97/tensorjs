@@ -8,7 +8,7 @@ class App extends React.Component {
   private model?: tjs.onnx.model.OnnxModel = undefined;
   private modelCompiled = false;
 
-  private scale = new tjs.tensor.gpu.GPUTensor(new Float32Array([255]), [1]);
+  private scale = new tjs.tensor.gpu.GPUTensor(new Float32Array([255]), [1], 16);
 
   private videoTensor?: tjs.tensor.gpu.GPUTensor;
 
@@ -37,7 +37,7 @@ class App extends React.Component {
       video.srcObject = stream;
 
       setTimeout(() => {
-        this.videoTensor = tjs.tensor.gpu.GPUTensor.fromData(video);
+        this.videoTensor = tjs.tensor.gpu.GPUTensor.fromData(video, 16);
 
         this.compileModel();
       }, 500);
@@ -66,7 +66,8 @@ class App extends React.Component {
 
       const reshaped = this.prepareVideo() as tjs.Tensor;
 
-      await this.model?.compileForInputs([reshaped]);
+      this.model?.optimize();
+      //await this.model?.compileForInputs([reshaped]);
 
       console.log('Compiled');
       console.log('Doing forward pass');
@@ -81,18 +82,18 @@ class App extends React.Component {
   handleResult(tensors: tjs.Tensor[]) {
     console.log('Got result', tensors);
 
-    requestAnimationFrame(() => {
+    setTimeout(() => {
       //@ts-ignore
-      (tensors[0] as tjs.tensor.gpu.GPUTensor).delete(this.model.allocator);
+      (tensors[0] as tjs.tensor.gpu.GPUTensor).delete();
       //@ts-ignore
-      (tensors[1] as tjs.tensor.gpu.GPUTensor).delete(this.model.allocator);
+      (tensors[1] as tjs.tensor.gpu.GPUTensor).delete();
       const reshaped = this.prepareVideo() as tjs.Tensor;
 
       this.model?.forward([reshaped]).then(results => {
         reshaped.delete();
         this.handleResult(results);
       });
-    });
+    }, 50);
     /*this.setState({
       ...this.state,
       showResult: true

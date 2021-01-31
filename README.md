@@ -7,7 +7,7 @@ This is a JS/TS library for accelerated tensor computation intended to be
 run in the browser. It contains an implementation for numpy-style
 multidimensional arrays and their operators.
 
-It also allows executing Onnx models. For examples check the [examples folder](https://github.com/Hoff97/tensorjs/tree/master/examples/).
+It also allows executing Onnx models. For examples check the [examples folder](https://github.com/Hoff97/tensorjs/tree/develop/examples/).
 
 There are three execution backends available:
 - **CPU:** This is implemented in plain javascript and thus
