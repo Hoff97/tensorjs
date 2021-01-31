@@ -23,7 +23,12 @@ There are three execution backends available:
 
 # How to use
 
-First import
+Install with
+```sh
+$ npm install @hoff97/tensor-js
+```
+
+and then import
 ```typescript
 import * as tjs from '@hoff97/tensor-js';
 ```
@@ -155,6 +160,10 @@ const values = await tensor.copy(32).getValues();
 
 Try to run your models with static input sizes. TensorJS will compile specialized versions of all operations
 after enough forward passes. For this the input shapes of the tensors have to be constant though.
+
+# Documentation
+
+You can find the documentation [here](https://hoff97.github.io/tensorjs/).
 
 # Development
 
