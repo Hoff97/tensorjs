@@ -199,7 +199,9 @@ class App extends React.Component<{}, AppState> {
           <tr>
             {imgs.map(img => (
               <td>
-                <img src={"img/" + img} height={50} onClick={() => this.setImage(img)} className="exampleImage"></img>
+                <img src={"img/" + img}
+                  height={50} onClick={() => this.setImage(img)}
+                  className="exampleImage" alt="Example"></img>
               </td>
             ))}
           </tr>
