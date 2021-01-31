@@ -7,5 +7,3 @@ The following examples currently exist:
 
 - [Style transfer](https://github.com/Hoff97/tensorjs/tree/develop/examples/style)
 - [Mobile Net](https://github.com/Hoff97/tensorjs/tree/develop/examples/mobilenet)
-- [Face detection](https://github.com/Hoff97/tensorjs/tree/develop/examples/facedetection)
-- [Image supersampling](https://github.com/Hoff97/tensorjs/tree/develop/examples/supersampling)
