@@ -7,7 +7,7 @@ This is a JS/TS library for accelerated tensor computation intended to be
 run in the browser. It contains an implementation for numpy-style
 multidimensional arrays and their operators.
 
-It also allows executing Onnx models. For examples check the [examples folder](https://github.com/Hoff97/tensorjs/tree/master/examples/)..
+It also allows executing Onnx models. For examples check the [examples folder](https://github.com/Hoff97/tensorjs/tree/master/examples/).
 
 There are three execution backends available:
 - **CPU:** This is implemented in plain javascript and thus
@@ -42,14 +42,17 @@ You can create tensors of the respective backend like this:
   ```
 - GPU:
   ```typescript
-  const tensor = new tjs.tensor.gpu.GPUTensor(new Float32Array([1,2,3,4]), [2,2]);
+  const tensor = new tjs.tensor.gpu.GPUTensor(new Float32Array([1,2,3,4]), [2,2], 32);
   ```
   or directly from an image/video element:
   ```typescript
   const video: HTMLVideoElement = document.querySelector("#videoElement");
   const tensor = tjs.tensor.gpu.GPUTensor.fromData(video);
   ```
-  which will be a tensor with shape `[height,width,4]`
+  which will be a tensor with shape `[height,width,4]`.
+  Creating a GPU tensor from a video element will usually be pretty fast.
+  Creation from an image not necessarily, since here the image data
+  first has to be transferred to the GPU.
 
 ### Tensor operations
 
@@ -94,7 +97,6 @@ const gpuTensor = await tjs.util.convert.toGPU(tensor);
 
 Note that converting to/from a GPU tensor is very expensive and should
 be prevented if possible.
-TODO: Refer to examples here?
 
 
 ## Onnx model support
@@ -122,13 +124,15 @@ model.optimize()
 
 ### Running with half precision
 
-By default full precision floats (32-bits) are used for model execution. You can try executing with
+By default full precision floats (32-bits) are used for model execution.
+On the GPU backend, you can try executing with
 half precision, but be aware that this might not work for all models.
 To use half precision, specify this when loading the model:
 ```typescript
 const model = new tjs.onnx.model.OnnxModel(buffer, {
   precision: 16
-});
+})
+model.toGPU();
 ```
 For the best performance you should also create your GPU tensors with half precision
 ```typescript
@@ -144,7 +148,7 @@ The outputs of the model will be half-precision tensors as well.
 To read the values of a half precision gpu tensor, you have to convert
 it to full precision first, which can be done with:
 ```typescript
-const values = await tensor.copy().getValues();
+const values = await tensor.copy(32).getValues();
 ```
 
 ### Other performance considerations
@@ -174,6 +178,14 @@ then build the whole library.
 
 ## Testing
 
+Before the first run, data for the onnx operator tests has to be loaded:
+
+```sh
+$ npm run testData
+```
+
+then
+
 ```sh
 $ npm run test
 ```
@@ -193,7 +205,11 @@ Unfortunately headless chrome relies on a software
 implementation for WebGL (instead of Hardware support).
 For this reason the GPU backend is not tested by default.
 
-To run GPU tests, uncomment the lines in `./test/gpu.test.ts` and
+To run GPU tests, uncomment the lines in `./test/gpu.test.ts`,
+set `run = true` in `./test/onnx.test.ts`, `./test/onnxPrecompiled.test.ts`
+(and optionally `./test/onnxPrecompiled.test.ts` although the model
+tests are quite performance intensive and should only be run on a suitable
+computer),
 change the `browsers` field in `karma.conf.js` to `ChromeGPU`.
 If Chrome still doesnt use the GPU, you can try something
 like
