@@ -24,7 +24,7 @@ There are three execution backends available:
 # How to use
 
 Install with
-```sh
+```shell
 $ npm install @hoff97/tensor-js
 ```
 
