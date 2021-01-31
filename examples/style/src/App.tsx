@@ -3,6 +3,7 @@ import './App.css';
 import { loadModel } from './inference';
 
 import * as tjs from '@hoff97/tensor-js';
+import { GPUTensor } from '../../../dist/lib/tensor/gpu/tensor';
 
 interface AppState {
   img: any;
@@ -23,13 +24,14 @@ const models = [
 class App extends React.Component<{}, AppState> {
   private model?: tjs.onnx.model.OnnxModel = undefined;
 
-  private scale = new tjs.tensor.gpu.GPUTensor(new Float32Array([255]), [1]);
+  private scale = new tjs.tensor.gpu.GPUTensor(new Float32Array([255]), [1], 16);
 
   constructor(props: {}) {
     super(props);
 
     loadModel('mosaic').then(x => {
       this.model = x;
+      console.log('Got model');
     });
 
     this.setState({
@@ -42,7 +44,7 @@ class App extends React.Component<{}, AppState> {
     const el = document.getElementById("img") as HTMLImageElement;
 
     console.log('Reading pixels');
-    const tensor = tjs.tensor.gpu.GPUTensor.fromData(el);
+    const tensor = tjs.tensor.gpu.GPUTensor.fromData(el, 16);
 
     let [height, width] = tensor.shape.slice(0,2);
 
@@ -89,9 +91,10 @@ class App extends React.Component<{}, AppState> {
 
     tensor = tensor.reshape(sh.slice(1), false);
     const transposed = tensor.transpose([1,2,0]);
+    console.log(transposed.getShape());
     tensor.delete();
 
-    const t = (transposed as tjs.tensor.gpu.GPUTensor).toTexture();
+    const t = (transposed as tjs.tensor.gpu.GPUTensor).copy(32) as GPUTensor;
     transposed.delete();
 
     t.getValues().then(x => {
@@ -101,9 +104,13 @@ class App extends React.Component<{}, AppState> {
       if (context) {
         var id = context.createImageData(t.shape[0],t.shape[1]);
         var d  = id.data;
+        console.log(d.length, x.length);
 
         for (let i = 0; i < x.length; i++) {
-          d[i] = Math.round(x[i]);
+          const pos = Math.floor(i/3);
+          const offset = i%3;
+          d[pos*4+offset] = Math.round(x[i]);
+          d[pos*4+3] = 255;
         }
         context.putImageData(id, 0, 0);
       }
