@@ -21,6 +21,21 @@ const models = [
   "rain-princess"
 ];
 
+const imgs = [
+  "n01440764_tench.JPEG",
+  "n03160309_dam.JPEG",
+  "n03216828_dock.JPEG",
+  "n03670208_limousine.JPEG",
+  "n04548280_wall_clock.JPEG",
+  "n04552348_warplane.JPEG",
+  "n04599235_wool.JPEG",
+  "n06874185_traffic_light.JPEG",
+  "n07873807_pizza.JPEG",
+  "n07920052_espresso.JPEG",
+  "n09193705_alp.JPEG",
+  "n12620546_hip.JPEG",
+];
+
 class App extends React.Component<{}, AppState> {
   private model?: tjs.onnx.model.OnnxModel = undefined;
 
@@ -130,6 +145,16 @@ class App extends React.Component<{}, AppState> {
     });
   }
 
+  setImage(img: string) {
+    this.setState({
+      ...this.state,
+      //@ts-ignore
+      img: "img/" + img,
+      scale: 50,
+      showResult: false
+    });
+  }
+
   getImageWidth(scale: number) {
     const width = Math.round(400*(scale/50) + 50);
 
@@ -169,6 +194,16 @@ class App extends React.Component<{}, AppState> {
           }
         </select><br/>
         <label htmlFor="file">Choose an image:</label> <input type='file' id="file" onChange={x => this.fileSelected(x)}/><br/>
+        Or use one of the examples:
+        <table>
+          <tr>
+            {imgs.map(img => (
+              <td>
+                <img src={"img/" + img} height={50} onClick={() => this.setImage(img)} className="exampleImage"></img>
+              </td>
+            ))}
+          </tr>
+        </table>
         { img !== undefined ? (<>
             <div className="slidecontainer">
               Scale: <input type="range" min="1" max="100" defaultValue={scale}

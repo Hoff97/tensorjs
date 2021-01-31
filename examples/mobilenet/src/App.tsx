@@ -29,7 +29,7 @@ const imgs = [
   "n07920052_espresso.JPEG",
   "n09193705_alp.JPEG",
   "n12620546_hip.JPEG",
-]
+];
 
 class App extends React.Component<{}, AppState> {
   private model?: tjs.onnx.model.OnnxModel = undefined;
@@ -152,7 +152,7 @@ class App extends React.Component<{}, AppState> {
           <tr>
             {imgs.map(img => (
               <td>
-                <img src={"img/" + img} height={50} onClick={() => this.setImage(img)}></img>
+                <img src={"img/" + img} height={50} onClick={() => this.setImage(img)} className="exampleImage"></img>
               </td>
             ))}
           </tr>

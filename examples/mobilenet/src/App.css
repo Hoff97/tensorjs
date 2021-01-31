@@ -14,3 +14,30 @@
   margin: 5px;
   box-shadow: 10px 5px 5px #CCC;
 }
+
+div.result {
+  font-size: 30px;
+  background-color: rgb(28, 28, 224);
+  height: 35px;
+
+  animation: fadeIn ease 0.5s;
+  color: #DDD;
+  overflow: hidden;
+}
+
+@keyframes fadeIn {
+  0% {width:0%;}
+  100% {width: 100%;}
+}
+
+td.resultList {
+  padding-left: 30px;
+}
+
+td.resultName {
+  padding-right: 20px;
+}
+
+img.exampleImage {
+  cursor: pointer;
+}
