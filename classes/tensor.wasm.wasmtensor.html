@@ -127,7 +127,7 @@
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="tensor.wasm.wasmtensor.html#gather" class="tsd-kind-icon">gather</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="tensor.wasm.wasmtensor.html#gemm" class="tsd-kind-icon">gemm</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="tensor.wasm.wasmtensor.html#gemm_impl" class="tsd-kind-icon">gemm_<wbr>impl</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="tensor.wasm.wasmtensor.html#getaxes" class="tsd-kind-icon">get<wbr>Axes</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-protected"><a href="tensor.wasm.wasmtensor.html#getaxes" class="tsd-kind-icon">get<wbr>Axes</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="tensor.wasm.wasmtensor.html#getshape" class="tsd-kind-icon">get<wbr>Shape</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="tensor.wasm.wasmtensor.html#getvalues" class="tsd-kind-icon">get<wbr>Values</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="tensor.wasm.wasmtensor.html#log" class="tsd-kind-icon">log</a></li>
@@ -184,7 +184,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="tensor.html">Tensor</a>.<a href="tensor.html#constructor">constructor</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/tensor/wasm/tensor.ts#L16">tensor/wasm/tensor.ts:16</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/tensor/wasm/tensor.ts#L16">tensor/wasm/tensor.ts:16</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -209,7 +209,7 @@
 					<div class="tsd-signature tsd-kind-icon">wasm<wbr>Tensor<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Tensor</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/tensor/wasm/tensor.ts#L16">tensor/wasm/tensor.ts:16</a></li>
+							<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/tensor/wasm/tensor.ts#L16">tensor/wasm/tensor.ts:16</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -219,7 +219,7 @@
 					<div class="tsd-signature tsd-kind-icon">pad<wbr>Mode<wbr>ToInt<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>constant<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>edge<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>reflect<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> = ...</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/tensor/wasm/tensor.ts#L209">tensor/wasm/tensor.ts:209</a></li>
+							<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/tensor/wasm/tensor.ts#L209">tensor/wasm/tensor.ts:209</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -251,7 +251,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#abs">abs</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/tensor/wasm/tensor.ts#L64">tensor/wasm/tensor.ts:64</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/tensor/wasm/tensor.ts#L64">tensor/wasm/tensor.ts:64</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
@@ -269,9 +269,32 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="tensor.html">Tensor</a>.<a href="tensor.html#add">add</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/types.ts#L229">types.ts:229</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L474">types.ts:474</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Adds two tensors. Supports broadcasting</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>example</dt>
+									<dd><pre><code class="language-typescript"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">a</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">CPUTensor</span><span style="color: #000000">([</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">],[</span><span style="color: #098658">1</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">3</span><span style="color: #000000">,</span><span style="color: #098658">4</span><span style="color: #000000">]);</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">b</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">CPUTensor</span><span style="color: #000000">([</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">],[</span><span style="color: #098658">5</span><span style="color: #000000">,</span><span style="color: #098658">6</span><span style="color: #000000">,</span><span style="color: #098658">7</span><span style="color: #000000">,</span><span style="color: #098658">8</span><span style="color: #000000">]);</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">c</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">CPUTensor</span><span style="color: #000000">([</span><span style="color: #098658">1</span><span style="color: #000000">],[</span><span style="color: #098658">2</span><span style="color: #000000">]);</span>
+
+<span style="color: #001080">a</span><span style="color: #000000">.</span><span style="color: #795E26">add</span><span style="color: #000000">(</span><span style="color: #001080">b</span><span style="color: #000000">);</span>
+<span style="color: #008000">//Will be</span>
+<span style="color: #008000">// [[6,8],</span>
+<span style="color: #008000">//  [10,12]]</span>
+
+<span style="color: #001080">a</span><span style="color: #000000">.</span><span style="color: #795E26">add</span><span style="color: #000000">(</span><span style="color: #001080">c</span><span style="color: #000000">);</span>
+<span style="color: #008000">//Will be</span>
+<span style="color: #008000">// [[3,4],</span>
+<span style="color: #008000">//  [5,6]]</span>
+</code></pre>
+									</dd>
+								</dl>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
@@ -293,7 +316,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#add_impl">add_impl</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/tensor/wasm/tensor.ts#L68">tensor/wasm/tensor.ts:68</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/tensor/wasm/tensor.ts#L68">tensor/wasm/tensor.ts:68</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -323,7 +346,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="tensor.html">Tensor</a>.<a href="tensor.html#alignshapes">alignShapes</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/types.ts#L181">types.ts:181</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L399">types.ts:399</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -350,13 +373,23 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="tensor.html">Tensor</a>.<a href="tensor.html#aligntensor">alignTensor</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/types.ts#L203">types.ts:203</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L428">types.ts:428</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Align the shapes of this tensor and the given tensor according to
+										the broadcasting rules:
+									<a href="https://github.com/onnx/onnx/blob/master/docs/Broadcasting.md">https://github.com/onnx/onnx/blob/master/docs/Broadcasting.md</a></p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>tensor: <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Tensor of which the shapes should be aligned</p>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-symbol">(</span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> | </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">[]</span></h4>
@@ -374,22 +407,41 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="tensor.html">Tensor</a>.<a href="tensor.html#averagepool">averagePool</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/types.ts#L130">types.ts:130</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L328">types.ts:328</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Performs average pooling over the spatial dimensions of this tensor with
+									shape [N,C,D1,D2,..]</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>kernelShape: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Size of the average pooling dimension</p>
+									</div>
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> pads: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Padding of the input specified as [startpad_D1,startpad_D2,...,startpad_DN,endpad_D1,endpad_D2,...]
+										Padding value will be 0. Defaults to 0 for all axes</p>
+									</div>
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> strides: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Stride size of the average pooling kernel. Defaults to 1 for all axes</p>
+									</div>
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> includePad: <span class="tsd-signature-type">boolean</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Wether padded values should be included in the average (or masked out). Defaults to false</p>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
@@ -407,7 +459,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#averagepool_impl">averagePool_impl</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/tensor/wasm/tensor.ts#L161">tensor/wasm/tensor.ts:161</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/tensor/wasm/tensor.ts#L161">tensor/wasm/tensor.ts:161</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -440,7 +492,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#ceil">ceil</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/tensor/wasm/tensor.ts#L227">tensor/wasm/tensor.ts:227</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/tensor/wasm/tensor.ts#L227">tensor/wasm/tensor.ts:227</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
@@ -458,7 +510,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#clip">clip</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/tensor/wasm/tensor.ts#L181">tensor/wasm/tensor.ts:181</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/tensor/wasm/tensor.ts#L181">tensor/wasm/tensor.ts:181</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -485,16 +537,46 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="tensor.html">Tensor</a>.<a href="tensor.html#compare">compare</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/types.ts#L15">types.ts:15</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L61">types.ts:61</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Compares this tensor to another tensor.</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>example</dt>
+									<dd><pre><code class="language-typescript"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">a</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">CPUTensor</span><span style="color: #000000">([</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">], [</span><span style="color: #098658">1</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">3</span><span style="color: #000000">,</span><span style="color: #098658">4</span><span style="color: #000000">]);</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">b</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">CPUTensor</span><span style="color: #000000">([</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">], [</span><span style="color: #098658">1.1</span><span style="color: #000000">,</span><span style="color: #098658">2.1</span><span style="color: #000000">,</span><span style="color: #098658">2.9</span><span style="color: #000000">,</span><span style="color: #098658">4.05</span><span style="color: #000000">]);</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">c</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">CPUTensor</span><span style="color: #000000">([</span><span style="color: #098658">4</span><span style="color: #000000">], [</span><span style="color: #098658">1</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">3</span><span style="color: #000000">,</span><span style="color: #098658">4</span><span style="color: #000000">]);</span>
+<span style="color: #001080">a</span><span style="color: #000000">.</span><span style="color: #795E26">compare</span><span style="color: #000000">(</span><span style="color: #001080">b</span><span style="color: #000000">, </span><span style="color: #098658">0.5</span><span style="color: #000000">).</span><span style="color: #795E26">then</span><span style="color: #000000">(</span><span style="color: #001080">equal</span><span style="color: #000000"> </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #000000"> </span><span style="color: #008000">//equal will be true</span>
+<span style="color: #000000">});</span>
+
+<span style="color: #001080">a</span><span style="color: #000000">.</span><span style="color: #795E26">compare</span><span style="color: #000000">(</span><span style="color: #001080">b</span><span style="color: #000000">).</span><span style="color: #795E26">then</span><span style="color: #000000">(</span><span style="color: #001080">equal</span><span style="color: #000000"> </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #000000"> </span><span style="color: #008000">//equal will be false</span>
+<span style="color: #000000">});</span>
+
+<span style="color: #001080">a</span><span style="color: #000000">.</span><span style="color: #795E26">compare</span><span style="color: #000000">(</span><span style="color: #001080">c</span><span style="color: #000000">).</span><span style="color: #795E26">then</span><span style="color: #000000">(</span><span style="color: #001080">equal</span><span style="color: #000000"> </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #000000"> </span><span style="color: #008000">//equal will be false since the shapes of the tensors do not match</span>
+<span style="color: #000000">});</span>
+</code></pre>
+									</dd>
+								</dl>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>tensor: <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Tensor to compare to</p>
+									</div>
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> epsilon: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Optional maximum difference between the tensors. If not specified the tensors have to be exactly equal</p>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -512,7 +594,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#concat">concat</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/tensor/wasm/tensor.ts#L170">tensor/wasm/tensor.ts:170</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/tensor/wasm/tensor.ts#L170">tensor/wasm/tensor.ts:170</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -532,35 +614,66 @@
 					<a name="conv" class="tsd-anchor"></a>
 					<h3>conv</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
-						<li class="tsd-signature tsd-kind-icon">conv<span class="tsd-signature-symbol">(</span>kernel<span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a>, bias<span class="tsd-signature-symbol">?: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a>, dilations<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span>, group<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span>, pads<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span>, strides<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></li>
+						<li class="tsd-signature tsd-kind-icon">conv<span class="tsd-signature-symbol">(</span>kernel<span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a>, bias<span class="tsd-signature-symbol">?: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a>, dilations<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span>, group<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span>, pads<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span>, strides<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span>, activation<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Activation</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="tensor.html">Tensor</a>.<a href="tensor.html#conv">conv</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/types.ts#L101">types.ts:101</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L252">types.ts:252</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Convolves this tensor with the specified kernel.</p>
+								</div>
+								<p>This tensor should have shape [N,C,D1,D2,...] where D1,D2,... are the spatial dimensions.</p>
+								<p>Behaves according to <a href="https://github.com/onnx/onnx/blob/master/docs/Operators.md#Conv">https://github.com/onnx/onnx/blob/master/docs/Operators.md#Conv</a></p>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>kernel: <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Convolution kernel with shape [M,C/G,K1,K2] where G is the group parameter</p>
+									</div>
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> bias: <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Optional bias to add to the result with shape [M]</p>
+									</div>
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> dilations: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Per axis dilations for the spatial dimension. Defaults to 1 for all axes</p>
+									</div>
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> group: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Group parameter</p>
+									</div>
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> pads: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Padding to add to the input for each spatial dimension. Defaults to 0 for all axes</p>
+									</div>
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> strides: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Convolution stride for each spatial dimension. Defaults to 1 for all axes</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> activation: <span class="tsd-signature-type">Activation</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Optional activation to apply. Defaults to the identity (so no activation)</p>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
@@ -578,7 +691,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#conv_impl">conv_impl</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/tensor/wasm/tensor.ts#L150">tensor/wasm/tensor.ts:150</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/tensor/wasm/tensor.ts#L150">tensor/wasm/tensor.ts:150</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -617,7 +730,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#copy">copy</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/tensor/wasm/tensor.ts#L48">tensor/wasm/tensor.ts:48</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/tensor/wasm/tensor.ts#L48">tensor/wasm/tensor.ts:48</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
@@ -635,7 +748,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#delete">delete</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/tensor/wasm/tensor.ts#L43">tensor/wasm/tensor.ts:43</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/tensor/wasm/tensor.ts#L43">tensor/wasm/tensor.ts:43</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -653,9 +766,32 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="tensor.html">Tensor</a>.<a href="tensor.html#divide">divide</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/types.ts#L244">types.ts:244</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L549">types.ts:549</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Divides two tensors. Supports broadcasting</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>example</dt>
+									<dd><pre><code class="language-typescript"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">a</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">CPUTensor</span><span style="color: #000000">([</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">],[</span><span style="color: #098658">5</span><span style="color: #000000">,</span><span style="color: #098658">6</span><span style="color: #000000">,</span><span style="color: #098658">7</span><span style="color: #000000">,</span><span style="color: #098658">8</span><span style="color: #000000">]);</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">b</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">CPUTensor</span><span style="color: #000000">([</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">],[</span><span style="color: #098658">1</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">3</span><span style="color: #000000">,</span><span style="color: #098658">4</span><span style="color: #000000">]);</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">c</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">CPUTensor</span><span style="color: #000000">([</span><span style="color: #098658">1</span><span style="color: #000000">],[</span><span style="color: #098658">2</span><span style="color: #000000">]);</span>
+
+<span style="color: #001080">a</span><span style="color: #000000">.</span><span style="color: #795E26">divide</span><span style="color: #000000">(</span><span style="color: #001080">b</span><span style="color: #000000">);</span>
+<span style="color: #008000">//Will be</span>
+<span style="color: #008000">// [[5,3],</span>
+<span style="color: #008000">//  [2.333,2]]</span>
+
+<span style="color: #001080">a</span><span style="color: #000000">.</span><span style="color: #795E26">divide</span><span style="color: #000000">(</span><span style="color: #001080">c</span><span style="color: #000000">);</span>
+<span style="color: #008000">//Will be</span>
+<span style="color: #008000">// [[2.5,3],</span>
+<span style="color: #008000">//  [3.5,4]]</span>
+</code></pre>
+									</dd>
+								</dl>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
@@ -677,7 +813,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#divide_impl">divide_impl</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/tensor/wasm/tensor.ts#L90">tensor/wasm/tensor.ts:90</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/tensor/wasm/tensor.ts#L90">tensor/wasm/tensor.ts:90</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -707,7 +843,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#exp">exp</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/tensor/wasm/tensor.ts#L52">tensor/wasm/tensor.ts:52</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/tensor/wasm/tensor.ts#L52">tensor/wasm/tensor.ts:52</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
@@ -725,7 +861,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#expand">expand</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/tensor/wasm/tensor.ts#L196">tensor/wasm/tensor.ts:196</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/tensor/wasm/tensor.ts#L196">tensor/wasm/tensor.ts:196</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -749,7 +885,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#floor">floor</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/tensor/wasm/tensor.ts#L223">tensor/wasm/tensor.ts:223</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/tensor/wasm/tensor.ts#L223">tensor/wasm/tensor.ts:223</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
@@ -767,7 +903,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#gather">gather</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/tensor/wasm/tensor.ts#L219">tensor/wasm/tensor.ts:219</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/tensor/wasm/tensor.ts#L219">tensor/wasm/tensor.ts:219</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -794,28 +930,54 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="tensor.html">Tensor</a>.<a href="tensor.html#gemm">gemm</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/types.ts#L282">types.ts:282</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L639">types.ts:639</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Calculates the general matrix product.
+									<a href="https://en.wikipedia.org/wiki/Basic_Linear_Algebra_Subprograms#Level_3">https://en.wikipedia.org/wiki/Basic_Linear_Algebra_Subprograms#Level_3</a></p>
+								</div>
+								<p>A and B can have batch dimensions. Their last two dimensions should
+								correspond to the dimensions for the matrix product</p>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>b: <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Second matrix for the matrix product</p>
+									</div>
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> aTranspose: <span class="tsd-signature-type">boolean</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>If the last two dimensions of a are transposed. Defaults to false</p>
+									</div>
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> bTranspose: <span class="tsd-signature-type">boolean</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>If the last two dimensions of a are transposed. Defaults to false</p>
+									</div>
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> alpha: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Alpha parameter. Defaults to 1.0</p>
+									</div>
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> c: <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Optional tensor to add to the result.</p>
+									</div>
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> beta: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Beta parameter, only used if c is specified. Defaults to 1.0</p>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
@@ -833,7 +995,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#gemm_impl">gemm_impl</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/tensor/wasm/tensor.ts#L111">tensor/wasm/tensor.ts:111</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/tensor/wasm/tensor.ts#L111">tensor/wasm/tensor.ts:111</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -861,10 +1023,10 @@
 						</li>
 					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-protected">
 					<a name="getaxes" class="tsd-anchor"></a>
-					<h3>get<wbr>Axes</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+					<h3><span class="tsd-flag ts-flagProtected">Protected</span> get<wbr>Axes</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-protected">
 						<li class="tsd-signature tsd-kind-icon">get<wbr>Axes<span class="tsd-signature-symbol">(</span>axes<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
@@ -872,7 +1034,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="tensor.html">Tensor</a>.<a href="tensor.html#getaxes">getAxes</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/types.ts#L40">types.ts:40</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L86">types.ts:86</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -896,7 +1058,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#getshape">getShape</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/tensor/wasm/tensor.ts#L35">tensor/wasm/tensor.ts:35</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/tensor/wasm/tensor.ts#L35">tensor/wasm/tensor.ts:35</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h4>
@@ -914,7 +1076,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#getvalues">getValues</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/tensor/wasm/tensor.ts#L31">tensor/wasm/tensor.ts:31</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/tensor/wasm/tensor.ts#L31">tensor/wasm/tensor.ts:31</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Float32Array</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -932,7 +1094,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#log">log</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/tensor/wasm/tensor.ts#L56">tensor/wasm/tensor.ts:56</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/tensor/wasm/tensor.ts#L56">tensor/wasm/tensor.ts:56</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
@@ -950,7 +1112,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#matmul">matMul</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/tensor/wasm/tensor.ts#L104">tensor/wasm/tensor.ts:104</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/tensor/wasm/tensor.ts#L104">tensor/wasm/tensor.ts:104</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -974,16 +1136,38 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="tensor.html">Tensor</a>.<a href="tensor.html#max">max</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/types.ts#L75">types.ts:75</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L177">types.ts:177</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Takes the maximum over specified axis/axes.</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>example</dt>
+									<dd><pre><code class="language-typescript"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">a</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">CPUTensor</span><span style="color: #000000">([</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">3</span><span style="color: #000000">], [</span><span style="color: #098658">1</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">3</span><span style="color: #000000">,</span><span style="color: #098658">4</span><span style="color: #000000">,</span><span style="color: #098658">5</span><span style="color: #000000">,</span><span style="color: #098658">6</span><span style="color: #000000">]);</span>
+
+<span style="color: #001080">a</span><span style="color: #000000">.</span><span style="color: #795E26">max</span><span style="color: #000000">(); </span><span style="color: #008000">//Will be [6]</span>
+<span style="color: #001080">a</span><span style="color: #000000">.</span><span style="color: #795E26">max</span><span style="color: #000000">(</span><span style="color: #098658">0</span><span style="color: #000000">); </span><span style="color: #008000">//Will be [4,5,6]</span>
+<span style="color: #001080">a</span><span style="color: #000000">.</span><span style="color: #795E26">max</span><span style="color: #000000">(</span><span style="color: #098658">1</span><span style="color: #000000">); </span><span style="color: #008000">//Will [3,6]</span>
+<span style="color: #001080">a</span><span style="color: #000000">.</span><span style="color: #795E26">max</span><span style="color: #000000">(</span><span style="color: #098658">0</span><span style="color: #000000">, </span><span style="color: #0000FF">true</span><span style="color: #000000">); </span><span style="color: #008000">//Will be [[4,5,6]]</span>
+</code></pre>
+									</dd>
+								</dl>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> axes: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>One or multiple axes to take the maximum over. If not specified this will be all axes</p>
+									</div>
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> keepDims: <span class="tsd-signature-type">boolean</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Wether the maximum axes will be kept with size 1</p>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
@@ -1001,7 +1185,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#max_impl">max_impl</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/tensor/wasm/tensor.ts#L134">tensor/wasm/tensor.ts:134</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/tensor/wasm/tensor.ts#L134">tensor/wasm/tensor.ts:134</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1028,16 +1212,38 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="tensor.html">Tensor</a>.<a href="tensor.html#min">min</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/types.ts#L81">types.ts:81</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L199">types.ts:199</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Takes the minimum over specified axis/axes.</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>example</dt>
+									<dd><pre><code class="language-typescript"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">a</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">CPUTensor</span><span style="color: #000000">([</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">3</span><span style="color: #000000">], [</span><span style="color: #098658">1</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">3</span><span style="color: #000000">,</span><span style="color: #098658">4</span><span style="color: #000000">,</span><span style="color: #098658">5</span><span style="color: #000000">,</span><span style="color: #098658">6</span><span style="color: #000000">]);</span>
+
+<span style="color: #001080">a</span><span style="color: #000000">.</span><span style="color: #795E26">min</span><span style="color: #000000">(); </span><span style="color: #008000">//Will be [1]</span>
+<span style="color: #001080">a</span><span style="color: #000000">.</span><span style="color: #795E26">min</span><span style="color: #000000">(</span><span style="color: #098658">0</span><span style="color: #000000">); </span><span style="color: #008000">//Will be [1,2,3]</span>
+<span style="color: #001080">a</span><span style="color: #000000">.</span><span style="color: #795E26">min</span><span style="color: #000000">(</span><span style="color: #098658">1</span><span style="color: #000000">); </span><span style="color: #008000">//Will [1,4]</span>
+<span style="color: #001080">a</span><span style="color: #000000">.</span><span style="color: #795E26">min</span><span style="color: #000000">(</span><span style="color: #098658">0</span><span style="color: #000000">, </span><span style="color: #0000FF">true</span><span style="color: #000000">); </span><span style="color: #008000">//Will be [[1,2,3]]</span>
+</code></pre>
+									</dd>
+								</dl>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> axes: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>One or multiple axes to take the minimum over. If not specified this will be all axes</p>
+									</div>
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> keepDims: <span class="tsd-signature-type">boolean</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Wether the minimum axes will be kept with size 1</p>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
@@ -1055,7 +1261,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#min_impl">min_impl</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/tensor/wasm/tensor.ts#L138">tensor/wasm/tensor.ts:138</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/tensor/wasm/tensor.ts#L138">tensor/wasm/tensor.ts:138</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1082,9 +1288,32 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="tensor.html">Tensor</a>.<a href="tensor.html#multiply">multiply</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/types.ts#L239">types.ts:239</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L524">types.ts:524</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Multiplies two tensors. Supports broadcasting</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>example</dt>
+									<dd><pre><code class="language-typescript"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">a</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">CPUTensor</span><span style="color: #000000">([</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">],[</span><span style="color: #098658">1</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">3</span><span style="color: #000000">,</span><span style="color: #098658">4</span><span style="color: #000000">]);</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">b</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">CPUTensor</span><span style="color: #000000">([</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">],[</span><span style="color: #098658">5</span><span style="color: #000000">,</span><span style="color: #098658">6</span><span style="color: #000000">,</span><span style="color: #098658">7</span><span style="color: #000000">,</span><span style="color: #098658">8</span><span style="color: #000000">]);</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">c</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">CPUTensor</span><span style="color: #000000">([</span><span style="color: #098658">1</span><span style="color: #000000">],[</span><span style="color: #098658">2</span><span style="color: #000000">]);</span>
+
+<span style="color: #001080">a</span><span style="color: #000000">.</span><span style="color: #795E26">multiply</span><span style="color: #000000">(</span><span style="color: #001080">b</span><span style="color: #000000">);</span>
+<span style="color: #008000">//Will be</span>
+<span style="color: #008000">// [[5,12],</span>
+<span style="color: #008000">//  [21,32]]</span>
+
+<span style="color: #001080">a</span><span style="color: #000000">.</span><span style="color: #795E26">multiply</span><span style="color: #000000">(</span><span style="color: #001080">c</span><span style="color: #000000">);</span>
+<span style="color: #008000">//Will be</span>
+<span style="color: #008000">// [[2,4]</span>
+<span style="color: #000000">    [</span><span style="color: #098658">6</span><span style="color: #000000">,</span><span style="color: #098658">8</span><span style="color: #000000">]]</span>
+</code></pre>
+									</dd>
+								</dl>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
@@ -1106,7 +1335,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#multiply_impl">multiply_impl</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/tensor/wasm/tensor.ts#L83">tensor/wasm/tensor.ts:83</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/tensor/wasm/tensor.ts#L83">tensor/wasm/tensor.ts:83</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1136,7 +1365,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#normalize">normalize</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/tensor/wasm/tensor.ts#L239">tensor/wasm/tensor.ts:239</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/tensor/wasm/tensor.ts#L239">tensor/wasm/tensor.ts:239</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1172,19 +1401,60 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="tensor.html">Tensor</a>.<a href="tensor.html#pad">pad</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/types.ts#L118">types.ts:118</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L307">types.ts:307</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Pads the input according to the padding mode. The input has shape [D1,D2,..]</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>example</dt>
+									<dd><pre><code class="language-typescript"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">a</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">CPUTensor</span><span style="color: #000000">([</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">],[</span><span style="color: #098658">1</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">3</span><span style="color: #000000">,</span><span style="color: #098658">4</span><span style="color: #000000">]);</span>
+<span style="color: #001080">a</span><span style="color: #000000">.</span><span style="color: #795E26">pad</span><span style="color: #000000">([</span><span style="color: #098658">1</span><span style="color: #000000">,</span><span style="color: #098658">1</span><span style="color: #000000">,</span><span style="color: #098658">1</span><span style="color: #000000">,</span><span style="color: #098658">1</span><span style="color: #000000">],</span><span style="color: #A31515">&#039;constant&#039;</span><span style="color: #000000">,</span><span style="color: #098658">5</span><span style="color: #000000">);</span>
+<span style="color: #008000">//Result will be:</span>
+<span style="color: #008000">// [[5,5,5,5],</span>
+<span style="color: #008000">//  [5,1,2,5],</span>
+<span style="color: #008000">//  [5,3,4,5],</span>
+<span style="color: #008000">//  [5,5,5,5]]</span>
+<span style="color: #001080">a</span><span style="color: #000000">.</span><span style="color: #795E26">pad</span><span style="color: #000000">([</span><span style="color: #098658">1</span><span style="color: #000000">,</span><span style="color: #098658">1</span><span style="color: #000000">,</span><span style="color: #098658">1</span><span style="color: #000000">,</span><span style="color: #098658">1</span><span style="color: #000000">],</span><span style="color: #A31515">&#039;edge&#039;</span><span style="color: #000000">);</span>
+<span style="color: #008000">//Result will be:</span>
+<span style="color: #008000">// [[1,1,2,2],</span>
+<span style="color: #008000">//  [1,1,2,2],</span>
+<span style="color: #008000">//  [3,3,4,4],</span>
+<span style="color: #008000">//  [3,3,4,4]]</span>
+
+<span style="color: #001080">a</span><span style="color: #000000">.</span><span style="color: #795E26">pad</span><span style="color: #000000">([</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">],</span><span style="color: #A31515">&#039;reflect&#039;</span><span style="color: #000000">);</span>
+<span style="color: #008000">//Result will be:</span>
+<span style="color: #008000">// [[4,3,3,4,4,3],</span>
+<span style="color: #008000">//  [2,1,1,2,2,1],</span>
+<span style="color: #008000">//  [2,1,1,2,2,1],</span>
+<span style="color: #008000">//  [4,3,3,4,4,3],</span>
+<span style="color: #008000">//  [4,3,3,4,4,3],</span>
+<span style="color: #008000">//  [2,1,1,2,2,1]]</span>
+</code></pre>
+									</dd>
+								</dl>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>pads: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Padding size of each input. Specified as [startpad_D1,startpad_D2,...,startpad_DN,endpad_D1,endpad_D2,...]</p>
+									</div>
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> mode: <span class="tsd-signature-type">PadMode</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Padding mode. One of &#39;constant&#39;, &#39;edge&#39;, &#39;reflect&#39;. Defaults to &#39;constant&#39;</p>
+									</div>
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> value: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Value for constant padding. Defaults to 0.0</p>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
@@ -1202,7 +1472,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#pad_impl">pad_impl</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/tensor/wasm/tensor.ts#L215">tensor/wasm/tensor.ts:215</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/tensor/wasm/tensor.ts#L215">tensor/wasm/tensor.ts:215</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1232,9 +1502,32 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="tensor.html">Tensor</a>.<a href="tensor.html#power">power</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/types.ts#L249">types.ts:249</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L574">types.ts:574</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Takes the positionwise power. Supports broadcasting</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>example</dt>
+									<dd><pre><code class="language-typescript"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">a</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">CPUTensor</span><span style="color: #000000">([</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">],[</span><span style="color: #098658">5</span><span style="color: #000000">,</span><span style="color: #098658">6</span><span style="color: #000000">,</span><span style="color: #098658">7</span><span style="color: #000000">,</span><span style="color: #098658">8</span><span style="color: #000000">]);</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">b</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">CPUTensor</span><span style="color: #000000">([</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">],[</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">3</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">3</span><span style="color: #000000">]);</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">c</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">CPUTensor</span><span style="color: #000000">([</span><span style="color: #098658">1</span><span style="color: #000000">],[</span><span style="color: #098658">2</span><span style="color: #000000">]);</span>
+
+<span style="color: #001080">a</span><span style="color: #000000">.</span><span style="color: #795E26">power</span><span style="color: #000000">(</span><span style="color: #001080">b</span><span style="color: #000000">);</span>
+<span style="color: #008000">//Will be</span>
+<span style="color: #008000">// [[25,216],</span>
+<span style="color: #008000">//  [49,512]]</span>
+
+<span style="color: #001080">a</span><span style="color: #000000">.</span><span style="color: #795E26">power</span><span style="color: #000000">(</span><span style="color: #001080">c</span><span style="color: #000000">);</span>
+<span style="color: #008000">//Will be</span>
+<span style="color: #008000">// [[25,36],</span>
+<span style="color: #008000">//  [49,64]]</span>
+</code></pre>
+									</dd>
+								</dl>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
@@ -1256,7 +1549,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#power_impl">power_impl</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/tensor/wasm/tensor.ts#L97">tensor/wasm/tensor.ts:97</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/tensor/wasm/tensor.ts#L97">tensor/wasm/tensor.ts:97</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1286,16 +1579,38 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="tensor.html">Tensor</a>.<a href="tensor.html#product">product</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/types.ts#L69">types.ts:69</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L155">types.ts:155</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Takes the product over specified axis/axes.</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>example</dt>
+									<dd><pre><code class="language-typescript"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">a</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">CPUTensor</span><span style="color: #000000">([</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">3</span><span style="color: #000000">], [</span><span style="color: #098658">1</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">3</span><span style="color: #000000">,</span><span style="color: #098658">4</span><span style="color: #000000">,</span><span style="color: #098658">5</span><span style="color: #000000">,</span><span style="color: #098658">6</span><span style="color: #000000">]);</span>
+
+<span style="color: #001080">a</span><span style="color: #000000">.</span><span style="color: #795E26">product</span><span style="color: #000000">(); </span><span style="color: #008000">//Will be [720]</span>
+<span style="color: #001080">a</span><span style="color: #000000">.</span><span style="color: #795E26">product</span><span style="color: #000000">(</span><span style="color: #098658">0</span><span style="color: #000000">); </span><span style="color: #008000">//Will be [4,10,18]</span>
+<span style="color: #001080">a</span><span style="color: #000000">.</span><span style="color: #795E26">product</span><span style="color: #000000">(</span><span style="color: #098658">1</span><span style="color: #000000">); </span><span style="color: #008000">//Will [6,120]</span>
+<span style="color: #001080">a</span><span style="color: #000000">.</span><span style="color: #795E26">product</span><span style="color: #000000">(</span><span style="color: #098658">0</span><span style="color: #000000">, </span><span style="color: #0000FF">true</span><span style="color: #000000">); </span><span style="color: #008000">//Will be [[4,10,18]]</span>
+</code></pre>
+									</dd>
+								</dl>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> axes: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>One or multiple axes to take the product over. If not specified this will be all axes</p>
+									</div>
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> keepDims: <span class="tsd-signature-type">boolean</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Wether the product axes will be kept with size 1</p>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
@@ -1313,7 +1628,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#product_impl">product_impl</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/tensor/wasm/tensor.ts#L130">tensor/wasm/tensor.ts:130</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/tensor/wasm/tensor.ts#L130">tensor/wasm/tensor.ts:130</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1340,16 +1655,29 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="tensor.html">Tensor</a>.<a href="tensor.html#reducemean">reduceMean</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/types.ts#L87">types.ts:87</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L214">types.ts:214</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Takes the mean over the specified axis/axes.
+										This is equal to <code>a.sum(axes, keepDims).divide(sumSize)</code> (where sumSize is the number
+									of entries in the summation axes) but faster.</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> axes: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>One or multiple axes to take the mean over. If not specified this will take the mean over all axes</p>
+									</div>
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> keepDims: <span class="tsd-signature-type">boolean</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Wether the mean axes will be kept with size 1</p>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
@@ -1367,16 +1695,29 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="tensor.html">Tensor</a>.<a href="tensor.html#reducemeansquare">reduceMeanSquare</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/types.ts#L94">types.ts:94</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L230">types.ts:230</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Takes the mean over the specified axis/axes with the entries of the tensor squared.
+										This is equal to <code>a.multiply(a).sum(axes, keepDims).divide(sumSize)</code> (where sumSize is the number
+									of entries in the summation axes) but faster.</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> axes: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>One or multiple axes to take the mean over. If not specified this will take the mean over all axes</p>
+									</div>
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> keepDims: <span class="tsd-signature-type">boolean</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Wether the mean axes will be kept with size 1</p>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
@@ -1394,7 +1735,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#reducemeansquare_impl">reduceMeanSquare_impl</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/tensor/wasm/tensor.ts#L146">tensor/wasm/tensor.ts:146</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/tensor/wasm/tensor.ts#L146">tensor/wasm/tensor.ts:146</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1421,7 +1762,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#reducemean_impl">reduceMean_impl</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/tensor/wasm/tensor.ts#L142">tensor/wasm/tensor.ts:142</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/tensor/wasm/tensor.ts#L142">tensor/wasm/tensor.ts:142</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1448,7 +1789,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#repeat">repeat</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/tensor/wasm/tensor.ts#L192">tensor/wasm/tensor.ts:192</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/tensor/wasm/tensor.ts#L192">tensor/wasm/tensor.ts:192</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1472,16 +1813,28 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="tensor.html">Tensor</a>.<a href="tensor.html#reshape">reshape</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/types.ts#L144">types.ts:144</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L350">types.ts:350</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Reshape the tensor to the specified shape</p>
+								</div>
+								<p>At most one value in the shape can be -1, which will be replaced by the inferred size for this dimension.</p>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>shape: <span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>New shape of the tensor</p>
+									</div>
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> copy: <span class="tsd-signature-type">boolean</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Wether the tensor values should be copied. Only has an effect on GPU tensors</p>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
@@ -1499,7 +1852,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#reshape_impl">reshape_impl</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/tensor/wasm/tensor.ts#L165">tensor/wasm/tensor.ts:165</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/tensor/wasm/tensor.ts#L165">tensor/wasm/tensor.ts:165</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1523,19 +1876,48 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="tensor.html">Tensor</a>.<a href="tensor.html#slice">slice</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/types.ts#L302">types.ts:302</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L680">types.ts:680</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Takes a slice of the tensor along the specified axes.</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>example</dt>
+									<dd><pre><code class="language-typescript"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">a</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">CPUTensor</span><span style="color: #000000">([</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">],[</span><span style="color: #098658">5</span><span style="color: #000000">,</span><span style="color: #098658">6</span><span style="color: #000000">,</span><span style="color: #098658">7</span><span style="color: #000000">,</span><span style="color: #098658">8</span><span style="color: #000000">]);</span>
+
+<span style="color: #001080">a</span><span style="color: #000000">.</span><span style="color: #795E26">slice</span><span style="color: #000000">([</span><span style="color: #098658">0</span><span style="color: #000000">],[</span><span style="color: #098658">1</span><span style="color: #000000">],[</span><span style="color: #098658">0</span><span style="color: #000000">]);</span>
+<span style="color: #008000">//Will be</span>
+<span style="color: #008000">// [[5,6]]</span>
+
+<span style="color: #001080">a</span><span style="color: #000000">.</span><span style="color: #795E26">slice</span><span style="color: #000000">([</span><span style="color: #098658">0</span><span style="color: #000000">],[</span><span style="color: #098658">1</span><span style="color: #000000">],[</span><span style="color: #098658">1</span><span style="color: #000000">]);</span>
+<span style="color: #008000">//Will be</span>
+<span style="color: #008000">// [[5],</span>
+<span style="color: #000000">    [</span><span style="color: #098658">6</span><span style="color: #000000">]]</span>
+</code></pre>
+									</dd>
+								</dl>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>starts: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Start of the slice for each axis</p>
+									</div>
 								</li>
 								<li>
 									<h5>ends: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>End of the slice for each axis - Exclusive (the end index will not be included in the slice)</p>
+									</div>
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> axes: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Axes to slice. Defaults to all axes</p>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
@@ -1553,7 +1935,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#slice_impl">slice_impl</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/tensor/wasm/tensor.ts#L231">tensor/wasm/tensor.ts:231</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/tensor/wasm/tensor.ts#L231">tensor/wasm/tensor.ts:231</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1583,9 +1965,15 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="tensor.html">Tensor</a>.<a href="tensor.html#softmax">softmax</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/types.ts#L266">types.ts:266</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L609">types.ts:609</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Takes the softmax along the given axis
+									<a href="https://en.wikipedia.org/wiki/Softmax_function">https://en.wikipedia.org/wiki/Softmax_function</a></p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
@@ -1607,7 +1995,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#sqrt">sqrt</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/tensor/wasm/tensor.ts#L60">tensor/wasm/tensor.ts:60</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/tensor/wasm/tensor.ts#L60">tensor/wasm/tensor.ts:60</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
@@ -1625,9 +2013,32 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="tensor.html">Tensor</a>.<a href="tensor.html#subtract">subtract</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/types.ts#L234">types.ts:234</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L499">types.ts:499</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Subtracts two tensors. Supports broadcasting</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>example</dt>
+									<dd><pre><code class="language-typescript"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">a</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">CPUTensor</span><span style="color: #000000">([</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">],[</span><span style="color: #098658">5</span><span style="color: #000000">,</span><span style="color: #098658">6</span><span style="color: #000000">,</span><span style="color: #098658">7</span><span style="color: #000000">,</span><span style="color: #098658">8</span><span style="color: #000000">]);</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">b</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">CPUTensor</span><span style="color: #000000">([</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">],[</span><span style="color: #098658">1</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">3</span><span style="color: #000000">,</span><span style="color: #098658">4</span><span style="color: #000000">]);</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">c</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">CPUTensor</span><span style="color: #000000">([</span><span style="color: #098658">1</span><span style="color: #000000">],[</span><span style="color: #098658">2</span><span style="color: #000000">]);</span>
+
+<span style="color: #001080">a</span><span style="color: #000000">.</span><span style="color: #795E26">subtract</span><span style="color: #000000">(</span><span style="color: #001080">b</span><span style="color: #000000">);</span>
+<span style="color: #008000">//Will be</span>
+<span style="color: #008000">// [[4,4],</span>
+<span style="color: #008000">//  [4,4]]</span>
+
+<span style="color: #001080">a</span><span style="color: #000000">.</span><span style="color: #795E26">subtract</span><span style="color: #000000">(</span><span style="color: #001080">c</span><span style="color: #000000">);</span>
+<span style="color: #008000">//Will be</span>
+<span style="color: #008000">// [[3,4],</span>
+<span style="color: #008000">//  [5,6]]</span>
+</code></pre>
+									</dd>
+								</dl>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
@@ -1649,7 +2060,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#subtract_impl">subtract_impl</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/tensor/wasm/tensor.ts#L76">tensor/wasm/tensor.ts:76</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/tensor/wasm/tensor.ts#L76">tensor/wasm/tensor.ts:76</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1679,16 +2090,38 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="tensor.html">Tensor</a>.<a href="tensor.html#sum">sum</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/types.ts#L57">types.ts:57</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L119">types.ts:119</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Sums over the specified axis/axes.</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>example</dt>
+									<dd><pre><code class="language-typescript"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">a</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">CPUTensor</span><span style="color: #000000">([</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">3</span><span style="color: #000000">], [</span><span style="color: #098658">1</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">3</span><span style="color: #000000">,</span><span style="color: #098658">4</span><span style="color: #000000">,</span><span style="color: #098658">5</span><span style="color: #000000">,</span><span style="color: #098658">6</span><span style="color: #000000">]);</span>
+
+<span style="color: #001080">a</span><span style="color: #000000">.</span><span style="color: #795E26">sum</span><span style="color: #000000">(); </span><span style="color: #008000">//Will be [21]</span>
+<span style="color: #001080">a</span><span style="color: #000000">.</span><span style="color: #795E26">sum</span><span style="color: #000000">(</span><span style="color: #098658">0</span><span style="color: #000000">); </span><span style="color: #008000">//Will be [5,7,9]</span>
+<span style="color: #001080">a</span><span style="color: #000000">.</span><span style="color: #795E26">sum</span><span style="color: #000000">(</span><span style="color: #098658">1</span><span style="color: #000000">); </span><span style="color: #008000">//Will [6,15]</span>
+<span style="color: #001080">a</span><span style="color: #000000">.</span><span style="color: #795E26">sum</span><span style="color: #000000">(</span><span style="color: #098658">0</span><span style="color: #000000">, </span><span style="color: #0000FF">true</span><span style="color: #000000">); </span><span style="color: #008000">//Will be [[5,7,9]]</span>
+</code></pre>
+									</dd>
+								</dl>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> axes: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>One or multiple axes to sum over. If not specified this will sum over all axes</p>
+									</div>
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> keepDims: <span class="tsd-signature-type">boolean</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Wether the summation axes will be kept with size 1</p>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
@@ -1706,16 +2139,28 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="tensor.html">Tensor</a>.<a href="tensor.html#sumsquare">sumSquare</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/types.ts#L63">types.ts:63</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L133">types.ts:133</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Sums over the specified axis/axes with the entries of the tensor squared.
+									This is equal to <code>a.multiply(a).sum(axes, keepDims)</code> but faster</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> axes: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>One or multiple axes to sum over. If not specified this will sum over all axes</p>
+									</div>
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> keepDims: <span class="tsd-signature-type">boolean</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Wether the summation axes will be kept with size 1</p>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
@@ -1733,7 +2178,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#sumsquare_impl">sumSquare_impl</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/tensor/wasm/tensor.ts#L126">tensor/wasm/tensor.ts:126</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/tensor/wasm/tensor.ts#L126">tensor/wasm/tensor.ts:126</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1760,7 +2205,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#sum_impl">sum_impl</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/tensor/wasm/tensor.ts#L122">tensor/wasm/tensor.ts:122</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/tensor/wasm/tensor.ts#L122">tensor/wasm/tensor.ts:122</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1787,13 +2232,32 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="tensor.html">Tensor</a>.<a href="tensor.html#transpose">transpose</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/types.ts#L254">types.ts:254</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L593">types.ts:593</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Transposes the tensor according to the given permutation</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>example</dt>
+									<dd><pre><code class="language-typescript"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">a</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">CPUTensor</span><span style="color: #000000">([</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">],[</span><span style="color: #098658">5</span><span style="color: #000000">,</span><span style="color: #098658">6</span><span style="color: #000000">,</span><span style="color: #098658">7</span><span style="color: #000000">,</span><span style="color: #098658">8</span><span style="color: #000000">]);</span>
+
+<span style="color: #001080">a</span><span style="color: #000000">.</span><span style="color: #795E26">transpose</span><span style="color: #000000">();</span>
+<span style="color: #008000">//Will be</span>
+<span style="color: #008000">// [[5,7],</span>
+<span style="color: #008000">//  [6,8]]</span>
+</code></pre>
+									</dd>
+								</dl>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> permutation: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Permutation for the axes. Default is the reverse axis order</p>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
@@ -1811,7 +2275,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#transpose_impl">transpose_impl</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/tensor/wasm/tensor.ts#L177">tensor/wasm/tensor.ts:177</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/tensor/wasm/tensor.ts#L177">tensor/wasm/tensor.ts:177</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1835,7 +2299,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="tensor.html">Tensor</a>.<a href="tensor.html#upsample">upsample</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/tensor/wasm/tensor.ts#L235">tensor/wasm/tensor.ts:235</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/tensor/wasm/tensor.ts#L235">tensor/wasm/tensor.ts:235</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1858,7 +2322,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/903db6a/lib/tensor/wasm/tensor.ts#L39">tensor/wasm/tensor.ts:39</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/tensor/wasm/tensor.ts#L39">tensor/wasm/tensor.ts:39</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="tensor.wasm.wasmtensor.html" class="tsd-signature-type" data-tsd-kind="Class">WASMTensor</a><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -1987,7 +2451,7 @@
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
 								<a href="tensor.wasm.wasmtensor.html#gemm_impl" class="tsd-kind-icon">gemm_<wbr>impl</a>
 							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-protected">
 								<a href="tensor.wasm.wasmtensor.html#getaxes" class="tsd-kind-icon">get<wbr>Axes</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
@@ -2128,6 +2592,9 @@
 			<ul class="tsd-legend">
 				<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited constructor</span></li>
 				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected method</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static property</span></li>
