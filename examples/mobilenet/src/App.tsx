@@ -3,14 +3,33 @@ import './App.css';
 import { loadModel } from './inference';
 
 import * as tjs from '@hoff97/tensor-js';
-import { GPUTensor } from '../../../dist/lib/tensor/gpu/tensor';
 import { classes } from './classes';
+
+interface Result {
+  name: string;
+  prob: number;
+}
 
 interface AppState {
   img: any;
-  scale: number;
   showResult: boolean;
+  results: Result[];
 }
+
+const imgs = [
+  "n01440764_tench.JPEG",
+  "n03160309_dam.JPEG",
+  "n03216828_dock.JPEG",
+  "n03670208_limousine.JPEG",
+  "n04548280_wall_clock.JPEG",
+  "n04552348_warplane.JPEG",
+  "n04599235_wool.JPEG",
+  "n06874185_traffic_light.JPEG",
+  "n07873807_pizza.JPEG",
+  "n07920052_espresso.JPEG",
+  "n09193705_alp.JPEG",
+  "n12620546_hip.JPEG",
+]
 
 class App extends React.Component<{}, AppState> {
   private model?: tjs.onnx.model.OnnxModel = undefined;
@@ -27,7 +46,8 @@ class App extends React.Component<{}, AppState> {
     });
 
     this.setState({
-      scale: 50
+      showResult: false,
+      results: []
     });
   }
 
@@ -66,32 +86,29 @@ class App extends React.Component<{}, AppState> {
     shifted.delete();
     const reshaped = norm.reshape([1,3,croppedSize,croppedSize], false);
 
-    console.log('Doing forward pass');
-    console.log(reshaped.getShape())
     this.model?.forward([reshaped]).then(result => this.handleResult(result[0]));
   }
 
-  handleResult(tensor: tjs.Tensor) {
+  async handleResult(tensor: tjs.Tensor) {
     console.log('Got result', tensor);
-
-    this.setState({
-      ...this.state,
-      showResult: true
-    });
 
     const probs = tensor.softmax(1);
     tensor.delete();
 
-    (probs as tjs.tensor.gpu.GPUTensor).copy(32).getValues().then(x => {
-      let probs = Array.from(x).map((v, i) => {
-        return {
-          prob: v,
-          name: classes[i]
-        }
-      });
+    const values = await (probs as tjs.tensor.gpu.GPUTensor).copy(32).getValues()
+    let probMap = Array.from(values).map((v, i) => {
+      return {
+        prob: v,
+        name: classes[i]
+      }
+    });
 
-      probs = probs.sort((a, b) => b.prob-a.prob);
-      console.log(probs);
+    probMap = probMap.sort((a, b) => b.prob-a.prob);
+
+    this.setState({
+      ...this.state,
+      showResult: true,
+      results: probMap.slice(0, 5)
     });
   }
 
@@ -99,47 +116,89 @@ class App extends React.Component<{}, AppState> {
     //@ts-ignore
     this.setState({
       ...this.state,
-      scale: 50,
       //@ts-ignore
       img: URL.createObjectURL(ev.target.files[0]),
-      showResult: false
+      showResult: false,
+      results: []
     });
   }
 
-  getImageWidth(scale: number) {
-    const width = Math.round(400*(scale/50) + 50);
-
-    return Math.floor(width/32)*32;
+  setImage(img: string) {
+    this.setState({
+      ...this.state,
+      //@ts-ignore
+      img: "img/" + img,
+      showResult: false,
+      results: []
+    });
   }
 
   render() {
     let img;
-    let scale = 50;
     let showResult = false;
     if (this.state) {
       img = this.state.img;
-      scale = this.state.scale || 50;
       showResult = this.state.showResult;
     }
 
-    const width = this.getImageWidth(scale);
+    const width = 400;
 
     return (
       <div className="App">
         <h1>MobilenNet Classification</h1>
         <label htmlFor="file">Choose an image:</label> <input type='file' id="file" onChange={x => this.fileSelected(x)}/><br/>
+        Or use one of the examples:
+        <table>
+          <tr>
+            {imgs.map(img => (
+              <td>
+                <img src={"img/" + img} height={50} onClick={() => this.setImage(img)}></img>
+              </td>
+            ))}
+          </tr>
+        </table>
         { img !== undefined ? (<>
-            <img id="img" src={this.state.img} alt="Your upload" width={width}/><br/>
+          <table>
+            <tr>
+              <td>
+                <img id="img" src={this.state.img} alt="Your upload" width={width}/><br/>
 
-            <button onClick={() => this.getImageData()}>Run</button><br/>
-
-            {
-              showResult ? (
-                "Result!"
-              ) : (<></>)
-            }
+                <button onClick={() => this.getImageData()}>Run</button><br/>
+              </td>
+              <td className="resultList">
+                {
+                  showResult ? (
+                    this.renderResults()
+                  ) : (<></>)
+                }
+              </td>
+            </tr>
+          </table>
           </>) : (<></>)}
       </div>
+    );
+  }
+
+  renderResults() {
+    const barSize = 400;
+
+    return (
+      <>
+       <table>
+         {this.state.results.map(x => (
+           <tr key={x.name}>
+             <td className="resultName">{x.name}</td>
+             <td>
+                <div style={{ width: x.prob*barSize }}>
+                  <div className="result">
+                    { x.prob*barSize > 50 ? Math.round(x.prob*100) + '%' : (<></>)}
+                  </div>
+                </div>
+              </td>
+           </tr>
+         ))}
+       </table>
+      </>
     );
   }
 }
