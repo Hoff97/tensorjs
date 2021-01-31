@@ -1,12 +1,8 @@
 import Long from 'long';
 import {onnx} from 'onnx-proto';
-import { PrototypeTensor } from '../tensor/cpu/prototype';
-import { gl, glContext } from '../tensor/gpu/gl';
-import { GPUMemoryAllocator } from '../tensor/gpu/memory';
-import { GPUTensor } from '../tensor/gpu/tensor';
+import { glContext } from '../tensor/gpu/gl';
 import Tensor, { Precision } from '../types';
 import { toCPU, toGPU, toWASM } from '../util/convert';
-import { Dict } from '../util/datastructs/dict';
 import { OnnxNode } from './node';
 import { ConstantNode } from './nodes/constant';
 import { defaultOptimizations } from './optimizations/default';
