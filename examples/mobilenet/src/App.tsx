@@ -3,101 +3,142 @@ import './App.css';
 import { loadModel } from './inference';
 
 import * as tjs from '@hoff97/tensor-js';
+import { GPUTensor } from '../../../dist/lib/tensor/gpu/tensor';
+import { classes } from './classes';
 
-class App extends React.Component {
+interface AppState {
+  img: any;
+  scale: number;
+  showResult: boolean;
+}
+
+class App extends React.Component<{}, AppState> {
   private model?: tjs.onnx.model.OnnxModel = undefined;
-  private modelCompiled = false;
 
-  private scale = new tjs.tensor.gpu.GPUTensor(new Float32Array([255]), [1], 16);
-
-  private videoTensor?: tjs.tensor.gpu.GPUTensor;
+  private mean = new tjs.tensor.gpu.GPUTensor(new Float32Array([0.485, 0.456, 0.406]), [3,1,1], 16);
+  private std = new tjs.tensor.gpu.GPUTensor(new Float32Array([0.229, 0.224, 0.225]), [3,1,1], 16);
 
   constructor(props: {}) {
     super(props);
 
-    loadModel('mobilenetv2-7').then(x => {
-      if (x !== undefined) {
-        this.model = x;
+    loadModel('mobilenet').then(x => {
+      this.model = x;
+      console.log('Got model');
+    });
 
-        this.getVideo();
-      }
+    this.setState({
+      scale: 50
     });
   }
 
-  async getVideo() {
-    const video: HTMLVideoElement = (document.querySelector("#videoElement") as any);
+  async getImageData() {
+    const el = document.getElementById("img") as HTMLImageElement;
 
-    if (navigator.mediaDevices.getUserMedia) {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          height: 224,
-          width: 224
+    console.log('Reading pixels');
+    const tensor = tjs.tensor.gpu.GPUTensor.fromData(el, 16);
+
+    let [height, width] = tensor.shape.slice(0,2);
+
+    const cropSize = Math.min(width, height);
+    const halfSize = Math.floor(cropSize/2);
+
+    const widthSliceStart = Math.floor(width/2) - halfSize;
+    const heightSliceStart = Math.floor(height/2) - halfSize;
+
+    const sliced = tensor.slice([heightSliceStart, widthSliceStart,0], [heightSliceStart + cropSize,widthSliceStart + cropSize,3], [0,1,2]);
+    tensor.delete();
+
+    const scale = 224/cropSize;
+    const scaled = sliced.upsample([scale,scale,1]);
+    sliced.delete();
+
+    const croppedSize = scaled.getShape()[0];
+
+    this.setState({
+      ...this.state
+    });
+
+    const transposed = scaled.transpose([2, 0, 1]);
+    scaled.delete();
+    const shifted = transposed.subtract(this.mean);
+    transposed.delete();
+    const norm = shifted.divide(this.std);
+    shifted.delete();
+    const reshaped = norm.reshape([1,3,croppedSize,croppedSize], false);
+
+    console.log('Doing forward pass');
+    console.log(reshaped.getShape())
+    this.model?.forward([reshaped]).then(result => this.handleResult(result[0]));
+  }
+
+  handleResult(tensor: tjs.Tensor) {
+    console.log('Got result', tensor);
+
+    this.setState({
+      ...this.state,
+      showResult: true
+    });
+
+    const probs = tensor.softmax(1);
+    tensor.delete();
+
+    (probs as tjs.tensor.gpu.GPUTensor).copy(32).getValues().then(x => {
+      let probs = Array.from(x).map((v, i) => {
+        return {
+          prob: v,
+          name: classes[i]
         }
       });
-      video.srcObject = stream;
 
-      setTimeout(() => {
-        this.videoTensor = tjs.tensor.gpu.GPUTensor.fromData(video, 16);
-
-        this.compileModel();
-      }, 500);
-    }
+      probs = probs.sort((a, b) => b.prob-a.prob);
+      console.log(probs);
+    });
   }
 
-  prepareVideo() {
-    if (this.videoTensor !== undefined) {
-      let [height, width] = this.videoTensor.shape.slice(0,2);
-
-      const sliced = this.videoTensor.slice([0], [3], [2]);
-
-      const transposed = sliced.transpose([2, 0, 1]);
-      sliced.delete();
-      const multiplied = transposed.multiply(this.scale)
-      transposed.delete();
-
-      const reshaped = multiplied.reshape([1,3,height,width], false);
-      return reshaped;
-    }
-  }
-
-  async compileModel() {
-    if (this.videoTensor !== undefined && !this.modelCompiled) {
-      this.modelCompiled = true;
-
-      const reshaped = this.prepareVideo() as tjs.Tensor;
-
-      this.model?.optimize();
-
-      console.log('Compiled');
-      console.log('Doing forward pass');
-
-      this.model?.forward([reshaped]).then(result => {
-        reshaped.delete();
-        this.handleResult(result);
-      });
-    }
-  }
-
-  handleResult(tensors: tjs.Tensor[]) {
-    console.log('Got result', tensors);
-
-    setTimeout(() => {
+  fileSelected(ev: React.ChangeEvent<HTMLInputElement>) {
+    //@ts-ignore
+    this.setState({
+      ...this.state,
+      scale: 50,
       //@ts-ignore
-      (tensors[0] as tjs.tensor.gpu.GPUTensor).delete();
-      const reshaped = this.prepareVideo() as tjs.Tensor;
+      img: URL.createObjectURL(ev.target.files[0]),
+      showResult: false
+    });
+  }
 
-      this.model?.forward([reshaped]).then(results => {
-        reshaped.delete();
-        this.handleResult(results);
-      });
-    }, 500);
+  getImageWidth(scale: number) {
+    const width = Math.round(400*(scale/50) + 50);
+
+    return Math.floor(width/32)*32;
   }
 
   render() {
+    let img;
+    let scale = 50;
+    let showResult = false;
+    if (this.state) {
+      img = this.state.img;
+      scale = this.state.scale || 50;
+      showResult = this.state.showResult;
+    }
+
+    const width = this.getImageWidth(scale);
+
     return (
       <div className="App">
-        <h1>Face detection</h1><br/>
-        <video autoPlay id="videoElement"/>
+        <h1>MobilenNet Classification</h1>
+        <label htmlFor="file">Choose an image:</label> <input type='file' id="file" onChange={x => this.fileSelected(x)}/><br/>
+        { img !== undefined ? (<>
+            <img id="img" src={this.state.img} alt="Your upload" width={width}/><br/>
+
+            <button onClick={() => this.getImageData()}>Run</button><br/>
+
+            {
+              showResult ? (
+                "Result!"
+              ) : (<></>)
+            }
+          </>) : (<></>)}
       </div>
     );
   }
