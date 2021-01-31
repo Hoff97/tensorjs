@@ -120,15 +120,6 @@ To do this, run
 model.optimize()
 ```
 
-### Compiling for static input shapes
-
-If you run the model on the GPU and on tensors of the same input shape all the time, you can greatly improve
-performance by compiling it for that input shape:
-```typescript
-await model.compileForInputs(inputs);
-```
-where the inputs are a list of GPU tensors. You should call this method only after optimizing the model.
-
 ### Running with half precision
 
 By default full precision floats (32-bits) are used for model execution. You can try executing with
@@ -156,6 +147,10 @@ it to full precision first, which can be done with:
 const values = await tensor.copy().getValues();
 ```
 
+### Other performance considerations
+
+Try to run your models with static input sizes. TensorJS will compile specialized versions of all operations
+after enough forward passes. For this the input shapes of the tensors have to be constant though.
 
 # Development
 
