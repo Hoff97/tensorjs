@@ -1,5 +1,9 @@
+import { GatherInfo, GatherOperation } from "../../ops/gpu/util/gather";
+import { PrototypeTensor } from "../../tensor/cpu/prototype";
 import { CPUTensor } from "../../tensor/cpu/tensor";
-import Tensor from "../../types";
+import { gpuConstructor, GPUTensor } from "../../tensor/gpu/tensor";
+import Tensor, { Precision } from "../../types";
+import { getSize } from "../../util/shape";
 import { OnnxNode } from "../node";
 import { Attributes, Constants } from "../types";
 
@@ -22,4 +26,10 @@ export class GatherNode extends OnnxNode {
 
     return [x.gather(this.axis, indices)];
   }
+
+  getType() {
+    return 'Gather';
+  }
+
+  delete(): void {}
 }

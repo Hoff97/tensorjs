@@ -1,8 +1,7 @@
 import { cast } from "../../ops/cpu/cast";
+import { PrototypeTensor } from "../../tensor/cpu/prototype";
 import { CPUTensor } from "../../tensor/cpu/tensor";
-import { glContext } from "../../tensor/gpu/gl";
 import Tensor from "../../types";
-import { toCPU, toGPU, toWASM } from "../../util/convert";
 import { OnnxNode } from "../node";
 import { Attributes, Constants } from "../types";
 
@@ -23,4 +22,10 @@ export class CastNode extends OnnxNode {
     }
     throw new Error("Can only cast CPU tensors right now");
   }
+
+  getType() {
+    return 'Cast';
+  }
+
+  delete(): void {}
 }

@@ -1,5 +1,6 @@
 import REGL from 'regl';
-import { GPUMemoryAllocator } from './memory';
+import { Dict } from '../../util/datastructs/dict';
+import { GPUMemoryAllocator, MemoryEntry } from './memory';
 
 const canvas = document.createElement("canvas");
 
@@ -14,10 +15,12 @@ function setup() {
 
   gl = REGL({
     gl: glContext,
-    extensions: ['OES_texture_float', 'WEBGL_color_buffer_float']
+    extensions: ['OES_texture_float', 'WEBGL_color_buffer_float', 'OES_texture_half_float']
   });
 
-  defaultAllocator = new GPUMemoryAllocator(gl);
+  defaultAllocator = new GPUMemoryAllocator(gl, () => {
+    return new Dict((key: number) => key);
+  });
 }
 
 setup();

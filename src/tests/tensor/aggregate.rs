@@ -181,3 +181,13 @@ fn test_tensor_mean() {
 
     assert!(res1.compare(&expected1, DELTA));
 }
+
+#[test]
+fn test_tensor_max_special_case() {
+    let a = Tensor::new(&vec![1,24], &vec![1.,2.,3.,4.,5.,6.,7.,8.,9.,10.,11.,12.,13.,14.,15.,16.,17.,18.,19.,20.,21.,22.,23.,24.]);
+    let expected1 = Tensor::new(&vec![1,1], &vec![24.]);
+
+    let res1 = a._max(&vec![1], true);
+
+    assert!(res1.compare(&expected1, DELTA));
+}

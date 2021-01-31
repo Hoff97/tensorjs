@@ -1,18 +1,19 @@
 import Long from 'long';
 import {onnx} from 'onnx-proto';
-import { gl, glContext } from '../tensor/gpu/gl';
-import Tensor from '../types';
+import { glContext } from '../tensor/gpu/gl';
+import Tensor, { Precision } from '../types';
 import { toCPU, toGPU, toWASM } from '../util/convert';
-import { TENSOR_INT64 } from './definitions';
 import { OnnxNode } from './node';
-import { ConcatNode } from './nodes/concat';
 import { ConstantNode } from './nodes/constant';
+import { defaultOptimizations } from './optimizations/default';
 import { nodeResolve } from './resolve';
 import { Constants } from './types';
 import { createTensor } from './util';
 
+export type NodeId = number;
+
 interface Intermediary {
-  to: number[];
+  to: NodeId[];
   deletable: boolean;
 }
 
@@ -22,59 +23,89 @@ interface IntermediaryRes {
 }
 
 interface ModelArgs {
+  /**
+   * Constants that should not be transferred to another device.
+   *
+   * Useful for operations that should only happen only on the CPU
+   */
   noConvertConstants?: string[];
-  noConvertNodes?: number[];
+  /**
+   * Nodes that should not be transferred to another device
+   *
+   * Useful for operations that should only happen only on the CPU
+   */
+  noConvertNodes?: NodeId[];
+
+  /**
+   * Precision that should be used. Only has an effect on GPU.
+   */
+  precision?: Precision;
 }
 
 export class OnnxModel {
   private version: number;
-  public inputs: onnx.IValueInfoProto[];
   private inputSet: Set<string> = new Set();
   private outputs: string[];
 
   private nodes: {[id: number]: OnnxNode} = {};
-  private nodeIds: number[] = [];
-  private defaultReady: number[] = [];
+  private nodeIds: NodeId[] = [];
+  private defaultReady: NodeId[] = [];
 
   private intermediaries: {[name: string]: Intermediary} = {};
 
   private constants: Constants = {};
 
   private noConvertConstants: Set<string>;
-  private noConvertNodes: Set<number>;
+  private noConvertNodes: Set<NodeId>;
 
+  private modelProto: onnx.ModelProto;
+
+  private nodeIdCounter = 10000;
+
+  private precision: Precision;
+
+  public inputs: onnx.IValueInfoProto[];
+
+  /**
+   * Builds a new onnx model
+   *
+   * @param buffer Onnx model
+   * @param args Optional arguments for the model
+   */
   constructor(buffer: ArrayBuffer | Uint8Array, args?: ModelArgs) {
-    let arr: Uint8Array;
-    if (buffer instanceof ArrayBuffer) {
-      arr = new Uint8Array(buffer);
-    } else {
-      arr = buffer;
-    }
-    const modelProto = onnx.ModelProto.decode(arr);
-
-    let ver = modelProto.opsetImport[0].version;
-    if (Long.isLong(ver)) {
-      ver = (ver as Long).toNumber();
-    }
-
-    this.version = ver;
-
-    this.inputs = modelProto.graph.input;
-    for (let i = 0; i < this.inputs.length; i++) {
-      this.inputSet.add(this.inputs[i].name);
-    }
-    this.outputs = modelProto.graph.output.map(x => x.name);
-
-    this.initializer(modelProto.graph.initializer);
-
-    this.initNodes(modelProto);
-
     if (args === undefined) {
       args = {};
     }
 
     this.noConvertConstants = new Set<string>(args.noConvertConstants !== undefined ? args.noConvertConstants : []);
     this.noConvertNodes = new Set<number>(args.noConvertNodes !== undefined ? args.noConvertNodes : []);
+
+    this.precision = args.precision || 32;
+
+    let arr: Uint8Array;
+    if (buffer instanceof ArrayBuffer) {
+      arr = new Uint8Array(buffer);
+    } else {
+      arr = buffer;
+    }
+    this.modelProto = onnx.ModelProto.decode(arr);
+
+    let ver = this.modelProto.opsetImport[0].version;
+    if (Long.isLong(ver)) {
+      ver = (ver as Long).toNumber();
+    }
+
+    this.version = ver;
+
+    this.inputs = this.modelProto.graph.input;
+    for (let i = 0; i < this.inputs.length; i++) {
+      this.inputSet.add(this.inputs[i].name);
+    }
+    this.outputs = this.modelProto.graph.output.map(x => x.name);
+
+    this.initializer(this.modelProto.graph.initializer);
+
+    this.initNodes(this.modelProto);
   }
 
   private initNodes(modelProto: onnx.ModelProto) {
@@ -135,6 +166,13 @@ export class OnnxModel {
     }
   }
 
+  /**
+   * Do a forward pass for the specified inputs
+   *
+   * @param wait Number of milliseconds to wait between each layer. This
+   *             is especially useful, if your model is complex and
+   *             you dont want your model to block your whole application.
+   */
   async forward(inputs: Tensor[], wait?: number): Promise<Tensor[]> {
     const intermediaryRes: {[name: string]: IntermediaryRes} = {};
 
@@ -145,46 +183,15 @@ export class OnnxModel {
       }
     }
 
-    const nodesReady: number[] = [...this.defaultReady];
+    const nodesReady: NodeId[] = [...this.defaultReady];
 
-    for (let i = 0; i < inputs.length; i++) {
-      intermediaryRes[this.inputs[i].name] = {
-        value: inputs[i],
-        used: 0
-      };
-
-      const inter = this.intermediaries[this.inputs[i].name];
-      for (let j = 0; j < inter.to.length; j++) {
-        const id = inter.to[j];
-        nodes[id].variableInputs++;
-
-        if (nodes[id].variableInputs === this.nodes[id].variableInputs) {
-          nodesReady.push(id);
-          delete nodes[id];
-        }
-      }
-    }
+    this.initializeForward(inputs, intermediaryRes, nodes, nodesReady);
 
     while(nodesReady.length > 0) {
-      const toDelete: string[] = [];
-
       const nodeId = nodesReady.shift();
       const node = this.nodes[nodeId];
 
-      const inputs: Tensor[] = [];
-      for (let i = 0; i < node.inputs.length; i++) {
-        const input = node.inputs[i];
-        if (this.constants[input] !== undefined) {
-          inputs.push(this.constants[input]);
-        } else {
-          const inter = intermediaryRes[input];
-          inter.used++;
-          if (inter.used === this.intermediaries[input].to.length && this.intermediaries[input].deletable) {
-            toDelete.push(input);
-          }
-          inputs.push(inter.value);
-        }
-      }
+      const {inputs, toDelete} = this.getInputsToNode(node, intermediaryRes);
 
       let outputs: Tensor[];
       try {
@@ -194,27 +201,8 @@ export class OnnxModel {
         throw e;
       }
       glContext.flush();
-      for (let i = 0; i < node.outputs.length; i++) {
-        const output = node.outputs[i];
-        intermediaryRes[output] = {
-          value: outputs[i],
-          used: 0
-        };
 
-        const inter = this.intermediaries[output];
-
-        if (inter !== undefined) {
-          for (let j = 0; j < inter.to.length; j++) {
-            const id = inter.to[j];
-            nodes[id].variableInputs++;
-
-            if (nodes[id].variableInputs === this.nodes[id].variableInputs) {
-              nodesReady.push(id);
-              delete nodes[id];
-            }
-          }
-        }
-      }
+      this.propagateResults(node, intermediaryRes, outputs, nodes, nodesReady);
 
       for (let i = 0; i < toDelete.length; i++) {
         if (!this.inputSet.has(toDelete[i])) {
@@ -239,9 +227,227 @@ export class OnnxModel {
     return outputs;
   }
 
+  protected initializeForward(inputs: Tensor[], intermediaryRes: {[name: string]: IntermediaryRes},
+                              nodes: {[id: number]: {variableInputs: number}},
+                              nodesReady: NodeId[]) {
+    for (let i = 0; i < inputs.length; i++) {
+      intermediaryRes[this.inputs[i].name] = {
+        value: inputs[i],
+        used: 0
+      };
+
+      const inter = this.intermediaries[this.inputs[i].name];
+
+      for (let j = 0; j < inter.to.length; j++) {
+        const id = inter.to[j];
+        nodes[id].variableInputs++;
+
+        if (nodes[id].variableInputs === this.nodes[id].variableInputs) {
+          nodesReady.push(id);
+          delete nodes[id];
+        }
+      }
+    }
+  }
+
+  protected getInputsToNode(node: OnnxNode, intermediaryRes: {[name: string]: IntermediaryRes}) {
+    const inputs: Tensor[] = [];
+    const toDelete: string[] = [];
+    for (let i = 0; i < node.inputs.length; i++) {
+      const input = node.inputs[i];
+      if (this.constants[input] !== undefined) {
+        inputs.push(this.constants[input]);
+      } else {
+        const inter = intermediaryRes[input];
+        inter.used++;
+        if (inter.used >= this.intermediaries[input].to.length && this.intermediaries[input].deletable) {
+          toDelete.push(input);
+        }
+        inputs.push(inter.value);
+      }
+    }
+
+    return {inputs, toDelete};
+  }
+
+  protected propagateResults(node: OnnxNode, intermediaryRes: {[name: string]: IntermediaryRes},
+                             outputs: Tensor[], nodes: {[id: number]: {variableInputs: number}},
+                             nodesReady: NodeId[]) {
+    for (let i = 0; i < node.outputs.length; i++) {
+      const output = node.outputs[i];
+      intermediaryRes[output] = {
+        value: outputs[i],
+        used: 0
+      };
+
+      const inter = this.intermediaries[output];
+
+      if (inter !== undefined) {
+        for (let j = 0; j < inter.to.length; j++) {
+          const id = inter.to[j];
+          nodes[id].variableInputs++;
+
+          if (nodes[id].variableInputs === this.nodes[id].variableInputs) {
+            nodesReady.push(id);
+            delete nodes[id];
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Transfer the model to the CPU
+   */
+  async toCPU() {
+    for (let i in this.constants) {
+      if (!this.noConvertConstants.has(i)) {
+        this.constants[i] = await toCPU(this.constants[i]);
+      }
+    }
+
+    for (let i of this.nodeIds) {
+      if (!this.noConvertNodes.has(i)) {
+        await this.nodes[i].toCPU();
+      }
+    }
+  }
+
+  /**
+   * Transfer the model to WASM
+   */
+  async toWASM() {
+    for (let i in this.constants) {
+      if (!this.noConvertConstants.has(i)) {
+        this.constants[i] = await toWASM(this.constants[i]);
+      }
+    }
+
+    for (let i of this.nodeIds) {
+      if (!this.noConvertNodes.has(i)) {
+        await this.nodes[i].toWASM();
+      }
+    }
+  }
+
+  /**
+   * Transfer the model to the GPU
+   */
+  async toGPU() {
+    for (let i in this.constants) {
+      if (!this.noConvertConstants.has(i)) {
+        this.constants[i] = await toGPU(this.constants[i], this.precision);
+      }
+    }
+
+    for (let i of this.nodeIds) {
+      if (!this.noConvertNodes.has(i)) {
+        await this.nodes[i].toGPU(this.precision);
+      }
+    }
+  }
+
+  /**
+   * Optimize the model.
+   */
+  public optimize() {
+    for (let optimization of defaultOptimizations) {
+      const applications = optimization.findApplications(this);
+
+      for (let nodeIds of applications) {
+        const nodes = nodeIds.map(x => this.nodes[x]);
+        const newNode = optimization.apply(nodes, (name) => this.resolveConstant(name), this.constants, this.version);
+
+        const outputs = new Set(newNode.outputs);
+
+        for (let nodeId of nodeIds) {
+          this.removeNode(nodeId, outputs);
+        }
+
+        this.insertNode(newNode);
+      }
+    }
+
+    this.prune();
+  }
+
+  private prune() {
+    while (true) {
+      const nodesToDelete = this.pruneIntermediaries();
+
+      if (nodesToDelete.size > 0) {
+        nodesToDelete.forEach(id => {
+          this.removeNode(id, new Set());
+        });
+      } else {
+        break;
+      }
+    }
+  }
+
+  private pruneIntermediaries() {
+    const nodesToDelete = new Set<number>();
+
+    const intermediariesToDelete: string[] = [];
+
+    for (let id in this.intermediaries) {
+      const intermediary = this.intermediaries[id];
+      if (intermediary.to.length === 0) {
+        intermediariesToDelete.push(id);
+        const nodeId = this.getNodeWithOutput(id);
+        if (nodeId !== undefined) {
+          nodesToDelete.add(nodeId);
+        }
+      }
+    }
+
+    for (let id of intermediariesToDelete) {
+      delete this.intermediaries[id];
+    }
+
+    return nodesToDelete;
+  }
+
+  private removeNode(nodeId: number, preserveIntermediaries: Set<string>) {
+    const node = this.nodes[nodeId];
+    for (let input of node.inputs) {
+      if (this.intermediaries[input] !== undefined) {
+        this.intermediaries[input].to = this.intermediaries[input].to.filter(x => x.toString() !== nodeId.toString());
+      }
+    }
+    if (!preserveIntermediaries.has(node.outputs[0])) {
+      delete this.intermediaries[node.outputs[0]];
+    }
+
+    this.nodeIds = this.nodeIds.filter(x => x.toString() !== nodeId.toString());
+    this.nodes[nodeId].delete();
+    delete this.nodes[nodeId];
+  }
+
+  private insertNode(node: OnnxNode) {
+    const id = this.nodeIdCounter++;
+
+    this.nodeIds.push(id);
+    this.nodes[id] = node;
+
+    for (let input of node.inputs) {
+      this.intermediaries[input].to.push(id);
+    }
+  }
+
+  // Utility functions
+
   public getNodeWithOutput(output: string) {
     for (let id of this.nodeIds) {
       if (this.nodes[id].outputs.findIndex(x => x === output) !== -1) {
+        return id;
+      }
+    }
+  }
+
+  public getNodeWithInput(output: string) {
+    for (let id of this.nodeIds) {
+      if (this.nodes[id].inputs.findIndex(x => x === output) !== -1) {
         return id;
       }
     }
@@ -259,45 +465,22 @@ export class OnnxModel {
     return undefined;
   }
 
-  async toCPU() {
-    for (let i in this.constants) {
-      if (!this.noConvertConstants.has(i)) {
-        this.constants[i] = await toCPU(this.constants[i]);
-      }
-    }
-
-    for (let i of this.nodeIds) {
-      if (!this.noConvertNodes.has(i)) {
-        await this.nodes[i].toCPU();
-      }
-    }
+  public getNodes() {
+    return this.nodes;
   }
 
-  async toWASM() {
-    for (let i in this.constants) {
-      if (!this.noConvertConstants.has(i)) {
-        this.constants[i] = await toWASM(this.constants[i]);
-      }
+  /**
+   * Deletes the model
+   *
+   * This will release the memory/framebuffers (depending on the backend)
+   */
+  public delete() {
+    for (let c in this.constants) {
+      this.constants[c].delete();
     }
 
-    for (let i of this.nodeIds) {
-      if (!this.noConvertNodes.has(i)) {
-        await this.nodes[i].toWASM();
-      }
-    }
-  }
-
-  async toGPU() {
-    for (let i in this.constants) {
-      if (!this.noConvertConstants.has(i)) {
-        this.constants[i] = await toGPU(this.constants[i]);
-      }
-    }
-
-    for (let i of this.nodeIds) {
-      if (!this.noConvertNodes.has(i)) {
-        await this.nodes[i].toGPU();
-      }
+    for (let nodeId of this.nodeIds) {
+      this.nodes[nodeId].delete();
     }
   }
 }

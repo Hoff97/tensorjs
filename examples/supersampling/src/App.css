@@ -1,0 +1,16 @@
+.App {
+  margin: 10px;
+  margin: auto;
+  width: 50%;
+  padding: 10px;
+}
+
+#canvas {
+  margin: 5px;
+  box-shadow: 10px 5px 5px #CCC;
+}
+
+#img {
+  margin: 5px;
+  box-shadow: 10px 5px 5px #CCC;
+}

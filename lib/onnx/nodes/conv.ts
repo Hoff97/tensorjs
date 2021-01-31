@@ -1,4 +1,11 @@
-import Tensor from "../../types";
+import { ConvBiasOperation, ConvInfo, ConvInput, ConvOperation } from "../../ops/gpu/conv/conv";
+import { PrototypeTensor } from "../../tensor/cpu/prototype";
+import { CPUTensor } from "../../tensor/cpu/tensor";
+import { MemoryEntry } from "../../tensor/gpu/memory";
+import { gpuConstructor, GPUTensor } from "../../tensor/gpu/tensor";
+import Tensor, { Activation, Precision } from "../../types";
+import { toCPU, toGPU, toWASM } from "../../util/convert";
+import { getSize } from "../../util/shape";
 import { OnnxNode } from "../node";
 import { Attributes, Constants } from "../types";
 
@@ -8,7 +15,17 @@ export class ConvNode extends OnnxNode {
   private pads?: number[];
   private strides?: number[];
 
-  constructor(attributes: Attributes, inputs: string[], outputs: string[], constants: Constants, onnxVersion: number) {
+  public kernel?: Tensor;
+  public bias?: Tensor;
+
+  private activation: Activation;
+
+  constructor(attributes: Attributes, inputs: string[],
+              outputs: string[], constants: Constants,
+              onnxVersion: number,
+              kernel?: Tensor,
+              bias?: Tensor,
+              activation?: Activation) {
     super(attributes, inputs, outputs, constants, onnxVersion);
 
     const autoPad = this.getAttributeString('autoPad');
@@ -16,17 +33,86 @@ export class ConvNode extends OnnxNode {
       throw new Error('Autopad in conv not supported yet');
     }
 
+    if (activation === undefined) {
+      activation = "id";
+    }
+    this.activation = activation;
+
     this.group = this.getAttributeInt('group') || 1;
     this.dilations = this.getAttributeInts('dilations');
     this.pads = this.getAttributeInts('pads');
     this.strides = this.getAttributeInts('strides');
+
+    this.kernel = kernel;
+    this.bias = bias;
   }
 
   async forward(inputs: Tensor[]): Promise<Tensor[]> {
     const x = inputs[0];
-    const w = inputs[1];
-    const b = inputs.length > 2 ? inputs[2] : undefined;
+    const w = this.kernel !== undefined ? this.kernel : inputs[1];
+    const b = inputs.length > 2 ? inputs[2] : this.bias;
 
-    return [x.conv(w, b, this.dilations, this.group, this.pads, this.strides)];
+    return [x.conv(w, b, this.dilations, this.group, this.pads, this.strides, this.activation)];
+  }
+
+  getDilations(rank: number) {
+    if (this.dilations !== undefined) {
+      return this.dilations;
+    }
+    return new Array(rank).fill(1);
+  }
+
+  getPads(rank: number) {
+    if (this.pads !== undefined) {
+      return this.pads;
+    }
+    return new Array(rank*2).fill(0);
+  }
+
+  getStrides(rank: number) {
+    if (this.strides !== undefined) {
+      return this.strides;
+    } return new Array(rank).fill(1);
+  }
+
+  getType() {
+    return 'Conv';
+  }
+
+  async toCPU() {
+    if (this.kernel !== undefined) {
+      this.kernel = await toCPU(this.kernel);
+    }
+    if (this.bias !== undefined) {
+      this.bias = await toCPU(this.bias);
+    }
+  }
+
+  async toWASM() {
+    if (this.kernel !== undefined) {
+      this.kernel = await toWASM(this.kernel);
+    }
+    if (this.bias !== undefined) {
+      this.bias = await toWASM(this.bias);
+    }
+  }
+
+  async toGPU(precision: Precision) {
+    if (this.kernel !== undefined) {
+      this.kernel = await toGPU(this.kernel, precision);
+    }
+    if (this.bias !== undefined) {
+      this.bias = await toGPU(this.bias, precision);
+    }
+  }
+
+
+  delete(): void {
+    if (this.kernel !== undefined) {
+      this.kernel.delete();
+    }
+    if (this.bias !== undefined) {
+      this.bias.delete();
+    }
   }
 }

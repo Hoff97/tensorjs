@@ -1,7 +1,5 @@
-import { CPUTensor } from "../../tensor/cpu/tensor";
 import { glContext } from "../../tensor/gpu/gl";
 import Tensor from "../../types";
-import { toCPU, toGPU, toWASM } from "../../util/convert";
 import { OnnxNode } from "../node";
 import { Attributes, Constants } from "../types";
 
@@ -16,7 +14,7 @@ export class InstanceNormalizationNode extends OnnxNode {
     //TODO: Handle onnx versions < 6 here
   }
 
-  async forward(inputs: Tensor[]): Promise<Tensor[]> {
+  async defaultForward(inputs: Tensor[]): Promise<Tensor[]> {
     const x = inputs[0];
     let scale = inputs[1];
     let B = inputs[2];
@@ -50,4 +48,14 @@ export class InstanceNormalizationNode extends OnnxNode {
 
     return [result];
   }
+
+  async forward(inputs: Tensor[]): Promise<Tensor[]> {
+    return this.defaultForward(inputs);
+  }
+
+  getType() {
+    return 'InstanceNormalization';
+  }
+
+  delete(): void {}
 }

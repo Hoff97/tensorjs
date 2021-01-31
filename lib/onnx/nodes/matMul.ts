@@ -16,9 +16,14 @@ export class MatMulNode extends OnnxNode {
         throw new Error("Automatic broadcasting in MatMul not supported yet");
       }
 
-      const result = A.gemm(B);
-      return [result];
+      return [A.gemm(B)];
     }
     throw new Error(`Matmul with onnx version ${this.onnxVersion} not yet implemented`);
   }
+
+  getType() {
+    return 'MatMul';
+  }
+
+  delete(): void {}
 }

@@ -1,37 +1,38 @@
-import { AddNode } from "./nodes/add";
+import { AddNode } from "./nodes/binary/add";
 import { BatchNormalizationNode } from "./nodes/batchNormalization";
 import { CastNode } from "./nodes/cast";
-import { CeilNode } from "./nodes/ceil";
+import { CeilNode } from "./nodes/unary/ceil";
 import { ClipNode } from "./nodes/clip";
 import { ConcatNode } from "./nodes/concat";
 import { ConstantNode } from "./nodes/constant";
 import { ConstantOfShapeNode } from "./nodes/constantOfShape";
 import { ConvNode } from "./nodes/conv";
-import { DivNode } from "./nodes/div";
-import { ExpNode } from "./nodes/exp";
+import { DivNode } from "./nodes/binary/div";
+import { ExpNode } from "./nodes/unary/exp";
 import { ExpandNode } from "./nodes/expand";
-import { FloorNode } from "./nodes/floor";
+import { FloorNode } from "./nodes/unary/floor";
 import { GatherNode } from "./nodes/gather";
 import { GemmNode } from "./nodes/gemm";
 import { InstanceNormalizationNode } from "./nodes/instanceNormalization";
 import { MatMulNode } from "./nodes/matMul";
-import { MulNode } from "./nodes/mul";
+import { MulNode } from "./nodes/binary/mul";
 import { PadNode } from "./nodes/pad";
-import { ReduceMaxNode } from "./nodes/reduceMax";
-import { ReduceMeanNode } from "./nodes/reduceMean";
-import { ReduceSumNode } from "./nodes/reduceSum";
-import { ReduceSumSquareNode } from "./nodes/reduceSumSquare";
+import { ReduceMaxNode } from "./nodes/reduce/reduceMax";
+import { ReduceMeanNode } from "./nodes/reduce/reduceMean";
+import { ReduceSumNode } from "./nodes/reduce/reduceSum";
+import { ReduceSumSquareNode } from "./nodes/reduce/reduceSumSquare";
 import { ReluNode } from "./nodes/relu";
 import { ReshapeNode } from "./nodes/reshape";
 import { ShapeNode } from "./nodes/shape";
 import { SliceNode } from "./nodes/slice";
 import { SoftmaxNode } from "./nodes/softmax";
-import { SubNode } from "./nodes/sub";
+import { SubNode } from "./nodes/binary/sub";
 import { TileNode } from "./nodes/tile";
 import { TransposeNode } from "./nodes/transpose";
 import { UnsqueezeNode } from "./nodes/unsqueeze";
 import { UpsampleNode } from "./nodes/upsample";
 import { NodeConstructor } from "./types";
+import { GlobalAveragePoolNode } from "./nodes/globalAveragePool";
 
 export const nodeResolve: {[opType: string]: NodeConstructor} = {
   'Conv': (attributes, inputs, outputs, constants, onnxVersion) => new ConvNode(attributes, inputs, outputs, constants, onnxVersion),
@@ -67,4 +68,5 @@ export const nodeResolve: {[opType: string]: NodeConstructor} = {
   'Upsample': (attributes, inputs, outputs, constants, onnxVersion) => new UpsampleNode(attributes, inputs, outputs, constants, onnxVersion),
   'Transpose': (attributes, inputs, outputs, constants, onnxVersion) => new TransposeNode(attributes, inputs, outputs, constants, onnxVersion),
   'Softmax': (attributes, inputs, outputs, constants, onnxVersion) => new SoftmaxNode(attributes, inputs, outputs, constants, onnxVersion),
+  'GlobalAveragePool': (attributes, inputs, outputs, constants, onnxVersion) => new GlobalAveragePoolNode(attributes, inputs, outputs, constants, onnxVersion),
 };

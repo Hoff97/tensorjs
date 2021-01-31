@@ -1,4 +1,9 @@
-import Tensor from "../../types";
+import { CopyInfo, CopyOperation } from "../../ops/gpu/util/copy";
+import { PrototypeTensor } from "../../tensor/cpu/prototype";
+import { CPUTensor } from "../../tensor/cpu/tensor";
+import { gpuConstructor, GPUTensor } from "../../tensor/gpu/tensor";
+import Tensor, { Precision } from "../../types";
+import { getSize } from "../../util/shape";
 import { OnnxNode } from "../node";
 import { Attributes, Constants } from "../types";
 
@@ -35,4 +40,11 @@ export class UnsqueezeNode extends OnnxNode {
     }
     throw new Error(`Unsqueeze with onnx version ${this.onnxVersion} not yet implemented`);
   }
+
+
+  getType() {
+    return 'Unsqueeze';
+  }
+
+  delete(): void {}
 }

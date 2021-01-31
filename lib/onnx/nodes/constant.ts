@@ -1,4 +1,4 @@
-import Tensor from "../../types";
+import Tensor, { Precision } from "../../types";
 import { toCPU, toGPU, toWASM } from "../../util/convert";
 import { OnnxNode } from "../node";
 import { Attributes, Constants } from "../types";
@@ -30,7 +30,15 @@ export class ConstantNode extends OnnxNode {
   async toWASM() {
     this.tensor = await toWASM(this.tensor);
   }
-  async toGPU() {
-    this.tensor = await toGPU(this.tensor);
+  async toGPU(precision: Precision) {
+    this.tensor = await toGPU(this.tensor, precision);
+  }
+
+  getType() {
+    return 'Constant';
+  }
+
+  delete(): void {
+    this.tensor.delete();
   }
 }

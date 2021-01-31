@@ -3,8 +3,8 @@ import { OnnxNode } from "../node";
 import { Attributes, Constants } from "../types";
 
 export class ClipNode extends OnnxNode {
-  private min?: number;
-  private max?: number;
+  public min?: number;
+  public max?: number;
 
   constructor(attributes: Attributes, inputs: string[], outputs: string[], constants: Constants, onnxVersion: number) {
     super(attributes, inputs, outputs, constants, onnxVersion);
@@ -29,4 +29,10 @@ export class ClipNode extends OnnxNode {
       throw new Error('Clip with onnx version >= 11 not yet implemented');
     }
   }
+
+  getType() {
+    return 'Clip';
+  }
+
+  delete(): void {}
 }

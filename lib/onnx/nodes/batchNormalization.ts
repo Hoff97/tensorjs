@@ -1,6 +1,5 @@
 import { CPUTensor } from "../../tensor/cpu/tensor";
-import { glContext } from "../../tensor/gpu/gl";
-import Tensor from "../../types";
+import Tensor, { Precision } from "../../types";
 import { toCPU, toGPU, toWASM } from "../../util/convert";
 import { OnnxNode } from "../node";
 import { Attributes, Constants } from "../types";
@@ -9,10 +8,8 @@ export class BatchNormalizationNode extends OnnxNode {
   private epsilon: number;
   private momentum: number;
 
-  private epsTensor: Tensor;
+  public epsTensor: Tensor;
 
-  private scale?: Tensor;
-  private bias?: Tensor;
 
   constructor(attributes: Attributes, inputs: string[], outputs: string[], constants: Constants, onnxVersion: number) {
     super(attributes, inputs, outputs, constants, onnxVersion);
@@ -34,63 +31,58 @@ export class BatchNormalizationNode extends OnnxNode {
     if (scale !== undefined && B !== undefined && mean !== undefined && variance !== undefined) {
       const varSqrt = variance.add(this.epsTensor).sqrt();
 
-      this.scale = scale.divide(varSqrt);
-      this.bias = B.subtract(mean.multiply(this.scale));
+      //this.scale = scale.divide(varSqrt);
+      //this.bias = B.subtract(mean.multiply(this.scale));
 
       varSqrt.delete();
     }
   }
 
-  async forward(inputs: Tensor[]): Promise<Tensor[]> {
+  async defaultForward(inputs: Tensor[]): Promise<Tensor[]> {
     const x = inputs[0];
 
-    if (this.scale !== undefined) {
-      const scaled = x.multiply(this.scale);
-      const result = scaled.add(this.bias);
-      scaled.delete();
+    let scale = inputs[1];
+    let B = inputs[2];
+    let mean = inputs[3];
+    let variance = inputs[4];
 
-      return [result];
-    } else {
-      let scale = inputs[1];
-      let B = inputs[2];
-      let mean = inputs[3];
-      let variance = inputs[4];
+    //TODO: Handle lower onnx versions here
 
-      //TODO: Handle lower onnx versions here
+    const C = scale.getShape()[0];
 
-      const C = scale.getShape()[0];
+    const newShape = [1,C,...new Array(x.getShape().length - 2).fill(1)];
 
-      const newShape = [1,C,...new Array(x.getShape().length - 2).fill(1)];
+    scale = scale.reshape(newShape, false);
+    B = B.reshape(newShape, false);
+    mean = mean.reshape(newShape, false);
+    variance = variance.reshape(newShape, false);
 
-      scale = scale.reshape(newShape, false);
-      B = B.reshape(newShape, false);
-      mean = mean.reshape(newShape, false);
-      variance = variance.reshape(newShape, false);
+    const result = x.normalize(mean, variance, this.epsilon, scale, B);
 
-      const result = x.normalize(mean, variance, this.epsilon, scale, B);
+    return [result];
+  }
 
-      return [result];
-    }
+  async forward(inputs: Tensor[]): Promise<Tensor[]> {
+    return this.defaultForward(inputs);
+  }
+
+  getType() {
+    return 'BatchNormalization';
   }
 
   async toCPU() {
-    if (this.scale !== undefined) {
-      this.scale = await toCPU(this.scale);
-      this.bias = await toCPU(this.bias);
-    }
+    this.epsTensor = await toCPU(this.epsTensor);
   }
 
   async toWASM() {
-    if (this.scale !== undefined) {
-      this.scale = await toWASM(this.scale);
-      this.bias = await toWASM(this.bias);
-    }
+    this.epsTensor = await toWASM(this.epsTensor);
   }
 
-  async toGPU() {
-    if (this.scale !== undefined) {
-      this.scale = await toGPU(this.scale);
-      this.bias = await toGPU(this.bias);
-    }
+  async toGPU(precision: Precision) {
+    this.epsTensor = await toGPU(this.epsTensor, precision);
+  }
+
+  delete(): void {
+    this.epsTensor.delete();
   }
 }

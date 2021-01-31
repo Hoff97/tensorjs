@@ -1,3 +1,4 @@
+import { PrototypeTensor } from "../../tensor/cpu/prototype";
 import { CPUTensor } from "../../tensor/cpu/tensor";
 import Tensor from "../../types";
 import { OnnxNode } from "../node";
@@ -18,4 +19,10 @@ export class ShapeNode extends OnnxNode {
     }
     throw new Error(`Shape not implemented for onnx version ${this.onnxVersion}`);
   }
+
+  getType() {
+    return 'Shape';
+  }
+
+  delete(): void {}
 }

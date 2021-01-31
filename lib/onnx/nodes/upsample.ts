@@ -17,10 +17,7 @@ export class UpsampleNode extends OnnxNode {
     }
   }
 
-  async forward(inputs: Tensor[]): Promise<Tensor[]> {
-    const x = inputs[0];
-    let scale = inputs[1];
-
+  async getScales(scale: Tensor) {
     if (!(scale instanceof CPUTensor)) {
       console.warn("Scales tensor for upsample not on CPU, need to transfer!");
       scale = await toCPU(scale);
@@ -32,7 +29,21 @@ export class UpsampleNode extends OnnxNode {
     for (let i = 0; i < sc.size; i++) {
       scales[i] = sc.get(i);
     }
+    return scales;
+  }
+
+  async forward(inputs: Tensor[]): Promise<Tensor[]> {
+    const x = inputs[0];
+    let scale = inputs[1];
+
+    const scales = await this.getScales(scale);
 
     return [x.upsample(scales)];
   }
+
+  getType() {
+    return 'Upsample';
+  }
+
+  delete(): void {}
 }

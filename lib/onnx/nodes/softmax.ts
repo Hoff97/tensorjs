@@ -1,4 +1,15 @@
-import Tensor from "../../types";
+import { BinaryOpInfo } from "../../ops/gpu/binary/binaryOperation";
+import { DivideOperation } from "../../ops/gpu/binary/divide";
+import { ExpOperation } from "../../ops/gpu/unary/exp";
+import { MaxOperation } from "../../ops/gpu/pool/max";
+import { PoolInfo } from "../../ops/gpu/pool/pool";
+import { SubtractOperation } from "../../ops/gpu/binary/subtract";
+import { SumOperation } from "../../ops/gpu/pool/sum";
+import { UnaryOpInfo } from "../../ops/gpu/unary/unaryOperation";
+import { PrototypeTensor } from "../../tensor/cpu/prototype";
+import { CPUTensor } from "../../tensor/cpu/tensor";
+import { gpuConstructor, GPUTensor } from "../../tensor/gpu/tensor";
+import Tensor, { Precision } from "../../types";
 import { OnnxNode } from "../node";
 import { Attributes, Constants } from "../types";
 
@@ -11,7 +22,7 @@ export class SoftmaxNode extends OnnxNode {
     this.axis = this.getAttributeInt("axis");
   }
 
-  async forward(inputs: Tensor[]): Promise<Tensor[]> {
+  async defaultForward(inputs: Tensor[]): Promise<Tensor[]> {
     const x = inputs[0];
 
     const shapeX = x.getShape();
@@ -42,4 +53,14 @@ export class SoftmaxNode extends OnnxNode {
 
     return [result.reshape(shapeX, false)];
   }
+
+  async forward(inputs: Tensor[]): Promise<Tensor[]> {
+    return this.defaultForward(inputs);
+  }
+
+  getType() {
+    return 'Softmax';
+  }
+
+  delete(): void {}
 }

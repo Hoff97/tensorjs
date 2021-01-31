@@ -1,7 +1,4 @@
-import { CPUTensor } from "../../tensor/cpu/tensor";
-import { glContext } from "../../tensor/gpu/gl";
 import Tensor, { PadMode } from "../../types";
-import { toCPU, toGPU, toWASM } from "../../util/convert";
 import { OnnxNode } from "../node";
 import { Attributes, Constants } from "../types";
 
@@ -15,7 +12,7 @@ export class PadNode extends OnnxNode {
 
     this.mode = (this.getAttributeString('mode') || 'constant') as PadMode;
     this.pads = this.getAttributeInts('pads');
-    this.value = this.getAttributeFloat("value");
+    this.value = this.getAttributeFloat("value") || 0;
   }
 
   async forward(inputs: Tensor[]): Promise<Tensor[]> {
@@ -25,4 +22,10 @@ export class PadNode extends OnnxNode {
 
     throw new Error(`Pad not implemented for onnx version ${this.onnxVersion}`);
   }
+
+  getType() {
+    return 'Pad';
+  }
+
+  delete(): void {}
 }

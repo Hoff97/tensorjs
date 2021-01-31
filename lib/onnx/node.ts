@@ -1,15 +1,22 @@
 import Long from "long";
 import { onnx } from "onnx-proto";
 import { Tensor } from "../library";
+import { PrototypeTensor } from "../tensor/cpu/prototype";
+import { CPUTensor } from "../tensor/cpu/tensor";
+import { defaultAllocator } from "../tensor/gpu/gl";
+import { GPUMemoryAllocator, MemoryEntry } from "../tensor/gpu/memory";
+import { GPUTensor } from "../tensor/gpu/tensor";
+import { Precision } from "../types";
 import { Attributes, Constants } from "./types";
 
 export abstract class OnnxNode {
-  protected attributes: {[name: string]: onnx.IAttributeProto} = {};
   protected onnxVersion: number;
+
   public inputs: string[];
   public outputs: string[];
 
   public variableInputs: number;
+  public attributes: {[name: string]: onnx.IAttributeProto} = {};
 
   constructor(attributes: Attributes, inputs: string[], outputs: string[], constants: Constants, onnxVersion: number) {
     for (let i = 0; i < attributes.length; i++) {
@@ -92,7 +99,11 @@ export abstract class OnnxNode {
 
   async toCPU() {}
   async toWASM() {}
-  async toGPU() {}
+  async toGPU(precision: Precision) {}
 
   abstract forward(inputs: Tensor[]): Promise<Tensor[]>;
+
+  abstract getType(): string;
+
+  abstract delete(): void;
 }

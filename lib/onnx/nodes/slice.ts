@@ -1,4 +1,3 @@
-import { CPUTensor } from "../../tensor/cpu/tensor";
 import Tensor from "../../types";
 import { OnnxNode } from "../node";
 import { Attributes, Constants } from "../types";
@@ -18,10 +17,15 @@ export class SliceNode extends OnnxNode {
 
   async forward(inputs: Tensor[]): Promise<Tensor[]> {
     if (this.onnxVersion < 11) {
-      const a = inputs[0];
-
-      return [a.slice(this.starts, this.ends, this.axes)];
+      const x = inputs[0];
+      return [x.slice(this.starts, this.ends, this.axes)];
     }
     throw new Error(`Slice not implemented for onnx version ${this.onnxVersion}`);
   }
+
+  getType() {
+    return 'Slice';
+  }
+
+  delete(): void {}
 }

@@ -21,8 +21,15 @@ export class TileNode extends OnnxNode {
       for (let i = 0; i < repeats.size; i++) {
         _repeats[i] = repeats.get(i);
       }
+
       return [x.repeat(_repeats)];
     }
     throw new Error(`Tile with onnx version ${this.onnxVersion} not yet implemented`);
   }
+
+  getType() {
+    return 'Tile';
+  }
+
+  delete(): void {}
 }

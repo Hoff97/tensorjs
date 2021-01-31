@@ -8,12 +8,12 @@ export function outputDimSize(inSize: number,
   return Math.floor(((inSize + headPad + tailPad - dkernel) / stride) + 1)
 }
 
-export function outputDimsSize(inSizes: number[],
-                               kernels: number[],
-                               headPads: number[],
-                               tailPads: number[],
-                               dilations: number[],
-                               strides: number[]) {
+export function outputDimsSize(inSizes: readonly number[],
+                               kernels: readonly number[],
+                               headPads: readonly number[],
+                               tailPads: readonly number[],
+                               dilations: readonly number[],
+                               strides: readonly number[]) {
   const result: number[] = [];
   for (let i = 0; i < inSizes.length; i++) {
     result.push(outputDimSize(inSizes[i], kernels[i], headPads[i], tailPads[i], dilations[i], strides[i]));

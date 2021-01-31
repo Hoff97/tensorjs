@@ -1,4 +1,9 @@
-import Tensor from "../../types";
+import { GemmCOperation, GemmInfo, GemmInput, GemmOperation } from "../../ops/gpu/matMul/gemm";
+import { PrototypeTensor } from "../../tensor/cpu/prototype";
+import { CPUTensor } from "../../tensor/cpu/tensor";
+import { gpuConstructor, GPUTensor } from "../../tensor/gpu/tensor";
+import Tensor, { Precision } from "../../types";
+import { getSize } from "../../util/shape";
 import { OnnxNode } from "../node";
 import { Attributes, Constants } from "../types";
 
@@ -31,4 +36,10 @@ export class GemmNode extends OnnxNode {
     }
     throw new Error(`Gemm is not implemented for onnx version ${this.onnxVersion}`);
   }
+
+  getType() {
+    return 'Gemm';
+  }
+
+  delete(): void {}
 }

@@ -15,7 +15,8 @@ export class ConcatNode extends OnnxNode {
 
   async forward(inputs: Tensor[]): Promise<Tensor[]> {
     if (inputs.length > 2) {
-      console.warn(`Concat with more than 2 tensors is currently slow. Doing concat with ${inputs.length} tensors`);
+      // This logging seems to slow down the operation more than the operation itself
+      //console.warn(`Concat with more than 2 tensors is currently slow. Doing concat with ${inputs.length} tensors`);
     }
 
     let result = inputs[0];
@@ -29,4 +30,10 @@ export class ConcatNode extends OnnxNode {
 
     return [result];
   }
+
+  getType() {
+    return 'Concat';
+  }
+
+  delete(): void {}
 }

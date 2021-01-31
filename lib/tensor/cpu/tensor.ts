@@ -52,6 +52,9 @@ export class CPUTensor extends Tensor {
       } else if (type === "int") {
         this.values = Int32Array.from(values);
         this.type = "int";
+      } else if (values === null ) {
+        //Prototype tensor that wont hold any data, but can be used for static inference in ONNX models
+        this.values = null;
       } else {
         this.values = Float32Array.from(values);
         this.type = "float";

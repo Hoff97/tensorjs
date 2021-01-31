@@ -1,5 +1,9 @@
+import { CopyInfo, CopyOperation } from "../../ops/gpu/util/copy";
+import { PrototypeTensor } from "../../tensor/cpu/prototype";
 import { CPUTensor } from "../../tensor/cpu/tensor";
-import Tensor from "../../types";
+import { gpuConstructor, GPUTensor } from "../../tensor/gpu/tensor";
+import Tensor, { Precision } from "../../types";
+import { getSize } from "../../util/shape";
 import { OnnxNode } from "../node";
 import { Attributes, Constants } from "../types";
 
@@ -27,8 +31,15 @@ export class ReshapeNode extends OnnxNode {
       for (let i = 0; i < shape.size; i++) {
         _shape[i] = shape.get(i);
       }
+
       return [x.reshape(_shape)];
     }
     throw new Error(`Reshape with onnx version ${this.onnxVersion} not yet implemented`);
   }
+
+  getType() {
+    return 'Reshape';
+  }
+
+  delete(): void {}
 }

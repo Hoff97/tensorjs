@@ -1,5 +1,7 @@
 import REGL, { Framebuffer2D, Regl } from "regl";
-import { AVLTree } from "../../util/avl";
+import { Precision } from "../../types";
+import { AVLTree } from "../../util/datastructs/avl";
+import { OrderedDict } from "../../util/datastructs/types";
 import { primeFactors } from "../../util/math";
 
 export interface MemoryEntry {
@@ -8,12 +10,18 @@ export interface MemoryEntry {
   size: number;
 
   frameBuffer: Framebuffer2D;
+  precision: Precision;
 
   id: number;
 }
 
+export interface Size {
+  width: number;
+  height: number;
+}
+
 export class GPUMemoryAllocator {
-  private tree: AVLTree<number,  MemoryEntry>;
+  private trees: {[precision: number]: OrderedDict<number,  MemoryEntry>};
 
   private entryId: number;
 
@@ -21,10 +29,13 @@ export class GPUMemoryAllocator {
 
   private maxSizeFactor: number;
 
-  constructor(regl: Regl, maxSizeFactor?: number) {
-    this.tree = new AVLTree({
-      compareValues: (a: MemoryEntry, b: MemoryEntry) => a.id === b.id
-    });
+  constructor(regl: Regl,
+              orderedDictConstructor: () => OrderedDict<number,  MemoryEntry>,
+              maxSizeFactor?: number) {
+    this.trees = {
+      16: orderedDictConstructor(),
+      32: orderedDictConstructor()
+    };
 
     this.regl = regl;
     this.entryId = 0;
@@ -32,14 +43,14 @@ export class GPUMemoryAllocator {
     this.maxSizeFactor = maxSizeFactor || 2;
   }
 
-  allocate(size: number): MemoryEntry {
+  allocate(size: number, precision: Precision): MemoryEntry {
     let upperBound = size*this.maxSizeFactor;
     const texSize = Math.ceil(size/4)*4;
     if (texSize < upperBound) {
       upperBound = texSize;
     }
 
-    const results = this.tree.betweenBoundsFirst({gte: size, lte: upperBound});
+    const results = this.trees[precision].betweenBoundsFirst({gte: size, lte: upperBound});
     if (results.length === 0) {
       const textureSize = Math.ceil(size / 4);
       const {width, height} = this.getTextureDims(textureSize);
@@ -49,7 +60,7 @@ export class GPUMemoryAllocator {
         height: height,
         depthStencil: false,
         colorFormat: 'rgba',
-        colorType: 'float'
+        colorType: precision === 32 ? 'float' : 'half float'
       });
 
       const memoryEntry: MemoryEntry = {
@@ -57,23 +68,45 @@ export class GPUMemoryAllocator {
         height: height,
         size: width*height*4,
         frameBuffer: framebuffer,
-        id: this.entryId++
+        id: this.entryId++,
+        precision: precision
       };
 
       return memoryEntry;
     } else {
       const first = results[0];
-      this.tree.deleteFirst(first.key);
+      this.trees[precision].deleteFirst(first.key);
 
       return first.value;
     }
   }
 
-  deallocate(entry: MemoryEntry) {
-    this.tree.insert(entry.size, entry);
+  getAllocationDimensions(size: number, precision: Precision): Size {
+    let upperBound = size*this.maxSizeFactor;
+    const texSize = Math.ceil(size/4)*4;
+    if (texSize < upperBound) {
+      upperBound = texSize;
+    }
+
+    const results = this.trees[precision].betweenBoundsFirst({gte: size, lte: upperBound});
+    if (results.length === 0) {
+      const textureSize = Math.ceil(size / 4);
+      return this.getTextureDims(textureSize);
+    } else {
+      const first = results[0];
+
+      return {
+        width: first.value.width,
+        height: first.value.height
+      }
+    }
   }
 
-  allocateTexture(values: Float32Array): MemoryEntry {
+  deallocate(entry: MemoryEntry) {
+    this.trees[entry.precision].insert(entry.size, entry);
+  }
+
+  allocateTexture(values: Float32Array, precision: Precision): MemoryEntry {
     const textureSize = Math.ceil(values.length/4);
     const {width, height} = this.getTextureDims(textureSize);
     const arraySize = width*height*4;
@@ -90,8 +123,8 @@ export class GPUMemoryAllocator {
       width: width,
       height: height,
       format: 'rgba',
-      type: 'float',
-      data: vals,
+      type: precision === 32 ? 'float' : 'half float',
+      data: precision === 32 ? vals : Array.from(vals),
     });
 
     const framebuffer = this.regl.framebuffer({
@@ -106,18 +139,19 @@ export class GPUMemoryAllocator {
       height: height,
       size: arraySize,
       frameBuffer: framebuffer,
-      id: this.entryId++
+      id: this.entryId++,
+      precision: precision
     }
   }
 
-  allocateOfDimensions(width: number, height: number): MemoryEntry {
+  allocateOfDimensions(width: number, height: number, precision: Precision): MemoryEntry {
     const arraySize = width*height*4;
 
     const texture = this.regl.texture({
       width: width,
       height: height,
       format: 'rgba',
-      type: 'float',
+      type: precision === 32 ? 'float' : 'half float',
     });
 
     const framebuffer = this.regl.framebuffer({
@@ -132,11 +166,12 @@ export class GPUMemoryAllocator {
       height: height,
       size: arraySize,
       frameBuffer: framebuffer,
-      id: this.entryId++
+      id: this.entryId++,
+      precision: precision
     }
   }
 
-  allocateFramebuffer(texture: REGL.Texture2D): MemoryEntry {
+  allocateFramebuffer(texture: REGL.Texture2D, precision: Precision): MemoryEntry {
     const framebuffer = this.regl.framebuffer({
       color: texture,
       width: texture.width,
@@ -149,11 +184,12 @@ export class GPUMemoryAllocator {
       height: texture.height,
       size: texture.width*texture.height*4,
       frameBuffer: framebuffer,
-      id: this.entryId++
+      id: this.entryId++,
+      precision: precision
     }
   }
 
-  private getTextureDims(size: number) {
+  private getTextureDims(size: number): Size {
     const factors = primeFactors(size);
     let width = 1;
     let height = 1;

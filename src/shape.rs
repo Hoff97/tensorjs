@@ -66,6 +66,28 @@ pub fn compute_strides(shape: &Vec<usize>) -> Vec<usize> {
     return res;
 }
 
+pub fn compute_strides_no_zero(shape: &Vec<usize>) -> Vec<usize> {
+    let rank = shape.len();
+
+    if rank == 0 {
+        return vec![];
+    }
+    if rank == 1 {
+        return vec![1];
+    }
+
+    let mut res: Vec<usize> = vec![1; rank];
+
+    let mut last_stride = 1;
+
+    for i in (0..(shape.len()-1)).rev() {
+        last_stride = last_stride * shape[i+1];
+        res[i] = last_stride;
+    }
+
+    return res;
+}
+
 pub fn compute_strides_uint32(shape: &Uint32Array) -> Vec<usize> {
     let rank = shape.length();
 
