@@ -65,8 +65,6 @@ for (let opset of opsetVersions) {
           inputsDevice.push(await toGPU(inputs[i], 32));
         }
 
-        await model.compileForInputs(inputsDevice);
-
         const result1 = (await model.forward(inputsDevice))[0];
         expect(await result1.compare(out, epsilon)).toBeTrue();
         const result2 = (await model.forward(inputsDevice))[0];
@@ -112,8 +110,6 @@ for (let opset of opsetVersions) {
           for (let i = 0; i < inputs.length; i++) {
             inputsDevice.push(await toGPU(inputs[i], 16));
           }
-
-          await model.compileForInputs(inputsDevice);
 
           const result1 = (await model.forward(inputsDevice))[0];
           expect(await result1.copy().compare(out, epsilon*30)).toBeTrue();

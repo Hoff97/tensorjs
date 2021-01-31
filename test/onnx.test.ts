@@ -7,7 +7,7 @@ import { onnx } from 'onnx-proto';
 import { createTensor } from '../lib/onnx/util';
 import Tensor from '../lib/types';
 
-const run = false;
+const run = true;
 
 const epsilon = 0.001;
 
