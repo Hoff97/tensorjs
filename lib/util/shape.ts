@@ -42,7 +42,11 @@ export function computeStrides(shape: ReadonlyArray<number>) {
   return strides;
 }
 
-export function indexToPos(index: ReadonlyArray<number>, strides: ReadonlyArray<number>, shape?: ReadonlyArray<number>) {
+export function indexToPos(
+  index: ReadonlyArray<number>,
+  strides: ReadonlyArray<number>,
+  shape?: ReadonlyArray<number>
+) {
   let ix = 0;
   for (let i = 0; i < index.length; i += 1) {
     if (shape) {
@@ -55,7 +59,10 @@ export function indexToPos(index: ReadonlyArray<number>, strides: ReadonlyArray<
   return ix;
 }
 
-export function posToIndex(pos: number, strides: ReadonlyArray<number>): number[] {
+export function posToIndex(
+  pos: number,
+  strides: ReadonlyArray<number>
+): number[] {
   let res = pos;
   const rank = strides.length;
   const index = new Array(rank);
@@ -68,7 +75,10 @@ export function posToIndex(pos: number, strides: ReadonlyArray<number>): number[
   return index;
 }
 
-export function compareShapes(a: ReadonlyArray<number>, b: ReadonlyArray<number>) {
+export function compareShapes(
+  a: ReadonlyArray<number>,
+  b: ReadonlyArray<number>
+) {
   if (a.length !== b.length) {
     return false;
   }
@@ -82,7 +92,10 @@ export function compareShapes(a: ReadonlyArray<number>, b: ReadonlyArray<number>
   return true;
 }
 
-export function checkEquivShapes(a: ReadonlyArray<number>, b: ReadonlyArray<number>) {
+export function checkEquivShapes(
+  a: ReadonlyArray<number>,
+  b: ReadonlyArray<number>
+) {
   if (a.length !== b.length) {
     return false;
   }

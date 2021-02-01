@@ -172,7 +172,7 @@ export class ConvOperation<GPUTensor extends GPUTensorI, ConvInf extends ConvInf
   }
 
   calc(input: ConvInput): GPUTensor {
-    if (this.fullyStatic) {
+    if (this.fullyStatic && this.outputShape !== undefined) {
       return this.compute(this.outputShape, {X: input.X, W: input.W});
     }
 

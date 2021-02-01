@@ -1,21 +1,17 @@
-import { CopyInfo, CopyOperation } from "../../ops/gpu/util/copy";
-import { PrototypeTensor } from "../../tensor/cpu/prototype";
-import { CPUTensor } from "../../tensor/cpu/tensor";
-import { gpuConstructor, GPUTensor } from "../../tensor/gpu/tensor";
-import Tensor, { Precision } from "../../types";
-import { getSize } from "../../util/shape";
-import { OnnxNode } from "../node";
-import { Attributes, Constants } from "../types";
+import {CPUTensor} from '../../tensor/cpu/tensor';
+import Tensor from '../../types';
+import {OnnxNode} from '../node';
+import {Attributes, Constants} from '../types';
 
 export class ReshapeNode extends OnnxNode {
-  private shape: number[];
-
-  constructor(attributes: Attributes, inputs: string[], outputs: string[], constants: Constants, onnxVersion: number) {
+  constructor(
+    attributes: Attributes,
+    inputs: string[],
+    outputs: string[],
+    constants: Constants,
+    onnxVersion: number
+  ) {
     super(attributes, inputs, outputs, constants, onnxVersion);
-
-    if (onnxVersion < 13) {
-      this.shape = this.getAttributeInts("shape");
-    }
   }
 
   async forward(inputs: Tensor[]): Promise<Tensor[]> {
@@ -34,7 +30,9 @@ export class ReshapeNode extends OnnxNode {
 
       return [x.reshape(_shape)];
     }
-    throw new Error(`Reshape with onnx version ${this.onnxVersion} not yet implemented`);
+    throw new Error(
+      `Reshape with onnx version ${this.onnxVersion} not yet implemented`
+    );
   }
 
   getType() {

@@ -116,7 +116,7 @@ export class PadOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTen
   }
 
   calc(input: PadInput): GPUTensor {
-    if (this.fullyStatic) {
+    if (this.fullyStatic && this.outputShape !== undefined) {
       return this.compute(this.outputShape, {X: input.input });
     }
     const resultShape = this.getOutputShape(input);

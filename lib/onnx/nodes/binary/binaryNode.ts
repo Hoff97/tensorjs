@@ -1,16 +1,17 @@
-import { BinaryOperation } from "../../../ops/gpu/binary/binaryOperation";
-import { PrototypeTensor } from "../../../tensor/cpu/prototype";
-import { CPUTensor } from "../../../tensor/cpu/tensor";
-import { GPUTensor } from "../../../tensor/gpu/tensor";
-import Tensor, { Precision } from "../../../types";
-import { getSize } from "../../../util/shape";
-import { OnnxNode } from "../../node";
-import { Attributes, Constants } from "../../types";
+import Tensor from '../../../types';
+import {OnnxNode} from '../../node';
+import {Attributes, Constants} from '../../types';
 
 export abstract class BinaryNode extends OnnxNode {
   protected name: string;
 
-  constructor(attributes: Attributes, inputs: string[], outputs: string[], constants: Constants, onnxVersion: number) {
+  constructor(
+    attributes: Attributes,
+    inputs: string[],
+    outputs: string[],
+    constants: Constants,
+    onnxVersion: number
+  ) {
     super(attributes, inputs, outputs, constants, onnxVersion);
   }
 
@@ -21,9 +22,11 @@ export abstract class BinaryNode extends OnnxNode {
       const a = inputs[0];
       const b = inputs[1];
 
-      return [this.compute(a,b)];
+      return [this.compute(a, b)];
     }
-    throw new Error(`${this.name} not implemented for onnx version ${this.onnxVersion}`);
+    throw new Error(
+      `${this.name} not implemented for onnx version ${this.onnxVersion}`
+    );
   }
 
   getType() {

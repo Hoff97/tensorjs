@@ -2,7 +2,11 @@ export function primeFactors(num: number) {
   return primeFactorsCompute(num);
 }
 
-export function primeFactorsCompute(inputNum: number, result: number[] = [], repeat = true): number[] {
+export function primeFactorsCompute(
+  inputNum: number,
+  result: number[] = [],
+  repeat = true
+): number[] {
   if (!Number.isInteger(inputNum)) return result;
 
   const num = Math.abs(inputNum);
@@ -15,7 +19,7 @@ export function primeFactorsCompute(inputNum: number, result: number[] = [], rep
     if (num % x) {
       x = 5;
       let add = 2;
-      while ((num % x) && (x < sqrt)) {
+      while (num % x && x < sqrt) {
         // search numbers: 5, 7, 11, 13, 17, 19, 23...
         x += add;
         // add each time: 2, 4, 2, 4, 2, 4, 2...
@@ -24,12 +28,12 @@ export function primeFactorsCompute(inputNum: number, result: number[] = [], rep
     }
   }
 
-  x = (x <= sqrt) ? x : num;
+  x = x <= sqrt ? x : num;
 
   if (!repeat) {
     const index = result.indexOf(x);
     if (index < 0) result.push(x);
   } else result.push(x);
 
-  return (x === num) ? result : primeFactorsCompute(num / x, result, repeat);
+  return x === num ? result : primeFactorsCompute(num / x, result, repeat);
 }

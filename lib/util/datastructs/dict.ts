@@ -1,6 +1,6 @@
-import { OrderedDict, QueryResult, SearchQuery } from "./types";
+import {OrderedDict, QueryResult, SearchQuery} from './types';
 
-export class Dict<K, V> implements OrderedDict<K,V> {
+export class Dict<K, V> implements OrderedDict<K, V> {
   private dict: {[key: number]: V[]};
 
   constructor(private toNumber: (key: K) => number) {
@@ -11,17 +11,23 @@ export class Dict<K, V> implements OrderedDict<K,V> {
     if (query.gte !== undefined) {
       const k = this.toNumber(query.gte);
       if (this.dict[k] !== undefined && this.dict[k].length > 0) {
-        return [{
-          key: query.gte, value: this.dict[k][this.dict[k].length - 1]
-        }];
+        return [
+          {
+            key: query.gte,
+            value: this.dict[k][this.dict[k].length - 1],
+          },
+        ];
       }
       return [];
     } else if (query.lte !== undefined) {
       const k = this.toNumber(query.lte);
       if (this.dict[k] !== undefined && this.dict[k].length > 0) {
-        return [{
-          key: query.lte, value: this.dict[k][this.dict[k].length - 1]
-        }];
+        return [
+          {
+            key: query.lte,
+            value: this.dict[k][this.dict[k].length - 1],
+          },
+        ];
       }
       return [];
     }

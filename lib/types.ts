@@ -1,5 +1,5 @@
-import { CPUTensor } from './tensor/cpu/tensor';
-import { compareShapes, getSize } from './util/shape';
+import {CPUTensor} from './tensor/cpu/tensor';
+import {compareShapes, getSize} from './util/shape';
 
 export type PadMode = 'constant' | 'reflect' | 'edge';
 
@@ -117,7 +117,7 @@ export default abstract class Tensor {
    * ```
    */
   sum(axes?: number | number[], keepDims?: boolean): Tensor {
-    let ax = this.getAxes(axes);
+    const ax = this.getAxes(axes);
     keepDims = keepDims || false;
     return this.sum_impl(ax, keepDims);
   }
@@ -131,7 +131,7 @@ export default abstract class Tensor {
    *
    */
   sumSquare(axes?: number | number[], keepDims?: boolean): Tensor {
-    let ax = this.getAxes(axes);
+    const ax = this.getAxes(axes);
     keepDims = keepDims || false;
     return this.sumSquare_impl(ax, keepDims);
   }
@@ -153,7 +153,7 @@ export default abstract class Tensor {
    * ```
    */
   product(axes?: number | number[], keepDims?: boolean): Tensor {
-    let ax = this.getAxes(axes);
+    const ax = this.getAxes(axes);
     keepDims = keepDims || false;
     return this.product_impl(ax, keepDims);
   }
@@ -175,7 +175,7 @@ export default abstract class Tensor {
    * ```
    */
   max(axes?: number | number[], keepDims?: boolean): Tensor {
-    let ax = this.getAxes(axes);
+    const ax = this.getAxes(axes);
     keepDims = keepDims || false;
     return this.max_impl(ax, keepDims);
   }
@@ -197,7 +197,7 @@ export default abstract class Tensor {
    * ```
    */
   min(axes?: number | number[], keepDims?: boolean): Tensor {
-    let ax = this.getAxes(axes);
+    const ax = this.getAxes(axes);
     keepDims = keepDims || false;
     return this.min_impl(ax, keepDims);
   }
@@ -212,7 +212,7 @@ export default abstract class Tensor {
    *
    */
   reduceMean(axes?: number | number[], keepDims?: boolean): Tensor {
-    let ax = this.getAxes(axes);
+    const ax = this.getAxes(axes);
     keepDims = keepDims || false;
 
     return this.reduceMean_impl(ax, keepDims);
@@ -228,7 +228,7 @@ export default abstract class Tensor {
    *
    */
   reduceMeanSquare(axes?: number | number[], keepDims?: boolean): Tensor {
-    let ax = this.getAxes(axes);
+    const ax = this.getAxes(axes);
     keepDims = keepDims || false;
 
     return this.reduceMeanSquare_impl(ax, keepDims);
@@ -249,13 +249,15 @@ export default abstract class Tensor {
    * @param strides Convolution stride for each spatial dimension. Defaults to 1 for all axes
    * @param activation Optional activation to apply. Defaults to the identity (so no activation)
    */
-  conv(kernel: Tensor,
-       bias?: Tensor,
-       dilations?: number[],
-       group?: number,
-       pads?: number[],
-       strides?: number[],
-       activation?: Activation): Tensor {
+  conv(
+    kernel: Tensor,
+    bias?: Tensor,
+    dilations?: number[],
+    group?: number,
+    pads?: number[],
+    strides?: number[],
+    activation?: Activation
+  ): Tensor {
     const sh = this.getShape();
     const dataRank = sh.length - 2;
 
@@ -265,10 +267,18 @@ export default abstract class Tensor {
     strides = strides || new Array(dataRank).fill(1);
 
     if (activation === undefined) {
-      activation = "id";
+      activation = 'id';
     }
 
-    return this.conv_impl(kernel, dilations, group, pads, strides, bias, activation);
+    return this.conv_impl(
+      kernel,
+      dilations,
+      group,
+      pads,
+      strides,
+      bias,
+      activation
+    );
   }
 
   /**
@@ -304,9 +314,7 @@ export default abstract class Tensor {
    * @param mode Padding mode. One of 'constant', 'edge', 'reflect'. Defaults to 'constant'
    * @param value Value for constant padding. Defaults to 0.0
    */
-  pad(pads: number[],
-      mode?: PadMode,
-      value?: number): Tensor {
+  pad(pads: number[], mode?: PadMode, value?: number): Tensor {
     if (mode === undefined) {
       mode = 'constant';
     }
@@ -325,10 +333,12 @@ export default abstract class Tensor {
    * @param strides Stride size of the average pooling kernel. Defaults to 1 for all axes
    * @param includePad Wether padded values should be included in the average (or masked out). Defaults to false
    */
-  averagePool(kernelShape: number[],
-              pads?: number[],
-              strides?: number[],
-              includePad?: boolean): Tensor {
+  averagePool(
+    kernelShape: number[],
+    pads?: number[],
+    strides?: number[],
+    includePad?: boolean
+  ): Tensor {
     const sh = this.getShape();
     const dataRank = sh.length - 2;
 
@@ -374,7 +384,10 @@ export default abstract class Tensor {
     return this.reshape_impl(shape, copy);
   }
 
-  protected abstract reshape_impl(shape: readonly number[], copy: boolean): Tensor;
+  protected abstract reshape_impl(
+    shape: readonly number[],
+    copy: boolean
+  ): Tensor;
 
   /**
    * Takes the exponential of each value of the tensor
@@ -396,7 +409,10 @@ export default abstract class Tensor {
    */
   abstract abs(): Tensor;
 
-  alignShapes(shape1: readonly number[], shape2: readonly number[]): (readonly number[])[] {
+  alignShapes(
+    shape1: readonly number[],
+    shape2: readonly number[]
+  ): (readonly number[])[] {
     if (compareShapes(shape1, shape2)) {
       return [shape1, shape2, shape1];
     }
@@ -431,6 +447,7 @@ export default abstract class Tensor {
     if (compareShapes(thisShape, thatShape)) {
       return [this, tensor, thisShape];
     }
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     let th: Tensor = this;
     if (thisShape.length < thatShape.length) {
       thisShape = [...thisShape];
@@ -498,7 +515,11 @@ export default abstract class Tensor {
    */
   subtract(tensor: Tensor) {
     const [th, tens, resultShape] = this.alignTensor(tensor);
-    return this.subtract_impl(th as Tensor, tens as Tensor, resultShape as number[]);
+    return this.subtract_impl(
+      th as Tensor,
+      tens as Tensor,
+      resultShape as number[]
+    );
   }
 
   /**
@@ -523,7 +544,11 @@ export default abstract class Tensor {
    */
   multiply(tensor: Tensor) {
     const [th, tens, resultShape] = this.alignTensor(tensor);
-    return this.multiply_impl(th as Tensor, tens as Tensor, resultShape as number[]);
+    return this.multiply_impl(
+      th as Tensor,
+      tens as Tensor,
+      resultShape as number[]
+    );
   }
 
   /**
@@ -548,7 +573,11 @@ export default abstract class Tensor {
    */
   divide(tensor: Tensor) {
     const [th, tens, resultShape] = this.alignTensor(tensor);
-    return this.divide_impl(th as Tensor, tens as Tensor, resultShape as number[]);
+    return this.divide_impl(
+      th as Tensor,
+      tens as Tensor,
+      resultShape as number[]
+    );
   }
 
   /**
@@ -573,7 +602,11 @@ export default abstract class Tensor {
    */
   power(tensor: Tensor) {
     const [th, tens, resultShape] = this.alignTensor(tensor);
-    return this.power_impl(th as Tensor, tens as Tensor, resultShape as number[]);
+    return this.power_impl(
+      th as Tensor,
+      tens as Tensor,
+      resultShape as number[]
+    );
   }
 
   /**
@@ -596,7 +629,7 @@ export default abstract class Tensor {
       const rank = shape.length;
       permutation = [];
       for (let i = 0; i < rank; i++) {
-        permutation.push(rank - i - 1)
+        permutation.push(rank - i - 1);
       }
     }
     return this.transpose_impl(permutation);
@@ -636,8 +669,14 @@ export default abstract class Tensor {
    * @param c Optional tensor to add to the result.
    * @param beta Beta parameter, only used if c is specified. Defaults to 1.0
    */
-  gemm(b: Tensor, aTranspose?: boolean, bTranspose?: boolean,
-       alpha?: number, c?: Tensor, beta?: number): Tensor {
+  gemm(
+    b: Tensor,
+    aTranspose?: boolean,
+    bTranspose?: boolean,
+    alpha?: number,
+    c?: Tensor,
+    beta?: number
+  ): Tensor {
     aTranspose = aTranspose || false;
     bTranspose = bTranspose || false;
     alpha = alpha !== undefined ? alpha : 1;
@@ -683,7 +722,7 @@ export default abstract class Tensor {
     if (axes === undefined) {
       axes = [];
       for (let i = 0; i < rank; i++) {
-        axes.push(i)
+        axes.push(i);
       }
     }
     starts = [...starts];
@@ -831,20 +870,52 @@ export default abstract class Tensor {
    * x'' = x'*scale + bias
    * ```
    */
-  abstract normalize(mean: Tensor, variance: Tensor, epsilon: number, scale: Tensor, bias: Tensor): Tensor;
+  abstract normalize(
+    mean: Tensor,
+    variance: Tensor,
+    epsilon: number,
+    scale: Tensor,
+    bias: Tensor
+  ): Tensor;
 
-  protected abstract add_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor;
+  protected abstract add_impl(
+    th: Tensor,
+    tensor: Tensor,
+    resultShape: readonly number[]
+  ): Tensor;
 
-  protected abstract subtract_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor;
+  protected abstract subtract_impl(
+    th: Tensor,
+    tensor: Tensor,
+    resultShape: readonly number[]
+  ): Tensor;
 
-  protected abstract multiply_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor;
+  protected abstract multiply_impl(
+    th: Tensor,
+    tensor: Tensor,
+    resultShape: readonly number[]
+  ): Tensor;
 
-  protected abstract divide_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor;
+  protected abstract divide_impl(
+    th: Tensor,
+    tensor: Tensor,
+    resultShape: readonly number[]
+  ): Tensor;
 
-  protected abstract power_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor;
+  protected abstract power_impl(
+    th: Tensor,
+    tensor: Tensor,
+    resultShape: readonly number[]
+  ): Tensor;
 
-  protected abstract gemm_impl(b: Tensor, aTranspose: boolean, bTranspose: boolean,
-                     alpha: number, beta: number, C?: Tensor): Tensor;
+  protected abstract gemm_impl(
+    b: Tensor,
+    aTranspose: boolean,
+    bTranspose: boolean,
+    alpha: number,
+    beta: number,
+    C?: Tensor
+  ): Tensor;
 
   protected abstract sum_impl(axes: number[], keepDims: boolean): Tensor;
   protected abstract sumSquare_impl(axes: number[], keepDims: boolean): Tensor;
@@ -857,30 +928,43 @@ export default abstract class Tensor {
 
   protected abstract reduceMean_impl(axes: number[], keepDims: boolean): Tensor;
 
-  protected abstract reduceMeanSquare_impl(axes: number[], keepDims: boolean): Tensor;
+  protected abstract reduceMeanSquare_impl(
+    axes: number[],
+    keepDims: boolean
+  ): Tensor;
 
-  protected abstract conv_impl(kernel: Tensor,
-                     dilations: number[],
-                     group: number,
-                     pads: number[],
-                     strides: number[],
-                     bias?: Tensor,
-                     activation?: Activation): Tensor;
+  protected abstract conv_impl(
+    kernel: Tensor,
+    dilations: number[],
+    group: number,
+    pads: number[],
+    strides: number[],
+    bias?: Tensor,
+    activation?: Activation
+  ): Tensor;
 
-  protected abstract pad_impl(pads: number[],
-                    mode: PadMode,
-                    value: number): Tensor;
+  protected abstract pad_impl(
+    pads: number[],
+    mode: PadMode,
+    value: number
+  ): Tensor;
 
-  protected abstract averagePool_impl(kernelShape: number[],
-                             pads: number[],
-                             strides: number[],
-                             includePad: boolean): Tensor;
+  protected abstract averagePool_impl(
+    kernelShape: number[],
+    pads: number[],
+    strides: number[],
+    includePad: boolean
+  ): Tensor;
 
   protected abstract transpose_impl(permutation: number[]): Tensor;
 
-  protected abstract slice_impl(starts: number[], ends: number[], axes: number[]): Tensor;
+  protected abstract slice_impl(
+    starts: number[],
+    ends: number[],
+    axes: number[]
+  ): Tensor;
 }
 
-export type Activation = "id" | "relu" | "relu6";
+export type Activation = 'id' | 'relu' | 'relu6';
 
 export type Precision = 16 | 32;

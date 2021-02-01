@@ -1,0 +1,8 @@
+dist/
+docs/
+examples/
+pkg/
+target/
+lib/wasm/
+
+webpack.config.js

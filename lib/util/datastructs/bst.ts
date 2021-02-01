@@ -51,7 +51,7 @@ export class BinarySearchTree<K,V> {
     this.left = null;
     this.right = null;
     this.parent = options.parent !== undefined ? options.parent : null;
-    if (options.hasOwnProperty('key')) { this.key = options.key; }
+    if (options.key !== undefined) { this.key = options.key; }
     this.value = options.hasOwnProperty('value') ? [options.value] : [];
     this.unique = options.unique || false;
 
@@ -390,9 +390,9 @@ export class BinarySearchTree<K,V> {
       if (this.right) { this.right.delete(key, value); }
       return;
     }
-  
+
     if (!(this.compareKeys(key, this.key) === 0)) { return; }
-  
+
     // Delete only a value
     if (this.value.length > 1 && value !== undefined) {
       this.value.forEach((d) => {
@@ -401,7 +401,7 @@ export class BinarySearchTree<K,V> {
       this.value = newValues;
       return;
     }
-  
+
     // Delete the whole node
     if (this.deleteIfLeaf()) {
       return;
@@ -409,15 +409,16 @@ export class BinarySearchTree<K,V> {
     if (this.deleteIfOnlyOneChild()) {
       return;
     }
-  
+
     // We are in the case where the node to delete has two children
     if (Math.random() >= 0.5) {   // Randomize replacement to avoid unbalancing the tree too much
       // Use the in-order predecessor
+      //@ts-ignore
       replaceWith = this.left.getMaxKeyDescendant();
-  
+
       this.key = replaceWith.key;
       this.value = replaceWith.value;
-  
+
       if (this === replaceWith.parent) {   // Special case
         this.left = replaceWith.left;
         if (replaceWith.left) { replaceWith.left.parent = replaceWith.parent; }
@@ -427,15 +428,17 @@ export class BinarySearchTree<K,V> {
       }
     } else {
       // Use the in-order successor
+      //@ts-ignore
       replaceWith = this.right.getMinKeyDescendant();
-  
+
       this.key = replaceWith.key;
       this.value = replaceWith.value;
-  
+
       if (this === replaceWith.parent) {   // Special case
         this.right = replaceWith.right;
         if (replaceWith.right) { replaceWith.right.parent = replaceWith.parent; }
       } else {
+        //@ts-ignore
         replaceWith.parent.left = replaceWith.right;
         if (replaceWith.right) { replaceWith.right.parent = replaceWith.parent; }
       }
