@@ -33,7 +33,7 @@ module.exports = function (config) {
       module: webpackConfig.module,
       resolve: webpackConfig.resolve,
       mode: 'development',
-      devtool: false,
+      devtool: 'false',
       plugins: [
         new webpack.SourceMapDevToolPlugin({
           test: /\.(ts|js|css)($|\?)/i,
@@ -43,10 +43,20 @@ module.exports = function (config) {
     },
     webpackMiddleware: {
       logLevel: 'error',
+      noInfo: true
     },
-    reporters: ['spec'],
+    reporters: ['spec', 'coverage-istanbul'],
     port: 9876,
     colors: true,
+
+    coverageIstanbulReporter: {
+      reports: [ 'html', 'text-summary', 'lcovonly' ],
+      dir: path.join(__dirname, 'coverage'),
+      fixWebpackSourcePaths: true,
+      'report-config': {
+        html: { outdir: 'html' }
+      }
+    },
 
     // level of logging
     // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG

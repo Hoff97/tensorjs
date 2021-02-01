@@ -25,3 +25,5 @@ karma.performance.js
 dist/test
 tsconfig.json
 webpack.config.js
+
+coverage/
