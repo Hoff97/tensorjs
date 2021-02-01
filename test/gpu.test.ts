@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {GPUTensor} from '../lib/tensor/gpu/tensor';
 import testBasic from './basic';
 import testConv from './conv';
@@ -20,7 +21,6 @@ describe('GPU create tensor', () => {
   });
 });
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const constructor = (shape: ReadonlyArray<number>, values: number[]) => {
   const vals = Float32Array.from(values);
   return new GPUTensor(vals, shape, 32);
