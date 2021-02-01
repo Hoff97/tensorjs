@@ -1,10 +1,9 @@
-import { defaultAllocator } from "../../../tensor/gpu/gl";
-import { GPUTensorConstructor, GPUTensorI } from "../../../tensor/gpu/interface";
-import { GPUMemoryAllocator } from "../../../tensor/gpu/memory";
-import { Precision } from "../../../types";
-import { getSize } from "../../../util/shape";
-import { Input, Operation } from "../operation";
-
+import {defaultAllocator} from '../../../tensor/gpu/gl';
+import {GPUTensorConstructor, GPUTensorI} from '../../../tensor/gpu/interface';
+import {GPUMemoryAllocator} from '../../../tensor/gpu/memory';
+import {Precision} from '../../../types';
+import {getSize} from '../../../util/shape';
+import {Input, Operation} from '../operation';
 
 export interface ConcatInfo {
   shapeA?: readonly number[];
@@ -15,7 +14,7 @@ export interface ConcatInfo {
   widthB?: number;
   heightB?: number;
 
-  shapeOutput?: readonly number[],
+  shapeOutput?: readonly number[];
   widthOutput?: number;
   heightOutput?: number;
 
@@ -28,8 +27,15 @@ export interface ConcatInput {
   axis: number;
 }
 
-export class ConcatOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTensor, ConcatInfo, ConcatInput> {
-  constructor(tensorConstructor: GPUTensorConstructor<GPUTensor>, allocator?: GPUMemoryAllocator) {
+export class ConcatOperation<GPUTensor extends GPUTensorI> extends Operation<
+  GPUTensor,
+  ConcatInfo,
+  ConcatInput
+> {
+  constructor(
+    tensorConstructor: GPUTensorConstructor<GPUTensor>,
+    allocator?: GPUMemoryAllocator
+  ) {
     super(tensorConstructor, allocator);
   }
 
@@ -40,11 +46,10 @@ export class ConcatOperation<GPUTensor extends GPUTensorI> extends Operation<GPU
   }
 
   getUniformAttrs(): Input[] {
-    return [
-      { name: "axis"}
-    ];
+    return [{name: 'axis'}];
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getFragmentShader(info: ConcatInfo): string {
     return `
     float process(int index[${this.maxRank}]) {
@@ -68,17 +73,21 @@ export class ConcatOperation<GPUTensor extends GPUTensorI> extends Operation<GPU
   }
 
   getTextureNames(): string[] {
-    return ["A", "B"];
+    return ['A', 'B'];
   }
 
   calc(input: ConcatInput): GPUTensor {
-    if (this.fullyStatic) {
+    if (this.fullyStatic && this.outputShape !== undefined) {
       return this.compute(this.outputShape, {A: input.A, B: input.B});
     }
 
     const outputShape = this.getOutputShape(input);
 
-    return this.compute(outputShape, {A: input.A, B: input.B}, {axis: input.axis});
+    return this.compute(
+      outputShape,
+      {A: input.A, B: input.B},
+      {axis: input.axis}
+    );
   }
 
   getOutputShape(input: ConcatInput): readonly number[] {
@@ -100,7 +109,10 @@ export class ConcatOperation<GPUTensor extends GPUTensorI> extends Operation<GPU
 
   getCompilationInfo(input: ConcatInput, precision: Precision): ConcatInfo {
     const outputShape = this.getOutputShape(input);
-    const outputSize = defaultAllocator.getAllocationDimensions(getSize(outputShape), precision);
+    const outputSize = defaultAllocator.getAllocationDimensions(
+      getSize(outputShape),
+      precision
+    );
 
     return {
       shapeA: input.A.shape,
@@ -115,8 +127,8 @@ export class ConcatOperation<GPUTensor extends GPUTensorI> extends Operation<GPU
       widthOutput: outputSize.width,
       heightOutput: outputSize.height,
 
-      axis: input.axis
-    }
+      axis: input.axis,
+    };
   }
 
   getInputInfoString(input: ConcatInput): string {

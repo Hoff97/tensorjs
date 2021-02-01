@@ -10,9 +10,12 @@ export abstract class BinaryNode extends OnnxNode {
     inputs: string[],
     outputs: string[],
     constants: Constants,
-    onnxVersion: number
+    onnxVersion: number,
+    name: string
   ) {
     super(attributes, inputs, outputs, constants, onnxVersion);
+
+    this.name = name;
   }
 
   abstract compute(a: Tensor, b: Tensor): Tensor;

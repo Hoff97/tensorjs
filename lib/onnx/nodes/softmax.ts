@@ -14,6 +14,7 @@ export class SoftmaxNode extends OnnxNode {
   ) {
     super(attributes, inputs, outputs, constants, onnxVersion);
 
+    //@ts-ignore
     this.axis = this.getAttributeInt('axis');
   }
 

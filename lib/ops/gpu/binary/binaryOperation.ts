@@ -1,10 +1,9 @@
-import { defaultAllocator } from "../../../tensor/gpu/gl";
-import { GPUTensorConstructor, GPUTensorI } from "../../../tensor/gpu/interface";
-import { GPUMemoryAllocator } from "../../../tensor/gpu/memory";
-import { Precision } from "../../../types";
-import { getSize } from "../../../util/shape";
-import { Operation } from "./../operation";
-
+import {defaultAllocator} from '../../../tensor/gpu/gl';
+import {GPUTensorConstructor, GPUTensorI} from '../../../tensor/gpu/interface';
+import {GPUMemoryAllocator} from '../../../tensor/gpu/memory';
+import {Precision} from '../../../types';
+import {getSize} from '../../../util/shape';
+import {Operation} from './../operation';
 
 export interface BinaryOpInfo {
   shapeA?: readonly number[];
@@ -13,7 +12,7 @@ export interface BinaryOpInfo {
   shapeB?: readonly number[];
   widthB?: number;
   heightB?: number;
-  shapeOutput?: readonly number[],
+  shapeOutput?: readonly number[];
   widthOutput?: number;
   heightOutput?: number;
 }
@@ -24,13 +23,19 @@ export interface BinaryOpInput {
   outputShape: readonly number[];
 }
 
-export abstract class BinaryOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTensor, BinaryOpInfo, BinaryOpInput> {
-  constructor(tensorConstructor: GPUTensorConstructor<GPUTensor>, allocator?: GPUMemoryAllocator) {
+export abstract class BinaryOperation<
+  GPUTensor extends GPUTensorI
+> extends Operation<GPUTensor, BinaryOpInfo, BinaryOpInput> {
+  constructor(
+    tensorConstructor: GPUTensorConstructor<GPUTensor>,
+    allocator?: GPUMemoryAllocator
+  ) {
     super(tensorConstructor, allocator);
   }
 
   abstract getOp(a: string, b: string): string;
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getFragmentShader(info: BinaryOpInfo): string {
     return `
     float process(int[${this.maxRank}] index) {
@@ -46,11 +51,11 @@ export abstract class BinaryOperation<GPUTensor extends GPUTensorI> extends Oper
   }
 
   getTextureNames(): string[] {
-    return ["A", "B"];
+    return ['A', 'B'];
   }
 
   calc(input: BinaryOpInput): GPUTensor {
-    return this.compute(input.outputShape, {A: input.A, B: input.B})
+    return this.compute(input.outputShape, {A: input.A, B: input.B});
   }
 
   compile(info: BinaryOpInfo, precision: Precision) {
@@ -65,7 +70,10 @@ export abstract class BinaryOperation<GPUTensor extends GPUTensorI> extends Oper
   }
 
   getCompilationInfo(input: BinaryOpInput, precision: Precision): BinaryOpInfo {
-    const outputSize = defaultAllocator.getAllocationDimensions(getSize(input.outputShape), precision);
+    const outputSize = defaultAllocator.getAllocationDimensions(
+      getSize(input.outputShape),
+      precision
+    );
 
     return {
       shapeA: input.A.shape,
@@ -76,7 +84,7 @@ export abstract class BinaryOperation<GPUTensor extends GPUTensorI> extends Oper
       heightB: input.B.memory.height,
       shapeOutput: input.outputShape,
       widthOutput: outputSize.width,
-      heightOutput: outputSize.height
+      heightOutput: outputSize.height,
     };
   }
 

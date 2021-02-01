@@ -1,18 +1,17 @@
-import { CPUTensor } from "../../../tensor/cpu/tensor";
-import { defaultAllocator } from "../../../tensor/gpu/gl";
-import { GPUTensorConstructor, GPUTensorI } from "../../../tensor/gpu/interface";
-import { GPUMemoryAllocator } from "../../../tensor/gpu/memory";
-import { Precision } from "../../../types";
-import { computeStrides, getSize } from "../../../util/shape";
-import { Input, Operation } from "../operation";
-
+import {CPUTensor} from '../../../tensor/cpu/tensor';
+import {defaultAllocator} from '../../../tensor/gpu/gl';
+import {GPUTensorConstructor, GPUTensorI} from '../../../tensor/gpu/interface';
+import {GPUMemoryAllocator} from '../../../tensor/gpu/memory';
+import {Precision} from '../../../types';
+import {computeStrides, getSize} from '../../../util/shape';
+import {Input, Operation} from '../operation';
 
 export interface GatherInfo {
   shapeX?: readonly number[];
   widthX?: number;
   heightX?: number;
 
-  shapeOutput?: readonly number[],
+  shapeOutput?: readonly number[];
   widthOutput?: number;
   heightOutput?: number;
 
@@ -30,31 +29,45 @@ export interface GatherInput {
   axis: number;
 }
 
-export class GatherOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTensor, GatherInfo, GatherInput> {
+export class GatherOperation<GPUTensor extends GPUTensorI> extends Operation<
+  GPUTensor,
+  GatherInfo,
+  GatherInput
+> {
   protected gatherMaxIxSize = 10;
 
-  constructor(tensorConstructor: GPUTensorConstructor<GPUTensor>, allocator?: GPUMemoryAllocator) {
+  constructor(
+    tensorConstructor: GPUTensorConstructor<GPUTensor>,
+    allocator?: GPUMemoryAllocator
+  ) {
     super(tensorConstructor, allocator);
   }
 
   getVariables() {
     return `
     ${this.getVarModifier('axis')} int axis;
-    ${this.getVarModifier('indexValues')} int indexValues[${this.gatherMaxIxSize}];
-    ${this.getVarModifier('mappedIndexStrides')} int mappedIndexStrides[${this.maxRank}];
-    ${this.getVarModifier('mappedInputStrides')} int mappedInputStrides[${this.maxRank}];
+    ${this.getVarModifier('indexValues')} int indexValues[${
+      this.gatherMaxIxSize
+    }];
+    ${this.getVarModifier('mappedIndexStrides')} int mappedIndexStrides[${
+      this.maxRank
+    }];
+    ${this.getVarModifier('mappedInputStrides')} int mappedInputStrides[${
+      this.maxRank
+    }];
     `;
   }
 
   getUniformAttrs(): Input[] {
     return [
-      { name: "axis" },
-      { name: "indexValues", length: this.gatherMaxIxSize },
-      { name: "mappedInputStrides", length: this.maxRank },
-      { name: "mappedIndexStrides", length: this.maxRank }
+      {name: 'axis'},
+      {name: 'indexValues', length: this.gatherMaxIxSize},
+      {name: 'mappedInputStrides', length: this.maxRank},
+      {name: 'mappedIndexStrides', length: this.maxRank},
     ];
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getFragmentShader(info: GatherInfo): string {
     return `
     float process(int index[${this.maxRank}]) {
@@ -88,16 +101,18 @@ export class GatherOperation<GPUTensor extends GPUTensorI> extends Operation<GPU
   }
 
   getTextureNames(): string[] {
-    return ["X"];
+    return ['X'];
   }
 
   calc(input: GatherInput): GPUTensor {
-    if (this.fullyStatic) {
+    if (this.fullyStatic && this.outputShape !== undefined) {
       return this.compute(this.outputShape, {X: input.X});
     }
 
     if (input.indices.size > this.gatherMaxIxSize) {
-      throw new Error(`Gather on GPU can deal with at most ${this.gatherMaxIxSize} indices, input had ${input.indices.size}`);
+      throw new Error(
+        `Gather on GPU can deal with at most ${this.gatherMaxIxSize} indices, input had ${input.indices.size}`
+      );
     }
 
     const r = input.X.shape.length;
@@ -131,12 +146,19 @@ export class GatherOperation<GPUTensor extends GPUTensorI> extends Operation<GPU
       mappedIndexStrides[i + q - 1] = 0;
     }
 
-    return this.compute(resultShape, {X: input.X}, {
-      axis: input.axis,
-      indexValues: this.pad(Array.from(input.indices.values), this.gatherMaxIxSize),
-      mappedInputStrides: this.pad(mappedInputStrides),
-      mappedIndexStrides: this.pad(mappedIndexStrides)
-    })
+    return this.compute(
+      resultShape,
+      {X: input.X},
+      {
+        axis: input.axis,
+        indexValues: this.pad(
+          Array.from(input.indices.values),
+          this.gatherMaxIxSize
+        ),
+        mappedInputStrides: this.pad(mappedInputStrides),
+        mappedIndexStrides: this.pad(mappedIndexStrides),
+      }
+    );
   }
 
   getOutputShape(input: GatherInput): readonly number[] {
@@ -208,7 +230,10 @@ export class GatherOperation<GPUTensor extends GPUTensorI> extends Operation<GPU
 
   getCompilationInfo(input: GatherInput, precision: Precision): GatherInfo {
     const outputShape = this.getOutputShape(input);
-    const outputSize = defaultAllocator.getAllocationDimensions(getSize(outputShape), precision);
+    const outputSize = defaultAllocator.getAllocationDimensions(
+      getSize(outputShape),
+      precision
+    );
 
     const r = input.X.shape.length;
     const q = input.indices.shape.length;
@@ -253,11 +278,13 @@ export class GatherOperation<GPUTensor extends GPUTensorI> extends Operation<GPU
       axis: input.axis,
       indexValues: Array.from(input.indices.values),
       mappedIndexStrides,
-      mappedInputStrides
+      mappedInputStrides,
     };
   }
 
   getInputInfoString(input: GatherInput): string {
-    return `${input.X.shape}-${input.axis}-${Array.from(input.indices.values)}-${input.indices.shape}`;
+    return `${input.X.shape}-${input.axis}-${Array.from(
+      input.indices.values
+    )}-${input.indices.shape}`;
   }
 }

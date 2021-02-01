@@ -1,10 +1,10 @@
 import {onnx} from 'onnx-proto';
 
-import Tensor from '../types';
-import { CPUTensor } from "../tensor/cpu/tensor";
-import { TENSOR_FLOAT, TENSOR_INT64 } from './definitions';
+import {CPUTensor} from '../tensor/cpu/tensor';
+import {TENSOR_FLOAT, TENSOR_INT64} from './definitions';
+// eslint-disable-next-line node/no-extraneous-import
 import Long from 'long';
-import { getSize } from '../util/shape';
+import {getSize} from '../util/shape';
 
 export function createTensor(tensorProto: onnx.ITensorProto): CPUTensor {
   if (tensorProto.segment !== undefined && tensorProto.segment !== null) {
@@ -17,6 +17,7 @@ export function createTensor(tensorProto: onnx.ITensorProto): CPUTensor {
   }
   for (let i = 0; i < shape.length; i++) {
     if (Long.isLong(shape[i])) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       shape[i] = (shape[i] as any).toNumber();
     }
   }
@@ -30,7 +31,10 @@ export function createTensor(tensorProto: onnx.ITensorProto): CPUTensor {
     if (tensorProto.floatData && tensorProto.floatData.length > 0) {
       return new CPUTensor(shape, tensorProto.floatData);
     } else if (tensorProto.rawData && tensorProto.rawData.length > 0) {
-      const buffer = tensorProto.rawData.buffer.slice(tensorProto.rawData.byteOffset, tensorProto.rawData.byteOffset+tensorProto.rawData.byteLength);
+      const buffer = tensorProto.rawData.buffer.slice(
+        tensorProto.rawData.byteOffset,
+        tensorProto.rawData.byteOffset + tensorProto.rawData.byteLength
+      );
       const values = new Float32Array(buffer);
       return new CPUTensor(shape, values);
     } else if (size === 0) {
@@ -42,15 +46,19 @@ export function createTensor(tensorProto: onnx.ITensorProto): CPUTensor {
     if (tensorProto.rawData && tensorProto.rawData.length > 0) {
       const values = new Int32Array(tensorProto.rawData.length / 8);
       for (let i = 0; i < tensorProto.rawData.length; i += 8) {
-        const value = Long.fromBytesLE(Array.from(tensorProto.rawData.slice(i,i+8))).toNumber();
-        values[i/8] = value;
+        const value = Long.fromBytesLE(
+          Array.from(tensorProto.rawData.slice(i, i + 8))
+        ).toNumber();
+        values[i / 8] = value;
       }
 
-      return new CPUTensor(shape, values, "int");
+      return new CPUTensor(shape, values, 'int');
     } else {
       throw new Error('Cant process int64 tensor without raw data');
     }
   } else {
-    throw new Error(`Handling of tensor type ${tensorProto.dataType} not yet implemented`);
+    throw new Error(
+      `Handling of tensor type ${tensorProto.dataType} not yet implemented`
+    );
   }
 }

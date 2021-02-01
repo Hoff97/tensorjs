@@ -1,10 +1,16 @@
-import { CPUTensor } from "../../tensor/cpu/tensor";
-import Tensor from "../../types";
-import { OnnxNode } from "../node";
-import { Attributes, Constants } from "../types";
+import {CPUTensor} from '../../tensor/cpu/tensor';
+import Tensor from '../../types';
+import {OnnxNode} from '../node';
+import {Attributes, Constants} from '../types';
 
 export class TileNode extends OnnxNode {
-  constructor(attributes: Attributes, inputs: string[], outputs: string[], constants: Constants, onnxVersion: number) {
+  constructor(
+    attributes: Attributes,
+    inputs: string[],
+    outputs: string[],
+    constants: Constants,
+    onnxVersion: number
+  ) {
     super(attributes, inputs, outputs, constants, onnxVersion);
   }
 
@@ -24,7 +30,9 @@ export class TileNode extends OnnxNode {
 
       return [x.repeat(_repeats)];
     }
-    throw new Error(`Tile with onnx version ${this.onnxVersion} not yet implemented`);
+    throw new Error(
+      `Tile with onnx version ${this.onnxVersion} not yet implemented`
+    );
   }
 
   getType() {

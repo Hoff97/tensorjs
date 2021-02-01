@@ -1,16 +1,21 @@
-import Tensor from "../../types";
-import { OnnxNode } from "../node";
-import { BatchNormalizationNode } from "../nodes/batchNormalization";
-import { ConvNode } from "../nodes/conv";
-import { Constants } from "../types";
-import { SequenceOptimization } from "./optimization";
+import Tensor from '../../types';
+import {OnnxNode} from '../node';
+import {BatchNormalizationNode} from '../nodes/batchNormalization';
+import {ConvNode} from '../nodes/conv';
+import {Constants} from '../types';
+import {SequenceOptimization} from './optimization';
 
 export class ConvBatchNorm extends SequenceOptimization {
   constructor() {
     super(['Conv', 'BatchNormalization']);
   }
 
-  apply(nodes: OnnxNode[], resolveConstant: (name: string) => Tensor, constants: Constants, onnxVersion: number): OnnxNode {
+  apply(
+    nodes: OnnxNode[],
+    resolveConstant: (name: string) => Tensor,
+    constants: Constants,
+    onnxVersion: number
+  ): OnnxNode {
     const conv = nodes[0] as ConvNode;
     const batchNorm = nodes[1] as BatchNormalizationNode;
 
@@ -28,9 +33,14 @@ export class ConvBatchNorm extends SequenceOptimization {
     varSqrt.delete();
     const bias = biasBN.subtract(meanBN.multiply(scale));
 
-    const newShape = [...scale.getShape(),...new Array(kernelConv.getShape().length - scale.getShape().length).fill(1)]
+    const newShape = [
+      ...scale.getShape(),
+      ...new Array(kernelConv.getShape().length - scale.getShape().length).fill(
+        1
+      ),
+    ];
 
-    let newKernel = kernelConv.multiply(scale.reshape(newShape, false));
+    const newKernel = kernelConv.multiply(scale.reshape(newShape, false));
     let newBias = bias;
     if (biasConv !== undefined) {
       const scaledBias = biasConv.multiply(scale);
@@ -38,8 +48,14 @@ export class ConvBatchNorm extends SequenceOptimization {
       scaledBias.delete();
     }
 
-    return new ConvNode(Object.entries(conv.attributes).map(x => x[1]), [conv.inputs[0]],
-                        batchNorm.outputs, constants, onnxVersion,
-                        newKernel, newBias);
+    return new ConvNode(
+      Object.entries(conv.attributes).map(x => x[1]),
+      [conv.inputs[0]],
+      batchNorm.outputs,
+      constants,
+      onnxVersion,
+      newKernel,
+      newBias
+    );
   }
 }

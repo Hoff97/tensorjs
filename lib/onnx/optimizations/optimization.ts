@@ -1,8 +1,7 @@
 import Tensor from '../../types';
-import { NodeId, OnnxModel } from '../model';
-import { OnnxNode } from '../node';
-import { Constants, OnnxModelI } from '../types';
-
+import {NodeId} from '../model';
+import {OnnxNode} from '../node';
+import {Constants, OnnxModelI} from '../types';
 
 export abstract class Optimization {
   /**
@@ -15,7 +14,12 @@ export abstract class Optimization {
    */
   abstract findApplications(model: OnnxModelI): NodeId[][];
 
-  abstract apply(nodes: OnnxNode[], resolveConstant: (name: string) => Tensor, constants: Constants, onnxVersion: number): OnnxNode;
+  abstract apply(
+    nodes: OnnxNode[],
+    resolveConstant: (name: string) => Tensor | undefined,
+    constants: Constants,
+    onnxVersion: number
+  ): OnnxNode;
 }
 
 export abstract class SequenceOptimization extends Optimization {
@@ -31,12 +35,13 @@ export abstract class SequenceOptimization extends Optimization {
 
     const nodes = model.getNodes();
 
-    for (let nodeId in Object.keys(nodes)) {
+    for (const nodeId in Object.keys(nodes)) {
       const node = nodes[nodeId];
 
       if (node !== undefined && node.getType() === this.nodeTypes[0]) {
         const app = this.checkApplication(model, nodeId);
         if (app !== undefined) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           results.push(app as any);
         }
       }
@@ -49,6 +54,7 @@ export abstract class SequenceOptimization extends Optimization {
     const nodes = model.getNodes();
 
     const nodeSeq = [nodeId];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let lastNode = nodes[nodeId as any];
     const nodeInstances = [lastNode];
     for (let i = 1; i < this.nodeTypes.length; i++) {
@@ -57,6 +63,7 @@ export abstract class SequenceOptimization extends Optimization {
         const nextNode = nodes[nextNodeId];
 
         if (nextNode.getType() === this.nodeTypes[i]) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           nodeSeq.push(nextNodeId as any);
           lastNode = nextNode;
           nodeInstances.push(lastNode);
@@ -74,6 +81,7 @@ export abstract class SequenceOptimization extends Optimization {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   canApply(nodes: OnnxNode[]) {
     return true;
   }

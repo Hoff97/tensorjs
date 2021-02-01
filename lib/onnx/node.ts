@@ -1,7 +1,7 @@
 // eslint-disable-next-line node/no-extraneous-import
 import Long from 'long';
 import {onnx} from 'onnx-proto';
-import {Tensor} from '../library';
+import {Precision, Tensor} from '../library';
 import {Attributes, Constants} from './types';
 
 export abstract class OnnxNode {
@@ -36,7 +36,8 @@ export abstract class OnnxNode {
     }
   }
 
-  initialize() {}
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  initialize(resolveConstant: (name: string) => Tensor | undefined) {}
 
   getAttribute(name: string) {
     return this.attributes[name];
@@ -103,7 +104,8 @@ export abstract class OnnxNode {
 
   async toCPU() {}
   async toWASM() {}
-  async toGPU() {}
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async toGPU(precision: Precision) {}
 
   abstract forward(inputs: Tensor[]): Promise<Tensor[]>;
 

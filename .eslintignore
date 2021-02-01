@@ -5,4 +5,6 @@ pkg/
 target/
 lib/wasm/
 
+karma.conf.js
+
 webpack.config.js

@@ -43,7 +43,7 @@ function loadOnnxModels() {
       const copyDir = `${dataDir}/models/${model.name}`;
       mkdirSync(copyDir);
       execSync(`cp tmp/${model.fileName} ${copyDir}`);
-      execSync(`cd ${copyDir} && mv ${model.fileName} ${model.name}.onnx`)
+      execSync(`cd ${copyDir} && mv ${model.fileName} ${model.name}.onnx`);
     }
   }
 }

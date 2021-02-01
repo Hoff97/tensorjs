@@ -1,15 +1,14 @@
-import { defaultAllocator } from "../../../tensor/gpu/gl";
-import { GPUTensorConstructor, GPUTensorI } from "../../../tensor/gpu/interface";
-import { GPUMemoryAllocator } from "../../../tensor/gpu/memory";
-import { Precision } from "../../../types";
-import { Input, Operation } from "../operation";
-
+import {defaultAllocator} from '../../../tensor/gpu/gl';
+import {GPUTensorConstructor, GPUTensorI} from '../../../tensor/gpu/interface';
+import {GPUMemoryAllocator} from '../../../tensor/gpu/memory';
+import {Precision} from '../../../types';
+import {Input, Operation} from '../operation';
 
 export interface ClipInfo {
   shapeX?: readonly number[];
   widthX?: number;
   heightX?: number;
-  shapeOutput?: readonly number[],
+  shapeOutput?: readonly number[];
   widthOutput?: number;
   heightOutput?: number;
 
@@ -25,11 +24,19 @@ export interface ClipInput {
   maxVal?: number;
 }
 
-export class ClipOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTensor, ClipInfo, ClipInput> {
-  constructor(tensorConstructor: GPUTensorConstructor<GPUTensor>, allocator?: GPUMemoryAllocator) {
+export class ClipOperation<GPUTensor extends GPUTensorI> extends Operation<
+  GPUTensor,
+  ClipInfo,
+  ClipInput
+> {
+  constructor(
+    tensorConstructor: GPUTensorConstructor<GPUTensor>,
+    allocator?: GPUMemoryAllocator
+  ) {
     super(tensorConstructor, allocator);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getFragmentShader(info: ClipInfo): string {
     return `
     void main() {
@@ -52,7 +59,7 @@ export class ClipOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTe
   }
 
   getTextureNames(): string[] {
-    return ["X"];
+    return ['X'];
   }
 
   getVariables() {
@@ -66,24 +73,28 @@ export class ClipOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTe
 
   getUniformAttrs(): Input[] {
     return [
-      { name: "minVal", type: "float" },
-      { name: "maxVal", type: "float" },
-      { name: "doMin"},
-      { name: "doMax"}
+      {name: 'minVal', type: 'float'},
+      {name: 'maxVal', type: 'float'},
+      {name: 'doMin'},
+      {name: 'doMax'},
     ];
   }
 
   calc(input: ClipInput): GPUTensor {
-    if (this.fullyStatic) {
+    if (this.fullyStatic && this.outputShape !== undefined) {
       return this.compute(this.outputShape, {X: input.input});
     }
 
-    return this.compute(input.input.shape, {X: input.input}, {
-      minVal: input.minVal !== undefined ? input.minVal : 0,
-      maxVal: input.maxVal !== undefined ? input.maxVal : 0,
-      doMin: input.minVal !== undefined ? 1 : 0,
-      doMax: input.maxVal !== undefined ? 1 : 0
-    });
+    return this.compute(
+      input.input.shape,
+      {X: input.input},
+      {
+        minVal: input.minVal !== undefined ? input.minVal : 0,
+        maxVal: input.maxVal !== undefined ? input.maxVal : 0,
+        doMin: input.minVal !== undefined ? 1 : 0,
+        doMax: input.maxVal !== undefined ? 1 : 0,
+      }
+    );
   }
 
   getOutputShape(input: ClipInput): readonly number[] {
@@ -99,7 +110,10 @@ export class ClipOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTe
   }
 
   getCompilationInfo(input: ClipInput, precision: Precision): ClipInfo {
-    const outputSize = defaultAllocator.getAllocationDimensions(input.input.size, precision);
+    const outputSize = defaultAllocator.getAllocationDimensions(
+      input.input.size,
+      precision
+    );
 
     return {
       shapeX: input.input.shape,
@@ -112,8 +126,8 @@ export class ClipOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTe
       minVal: input.minVal !== undefined ? input.minVal : 0,
       maxVal: input.maxVal !== undefined ? input.maxVal : 0,
       doMin: input.minVal !== undefined ? 1 : 0,
-      doMax: input.maxVal !== undefined ? 1 : 0
-    }
+      doMax: input.maxVal !== undefined ? 1 : 0,
+    };
   }
 
   getInputInfoString(input: ClipInput): string {

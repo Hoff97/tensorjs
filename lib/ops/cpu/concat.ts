@@ -1,4 +1,4 @@
-import { CPUTensor } from '../../tensor/cpu/tensor';
+import {CPUTensor} from '../../tensor/cpu/tensor';
 
 export function concat(x: CPUTensor, y: CPUTensor, axis: number) {
   const outputShape = [...x.shape];
@@ -11,10 +11,11 @@ export function concat(x: CPUTensor, y: CPUTensor, axis: number) {
 
   let ix = 0;
 
-  let iterXSize = result.strides[axis] * x.shape[axis];
-  let iterYSize = result.strides[axis] * y.shape[axis];
+  const iterXSize = result.strides[axis] * x.shape[axis];
+  const iterYSize = result.strides[axis] * y.shape[axis];
 
-  let outerIters = result.size / (axis > 0 ? result.strides[axis - 1] : result.size);
+  const outerIters =
+    result.size / (axis > 0 ? result.strides[axis - 1] : result.size);
   for (let i = 0; i < outerIters; i++) {
     for (let j = 0; j < iterXSize; j++) {
       result.set(ix, x.get(indexX));

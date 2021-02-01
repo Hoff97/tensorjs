@@ -1,17 +1,16 @@
-import { defaultAllocator } from "../../../tensor/gpu/gl";
-import { GPUTensorConstructor, GPUTensorI } from "../../../tensor/gpu/interface";
-import { GPUMemoryAllocator } from "../../../tensor/gpu/memory";
-import { Precision } from "../../../types";
-import { computeStrides, getSize } from "../../../util/shape";
-import { poolResultShape } from "../../util/pool";
-import { Input, Operation } from "../operation";
-
+import {defaultAllocator} from '../../../tensor/gpu/gl';
+import {GPUTensorConstructor, GPUTensorI} from '../../../tensor/gpu/interface';
+import {GPUMemoryAllocator} from '../../../tensor/gpu/memory';
+import {Precision} from '../../../types';
+import {computeStrides, getSize} from '../../../util/shape';
+import {poolResultShape} from '../../util/pool';
+import {Input, Operation} from '../operation';
 
 export interface PoolInfo {
   shapeX?: readonly number[];
   widthX?: number;
   heightX?: number;
-  shapeOutput?: readonly number[],
+  shapeOutput?: readonly number[];
   widthOutput?: number;
   heightOutput?: number;
 
@@ -29,21 +28,29 @@ export interface PoolInput {
   keepDims: boolean;
 }
 
-export abstract class PoolOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTensor, PoolInfo, PoolInput> {
+export abstract class PoolOperation<
+  GPUTensor extends GPUTensorI
+> extends Operation<GPUTensor, PoolInfo, PoolInput> {
   protected maxIterations = 1000000;
 
-  constructor(tensorConstructor: GPUTensorConstructor<GPUTensor>, allocator?: GPUMemoryAllocator) {
+  constructor(
+    tensorConstructor: GPUTensorConstructor<GPUTensor>,
+    allocator?: GPUMemoryAllocator
+  ) {
     super(tensorConstructor, allocator);
   }
 
   getVariables() {
     return `
-    ${this.getVarModifier('mappedInputStrides')} int mappedInputStrides[${this.maxRank}];
+    ${this.getVarModifier('mappedInputStrides')} int mappedInputStrides[${
+      this.maxRank
+    }];
     ${this.getVarModifier('mappedInputStrides')} int sumDims[${this.maxRank}];
     ${this.getVarModifier('mappedInputStrides')} int sumSize;
     `;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getFragmentShader(info: PoolInfo): string {
     return `
     float process(int index[${this.maxRank}]) {
@@ -86,6 +93,8 @@ export abstract class PoolOperation<GPUTensor extends GPUTensorI> extends Operat
   }
 
   abstract update(a: string, b: string): string;
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   post(res: string) {
     return '';
   }
@@ -94,28 +103,32 @@ export abstract class PoolOperation<GPUTensor extends GPUTensorI> extends Operat
   }
 
   getTextureNames(): string[] {
-    return ["X"];
+    return ['X'];
   }
 
   getUniformAttrs(): Input[] {
     return [
-      { name: "mappedInputStrides", length: this.maxRank },
-      { name: "sumDims", length: this.maxRank },
-      { name: "sumSize" }
+      {name: 'mappedInputStrides', length: this.maxRank},
+      {name: 'sumDims', length: this.maxRank},
+      {name: 'sumSize'},
     ];
   }
 
   calc(input: PoolInput): GPUTensor {
-    if (this.fullyStatic) {
+    if (this.fullyStatic && this.outputShape !== undefined) {
       return this.compute(this.outputShape, {X: input.X});
     }
 
-    const [outputShape, ixMap] = poolResultShape(input.X.shape, input.axes, input.keepDims);
+    const [outputShape, ixMap] = poolResultShape(
+      input.X.shape,
+      input.axes,
+      input.keepDims
+    );
 
     const inputStrides = computeStrides(input.X.shape);
     const mappedInputStrides = [];
-    for (let i of ixMap) {
-      mappedInputStrides.push(inputStrides[i])
+    for (const i of ixMap) {
+      mappedInputStrides.push(inputStrides[i]);
     }
 
     let sumSize = 1;
@@ -125,26 +138,43 @@ export abstract class PoolOperation<GPUTensor extends GPUTensorI> extends Operat
       sumSize *= input.X.shape[input.axes[i]];
     }
 
-    return this.compute(outputShape, {X: input.X}, {
+    return this.compute(
+      outputShape,
+      {X: input.X},
+      {
         mappedInputStrides: this.pad(mappedInputStrides),
         sumDims: this.pad(sumDims),
-        sumSize
-    });
+        sumSize,
+      }
+    );
   }
 
   getOutputShape(input: PoolInput): readonly number[] {
-    const [outputShape, ixMap] = poolResultShape(input.X.shape, input.axes, input.keepDims);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [outputShape, ixMap] = poolResultShape(
+      input.X.shape,
+      input.axes,
+      input.keepDims
+    );
     return outputShape;
   }
 
   compile(info: PoolInfo, precision: Precision) {
-    if (info.shapeX !== undefined && info.axes !== undefined && info.keepDims !== undefined) {
-      const [outputShape, ixMap] = poolResultShape(info.shapeX, info.axes, info.keepDims);
+    if (
+      info.shapeX !== undefined &&
+      info.axes !== undefined &&
+      info.keepDims !== undefined
+    ) {
+      const [outputShape, ixMap] = poolResultShape(
+        info.shapeX,
+        info.axes,
+        info.keepDims
+      );
 
       const inputStrides = computeStrides(info.shapeX);
       const mappedInputStrides = [];
-      for (let i of ixMap) {
-        mappedInputStrides.push(inputStrides[i])
+      for (const i of ixMap) {
+        mappedInputStrides.push(inputStrides[i]);
       }
 
       let sumSize = 1;
@@ -169,12 +199,16 @@ export abstract class PoolOperation<GPUTensor extends GPUTensorI> extends Operat
   }
 
   getCompilationInfo(input: PoolInput, precision: Precision): PoolInfo {
-    const [outputShape, ixMap] = poolResultShape(input.X.shape, input.axes, input.keepDims);
+    const [outputShape, ixMap] = poolResultShape(
+      input.X.shape,
+      input.axes,
+      input.keepDims
+    );
 
     const inputStrides = computeStrides(input.X.shape);
     const mappedInputStrides = [];
-    for (let i of ixMap) {
-      mappedInputStrides.push(inputStrides[i])
+    for (const i of ixMap) {
+      mappedInputStrides.push(inputStrides[i]);
     }
 
     let sumSize = 1;
@@ -184,7 +218,10 @@ export abstract class PoolOperation<GPUTensor extends GPUTensorI> extends Operat
       sumSize *= input.X.shape[input.axes[i]];
     }
 
-    const outputSize = defaultAllocator.getAllocationDimensions(getSize(outputShape), precision);
+    const outputSize = defaultAllocator.getAllocationDimensions(
+      getSize(outputShape),
+      precision
+    );
 
     return {
       shapeX: input.X.shape,
@@ -197,7 +234,7 @@ export abstract class PoolOperation<GPUTensor extends GPUTensorI> extends Operat
 
       mappedInputStrides,
       sumDims,
-      sumSize
+      sumSize,
     };
   }
 

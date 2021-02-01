@@ -1,5 +1,5 @@
-import { Precision } from "../../types";
-import { MemoryEntry } from "./memory";
+import {Precision} from '../../types';
+import {MemoryEntry} from './memory';
 
 export interface GPUTensorI {
   memory: MemoryEntry;
@@ -7,4 +7,8 @@ export interface GPUTensorI {
   shape: readonly number[];
 }
 
-export type GPUTensorConstructor<GPUTensor extends GPUTensorI> = (memory: MemoryEntry, shape: readonly number[], precision: Precision) => GPUTensor;
+export type GPUTensorConstructor<GPUTensor extends GPUTensorI> = (
+  memory: MemoryEntry,
+  shape: readonly number[],
+  precision: Precision
+) => GPUTensor;

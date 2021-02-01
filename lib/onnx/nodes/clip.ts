@@ -1,16 +1,24 @@
-import Tensor from "../../types";
-import { OnnxNode } from "../node";
-import { Attributes, Constants } from "../types";
+import Tensor from '../../types';
+import {OnnxNode} from '../node';
+import {Attributes, Constants} from '../types';
 
 export class ClipNode extends OnnxNode {
   public min?: number;
   public max?: number;
 
-  constructor(attributes: Attributes, inputs: string[], outputs: string[], constants: Constants, onnxVersion: number) {
+  constructor(
+    attributes: Attributes,
+    inputs: string[],
+    outputs: string[],
+    constants: Constants,
+    onnxVersion: number
+  ) {
     super(attributes, inputs, outputs, constants, onnxVersion);
 
     if (onnxVersion < 11) {
+      //@ts-ignore
       this.min = this.getAttributeFloat('min');
+      //@ts-ignore
       this.max = this.getAttributeFloat('max');
     }
   }

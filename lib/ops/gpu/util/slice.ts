@@ -1,17 +1,16 @@
-import { defaultAllocator } from "../../../tensor/gpu/gl";
-import { GPUTensorConstructor, GPUTensorI } from "../../../tensor/gpu/interface";
-import { GPUMemoryAllocator } from "../../../tensor/gpu/memory";
-import { Precision } from "../../../types";
-import { getSize } from "../../../util/shape";
-import { Input, Operation } from "../operation";
-
+import {defaultAllocator} from '../../../tensor/gpu/gl';
+import {GPUTensorConstructor, GPUTensorI} from '../../../tensor/gpu/interface';
+import {GPUMemoryAllocator} from '../../../tensor/gpu/memory';
+import {Precision} from '../../../types';
+import {getSize} from '../../../util/shape';
+import {Input, Operation} from '../operation';
 
 export interface SliceInfo {
   shapeX?: readonly number[];
   widthX?: number;
   heightX?: number;
 
-  shapeOutput?: readonly number[],
+  shapeOutput?: readonly number[];
   widthOutput?: number;
   heightOutput?: number;
 
@@ -29,11 +28,19 @@ export interface SliceInput {
   axes: number[];
 }
 
-export class SliceOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTensor, SliceInfo, SliceInput> {
-  constructor(tensorConstructor: GPUTensorConstructor<GPUTensor>, allocator?: GPUMemoryAllocator) {
+export class SliceOperation<GPUTensor extends GPUTensorI> extends Operation<
+  GPUTensor,
+  SliceInfo,
+  SliceInput
+> {
+  constructor(
+    tensorConstructor: GPUTensorConstructor<GPUTensor>,
+    allocator?: GPUMemoryAllocator
+  ) {
     super(tensorConstructor, allocator);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getFragmentShader(info: SliceInfo): string {
     return `
     float process(int index[${this.maxRank}]) {
@@ -55,7 +62,7 @@ export class SliceOperation<GPUTensor extends GPUTensorI> extends Operation<GPUT
   }
 
   getTextureNames(): string[] {
-    return ["X"];
+    return ['X'];
   }
 
   getVariables() {
@@ -65,13 +72,11 @@ export class SliceOperation<GPUTensor extends GPUTensorI> extends Operation<GPUT
   }
 
   getUniformAttrs(): Input[] {
-    return [
-      { name: "offsets", length: this.maxRank }
-    ];
+    return [{name: 'offsets', length: this.maxRank}];
   }
 
   calc(input: SliceInput): GPUTensor {
-    if (this.fullyStatic) {
+    if (this.fullyStatic && this.outputShape !== undefined) {
       return this.compute(this.outputShape, {X: input.X});
     }
 
@@ -81,16 +86,20 @@ export class SliceOperation<GPUTensor extends GPUTensorI> extends Operation<GPUT
     const offsets: number[] = new Array(rank).fill(0);
     let axIx = 0;
     for (let i = 0; i < rank && axIx < input.axes.length; i++) {
-      if (i == input.axes[axIx]) {
+      if (i === input.axes[axIx]) {
         resultShape[i] = input.ends[axIx] - input.starts[axIx];
         offsets[i] = input.starts[axIx];
         axIx++;
       }
     }
 
-    return this.compute(resultShape, {X: input.X}, {
-      offsets: this.pad(offsets)
-    });
+    return this.compute(
+      resultShape,
+      {X: input.X},
+      {
+        offsets: this.pad(offsets),
+      }
+    );
   }
 
   getOutputShape(input: SliceInput): readonly number[] {
@@ -99,7 +108,7 @@ export class SliceOperation<GPUTensor extends GPUTensorI> extends Operation<GPUT
     const resultShape = [...input.X.shape];
     let axIx = 0;
     for (let i = 0; i < rank && axIx < input.axes.length; i++) {
-      if (i == input.axes[axIx]) {
+      if (i === input.axes[axIx]) {
         resultShape[i] = input.ends[axIx] - input.starts[axIx];
         axIx++;
       }
@@ -112,13 +121,17 @@ export class SliceOperation<GPUTensor extends GPUTensorI> extends Operation<GPUT
     if (info.shapeX !== undefined) {
       this.maxRank = info.shapeX.length;
 
-      if (info.axes !== undefined && info.starts !== undefined && info.starts !== undefined) {
+      if (
+        info.axes !== undefined &&
+        info.starts !== undefined &&
+        info.starts !== undefined
+      ) {
         const rank = info.shapeX.length;
 
         const offsets: number[] = new Array(rank).fill(0);
         let axIx = 0;
         for (let i = 0; i < rank && axIx < info.axes.length; i++) {
-          if (i == info.axes[axIx]) {
+          if (i === info.axes[axIx]) {
             offsets[i] = info.starts[axIx];
             axIx++;
           }
@@ -137,7 +150,10 @@ export class SliceOperation<GPUTensor extends GPUTensorI> extends Operation<GPUT
 
   getCompilationInfo(input: SliceInput, precision: Precision): SliceInfo {
     const outputShape = this.getOutputShape(input);
-    const outputSize = defaultAllocator.getAllocationDimensions(getSize(outputShape), precision);
+    const outputSize = defaultAllocator.getAllocationDimensions(
+      getSize(outputShape),
+      precision
+    );
 
     const rank = input.X.shape.length;
 
@@ -145,7 +161,7 @@ export class SliceOperation<GPUTensor extends GPUTensorI> extends Operation<GPUT
     const offsets: number[] = new Array(rank).fill(0);
     let axIx = 0;
     for (let i = 0; i < rank && axIx < input.axes.length; i++) {
-      if (i == input.axes[axIx]) {
+      if (i === input.axes[axIx]) {
         resultShape[i] = input.ends[axIx] - input.starts[axIx];
         offsets[i] = input.starts[axIx];
         axIx++;
@@ -161,7 +177,7 @@ export class SliceOperation<GPUTensor extends GPUTensorI> extends Operation<GPUT
       widthOutput: outputSize.width,
       heightOutput: outputSize.height,
 
-      offsets
+      offsets,
     };
   }
 

@@ -1,18 +1,25 @@
-import Tensor, { PadMode } from "../../types";
-import { OnnxNode } from "../node";
-import { Attributes, Constants } from "../types";
+import Tensor, {PadMode} from '../../types';
+import {OnnxNode} from '../node';
+import {Attributes, Constants} from '../types';
 
 export class PadNode extends OnnxNode {
   private mode: PadMode;
   private pads: number[];
   private value: number;
 
-  constructor(attributes: Attributes, inputs: string[], outputs: string[], constants: Constants, onnxVersion: number) {
+  constructor(
+    attributes: Attributes,
+    inputs: string[],
+    outputs: string[],
+    constants: Constants,
+    onnxVersion: number
+  ) {
     super(attributes, inputs, outputs, constants, onnxVersion);
 
     this.mode = (this.getAttributeString('mode') || 'constant') as PadMode;
+    //@ts-ignore
     this.pads = this.getAttributeInts('pads');
-    this.value = this.getAttributeFloat("value") || 0;
+    this.value = this.getAttributeFloat('value') || 0;
   }
 
   async forward(inputs: Tensor[]): Promise<Tensor[]> {

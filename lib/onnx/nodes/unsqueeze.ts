@@ -3,7 +3,7 @@ import {OnnxNode} from '../node';
 import {Attributes, Constants} from '../types';
 
 export class UnsqueezeNode extends OnnxNode {
-  private axes: number[];
+  private axes?: number[];
 
   constructor(
     attributes: Attributes,
@@ -22,7 +22,7 @@ export class UnsqueezeNode extends OnnxNode {
   async forward(inputs: Tensor[]): Promise<Tensor[]> {
     const x = inputs[0];
 
-    if (this.onnxVersion < 13) {
+    if (this.onnxVersion < 13 && this.axes !== undefined) {
       const currShape = x.getShape();
       const newShape = [];
       let axIx = 0;

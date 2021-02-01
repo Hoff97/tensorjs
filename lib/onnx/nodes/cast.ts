@@ -16,6 +16,7 @@ export class CastNode extends OnnxNode {
   ) {
     super(attributes, inputs, outputs, constants, onnxVersion);
 
+    //@ts-ignore
     this.to = this.getAttributeString('to');
   }
 

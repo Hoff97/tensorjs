@@ -1,15 +1,14 @@
-import { DrawCommand, Framebuffer2D } from "regl";
-import { ConvNode } from "../../onnx/nodes/conv";
-import { defaultAllocator, gl } from "../../tensor/gpu/gl";
-import { GPUTensorConstructor, GPUTensorI } from "../../tensor/gpu/interface";
-import { GPUMemoryAllocator } from "../../tensor/gpu/memory";
-import { Precision } from "../../types";
-import { computeStrides, getSize } from "../../util/shape";
+import {DrawCommand, Framebuffer2D} from 'regl';
+import {defaultAllocator, gl} from '../../tensor/gpu/gl';
+import {GPUTensorConstructor, GPUTensorI} from '../../tensor/gpu/interface';
+import {GPUMemoryAllocator} from '../../tensor/gpu/memory';
+import {Precision} from '../../types';
+import {computeStrides, getSize} from '../../util/shape';
 
 export const defaultMaxRank = 10;
 export const defaultMaxIterations = 10000000;
 
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type DictBase = {[name: string]: any};
 
 type InputType = 'int' | 'float';
@@ -20,7 +19,11 @@ export interface Input {
   type?: InputType;
 }
 
-export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictBase, InputType> {
+export abstract class Operation<
+  GPUTensor extends GPUTensorI,
+  Info extends DictBase,
+  InputType
+> {
   protected allocator: GPUMemoryAllocator;
 
   protected statics: Set<string> = new Set<string>();
@@ -29,16 +32,20 @@ export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictB
 
   protected maxRank: number;
 
-  protected drawCommand: DrawCommand;
+  protected drawCommand?: DrawCommand;
 
-  protected precision: Precision;
+  protected precision?: Precision;
 
   private copyCounter = 0;
 
   protected fullyStatic = false;
   protected outputShape?: readonly number[];
 
-  constructor(tensorConstructor: GPUTensorConstructor<GPUTensor>, allocator?: GPUMemoryAllocator, maxRank?: number) {
+  constructor(
+    tensorConstructor: GPUTensorConstructor<GPUTensor>,
+    allocator?: GPUMemoryAllocator,
+    maxRank?: number
+  ) {
     if (allocator === undefined) {
       allocator = defaultAllocator;
     }
@@ -55,7 +62,7 @@ export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictB
     let staticTextures = 0;
     let staticVars = 0;
 
-    for (let key in info) {
+    for (const key in info) {
       if (key.startsWith('shape')) {
         const texName = key.slice('shape'.length);
         this.statics.add(`shape${texName}`);
@@ -71,9 +78,12 @@ export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictB
       }
     }
 
-    if (staticTextures - 1 === this.getTextureNames().length && staticVars === this.getUniformAttrs().length) {
+    if (
+      staticTextures - 1 === this.getTextureNames().length &&
+      staticVars === this.getUniformAttrs().length
+    ) {
       this.fullyStatic = true;
-      this.outputShape = info["shapeOutput"];
+      this.outputShape = info['shapeOutput'];
     }
   }
 
@@ -81,14 +91,14 @@ export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictB
     return this.statics.has(name) ? '' : 'uniform';
   }
 
-  pad(arr: number[], len=this.maxRank) {
+  pad(arr: number[], len = this.maxRank) {
     while (arr.length < len) {
       arr.push(-1);
     }
     return arr;
   }
 
-  copyPad(arr: readonly number[], len=this.maxRank) {
+  copyPad(arr: readonly number[], len = this.maxRank) {
     const result = Array.from(arr);
     while (result.length < len) {
       result.push(-1);
@@ -100,13 +110,14 @@ export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictB
     return '';
   }
 
-  getVariableDeclarations(info: Info) {
+  getVariableDeclarations() {
     const textures = this.getTextureNames();
     textures.push('Output');
 
     return `
-      ${textures.map(x => {
-        return `
+      ${textures
+        .map(x => {
+          return `
         ${x === 'Output' ? '' : `uniform sampler2D ${x};`}
         ${this.getVarModifier('size' + x)} int size${x};
         ${this.getVarModifier('width' + x)} int width${x};
@@ -115,10 +126,11 @@ export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictB
         ${this.getVarModifier('shape' + x)} int shape${x}[${this.maxRank}];
         ${this.getVarModifier('rank' + x)} int rank${x};
         `;
-      }).join('\n')}
+        })
+        .join('\n')}
       varying vec2 uv;
 
-      ${this.getVariables()}`
+      ${this.getVariables()}`;
   }
 
   getVariableInitializations(info: Info) {
@@ -126,7 +138,7 @@ export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictB
     textures.push('Output');
 
     let inits = '';
-    for (let tex of textures) {
+    for (const tex of textures) {
       if (`shape${tex}` in info) {
         const shape = info[`shape${tex}`] as number[];
         const strides = computeStrides(shape);
@@ -139,14 +151,14 @@ export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictB
         inits += `\nrank${tex} = ${rank};`;
       }
     }
-    for (let k in info) {
+    for (const k in info) {
       if (!k.startsWith('shape')) {
         if (Array.isArray(info[k])) {
           inits += this.getArrayInit(k, info[k]);
         } else {
           const type = this.getVarType(k);
 
-          if (type === "int") {
+          if (type === 'int') {
             inits += `\n${k} = ${info[k]};`;
           } else {
             inits += `\n${k} = ${(info[k] as number).toPrecision(20)};`;
@@ -159,13 +171,14 @@ export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictB
   }
 
   getVarType(name: string) {
-    let res = this.getUniformAttrs().find(x => x.name === name);
+    const res = this.getUniformAttrs().find(x => x.name === name);
     if (res !== undefined) {
-      return res.type ? res.type : "int";
+      return res.type ? res.type : 'int';
     }
-    return "int";
+    return 'int';
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getArrayInit(name: string, values: any[], len?: number, pad?: string) {
     if (len === undefined) {
       len = this.maxRank;
@@ -174,22 +187,22 @@ export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictB
     const type = this.getVarType(name);
 
     if (pad === undefined) {
-      if (type === "int") {
+      if (type === 'int') {
         pad = '-1';
-      } else if (type === "float") {
+      } else if (type === 'float') {
         pad = '-1.0';
       }
     }
     let res = '';
     for (let i = 0; i < len; i++) {
       if (i < values.length) {
-        if (type === "int") {
+        if (type === 'int') {
           res += `\n ${name}[${i}] = ${values[i]};`;
         } else if (type === 'float') {
-          res += `\n ${name}[${i}] = ${(values[i] as number).toPrecision(20)};`
+          res += `\n ${name}[${i}] = ${(values[i] as number).toPrecision(20)};`;
         }
       } else {
-        res += `\n ${name}[${i}] = ${pad};`
+        res += `\n ${name}[${i}] = ${pad};`;
       }
     }
     return res;
@@ -255,19 +268,21 @@ export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictB
   getTextureFunctions() {
     const textures = this.getTextureNames();
 
-    return textures.map(x => {
-      return `
+    return textures
+      .map(x => {
+        return `
       float _${x}(int indices[${this.maxRank}]) {
         return getValueAt(indices, strides${x}, width${x}, height${x}, ${x});
       }
       `;
-    }).join('\n');
+      })
+      .join('\n');
   }
 
   getCompleteFragmentShader(info: Info, precision: Precision): string {
     const fragShader = this.getFragmentShader(info);
 
-    const variableDecls = this.getVariableDeclarations(info);
+    const variableDecls = this.getVariableDeclarations();
     const varInits = this.getVariableInitializations(info);
 
     const utilFunctions = this.getUtilFunctions();
@@ -294,7 +309,7 @@ export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictB
     const uniformAttrs: Input[] = [];
 
     const defaultUniformAttrs: Input[] = this.getUniformAttrs();
-    for (let defaultAttr of defaultUniformAttrs) {
+    for (const defaultAttr of defaultUniformAttrs) {
       if (info[defaultAttr.name] === undefined) {
         uniformAttrs.push(defaultAttr);
       }
@@ -302,8 +317,8 @@ export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictB
 
     const textures = this.getTextureNames();
     textures.push('Output');
-    for (let texture of textures) {
-      uniformAttrs.push({ name: texture })
+    for (const texture of textures) {
+      uniformAttrs.push({name: texture});
 
       if (info[`shape${texture}`] === undefined) {
         uniformAttrs.push({name: `size${texture}`});
@@ -319,12 +334,13 @@ export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictB
       }
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const uniforms: any = {};
-    for (let uniformAttr of uniformAttrs) {
+    for (const uniformAttr of uniformAttrs) {
       if (info[uniformAttr.name] === undefined) {
         if (uniformAttr.length !== undefined) {
           for (let i = 0; i < uniformAttr.length; i++) {
-            const name = `${uniformAttr.name}[${i}]`
+            const name = `${uniformAttr.name}[${i}]`;
             uniforms[name] = gl.prop(name as never);
           }
         } else {
@@ -351,7 +367,7 @@ export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictB
           ${name} = ${name} - ${strides}[i]*${result}[i]; // Stupid modulo hack
         }
       }
-    }`
+    }`;
   }
 
   initIndex(index: string, rank?: string) {
@@ -445,7 +461,7 @@ export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictB
   }
 
   precisionString(precision: Precision) {
-    return precision === 32 ? "highp" : "mediump";
+    return precision === 32 ? 'highp' : 'mediump';
   }
 
   getDrawCommand(info: Info, precision: Precision): DrawCommand {
@@ -464,14 +480,14 @@ export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictB
           gl_Position = vec4(position, 0, 1);
         }`,
       attributes: {
-        position: [-4, -4, 4, -4, 0, 4]
+        position: [-4, -4, 4, -4, 0, 4],
       },
       uniforms: uniforms,
       framebuffer: gl.prop('framebuffer' as never),
       depth: {
-        enable: false
+        enable: false,
       },
-      count: 3
+      count: 3,
     });
 
     return result;
@@ -485,27 +501,35 @@ export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictB
     this.drawCommand = this.getDrawCommand(info, precision);
   }
 
-  compute(resultShape: readonly number[], inputTensors: {[name: string]: GPUTensorI}, inputs?: any) {
+  compute(
+    resultShape: readonly number[],
+    inputTensors: {[name: string]: GPUTensorI},
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    inputs?: any
+  ) {
     if (this.drawCommand === undefined) {
-      this.compile({} as any, 32);
+      this.compile({} as Info, 32);
     }
 
     const resultSize = getSize(resultShape);
-    let result = this.allocator.allocate(resultSize, this.precision);
+    //@ts-ignore
+    const result = this.allocator.allocate(resultSize, this.precision);
 
     const inputTextures: {[name: string]: Framebuffer2D} = {};
-    for (let name in inputTensors) {
-      inputTextures[name] = inputTensors[name].memory.frameBuffer
+    for (const name in inputTensors) {
+      inputTextures[name] = inputTensors[name].memory.frameBuffer;
     }
     if (inputs === undefined) {
       inputs = {};
     }
 
     if (!this.fullyStatic) {
-      for (let name in inputTensors) {
+      for (const name in inputTensors) {
         if (!this.statics.has(`shape${name}`)) {
           inputs[`size${name}`] = inputTensors[name].size;
-          inputs[`strides${name}`] = this.pad(computeStrides(inputTensors[name].shape));
+          inputs[`strides${name}`] = this.pad(
+            computeStrides(inputTensors[name].shape)
+          );
           inputs[`shape${name}`] = this.copyPad(inputTensors[name].shape);
           inputs[`rank${name}`] = inputTensors[name].shape.length;
         }
@@ -535,12 +559,14 @@ export abstract class Operation<GPUTensor extends GPUTensorI, Info extends DictB
       }
     }
 
+    //@ts-ignore
     this.drawCommand({
       framebuffer: result.frameBuffer,
       ...inputTextures,
-      ...inputs
+      ...inputs,
     });
 
+    //@ts-ignore
     return this.gpuTensorConstructor(result, resultShape, this.precision);
   }
 

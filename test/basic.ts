@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import Tensor from '../lib/types';
 
 const epsilon = 0.00001;
@@ -588,12 +589,14 @@ export default function testBasic(name: string, constructor: TensorConstructor, 
       }
 
       const a = constructor([2, 2], [1, 2, 3, 4]);
-      const expected1 = constructor([2, 2], [2,2,3,3]);
-      const expected2 = constructor([2, 2], [1,2,3,3]);
-      const expected3 = constructor([2, 2], [2,2,3,4]);
+      const expected1 = constructor([2, 2], [2, 2, 3, 3]);
+      const expected2 = constructor([2, 2], [1, 2, 3, 3]);
+      const expected3 = constructor([2, 2], [2, 2, 3, 4]);
 
-      expect(await a.clip(2,3).compare(expected1, epsilon)).toBeTruthy();
-      expect(await a.clip(undefined,3).compare(expected2, epsilon)).toBeTruthy();
+      expect(await a.clip(2, 3).compare(expected1, epsilon)).toBeTruthy();
+      expect(
+        await a.clip(undefined, 3).compare(expected2, epsilon)
+      ).toBeTruthy();
       expect(await a.clip(2).compare(expected3, epsilon)).toBeTruthy();
 
       a.delete();
@@ -611,16 +614,11 @@ export default function testBasic(name: string, constructor: TensorConstructor, 
 
       const a = constructor([2,3], [1,2,3,4,5,6]);
 
-      const b = constructor([2,2], [1,2,3,4,]);
-
       const expected1 = constructor([4,3], [1,2,3,4,5,6,1,2,3,4,5,6]);
       const expected2 = constructor([2,6], [1,2,3,1,2,3,4,5,6,4,5,6]);
 
-      const expected3 = constructor([2,4], [1,2,1,2,3,4,3,4]);
-      const expected4 = constructor([4,2], [1,2,3,4,1,2,3,4]);
-
-      expect(await a.repeat([2,1]).compare(expected1, epsilon)).toBeTruthy();
-      expect(await a.repeat([1,2]).compare(expected2, epsilon)).toBeTruthy();
+      expect(await a.repeat([2, 1]).compare(expected1, epsilon)).toBeTruthy();
+      expect(await a.repeat([1, 2]).compare(expected2, epsilon)).toBeTruthy();
 
       a.delete();
       expected1.delete();

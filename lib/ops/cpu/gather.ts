@@ -1,5 +1,5 @@
-import { CPUTensor } from '../../tensor/cpu/tensor';
-import { incrementIndex } from '../../util/shape';
+import {CPUTensor} from '../../tensor/cpu/tensor';
+import {incrementIndex} from '../../util/shape';
 
 export function gather(x: CPUTensor, axis: number, indices: CPUTensor) {
   const r = x.shape.length;
@@ -25,7 +25,7 @@ export function gather(x: CPUTensor, axis: number, indices: CPUTensor) {
   for (let i = 0; i < result.size; i++) {
     gatherIx = outIx.slice(axis, axis + q);
     const axIx = indices.get(gatherIx);
-    inputIx = [...outIx.slice(0, axis), axIx, ...outIx.slice(axis + q)]
+    inputIx = [...outIx.slice(0, axis), axIx, ...outIx.slice(axis + q)];
 
     result.set(i, x.get(inputIx));
 

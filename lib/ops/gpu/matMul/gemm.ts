@@ -1,12 +1,10 @@
-import { getSize } from "../../../util/shape";
-import { outputDimsSize } from "../../util/conv";
+import {getSize} from '../../../util/shape';
 
-import { GPUTensorConstructor, GPUTensorI } from "../../../tensor/gpu/interface";
-import { GPUMemoryAllocator } from "../../../tensor/gpu/memory";
-import { Input, Operation } from "../operation";
-import { Precision } from "../../../types";
-import { defaultAllocator } from "../../../tensor/gpu/gl";
-
+import {GPUTensorConstructor, GPUTensorI} from '../../../tensor/gpu/interface';
+import {GPUMemoryAllocator} from '../../../tensor/gpu/memory';
+import {Input, Operation} from '../operation';
+import {Precision} from '../../../types';
+import {defaultAllocator} from '../../../tensor/gpu/gl';
 
 export interface GemmInfo {
   shapeA?: readonly number[];
@@ -15,7 +13,7 @@ export interface GemmInfo {
   shapeB?: readonly number[];
   widthB?: number;
   heightB?: number;
-  shapeOutput?: readonly number[],
+  shapeOutput?: readonly number[];
   widthOutput?: number;
   heightOutput?: number;
 
@@ -40,10 +38,17 @@ export interface GemmInput {
   beta: number;
 }
 
-export class GemmOperation<GPUTensor extends GPUTensorI, GemmInf extends GemmInfo = GemmInfo, GemmIn extends GemmInput = GemmInput> extends Operation<GPUTensor, GemmInf, GemmIn> {
+export class GemmOperation<
+  GPUTensor extends GPUTensorI,
+  GemmInf extends GemmInfo = GemmInfo,
+  GemmIn extends GemmInput = GemmInput
+> extends Operation<GPUTensor, GemmInf, GemmIn> {
   protected maxIterations = 1000000;
 
-  constructor(tensorConstructor: GPUTensorConstructor<GPUTensor>, allocator?: GPUMemoryAllocator) {
+  constructor(
+    tensorConstructor: GPUTensorConstructor<GPUTensor>,
+    allocator?: GPUMemoryAllocator
+  ) {
     super(tensorConstructor, allocator);
   }
 
@@ -127,6 +132,7 @@ export class GemmOperation<GPUTensor extends GPUTensorI, GemmInf extends GemmInf
     `;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getFragmentShader(info: GemmInfo): string {
     return `
     float process(int index[${this.maxRank}]) {
@@ -140,42 +146,51 @@ export class GemmOperation<GPUTensor extends GPUTensorI, GemmInf extends GemmInf
   }
 
   getTextureNames(): string[] {
-    return ["A", "B"];
+    return ['A', 'B'];
   }
 
   getUniformAttrs(): Input[] {
     return [
-      { name: "M" },
-      { name: "N" },
-      { name: "O" },
-      { name: "rank" },
-      { name: "aTranspose" },
-      { name: "bTranspose" },
-      { name: "alpha", type: "float" },
-      { name: "beta", type: "float" }
+      {name: 'M'},
+      {name: 'N'},
+      {name: 'O'},
+      {name: 'rank'},
+      {name: 'aTranspose'},
+      {name: 'bTranspose'},
+      {name: 'alpha', type: 'float'},
+      {name: 'beta', type: 'float'},
     ];
   }
 
   calc(input: GemmInput): GPUTensor {
-    if (this.fullyStatic) {
+    if (this.fullyStatic && this.outputShape !== undefined) {
       return this.compute(this.outputShape, {A: input.a, B: input.b});
     }
 
     const rank = input.a.shape.length;
 
-    const M = input.aTranspose ? input.a.shape[rank - 1] : input.a.shape[rank - 2];
-    const N = input.aTranspose ? input.a.shape[rank - 2] : input.a.shape[rank - 1];
-    const O = input.bTranspose ? input.b.shape[rank - 2] : input.b.shape[rank - 1];
+    const M = input.aTranspose
+      ? input.a.shape[rank - 1]
+      : input.a.shape[rank - 2];
+    const N = input.aTranspose
+      ? input.a.shape[rank - 2]
+      : input.a.shape[rank - 1];
+    const O = input.bTranspose
+      ? input.b.shape[rank - 2]
+      : input.b.shape[rank - 1];
 
-    const batchShape = input.a.shape.slice(0, rank-2);
+    const batchShape = input.a.shape.slice(0, rank - 2);
     const resultShape = [...batchShape, M, O];
 
     const uniforms = {
-      M, N, O, rank,
+      M,
+      N,
+      O,
+      rank,
       aTranspose: input.aTranspose ? 1 : 0,
       bTranspose: input.bTranspose ? 1 : 0,
       alpha: input.alpha,
-      beta: input.beta
+      beta: input.beta,
     };
 
     return this.compute(resultShape, {A: input.a, B: input.b}, uniforms);
@@ -184,10 +199,14 @@ export class GemmOperation<GPUTensor extends GPUTensorI, GemmInf extends GemmInf
   getOutputShape(input: GemmIn): readonly number[] {
     const rank = input.a.shape.length;
 
-    const M = input.aTranspose ? input.a.shape[rank - 1] : input.a.shape[rank - 2];
-    const O = input.bTranspose ? input.b.shape[rank - 2] : input.b.shape[rank - 1];
+    const M = input.aTranspose
+      ? input.a.shape[rank - 1]
+      : input.a.shape[rank - 2];
+    const O = input.bTranspose
+      ? input.b.shape[rank - 2]
+      : input.b.shape[rank - 1];
 
-    const batchShape = input.a.shape.slice(0, rank-2);
+    const batchShape = input.a.shape.slice(0, rank - 2);
     const resultShape = [...batchShape, M, O];
 
     return resultShape;
@@ -200,8 +219,12 @@ export class GemmOperation<GPUTensor extends GPUTensorI, GemmInf extends GemmInf
       this.maxRank = rank;
 
       if (info.aTranspose !== undefined) {
-        const M = info.aTranspose ? info.shapeA[rank - 1] : info.shapeA[rank - 2];
-        const N = info.aTranspose ? info.shapeA[rank - 2] : info.shapeA[rank - 1];
+        const M = info.aTranspose
+          ? info.shapeA[rank - 1]
+          : info.shapeA[rank - 2];
+        const N = info.aTranspose
+          ? info.shapeA[rank - 2]
+          : info.shapeA[rank - 1];
 
         info.M = M;
         info.N = N;
@@ -223,13 +246,22 @@ export class GemmOperation<GPUTensor extends GPUTensorI, GemmInf extends GemmInf
 
   getCompilationInfo(input: GemmIn, precision: Precision): GemmInf {
     const outputShape = this.getOutputShape(input);
-    const outputSize = defaultAllocator.getAllocationDimensions(getSize(outputShape), precision);
+    const outputSize = defaultAllocator.getAllocationDimensions(
+      getSize(outputShape),
+      precision
+    );
 
     const rank = input.a.shape.length;
 
-    const M = input.aTranspose ? input.a.shape[rank - 1] : input.a.shape[rank - 2];
-    const N = input.aTranspose ? input.a.shape[rank - 2] : input.a.shape[rank - 1];
-    const O = input.bTranspose ? input.b.shape[rank - 2] : input.b.shape[rank - 1];
+    const M = input.aTranspose
+      ? input.a.shape[rank - 1]
+      : input.a.shape[rank - 2];
+    const N = input.aTranspose
+      ? input.a.shape[rank - 2]
+      : input.a.shape[rank - 1];
+    const O = input.bTranspose
+      ? input.b.shape[rank - 2]
+      : input.b.shape[rank - 1];
 
     const info: GemmInfo = {
       shapeA: input.a.shape,
@@ -244,14 +276,16 @@ export class GemmOperation<GPUTensor extends GPUTensorI, GemmInf extends GemmInf
       widthOutput: outputSize.width,
       heightOutput: outputSize.height,
 
-      M, N, O,
+      M,
+      N,
+      O,
 
       aTranspose: input.aTranspose ? 1 : 0,
       bTranspose: input.bTranspose ? 1 : 0,
       alpha: input.alpha,
       beta: input.beta,
 
-      rank
+      rank,
     };
 
     return info as GemmInf;
@@ -273,11 +307,16 @@ export interface GemmCInput extends GemmInput {
   c: GPUTensorI;
 }
 
-export class GemmCOperation<GPUTensor extends GPUTensorI> extends GemmOperation<GPUTensor, GemmCInfo, GemmCInput> {
+export class GemmCOperation<GPUTensor extends GPUTensorI> extends GemmOperation<
+  GPUTensor,
+  GemmCInfo,
+  GemmCInput
+> {
   getTextureNames(): string[] {
-    return ["A", "B", "C"];
+    return ['A', 'B', 'C'];
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getFragmentShader(info: GemmInfo): string {
     return `
     float process(int index[${this.maxRank}]) {
@@ -293,28 +332,45 @@ export class GemmCOperation<GPUTensor extends GPUTensorI> extends GemmOperation<
   }
 
   calc(input: GemmCInput): GPUTensor {
-    if (this.fullyStatic) {
-      return this.compute(this.outputShape, {A: input.a, B: input.b, C: input.c});
+    if (this.fullyStatic && this.outputShape !== undefined) {
+      return this.compute(this.outputShape, {
+        A: input.a,
+        B: input.b,
+        C: input.c,
+      });
     }
 
     const rank = input.a.shape.length;
 
-    const M = input.aTranspose ? input.a.shape[rank - 1] : input.a.shape[rank - 2];
-    const N = input.aTranspose ? input.a.shape[rank - 2] : input.a.shape[rank - 1];
-    const O = input.bTranspose ? input.b.shape[rank - 2] : input.b.shape[rank - 1];
+    const M = input.aTranspose
+      ? input.a.shape[rank - 1]
+      : input.a.shape[rank - 2];
+    const N = input.aTranspose
+      ? input.a.shape[rank - 2]
+      : input.a.shape[rank - 1];
+    const O = input.bTranspose
+      ? input.b.shape[rank - 2]
+      : input.b.shape[rank - 1];
 
-    const batchShape = input.a.shape.slice(0, rank-2);
+    const batchShape = input.a.shape.slice(0, rank - 2);
     const resultShape = [...batchShape, M, O];
 
     const uniforms = {
-      M, N, O, rank,
+      M,
+      N,
+      O,
+      rank,
       aTranspose: input.aTranspose ? 1 : 0,
       bTranspose: input.bTranspose ? 1 : 0,
       alpha: input.alpha,
-      beta: input.beta
+      beta: input.beta,
     };
 
-    return this.compute(resultShape, {A: input.a, B: input.b, C: input.c}, uniforms);
+    return this.compute(
+      resultShape,
+      {A: input.a, B: input.b, C: input.c},
+      uniforms
+    );
   }
 
   getCompilationInfo(input: GemmCInput, precision: Precision): GemmCInfo {
@@ -325,7 +381,7 @@ export class GemmCOperation<GPUTensor extends GPUTensorI> extends GemmOperation<
 
       shapeC: input.c.shape,
       widthC: input.c.memory.width,
-      heightC: input.c.memory.height
+      heightC: input.c.memory.height,
     };
 
     return info;

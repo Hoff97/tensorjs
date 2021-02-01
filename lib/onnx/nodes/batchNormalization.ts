@@ -1,8 +1,8 @@
-import { CPUTensor } from "../../tensor/cpu/tensor";
-import Tensor, { Precision } from "../../types";
-import { toCPU, toGPU, toWASM } from "../../util/convert";
-import { OnnxNode } from "../node";
-import { Attributes, Constants } from "../types";
+import {CPUTensor} from '../../tensor/cpu/tensor';
+import Tensor, {Precision} from '../../types';
+import {toCPU, toGPU, toWASM} from '../../util/convert';
+import {OnnxNode} from '../node';
+import {Attributes, Constants} from '../types';
 
 export class BatchNormalizationNode extends OnnxNode {
   private epsilon: number;
@@ -10,11 +10,16 @@ export class BatchNormalizationNode extends OnnxNode {
 
   public epsTensor: Tensor;
 
-
-  constructor(attributes: Attributes, inputs: string[], outputs: string[], constants: Constants, onnxVersion: number) {
+  constructor(
+    attributes: Attributes,
+    inputs: string[],
+    outputs: string[],
+    constants: Constants,
+    onnxVersion: number
+  ) {
     super(attributes, inputs, outputs, constants, onnxVersion);
 
-    this.epsilon = this.getAttributeFloat('epsilon') || 1e-05;
+    this.epsilon = this.getAttributeFloat('epsilon') || 1e-5;
     this.momentum = this.getAttributeFloat('momentum') || 0.9;
 
     this.epsTensor = new CPUTensor([1], [this.epsilon]);
@@ -28,7 +33,12 @@ export class BatchNormalizationNode extends OnnxNode {
     const mean = resolveConstant(this.inputs[3]);
     const variance = resolveConstant(this.inputs[4]);
 
-    if (scale !== undefined && B !== undefined && mean !== undefined && variance !== undefined) {
+    if (
+      scale !== undefined &&
+      B !== undefined &&
+      mean !== undefined &&
+      variance !== undefined
+    ) {
       const varSqrt = variance.add(this.epsTensor).sqrt();
 
       //this.scale = scale.divide(varSqrt);
@@ -50,7 +60,7 @@ export class BatchNormalizationNode extends OnnxNode {
 
     const C = scale.getShape()[0];
 
-    const newShape = [1,C,...new Array(x.getShape().length - 2).fill(1)];
+    const newShape = [1, C, ...new Array(x.getShape().length - 2).fill(1)];
 
     scale = scale.reshape(newShape, false);
     B = B.reshape(newShape, false);

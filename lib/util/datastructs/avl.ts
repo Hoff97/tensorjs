@@ -59,6 +59,7 @@ export class AVLTree<K, V> implements OrderedDict<K, V> {
   }
 
   executeOnEveryNode(fn: (tree: _AVLTree<K, V>) => void) {
+    //@ts-ignore
     this.tree.executeOnEveryNode(fn);
   }
 }
@@ -75,7 +76,7 @@ class _AVLTree<K, V> extends BinarySearchTree<K, V> {
   }
 
   checkHeightCorrect() {
-    if (!this.hasOwnProperty('key')) {
+    if (this.key === undefined) {
       return;
     } // Empty tree
 
@@ -148,7 +149,7 @@ class _AVLTree<K, V> extends BinarySearchTree<K, V> {
         q.parent.right = p;
       }
     } else {
-      p.parent = null;
+      p.parent = undefined;
     }
     p.right = q;
     q.parent = p;
@@ -167,17 +168,16 @@ class _AVLTree<K, V> extends BinarySearchTree<K, V> {
     return p;
   }
 
-  leftRotation = function () {
+  leftRotation() {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const p = this;
     const q = this.right;
-    let b: _AVLTree<K, V>;
-    let ah: number, bh: number, ch: number;
 
     if (!q) {
       return this;
     } // No change
 
-    b = q.left;
+    const b = q.left;
 
     // Alter tree structure
     if (p.parent) {
@@ -188,7 +188,7 @@ class _AVLTree<K, V> extends BinarySearchTree<K, V> {
         p.parent.right = q;
       }
     } else {
-      q.parent = null;
+      q.parent = undefined;
     }
     q.left = p;
     p.parent = q;
@@ -198,14 +198,16 @@ class _AVLTree<K, V> extends BinarySearchTree<K, V> {
     }
 
     // Update heights
-    ah = p.left ? p.left.height : 0;
-    bh = b ? b.height : 0;
-    ch = q.right ? q.right.height : 0;
+    const ah = p.left ? p.left.height : 0;
+    const bh = b ? b.height : 0;
+    const ch = q.right ? q.right.height : 0;
+    //@ts-ignore
     p.height = Math.max(ah, bh) + 1;
+    //@ts-ignore
     q.height = Math.max(ch, p.height) + 1;
 
     return q;
-  };
+  }
 
   rightTooSmall() {
     if (this.balanceFactor() <= 1) {
@@ -232,11 +234,12 @@ class _AVLTree<K, V> extends BinarySearchTree<K, V> {
   }
 
   rebalanceAlongPath(path: _AVLTree<K, V>[]) {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     let newRoot: _AVLTree<K, V> = this;
     let rotated;
     let i;
 
-    if (!this.hasOwnProperty('key')) {
+    if (this.key === undefined) {
       delete this.height;
       return this;
     } // Empty tree
@@ -246,7 +249,9 @@ class _AVLTree<K, V> extends BinarySearchTree<K, V> {
       path[i].height =
         1 +
         Math.max(
+          //@ts-ignore
           path[i].left ? path[i].left.height : 0,
+          //@ts-ignore
           path[i].right ? path[i].right.height : 0
         );
 
@@ -269,11 +274,12 @@ class _AVLTree<K, V> extends BinarySearchTree<K, V> {
   }
 
   insert(key: K, value: V) {
-    var insertPath: _AVLTree<K, V>[] = [];
+    const insertPath: _AVLTree<K, V>[] = [];
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     let currentNode: _AVLTree<K, V> = this;
 
     // Empty tree, insert as root
-    if (!this.hasOwnProperty('key')) {
+    if (this.key === undefined) {
       this.key = key;
       this.value.push(value);
       this.height = 1;
@@ -281,11 +287,13 @@ class _AVLTree<K, V> extends BinarySearchTree<K, V> {
     }
 
     // Insert new leaf at the right place
+    // eslint-disable-next-line no-constant-condition
     while (true) {
       // Same key: no change in the tree structure
+      //@ts-ignore
       if (currentNode.compareKeys(currentNode.key, key) === 0) {
         if (currentNode.unique) {
-          var err = new Error(
+          const err = new Error(
             "Can't insert key " + key + ', it violates the unique constraint'
           );
           throw err;
@@ -297,6 +305,7 @@ class _AVLTree<K, V> extends BinarySearchTree<K, V> {
 
       insertPath.push(currentNode);
 
+      //@ts-ignore
       if (currentNode.compareKeys(key, currentNode.key) < 0) {
         if (!currentNode.left) {
           insertPath.push(
@@ -338,22 +347,26 @@ class _AVLTree<K, V> extends BinarySearchTree<K, V> {
   delete(key: K, value: V) {
     const newData: V[] = [];
     let replaceWith;
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     let currentNode: _AVLTree<K, V> = this;
     const deletePath = [];
 
-    if (!this.hasOwnProperty('key')) {
+    if (this.key === undefined) {
       return this;
     } // Empty tree
 
     // Either no match is found and the function will return from within the loop
     // Or a match is found and deletePath will contain the path from the root to the node to delete after the loop
+    // eslint-disable-next-line no-constant-condition
     while (true) {
+      //@ts-ignore
       if (currentNode.compareKeys(key, currentNode.key) === 0) {
         break;
       }
 
       deletePath.push(currentNode);
 
+      //@ts-ignore
       if (currentNode.compareKeys(key, currentNode.key) < 0) {
         if (currentNode.left) {
           currentNode = currentNode.left;
@@ -392,10 +405,13 @@ class _AVLTree<K, V> extends BinarySearchTree<K, V> {
         delete currentNode.height;
         return this;
       } else {
+        //@ts-ignore
         if (currentNode.parent.left === currentNode) {
-          currentNode.parent.left = null;
+          //@ts-ignore
+          currentNode.parent.left = undefined;
         } else {
-          currentNode.parent.right = null;
+          //@ts-ignore
+          currentNode.parent.right = undefined;
         }
         return this.rebalanceAlongPath(deletePath);
       }
@@ -407,14 +423,20 @@ class _AVLTree<K, V> extends BinarySearchTree<K, V> {
 
       if (currentNode === this) {
         // This node is also the root
-        replaceWith.parent = null;
+        //@ts-ignore
+        replaceWith.parent = undefined;
         return replaceWith; // height of replaceWith is necessarily 1 because the tree was balanced before deletion
       } else {
+        //@ts-ignore
         if (currentNode.parent.left === currentNode) {
+          //@ts-ignore
           currentNode.parent.left = replaceWith;
+          //@ts-ignore
           replaceWith.parent = currentNode.parent;
         } else {
+          //@ts-ignore
           currentNode.parent.right = replaceWith;
+          //@ts-ignore
           replaceWith.parent = currentNode.parent;
         }
 
@@ -440,6 +462,7 @@ class _AVLTree<K, V> extends BinarySearchTree<K, V> {
 
     // After this loop, replaceWith is the right-most leaf in the left subtree
     // and deletePath the path from the root (inclusive) to replaceWith (exclusive)
+    // eslint-disable-next-line no-constant-condition
     while (true) {
       if (replaceWith.right) {
         deletePath.push(replaceWith);
@@ -452,6 +475,7 @@ class _AVLTree<K, V> extends BinarySearchTree<K, V> {
     currentNode.key = replaceWith.key;
     currentNode.value = replaceWith.value;
 
+    //@ts-ignore
     replaceWith.parent.right = replaceWith.left;
     if (replaceWith.left) {
       replaceWith.left.parent = replaceWith.parent;
@@ -462,22 +486,26 @@ class _AVLTree<K, V> extends BinarySearchTree<K, V> {
 
   deleteFirst(key: K) {
     let replaceWith;
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     let currentNode: _AVLTree<K, V> = this;
     const deletePath = [];
 
-    if (!this.hasOwnProperty('key')) {
+    if (this.key === undefined) {
       return this;
     } // Empty tree
 
     // Either no match is found and the function will return from within the loop
     // Or a match is found and deletePath will contain the path from the root to the node to delete after the loop
+    // eslint-disable-next-line no-constant-condition
     while (true) {
+      //@ts-ignore
       if (currentNode.compareKeys(key, currentNode.key) === 0) {
         break;
       }
 
       deletePath.push(currentNode);
 
+      //@ts-ignore
       if (currentNode.compareKeys(key, currentNode.key) < 0) {
         if (currentNode.left) {
           currentNode = currentNode.left;
@@ -511,9 +539,12 @@ class _AVLTree<K, V> extends BinarySearchTree<K, V> {
         delete currentNode.height;
         return this;
       } else {
+        //@ts-ignore
         if (currentNode.parent.left === currentNode) {
+          //@ts-ignore
           currentNode.parent.left = null;
         } else {
+          //@ts-ignore
           currentNode.parent.right = null;
         }
         return this.rebalanceAlongPath(deletePath);
@@ -526,14 +557,20 @@ class _AVLTree<K, V> extends BinarySearchTree<K, V> {
 
       if (currentNode === this) {
         // This node is also the root
+        //@ts-ignore
         replaceWith.parent = null;
         return replaceWith; // height of replaceWith is necessarily 1 because the tree was balanced before deletion
       } else {
+        //@ts-ignore
         if (currentNode.parent.left === currentNode) {
+          //@ts-ignore
           currentNode.parent.left = replaceWith;
+          //@ts-ignore
           replaceWith.parent = currentNode.parent;
         } else {
+          //@ts-ignore
           currentNode.parent.right = replaceWith;
+          //@ts-ignore
           replaceWith.parent = currentNode.parent;
         }
 
@@ -559,6 +596,7 @@ class _AVLTree<K, V> extends BinarySearchTree<K, V> {
 
     // After this loop, replaceWith is the right-most leaf in the left subtree
     // and deletePath the path from the root (inclusive) to replaceWith (exclusive)
+    // eslint-disable-next-line no-constant-condition
     while (true) {
       if (replaceWith.right) {
         deletePath.push(replaceWith);
@@ -571,6 +609,7 @@ class _AVLTree<K, V> extends BinarySearchTree<K, V> {
     currentNode.key = replaceWith.key;
     currentNode.value = replaceWith.value;
 
+    //@ts-ignore
     replaceWith.parent.right = replaceWith.left;
     if (replaceWith.left) {
       replaceWith.left.parent = replaceWith.parent;

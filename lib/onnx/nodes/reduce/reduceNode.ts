@@ -14,7 +14,8 @@ export abstract class ReduceNode extends OnnxNode {
     inputs: string[],
     outputs: string[],
     constants: Constants,
-    onnxVersion: number
+    onnxVersion: number,
+    name: string
   ) {
     super(attributes, inputs, outputs, constants, onnxVersion);
 
@@ -22,6 +23,8 @@ export abstract class ReduceNode extends OnnxNode {
     const keep = this.getAttributeInt('keepdims');
 
     this.keepDims = keep === 1 || keep === undefined;
+
+    this.name = name;
   }
 
   abstract calc(input: Tensor): Tensor;

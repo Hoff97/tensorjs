@@ -17,7 +17,9 @@ export class SliceNode extends OnnxNode {
     super(attributes, inputs, outputs, constants, onnxVersion);
 
     this.axes = this.getAttributeInts('axes');
+    //@ts-ignore
     this.starts = this.getAttributeInts('starts');
+    //@ts-ignore
     this.ends = this.getAttributeInts('ends');
   }
 

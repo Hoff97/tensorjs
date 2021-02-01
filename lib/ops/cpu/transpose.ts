@@ -1,5 +1,5 @@
-import { CPUTensor } from '../../tensor/cpu/tensor';
-import { incrementIndex } from '../../util/shape';
+import {CPUTensor} from '../../tensor/cpu/tensor';
+import {incrementIndex} from '../../util/shape';
 
 export function transpose(x: CPUTensor, permutation: number[]) {
   const rank = x.shape.length;
@@ -23,7 +23,7 @@ export function transpose(x: CPUTensor, permutation: number[]) {
   for (let i = 0; i < x.size; i++) {
     let outIx = 0;
     for (let j = 0; j < rank; j++) {
-      outIx += index[j]*mappedStrides[j];
+      outIx += index[j] * mappedStrides[j];
     }
 
     result.set(outIx, x.get(i));

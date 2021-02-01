@@ -1,9 +1,9 @@
-import { CPUTensor } from "../../tensor/cpu/tensor";
+import {CPUTensor} from '../../tensor/cpu/tensor';
 
 export function cast(a: CPUTensor, to: string) {
   if (a.type === to) {
     return a;
-  } else if (to === "float") {
+  } else if (to === 'float') {
     const arr = new Float32Array(a.size);
     for (let i = 0; i < a.size; i++) {
       arr[i] = a.get(i);

@@ -1,17 +1,16 @@
-import { defaultAllocator } from "../../../tensor/gpu/gl";
-import { GPUTensorConstructor, GPUTensorI } from "../../../tensor/gpu/interface";
-import { GPUMemoryAllocator } from "../../../tensor/gpu/memory";
-import { Precision } from "../../../types";
-import { getSize } from "../../../util/shape";
-import { Input, Operation } from "../operation";
-
+import {defaultAllocator} from '../../../tensor/gpu/gl';
+import {GPUTensorConstructor, GPUTensorI} from '../../../tensor/gpu/interface';
+import {GPUMemoryAllocator} from '../../../tensor/gpu/memory';
+import {Precision} from '../../../types';
+import {getSize} from '../../../util/shape';
+import {Input, Operation} from '../operation';
 
 export interface RepeatInfo {
   shapeA?: readonly number[];
   widthA?: number;
   heightA?: number;
 
-  shapeOutput?: readonly number[],
+  shapeOutput?: readonly number[];
   widthOutput?: number;
   heightOutput?: number;
 
@@ -23,8 +22,15 @@ export interface RepeatInput {
   repeats: readonly number[];
 }
 
-export class RepeatOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTensor, RepeatInfo, RepeatInput> {
-  constructor(tensorConstructor: GPUTensorConstructor<GPUTensor>, allocator?: GPUMemoryAllocator) {
+export class RepeatOperation<GPUTensor extends GPUTensorI> extends Operation<
+  GPUTensor,
+  RepeatInfo,
+  RepeatInput
+> {
+  constructor(
+    tensorConstructor: GPUTensorConstructor<GPUTensor>,
+    allocator?: GPUMemoryAllocator
+  ) {
     super(tensorConstructor, allocator);
   }
 
@@ -35,11 +41,10 @@ export class RepeatOperation<GPUTensor extends GPUTensorI> extends Operation<GPU
   }
 
   getUniformAttrs(): Input[] {
-    return [
-      { name: "repeats", length: this.maxRank }
-    ];
+    return [{name: 'repeats', length: this.maxRank}];
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getFragmentShader(info: RepeatInfo): string {
     return `
     float process(int index[${this.maxRank}]) {
@@ -72,17 +77,21 @@ export class RepeatOperation<GPUTensor extends GPUTensorI> extends Operation<GPU
   }
 
   getTextureNames(): string[] {
-    return ["A"];
+    return ['A'];
   }
 
   calc(input: RepeatInput): GPUTensor {
-    if (this.fullyStatic) {
+    if (this.fullyStatic && this.outputShape !== undefined) {
       return this.compute(this.outputShape, {A: input.A});
     }
 
     const outputShape = this.getOutputShape(input);
 
-    return this.compute(outputShape, {A: input.A}, {repeats: this.copyPad(input.repeats)});
+    return this.compute(
+      outputShape,
+      {A: input.A},
+      {repeats: this.copyPad(input.repeats)}
+    );
   }
 
   compile(info: RepeatInfo, precision: Precision) {
@@ -95,7 +104,10 @@ export class RepeatOperation<GPUTensor extends GPUTensorI> extends Operation<GPU
 
   getCompilationInfo(input: RepeatInput, precision: Precision): RepeatInfo {
     const outputShape = this.getOutputShape(input);
-    const outputSize = defaultAllocator.getAllocationDimensions(getSize(outputShape), precision);
+    const outputSize = defaultAllocator.getAllocationDimensions(
+      getSize(outputShape),
+      precision
+    );
 
     return {
       shapeA: input.A.shape,
@@ -106,7 +118,7 @@ export class RepeatOperation<GPUTensor extends GPUTensorI> extends Operation<GPU
       widthOutput: outputSize.width,
       heightOutput: outputSize.height,
 
-      repeats: input.repeats
+      repeats: input.repeats,
     };
   }
 
