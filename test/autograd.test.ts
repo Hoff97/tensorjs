@@ -216,9 +216,9 @@ for (const backend of backends) {
       );
 
       //@ts-ignore
-      expect(await vA.grad.compare(numericalGradA, 1)).toBeTrue();
+      expect(await vA.grad.compare(numericalGradA, epsilon)).toBeTrue();
       //@ts-ignore
-      expect(await vB.grad.compare(numericalGradB, 1)).toBeTrue();
+      expect(await vB.grad.compare(numericalGradB, epsilon)).toBeTrue();
     });
 
     it('should work with clip', async () => {
@@ -243,6 +243,29 @@ for (const backend of backends) {
 
       //@ts-ignore
       expect(await v.grad.compare(numericalGrad, epsilon)).toBeTrue();
+    });
+
+    it('should work with repeat', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 2], [1, 2, 3, 4]);
+      const ones = backend.constructor([6, 4], new Array(24).fill(1));
+
+      const v = new Variable(a);
+
+      const aCPU = await toCPU(a);
+
+      const res = v.repeat([3, 2]) as Variable;
+      res.backward(ones);
+
+      const numericalGrad = await backend.toBackend(
+        numericalGradient(aCPU, (a: CPUTensor) => a.repeat([3, 2]) as CPUTensor)
+      );
+
+      //@ts-ignore
+      expect(await v.grad.compare(numericalGrad, 0.1)).toBeTrue();
     });
   });
 }

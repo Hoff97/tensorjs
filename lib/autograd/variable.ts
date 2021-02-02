@@ -11,6 +11,7 @@ import {SqrtBack} from './ops/unary/sqrtBack';
 import {BackwardOp, VariableI} from './types';
 import {ConcatBack} from './ops/util/concatBack';
 import {ClipBack} from './ops/unary/clipBack';
+import {RepeatBack} from './ops/util/repeatBack';
 
 export class Variable extends Tensor implements VariableI {
   public grad?: Tensor;
@@ -98,21 +99,23 @@ export class Variable extends Tensor implements VariableI {
   }
 
   matMul(tensor: Tensor): Tensor {
+    if (!(tensor instanceof Variable)) {
+      throw new Error('MatMul can only be done with another variable');
+    }
+
     return new Variable(
-      this.value.matMul(
-        (tensor as VariableI).value ? (tensor as VariableI).value : tensor
-      ),
+      this.value.matMul(tensor.value),
       undefined,
       new MatMulBack(this, tensor)
     );
   }
 
   concat(tensor: Tensor, axis: number): Tensor {
+    if (!(tensor instanceof Variable)) {
+      throw new Error('Concat can only be done with another variable');
+    }
     return new Variable(
-      this.value.concat(
-        (tensor as VariableI).value ? (tensor as VariableI).value : tensor,
-        axis
-      ),
+      this.value.concat(tensor.value, axis),
       undefined,
       new ConcatBack(this, tensor, axis)
     );
@@ -131,7 +134,11 @@ export class Variable extends Tensor implements VariableI {
   }
 
   repeat(repeats: number[]): Tensor {
-    throw new Error('Method not implemented.');
+    return new Variable(
+      this.value.repeat(repeats),
+      undefined,
+      new RepeatBack(this, repeats)
+    );
   }
 
   expand(shape: number[]): Tensor {
