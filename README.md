@@ -2,6 +2,7 @@
 
 ![Test](https://github.com/Hoff97/tensorjs/workflows/Test/badge.svg?branch=develop)
 ![Version](https://img.shields.io/npm/v/@hoff97/tensor-js)
+![David](https://img.shields.io/david/Hoff97/tensorjs)
 
 This is a JS/TS library for accelerated tensor computation intended to be
 run in the browser. It contains an implementation for numpy-style
