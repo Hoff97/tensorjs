@@ -908,31 +908,31 @@ export default abstract class Tensor {
     bias: Tensor
   ): Tensor;
 
-  protected abstract add_impl(
+  abstract add_impl(
     th: Tensor,
     tensor: Tensor,
     resultShape: readonly number[]
   ): Tensor;
 
-  protected abstract subtract_impl(
+  abstract subtract_impl(
     th: Tensor,
     tensor: Tensor,
     resultShape: readonly number[]
   ): Tensor;
 
-  protected abstract multiply_impl(
+  abstract multiply_impl(
     th: Tensor,
     tensor: Tensor,
     resultShape: readonly number[]
   ): Tensor;
 
-  protected abstract divide_impl(
+  abstract divide_impl(
     th: Tensor,
     tensor: Tensor,
     resultShape: readonly number[]
   ): Tensor;
 
-  protected abstract power_impl(
+  abstract power_impl(
     th: Tensor,
     tensor: Tensor,
     resultShape: readonly number[]

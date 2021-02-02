@@ -14,6 +14,9 @@ import {ClipBack} from './ops/unary/clipBack';
 import {RepeatBack} from './ops/util/repeatBack';
 import {ExpandBack} from './ops/util/expandBack';
 import {ReshapeBack} from './ops/util/reshapeBack';
+import {AddBack} from './ops/binary/addBack';
+import {SubtractBack} from './ops/binary/subtractBack';
+import {MultiplyBack} from './ops/binary/multiplyBack';
 
 export class Variable extends Tensor implements VariableI {
   public grad?: Tensor;
@@ -185,7 +188,48 @@ export class Variable extends Tensor implements VariableI {
     throw new Error('Method not implemented.');
   }
 
-  protected add_impl(
+  add_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor {
+    if (!(tensor instanceof Variable) || !(th instanceof Variable)) {
+      throw new Error('Can only add Variable tensor to Variable tensor');
+    }
+    return new Variable(
+      th.value.add_impl(th.value, tensor.value, resultShape),
+      undefined,
+      new AddBack(th, tensor, resultShape)
+    );
+  }
+
+  subtract_impl(
+    th: Tensor,
+    tensor: Tensor,
+    resultShape: readonly number[]
+  ): Tensor {
+    if (!(tensor instanceof Variable) || !(th instanceof Variable)) {
+      throw new Error('Can only add Variable tensor to Variable tensor');
+    }
+    return new Variable(
+      th.value.subtract_impl(th.value, tensor.value, resultShape),
+      undefined,
+      new SubtractBack(th, tensor, resultShape)
+    );
+  }
+
+  multiply_impl(
+    th: Tensor,
+    tensor: Tensor,
+    resultShape: readonly number[]
+  ): Tensor {
+    if (!(tensor instanceof Variable) || !(th instanceof Variable)) {
+      throw new Error('Can only add Variable tensor to Variable tensor');
+    }
+    return new Variable(
+      th.value.multiply_impl(th.value, tensor.value, resultShape),
+      undefined,
+      new MultiplyBack(th, tensor, resultShape)
+    );
+  }
+
+  divide_impl(
     th: Tensor,
     tensor: Tensor,
     resultShape: readonly number[]
@@ -193,29 +237,7 @@ export class Variable extends Tensor implements VariableI {
     throw new Error('Method not implemented.');
   }
 
-  protected subtract_impl(
-    th: Tensor,
-    tensor: Tensor,
-    resultShape: readonly number[]
-  ): Tensor {
-    throw new Error('Method not implemented.');
-  }
-
-  protected multiply_impl(
-    th: Tensor,
-    tensor: Tensor,
-    resultShape: readonly number[]
-  ): Tensor {
-    throw new Error('Method not implemented.');
-  }
-  protected divide_impl(
-    th: Tensor,
-    tensor: Tensor,
-    resultShape: readonly number[]
-  ): Tensor {
-    throw new Error('Method not implemented.');
-  }
-  protected power_impl(
+  power_impl(
     th: Tensor,
     tensor: Tensor,
     resultShape: readonly number[]
