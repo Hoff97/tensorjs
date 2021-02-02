@@ -24,11 +24,15 @@ jobs:
     - name: Get test data
       run: |
         npm run testData
+    - name: Lint
+      run: |
+        npm run lint
     - name: Run tests
       run: |
         npm run test
       env:
         CI: true
-    - name: Lint
-      run: |
-        npm run lint
+    - uses: codecov/codecov-action@v1
+        with:
+          files: ./coverage/coverage-final.json
+          flags: unittests # optional

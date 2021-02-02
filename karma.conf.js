@@ -50,7 +50,7 @@ module.exports = function (config) {
     colors: true,
 
     coverageIstanbulReporter: {
-      reports: [ 'html', 'text-summary', 'lcovonly' ],
+      reports: [ 'html', 'text-summary', 'lcovonly', 'json' ],
       dir: path.join(__dirname, 'coverage'),
       fixWebpackSourcePaths: true,
       'report-config': {
