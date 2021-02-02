@@ -33,6 +33,6 @@ jobs:
       env:
         CI: true
     - uses: codecov/codecov-action@v1
-        with:
-          files: ./coverage/coverage-final.json
-          flags: unittests # optional
+      with:
+        files: ./coverage/coverage-final.json
+        flags: unittests # optional
