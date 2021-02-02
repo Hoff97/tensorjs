@@ -172,7 +172,6 @@ You can find the documentation [here](https://hoff97.github.io/tensorjs/).
 Make sure you have [wasm-pack](https://github.com/rustwasm/wasm-pack) installed, then
 
 ```sh
-$ npm run build:wasm
 $ npm install
 ```
 
@@ -182,7 +181,7 @@ $ npm install
 $ npm run build
 ```
 
-This will first build the rust into a WASM package and
+This will first build the rust code into a WASM package and
 then build the whole library.
 
 ## Testing
@@ -207,6 +206,8 @@ This will run:
 - Unit tests for all backends, which can be run individually
   by `npm run test:integration`
 
+Coverage reports are generated in `coverage`.
+
 ## Testing the GPU implementation:
 
 The tests are run in a Headless Chrome by default.
@@ -216,7 +217,7 @@ For this reason the GPU backend is not tested by default.
 
 To run GPU tests, uncomment the lines in `./test/gpu.test.ts`,
 set `run = true` in `./test/onnx.test.ts`, `./test/onnxPrecompiled.test.ts`
-(and optionally `./test/onnxPrecompiled.test.ts` although the model
+(and optionally `./test/onnxModel.test.ts` although the model
 tests are quite performance intensive and should only be run on a suitable
 computer),
 change the `browsers` field in `karma.conf.js` to `ChromeGPU`.

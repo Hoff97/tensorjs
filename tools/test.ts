@@ -59,7 +59,9 @@ for (const opset in opsetToTag) {
 if (existsSync('tmp')) {
   execSync('rm -rf ./tmp');
 }
-mkdirSync(dataDir);
+if (!existsSync(dataDir)) {
+  mkdirSync(dataDir);
+}
 
 mkdirSync('./tmp');
 

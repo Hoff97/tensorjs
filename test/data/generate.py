@@ -1,3 +1,5 @@
+# This generates models for the onnx model optimization tests
+
 import torch
 from torch.cuda import random
 import torch.nn as nn
