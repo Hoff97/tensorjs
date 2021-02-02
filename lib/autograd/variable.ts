@@ -12,6 +12,7 @@ import {BackwardOp, VariableI} from './types';
 import {ConcatBack} from './ops/util/concatBack';
 import {ClipBack} from './ops/unary/clipBack';
 import {RepeatBack} from './ops/util/repeatBack';
+import {ExpandBack} from './ops/util/expandBack';
 
 export class Variable extends Tensor implements VariableI {
   public grad?: Tensor;
@@ -142,24 +143,36 @@ export class Variable extends Tensor implements VariableI {
   }
 
   expand(shape: number[]): Tensor {
-    throw new Error('Method not implemented.');
+    return new Variable(
+      this.value.expand(shape),
+      undefined,
+      new ExpandBack(this, shape)
+    );
   }
 
   copy(): Tensor {
-    throw new Error('Method not implemented.');
+    return new Variable(
+      this.value.copy(),
+      this.grad !== undefined ? this.grad.copy() : undefined
+    );
   }
+
   gather(axis: number, indices: CPUTensor): Tensor {
     throw new Error('Method not implemented.');
   }
+
   floor(): Tensor {
-    throw new Error('Method not implemented.');
+    return new Variable(this.value.floor());
   }
+
   ceil(): Tensor {
-    throw new Error('Method not implemented.');
+    return new Variable(this.value.ceil());
   }
+
   upsample(scales: number[]): Tensor {
     throw new Error('Method not implemented.');
   }
+
   normalize(
     mean: Tensor,
     variance: Tensor,
