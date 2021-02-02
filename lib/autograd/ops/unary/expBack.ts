@@ -1,5 +1,5 @@
-import {Tensor} from '../../library';
-import {BackwardOp, VariableI} from '../types';
+import {Tensor} from '../../../library';
+import {BackwardOp, VariableI} from '../../types';
 
 export class ExpBack implements BackwardOp {
   constructor(public input: VariableI | Tensor, public exp: Tensor) {}

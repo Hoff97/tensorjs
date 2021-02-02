@@ -2,12 +2,15 @@
 import {Tensor} from '../library';
 import {CPUTensor} from '../tensor/cpu/tensor';
 import {TensorValues, Activation, PadMode} from '../types';
-import {AbsBack} from './ops/absBack';
-import {ExpBack} from './ops/expBack';
-import {LogBack} from './ops/logBack';
-import {NegateBack} from './ops/negateBack';
-import {SqrtBack} from './ops/sqrtBack';
+import {AbsBack} from './ops/unary/absBack';
+import {ExpBack} from './ops/unary/expBack';
+import {LogBack} from './ops/unary/logBack';
+import {MatMulBack} from './ops/matMulBack';
+import {NegateBack} from './ops/unary/negateBack';
+import {SqrtBack} from './ops/unary/sqrtBack';
 import {BackwardOp, VariableI} from './types';
+import {ConcatBack} from './ops/util/concatBack';
+import {ClipBack} from './ops/unary/clipBack';
 
 export class Variable extends Tensor implements VariableI {
   public grad?: Tensor;
@@ -95,15 +98,36 @@ export class Variable extends Tensor implements VariableI {
   }
 
   matMul(tensor: Tensor): Tensor {
-    throw new Error('Method not implemented.');
+    return new Variable(
+      this.value.matMul(
+        (tensor as VariableI).value ? (tensor as VariableI).value : tensor
+      ),
+      undefined,
+      new MatMulBack(this, tensor)
+    );
   }
 
   concat(tensor: Tensor, axis: number): Tensor {
-    throw new Error('Method not implemented.');
+    return new Variable(
+      this.value.concat(
+        (tensor as VariableI).value ? (tensor as VariableI).value : tensor,
+        axis
+      ),
+      undefined,
+      new ConcatBack(this, tensor, axis)
+    );
   }
 
   clip(min?: number, max?: number): Tensor {
-    throw new Error('Method not implemented.');
+    return new Variable(
+      this.value.clip(min, max),
+      undefined,
+      new ClipBack(this, min, max)
+    );
+  }
+
+  clipBackward(grad: Tensor, min?: number, max?: number): Tensor {
+    throw new Error('Clip backward not implemented for Variable');
   }
 
   repeat(repeats: number[]): Tensor {
