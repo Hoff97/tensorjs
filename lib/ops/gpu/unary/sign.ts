@@ -13,6 +13,6 @@ export class SignOperation<
   }
 
   operation(input: string): string {
-    return `${input} < 0.0 ? -1.0 : 1.0`;
+    return `sign(${input})`;
   }
 }
