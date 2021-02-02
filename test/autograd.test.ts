@@ -21,13 +21,13 @@ const backends = [
       new WASMTensor(new Float32Array(values), new Uint32Array(shape)),
     toBackend: (tensor: Tensor) => toWASM(tensor),
     wait: wasmLoaded,
-  },
+  } /*,
   {
     name: 'GPU',
     constructor: (shape: ReadonlyArray<number>, values: number[]) =>
       new GPUTensor(new Float32Array(values), shape, 32),
     toBackend: (tensor: Tensor) => toGPU(tensor, 32),
-  },
+  }*/,
 ];
 
 for (const backend of backends) {
@@ -316,6 +316,192 @@ for (const backend of backends) {
 
       //@ts-ignore
       expect(await v.grad.compare(numericalGrad, 0.1)).toBeTrue();
+    });
+
+    it('should work with add', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 2], [1, 2, 3, 4]);
+      const b = backend.constructor([2, 2], [5, 6, 7, 8]);
+      const ones = backend.constructor([2, 2], new Array(4).fill(1));
+
+      const vA = new Variable(a);
+      const vB = new Variable(b);
+
+      const aCPU = await toCPU(a);
+      const bCPU = await toCPU(b);
+
+      const res = vA.add(vB) as Variable;
+      res.backward(ones);
+
+      const numericalGradA = await backend.toBackend(
+        numericalGradient(aCPU, (a: CPUTensor) => a.add(bCPU) as CPUTensor)
+      );
+      const numericalGradB = await backend.toBackend(
+        numericalGradient(bCPU, (b: CPUTensor) => aCPU.add(b) as CPUTensor)
+      );
+
+      //@ts-ignore
+      expect(await vA.grad.compare(numericalGradA, epsilon)).toBeTrue();
+      //@ts-ignore
+      expect(await vB.grad.compare(numericalGradB, epsilon)).toBeTrue();
+    });
+
+    it('should work with broadcasted add', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 2], [1, 2, 3, 4]);
+      const b = backend.constructor([2], [5, 6]);
+      const ones = backend.constructor([2, 2], new Array(4).fill(1));
+
+      const vA = new Variable(a);
+      const vB = new Variable(b);
+
+      const aCPU = await toCPU(a);
+      const bCPU = await toCPU(b);
+
+      const res = vA.add(vB) as Variable;
+      res.backward(ones);
+
+      const numericalGradA = await backend.toBackend(
+        numericalGradient(aCPU, (a: CPUTensor) => a.add(bCPU) as CPUTensor)
+      );
+      const numericalGradB = await backend.toBackend(
+        numericalGradient(bCPU, (b: CPUTensor) => aCPU.add(b) as CPUTensor)
+      );
+
+      //@ts-ignore
+      expect(await vA.grad.compare(numericalGradA, 0.05)).toBeTrue();
+      //@ts-ignore
+      expect(await vB.grad.compare(numericalGradB, 0.05)).toBeTrue();
+    });
+
+    it('should work with subtract', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 2], [1, 2, 3, 4]);
+      const b = backend.constructor([2, 2], [5, 6, 7, 8]);
+      const ones = backend.constructor([2, 2], new Array(4).fill(1));
+
+      const vA = new Variable(a);
+      const vB = new Variable(b);
+
+      const aCPU = await toCPU(a);
+      const bCPU = await toCPU(b);
+
+      const res = vA.subtract(vB) as Variable;
+      res.backward(ones);
+
+      const numericalGradA = await backend.toBackend(
+        numericalGradient(aCPU, (a: CPUTensor) => a.subtract(bCPU) as CPUTensor)
+      );
+      const numericalGradB = await backend.toBackend(
+        numericalGradient(bCPU, (b: CPUTensor) => aCPU.subtract(b) as CPUTensor)
+      );
+
+      //@ts-ignore
+      expect(await vA.grad.compare(numericalGradA, epsilon)).toBeTrue();
+      //@ts-ignore
+      expect(await vB.grad.compare(numericalGradB, epsilon)).toBeTrue();
+    });
+
+    it('should work with broadcasted subtract', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 2], [1, 2, 3, 4]);
+      const b = backend.constructor([2], [5, 6]);
+      const ones = backend.constructor([2, 2], new Array(4).fill(1));
+
+      const vA = new Variable(a);
+      const vB = new Variable(b);
+
+      const aCPU = await toCPU(a);
+      const bCPU = await toCPU(b);
+
+      const res = vA.subtract(vB) as Variable;
+      res.backward(ones);
+
+      const numericalGradA = await backend.toBackend(
+        numericalGradient(aCPU, (a: CPUTensor) => a.subtract(bCPU) as CPUTensor)
+      );
+      const numericalGradB = await backend.toBackend(
+        numericalGradient(bCPU, (b: CPUTensor) => aCPU.subtract(b) as CPUTensor)
+      );
+
+      //@ts-ignore
+      expect(await vA.grad.compare(numericalGradA, 0.05)).toBeTrue();
+      //@ts-ignore
+      expect(await vB.grad.compare(numericalGradB, 0.05)).toBeTrue();
+    });
+
+    it('should work with multiply', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 2], [1, 2, 3, 4]);
+      const b = backend.constructor([2, 2], [5, 6, 7, 8]);
+      const ones = backend.constructor([2, 2], new Array(4).fill(1));
+
+      const vA = new Variable(a);
+      const vB = new Variable(b);
+
+      const aCPU = await toCPU(a);
+      const bCPU = await toCPU(b);
+
+      const res = vA.multiply(vB) as Variable;
+      res.backward(ones);
+
+      const numericalGradA = await backend.toBackend(
+        numericalGradient(aCPU, (a: CPUTensor) => a.multiply(bCPU) as CPUTensor)
+      );
+      const numericalGradB = await backend.toBackend(
+        numericalGradient(bCPU, (b: CPUTensor) => aCPU.multiply(b) as CPUTensor)
+      );
+
+      //@ts-ignore
+      expect(await vA.grad.compare(numericalGradA, 0.1)).toBeTrue();
+      //@ts-ignore
+      expect(await vB.grad.compare(numericalGradB, 0.1)).toBeTrue();
+    });
+
+    it('should work with broadcasted multiply', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 2], [1, 2, 3, 4]);
+      const b = backend.constructor([2], [5, 6]);
+      const ones = backend.constructor([2, 2], new Array(4).fill(1));
+
+      const vA = new Variable(a);
+      const vB = new Variable(b);
+
+      const aCPU = await toCPU(a);
+      const bCPU = await toCPU(b);
+
+      const res = vA.multiply(vB) as Variable;
+      res.backward(ones);
+
+      const numericalGradA = await backend.toBackend(
+        numericalGradient(aCPU, (a: CPUTensor) => a.multiply(bCPU) as CPUTensor)
+      );
+      const numericalGradB = await backend.toBackend(
+        numericalGradient(bCPU, (b: CPUTensor) => aCPU.multiply(b) as CPUTensor)
+      );
+
+      //@ts-ignore
+      expect(await vA.grad.compare(numericalGradA, 0.05)).toBeTrue();
+      //@ts-ignore
+      expect(await vB.grad.compare(numericalGradB, 0.05)).toBeTrue();
     });
   });
 }
