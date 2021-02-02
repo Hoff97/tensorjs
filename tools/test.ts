@@ -6,11 +6,11 @@ import {models} from '../test/data/models';
 
 const dataDir = 'test/data/onnx';
 
-function loadOnnxUnitTests() {
-  const opsetToTag = {
-    '9': 'v1.4.0',
-  };
+const opsetToTag = {
+  '9': 'v1.4.0',
+};
 
+function loadOnnxUnitTests() {
   for (const opset in opsetToTag) {
     const command = `cd tmp && git clone --depth 1 --branch ${opsetToTag[opset]} https://github.com/onnx/onnx.git`;
     execSync(command);
@@ -48,8 +48,13 @@ function loadOnnxModels() {
   }
 }
 
-if (existsSync(dataDir)) {
-  execSync(`rm -rf ${dataDir}`);
+if (existsSync(`${dataDir}/models`)) {
+  execSync(`rm -rf ${dataDir}/models`);
+}
+for (const opset in opsetToTag) {
+  if (existsSync(`${dataDir}/${opset}`)) {
+    execSync(`rm -rf ${dataDir}/${opset}`);
+  }
 }
 if (existsSync('tmp')) {
   execSync('rm -rf ./tmp');
