@@ -65,6 +65,14 @@ export function ceil(a: CPUTensor) {
   return positionWiseUnaryOp(a, o1 => Math.ceil(o1));
 }
 
+export function sign(a: CPUTensor) {
+  return positionWiseUnaryOp(a, o1 => (o1 < 0 ? -1 : 1));
+}
+
+export function negate(a: CPUTensor) {
+  return positionWiseUnaryOp(a, o1 => -o1);
+}
+
 export function clip(a: CPUTensor, min?: number, max?: number) {
   let f = (o1: number) => o1;
   if (min !== undefined && max !== undefined) {

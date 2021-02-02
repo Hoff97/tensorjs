@@ -9,7 +9,9 @@ import {
   floor,
   log,
   multiply,
+  negate,
   power,
+  sign,
   sqrt,
   subtract,
 } from '../../ops/cpu/basic';
@@ -95,6 +97,14 @@ export class CPUTensor extends Tensor {
     return this.shape;
   }
 
+  constantLike(value: number): Tensor {
+    return new CPUTensor(this.shape, new Float32Array(this.size).fill(value));
+  }
+
+  singleConstant(value: number): Tensor {
+    return new CPUTensor([1], [value]);
+  }
+
   async cpu(): Promise<CPUTensor> {
     return this;
   }
@@ -160,6 +170,14 @@ export class CPUTensor extends Tensor {
 
   ceil(): Tensor {
     return ceil(this);
+  }
+
+  negate(): Tensor {
+    return negate(this);
+  }
+
+  sign(): Tensor {
+    return sign(this);
   }
 
   clip(min?: number, max?: number): Tensor {

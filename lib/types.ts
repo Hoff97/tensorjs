@@ -25,6 +25,16 @@ export default abstract class Tensor {
   abstract getShape(): ReadonlyArray<number>;
 
   /**
+   * Constructs a tensor with the same shape and the given value everywhere
+   */
+  abstract constantLike(value: number): Tensor;
+
+  /**
+   * Constructs a tensor with shape [1] and the given value everywhere
+   */
+  abstract singleConstant(value: number): Tensor;
+
+  /**
    * Deletes the tensor. Has the following effects depending on the backend
    * of the tensor:
    *
@@ -408,6 +418,18 @@ export default abstract class Tensor {
    * Takes the absolute of each value of the tensor
    */
   abstract abs(): Tensor;
+
+  /**
+   * Negates all entries of the tensor
+   */
+  abstract negate(): Tensor;
+
+  /**
+   * Computes the value-wise sign which is:
+   *  - (-1) if x < 0
+   *  - 1 otherwise
+   */
+  abstract sign(): Tensor;
 
   alignShapes(
     shape1: readonly number[],

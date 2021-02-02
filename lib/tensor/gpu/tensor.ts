@@ -41,6 +41,8 @@ import {SliceOperation} from '../../ops/gpu/util/slice';
 import {UpsampleOperation} from '../../ops/gpu/conv/upsample';
 import {NormalizeOperation} from '../../ops/gpu/conv/normalize';
 import {Dispatcher} from '../../ops/gpu/dispatcher';
+import {SignOperation} from '../../ops/gpu/unary/sign';
+import {NegateOperation} from '../../ops/gpu/unary/negate';
 
 export class GPUTensor extends Tensor implements GPUTensorI {
   public memory: MemoryEntry;
@@ -98,6 +100,18 @@ export class GPUTensor extends Tensor implements GPUTensorI {
     return this;
   }
 
+  constantLike(value: number): Tensor {
+    return new GPUTensor(
+      new Float32Array(this.size).fill(value),
+      this.shape,
+      this.precision
+    );
+  }
+
+  singleConstant(value: number): Tensor {
+    return new GPUTensor(new Float32Array([value]), [1], this.precision);
+  }
+
   delete(): void {
     this.deleted = true;
     defaultAllocator.deallocate(this.memory);
@@ -134,6 +148,14 @@ export class GPUTensor extends Tensor implements GPUTensorI {
 
   ceil(): Tensor {
     return defaultCeilD.calc({input: this}, this.precision) as GPUTensor;
+  }
+
+  negate(): Tensor {
+    return defaultNegateD.calc({input: this}, this.precision) as GPUTensor;
+  }
+
+  sign(): Tensor {
+    return defaultSignD.calc({input: this}, this.precision) as GPUTensor;
   }
 
   add_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor {
@@ -470,114 +492,84 @@ export const gpuConstructor: GPUTensorConstructor<GPUTensor> = (
 const defaultMatMulD = new Dispatcher(
   () => new MatMulOperation(gpuConstructor)
 );
-//const defaultMatMul = new MatMulOperation(gpuConstructor);
+
 const defaultGemmD = new Dispatcher(() => new GemmOperation(gpuConstructor));
-//const defaultGemm = new GemmOperation(gpuConstructor);
 const defaultGemmCD = new Dispatcher(() => new GemmCOperation(gpuConstructor));
-//const defaultGemmC = new GemmCOperation(gpuConstructor);
 
 //Unary operations
 const defaultExpD = new Dispatcher(() => new ExpOperation(gpuConstructor));
-//const defaultExp = new ExpOperation(gpuConstructor);
 const defaultAbsD = new Dispatcher(() => new AbsOperation(gpuConstructor));
-//const defaultAbs = new AbsOperation(gpuConstructor);
 const defaultCeilD = new Dispatcher(() => new CeilOperation(gpuConstructor));
-//const defaultCeil = new CeilOperation(gpuConstructor);
 const defaultFloorD = new Dispatcher(() => new FloorOperation(gpuConstructor));
-//const defaultFloor = new FloorOperation(gpuConstructor);
 const defaultClipD = new Dispatcher(() => new ClipOperation(gpuConstructor));
-//const defaultClip = new ClipOperation(gpuConstructor);
 const defaultSqrtD = new Dispatcher(() => new SqrtOperation(gpuConstructor));
-//const defaultSqrt = new SqrtOperation(gpuConstructor);
 const defaultLogD = new Dispatcher(() => new LogOperation(gpuConstructor));
-//const defaultLog = new LogOperation(gpuConstructor);
+const defaultNegateD = new Dispatcher(
+  () => new NegateOperation(gpuConstructor)
+);
+const defaultSignD = new Dispatcher(() => new SignOperation(gpuConstructor));
 
 //Convolutions
 const defaultConvD = new Dispatcher(() => new ConvOperation(gpuConstructor));
-//const defaultConv = new ConvOperation(gpuConstructor);
 const defaultAveragePoolD = new Dispatcher(
   () => new AveragePoolOperation(gpuConstructor)
 );
-//const defaultAveragePool = new AveragePoolOperation(gpuConstructor);
 const defaultConvBiasD = new Dispatcher(
   () => new ConvBiasOperation(gpuConstructor)
 );
-//const defaultConvBias = new ConvBiasOperation(gpuConstructor);
 const defaultPadD = new Dispatcher(() => new PadOperation(gpuConstructor));
-//const defaultPad = new PadOperation(gpuConstructor);
 const defaultUpsampleD = new Dispatcher(
   () => new UpsampleOperation(gpuConstructor)
 );
-//const defaultUpsample = new UpsampleOperation(gpuConstructor);
 
 //Binary operations
 const defaultAddD = new Dispatcher(() => new AddOperation(gpuConstructor));
-//const defaultAdd = new AddOperation(gpuConstructor);
 const defaultSubtractD = new Dispatcher(
   () => new SubtractOperation(gpuConstructor)
 );
-//const defaultSubtract = new SubtractOperation(gpuConstructor);
 const defaultMultiplyD = new Dispatcher(
   () => new MultiplyOperation(gpuConstructor)
 );
-//const defaultMultiply = new MultiplyOperation(gpuConstructor);
 const defaultDivideD = new Dispatcher(
   () => new DivideOperation(gpuConstructor)
 );
-//const defaultDivide = new DivideOperation(gpuConstructor);
 const defaultPowerD = new Dispatcher(() => new PowerOperation(gpuConstructor));
-//const defaultPower = new PowerOperation(gpuConstructor);
 
 //Reductions
 const defaultMeanD = new Dispatcher(
   () => new ReduceMeanOperation(gpuConstructor)
 );
-//const defaultMean = new ReduceMeanOperation(gpuConstructor);
 const defaultMeanSquareD = new Dispatcher(
   () => new ReduceMeanSquareOperation(gpuConstructor)
 );
-//const defaultMeanSquare = new ReduceMeanSquareOperation(gpuConstructor);
 const defaultSumSquareD = new Dispatcher(
   () => new SumSquareOperation(gpuConstructor)
 );
-//const defaultSumSquare = new SumSquareOperation(gpuConstructor);
 const defaultSumD = new Dispatcher(() => new SumOperation(gpuConstructor));
-//const defaultSum = new SumOperation(gpuConstructor);
 const defaultProductD = new Dispatcher(
   () => new ProductOperation(gpuConstructor)
 );
-//const defaultProduct = new ProductOperation(gpuConstructor);
 const defaultMaxD = new Dispatcher(() => new MaxOperation(gpuConstructor));
-//const defaultMax = new MaxOperation(gpuConstructor);
 const defaultMinD = new Dispatcher(() => new MinOperation(gpuConstructor));
-//const defaultMin = new MinOperation(gpuConstructor);
 
 //Util
 const defaultConcatD = new Dispatcher(
   () => new ConcatOperation(gpuConstructor)
 );
-//const defaultConcat = new ConcatOperation(gpuConstructor);
 const defaultCopyD = new Dispatcher(() => new CopyOperation(gpuConstructor));
-//const defaultCopy = new CopyOperation(gpuConstructor);
 const defaultExpandD = new Dispatcher(
   () => new ExpandOperation(gpuConstructor)
 );
-//const defaultExpand = new ExpandOperation(gpuConstructor);
 const defaultGatherD = new Dispatcher(
   () => new GatherOperation(gpuConstructor)
 );
-//const defaultGather = new GatherOperation(gpuConstructor);
 const defaultTransposeD = new Dispatcher(
   () => new TransposeOperation(gpuConstructor)
 );
-//const defaultTranspose = new TransposeOperation(gpuConstructor);
 const defaultRepeatD = new Dispatcher(
   () => new RepeatOperation(gpuConstructor)
 );
-//const defaultRepeat = new RepeatOperation(gpuConstructor);
 const defaultSliceD = new Dispatcher(() => new SliceOperation(gpuConstructor));
-//const defaultSlice = new SliceOperation(gpuConstructor);
 const defaultNormalizeD = new Dispatcher(
   () => new NormalizeOperation(gpuConstructor)
 );
-//const defaultNormalize = new NormalizeOperation(gpuConstructor);

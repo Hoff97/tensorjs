@@ -39,6 +39,18 @@ export class WASMTensor extends Tensor {
     return Array.from(this.wasmTensor.get_shape());
   }
 
+  constantLike(value: number): Tensor {
+    // TODO: Maybe more efficient in WASM?
+    return new WASMTensor(
+      new Float32Array(this.wasmTensor.size).fill(value),
+      this.wasmTensor.get_shape()
+    );
+  }
+
+  singleConstant(value: number): Tensor {
+    return new WASMTensor(new Float32Array([value]), new Uint32Array([1]));
+  }
+
   async wasm(): Promise<WASMTensor> {
     return this;
   }
@@ -67,6 +79,14 @@ export class WASMTensor extends Tensor {
 
   abs(): Tensor {
     return new WASMTensor(this.wasmTensor.abs());
+  }
+
+  negate(): Tensor {
+    return new WASMTensor(this.wasmTensor.negate());
+  }
+
+  sign(): Tensor {
+    return new WASMTensor(this.wasmTensor.sign());
   }
 
   add_impl(
