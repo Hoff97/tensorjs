@@ -104,6 +104,30 @@ for (const backend of backends) {
       expect(await v.grad.compare(numericalGrad, epsilon)).toBeTrue();
     });
 
+    it('should work with reshape', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 2], [1, 2, 4, 16]);
+      const ones = backend.constructor([4], [1, 1, 1, 1]);
+
+      const v = new Variable(a);
+
+      const res = v.reshape([4]) as Variable;
+      res.backward(ones);
+
+      const numericalGrad = await backend.toBackend(
+        numericalGradient(
+          await toCPU(a),
+          (a: CPUTensor) => a.reshape([4]) as CPUTensor
+        )
+      );
+
+      //@ts-ignore
+      expect(await v.grad.compare(numericalGrad, epsilon)).toBeTrue();
+    });
+
     it('should work with abs', async () => {
       if (backend.wait !== undefined) {
         await backend.wait;
@@ -262,6 +286,32 @@ for (const backend of backends) {
 
       const numericalGrad = await backend.toBackend(
         numericalGradient(aCPU, (a: CPUTensor) => a.repeat([3, 2]) as CPUTensor)
+      );
+
+      //@ts-ignore
+      expect(await v.grad.compare(numericalGrad, 0.1)).toBeTrue();
+    });
+
+    it('should work with expand', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 2], [1, 2, 3, 4]);
+      const ones = backend.constructor([3, 2, 2], new Array(12).fill(1));
+
+      const v = new Variable(a);
+
+      const aCPU = await toCPU(a);
+
+      const res = v.expand([3, 2, 2]) as Variable;
+      res.backward(ones);
+
+      const numericalGrad = await backend.toBackend(
+        numericalGradient(
+          aCPU,
+          (a: CPUTensor) => a.expand([3, 2, 2]) as CPUTensor
+        )
       );
 
       //@ts-ignore

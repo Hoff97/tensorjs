@@ -13,6 +13,7 @@ import {ConcatBack} from './ops/util/concatBack';
 import {ClipBack} from './ops/unary/clipBack';
 import {RepeatBack} from './ops/util/repeatBack';
 import {ExpandBack} from './ops/util/expandBack';
+import {ReshapeBack} from './ops/util/reshapeBack';
 
 export class Variable extends Tensor implements VariableI {
   public grad?: Tensor;
@@ -68,7 +69,8 @@ export class Variable extends Tensor implements VariableI {
   protected reshape_impl(shape: readonly number[], copy: boolean): Tensor {
     return new Variable(
       this.value.reshape(shape, copy),
-      this.grad !== undefined ? this.grad.reshape(shape, copy) : undefined
+      this.grad !== undefined ? this.grad.reshape(shape, copy) : undefined,
+      new ReshapeBack(this)
     );
   }
 
@@ -182,6 +184,7 @@ export class Variable extends Tensor implements VariableI {
   ): Tensor {
     throw new Error('Method not implemented.');
   }
+
   protected add_impl(
     th: Tensor,
     tensor: Tensor,
@@ -189,6 +192,7 @@ export class Variable extends Tensor implements VariableI {
   ): Tensor {
     throw new Error('Method not implemented.');
   }
+
   protected subtract_impl(
     th: Tensor,
     tensor: Tensor,
@@ -196,6 +200,7 @@ export class Variable extends Tensor implements VariableI {
   ): Tensor {
     throw new Error('Method not implemented.');
   }
+
   protected multiply_impl(
     th: Tensor,
     tensor: Tensor,
