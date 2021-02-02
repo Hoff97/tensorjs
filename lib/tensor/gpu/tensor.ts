@@ -43,6 +43,7 @@ import {NormalizeOperation} from '../../ops/gpu/conv/normalize';
 import {Dispatcher} from '../../ops/gpu/dispatcher';
 import {SignOperation} from '../../ops/gpu/unary/sign';
 import {NegateOperation} from '../../ops/gpu/unary/negate';
+import {ClipBackwardOperation} from '../../ops/gpu/util/clipBackward';
 
 export class GPUTensor extends Tensor implements GPUTensorI {
   public memory: MemoryEntry;
@@ -406,6 +407,13 @@ export class GPUTensor extends Tensor implements GPUTensorI {
     ) as GPUTensor;
   }
 
+  clipBackward(grad: Tensor, min?: number, max?: number): Tensor {
+    return defaultClipBackwardD.calc(
+      {input: this, minVal: min, maxVal: max, grad},
+      this.precision
+    ) as GPUTensor;
+  }
+
   repeat(repeats: number[]): Tensor {
     return defaultRepeatD.calc({A: this, repeats}, this.precision) as GPUTensor;
   }
@@ -502,6 +510,9 @@ const defaultAbsD = new Dispatcher(() => new AbsOperation(gpuConstructor));
 const defaultCeilD = new Dispatcher(() => new CeilOperation(gpuConstructor));
 const defaultFloorD = new Dispatcher(() => new FloorOperation(gpuConstructor));
 const defaultClipD = new Dispatcher(() => new ClipOperation(gpuConstructor));
+const defaultClipBackwardD = new Dispatcher(
+  () => new ClipBackwardOperation(gpuConstructor)
+);
 const defaultSqrtD = new Dispatcher(() => new SqrtOperation(gpuConstructor));
 const defaultLogD = new Dispatcher(() => new LogOperation(gpuConstructor));
 const defaultNegateD = new Dispatcher(

@@ -1211,6 +1211,33 @@ impl Tensor {
         self.unary_op(|x: f32| x.min(max))
     }
 
+    pub fn clip_backward(&self, min: f32, max: f32, grad: &Tensor) -> Tensor {
+        self.binary_op(grad, |v: f32, g: f32| {
+            if v < min || v > max {
+                return 0.0;
+            }
+            return g;
+        })
+    }
+
+    pub fn clip_min_backward(&self, min: f32, grad: &Tensor) -> Tensor {
+        self.binary_op(grad, |v: f32, g: f32| {
+            if v < min {
+                return 0.0;
+            }
+            return g;
+        })
+    }
+
+    pub fn clip_max_backward(&self, max: f32, grad: &Tensor) -> Tensor {
+        self.binary_op(grad, |v: f32, g: f32| {
+            if v > max {
+                return 0.0;
+            }
+            return g;
+        })
+    }
+
     pub fn expand(&self, shape: Uint32Array) -> Tensor {
         let mut _shape: Vec<usize> = vec![0; shape.length() as usize];
         for i in 0..shape.length() {

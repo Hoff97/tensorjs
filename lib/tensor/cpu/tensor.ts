@@ -4,6 +4,7 @@ import {
   add,
   ceil,
   clip,
+  clipBackward,
   divide,
   exp,
   floor,
@@ -182,6 +183,13 @@ export class CPUTensor extends Tensor {
 
   clip(min?: number, max?: number): Tensor {
     return clip(this, min, max);
+  }
+
+  clipBackward(grad: Tensor, min?: number, max?: number): Tensor {
+    if (!(grad instanceof CPUTensor)) {
+      throw new Error('Can only do clipBackward with CPUTensor');
+    }
+    return clipBackward(this, grad, this.getShape(), min, max);
   }
 
   add_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor {

@@ -125,3 +125,26 @@ export function power(
 ) {
   return positionWiseBinaryOp(a, b, (o1, o2) => Math.pow(o1, o2), resultShape);
 }
+
+export function clipBackward(
+  value: CPUTensor,
+  grad: CPUTensor,
+  resultShape: readonly number[],
+  min?: number,
+  max?: number
+) {
+  return positionWiseBinaryOp(
+    value,
+    grad,
+    (v, g) => {
+      if (min !== undefined && v < min) {
+        return 0;
+      }
+      if (max !== undefined && v > max) {
+        return 0;
+      }
+      return g;
+    },
+    resultShape
+  );
+}

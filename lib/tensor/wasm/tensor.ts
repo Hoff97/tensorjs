@@ -323,6 +323,26 @@ export class WASMTensor extends Tensor {
     return this.copy();
   }
 
+  clipBackward(grad: Tensor, min?: number, max?: number): Tensor {
+    if (!(grad instanceof WASMTensor)) {
+      throw new Error('Can only do grad backward with Wasm tensor');
+    }
+    if (min !== undefined && max !== undefined) {
+      return new WASMTensor(
+        this.wasmTensor.clip_backward(min, max, grad.wasmTensor)
+      );
+    } else if (min !== undefined) {
+      return new WASMTensor(
+        this.wasmTensor.clip_min_backward(min, grad.wasmTensor)
+      );
+    } else if (max !== undefined) {
+      return new WASMTensor(
+        this.wasmTensor.clip_max_backward(max, grad.wasmTensor)
+      );
+    }
+    return this.copy();
+  }
+
   repeat(repeats: number[]): Tensor {
     return new WASMTensor(this.wasmTensor.repeat(new Uint32Array(repeats)));
   }

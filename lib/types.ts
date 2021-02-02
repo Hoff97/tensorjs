@@ -805,6 +805,14 @@ export default abstract class Tensor {
   abstract clip(min?: number, max?: number): Tensor;
 
   /**
+   * Backward pass for clip
+   * @param grad Gradient from which values should be selected
+   * @param min Minimum value. Defaults to the minimum possible value
+   * @param max Maximum value. Defaults to the maximum possible value
+   */
+  abstract clipBackward(grad: Tensor, min?: number, max?: number): Tensor;
+
+  /**
    * Repeat the tensor along each dimension
    *
    * @example
