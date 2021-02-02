@@ -32,7 +32,7 @@ import {sum} from '../../ops/cpu/sum';
 import {sumSquare} from '../../ops/cpu/sumSquare';
 import {transpose} from '../../ops/cpu/transpose';
 import {upsample} from '../../ops/cpu/upsample';
-import Tensor, {PadMode, TensorValues} from '../../types';
+import Tensor, {Activation, PadMode, TensorValues} from '../../types';
 import {
   compareShapes,
   computeStrides,
@@ -275,6 +275,7 @@ export class CPUTensor extends Tensor {
     group: number,
     pads: number[],
     strides: number[],
+    activation: Activation,
     bias?: Tensor
   ): Tensor {
     if (
@@ -290,6 +291,7 @@ export class CPUTensor extends Tensor {
       group,
       pads,
       strides,
+      activation,
       bias as CPUTensor
     );
   }

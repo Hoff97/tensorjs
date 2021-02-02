@@ -1,3 +1,4 @@
+import {Activation} from '../../library';
 import {CPUTensor} from '../../tensor/cpu/tensor';
 import {getSize, incrementIndex} from '../../util/shape';
 import {outputDimsSize} from '../util/conv';
@@ -9,6 +10,7 @@ export function conv(
   group: number,
   pads: number[],
   strides: number[],
+  activation: Activation,
   bias?: CPUTensor
 ) {
   const N = x.shape[0];
@@ -94,6 +96,23 @@ export function conv(
             incrementIndex(kernelIndices, w.shape);
           }
 
+          Y.set(outputIndices, result);
+
+          incrementIndex(outputIndices, Y.shape);
+        }
+      }
+
+      if (activation !== 'id') {
+        const outputIndices = new Array(R.length).fill(0);
+        outputIndices.unshift(n, m);
+
+        for (let oIx = 0; oIx < outputSize; oIx++) {
+          let result = Y.get(outputIndices);
+          if (activation === 'relu') {
+            result = Math.max(0, result);
+          } else if (activation === 'relu6') {
+            result = Math.min(Math.max(0, result), 6);
+          }
           Y.set(outputIndices, result);
 
           incrementIndex(outputIndices, Y.shape);

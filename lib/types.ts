@@ -276,8 +276,8 @@ export default abstract class Tensor {
       group,
       pads,
       strides,
-      bias,
-      activation
+      activation,
+      bias
     );
   }
 
@@ -939,8 +939,8 @@ export default abstract class Tensor {
     group: number,
     pads: number[],
     strides: number[],
-    bias?: Tensor,
-    activation?: Activation
+    activation: Activation,
+    bias?: Tensor
   ): Tensor;
 
   protected abstract pad_impl(

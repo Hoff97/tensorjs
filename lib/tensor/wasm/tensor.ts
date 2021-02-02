@@ -1,3 +1,4 @@
+import {Activation} from '../../library';
 import Tensor, {PadMode} from '../../types';
 import {compareShapes} from '../../util/shape';
 
@@ -203,12 +204,23 @@ export class WASMTensor extends Tensor {
     );
   }
 
+  getActivationFlag(activation: Activation) {
+    if (activation === 'id') {
+      return 0;
+    } else if (activation === 'relu') {
+      return 1;
+    } else {
+      return 2;
+    }
+  }
+
   conv_impl(
     kernel: Tensor,
     dilations: number[],
     group: number,
     pads: number[],
     strides: number[],
+    activation: Activation,
     bias?: Tensor
   ): Tensor {
     if (
@@ -217,6 +229,9 @@ export class WASMTensor extends Tensor {
     ) {
       throw new Error('Can only do convolution of CPU tensor with CPU tensor');
     }
+
+    const activationFlag = this.getActivationFlag(activation);
+
     if (bias !== undefined) {
       return new WASMTensor(
         this.wasmTensor.conv_with_bias(
@@ -225,7 +240,8 @@ export class WASMTensor extends Tensor {
           new Uint32Array(dilations),
           group,
           new Uint32Array(pads),
-          new Uint32Array(strides)
+          new Uint32Array(strides),
+          activationFlag
         )
       );
     } else {
@@ -235,7 +251,8 @@ export class WASMTensor extends Tensor {
           new Uint32Array(dilations),
           group,
           new Uint32Array(pads),
-          new Uint32Array(strides)
+          new Uint32Array(strides),
+          activationFlag
         )
       );
     }

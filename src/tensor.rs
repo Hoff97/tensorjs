@@ -338,7 +338,8 @@ impl Tensor {
                  _dilations: &Vec<usize>,
                  group: usize,
                  _pads: &Vec<usize>,
-                 _strides: &Vec<usize>
+                 _strides: &Vec<usize>,
+                 activation: u32
                  ) -> Tensor {
         let N = self.shape[0];
         let C = self.shape[1];
@@ -360,7 +361,7 @@ impl Tensor {
         for i in 0..data_rank {
             output_shape[i+2] = R[i];
         }
-        
+
         let output_strides = compute_strides(&output_shape);
         let o_size = get_size(&output_shape);
         let mut values = vec![0.0; o_size];
@@ -427,6 +428,18 @@ impl Tensor {
                         values[basis + o_ix] = result;
 
                         increment_index(&mut output_indices, &output_shape);
+                    }
+                }
+
+                if activation != 0 {
+                    for o in 0..output_size {
+                        let mut result = values[basis + o];
+                        if activation == 1 {
+                            result = result.max(0.0)
+                        } else if activation == 2 {
+                            result = result.max(0.0).min(6.0);
+                        }
+                        values[basis + o] = result;
                     }
                 }
             }
@@ -1059,7 +1072,8 @@ impl Tensor {
                 dilations: Uint32Array,
                 group: u32,
                 pads: Uint32Array,
-                strides: Uint32Array) -> Tensor {
+                strides: Uint32Array,
+                activation: u32) -> Tensor {
         let mut _dilations: Vec<usize> = vec![0; dilations.length() as usize];
         let mut _pads: Vec<usize> = vec![0; pads.length() as usize];
         let mut _strides: Vec<usize> = vec![0; strides.length() as usize];
@@ -1070,16 +1084,17 @@ impl Tensor {
             _strides[i as usize] = strides.get_index(i) as usize;
         }
 
-        return self._conv(kernel, None, &_dilations, group as usize, &_pads, &_strides);
+        return self._conv(kernel, None, &_dilations, group as usize, &_pads, &_strides, activation);
     }
 
     pub fn conv_with_bias(&self,
-        kernel: &Tensor,
-        bias: &Tensor,
-        dilations: Uint32Array,
-        group: u32,
-        pads: Uint32Array,
-        strides: Uint32Array) -> Tensor {
+                          kernel: &Tensor,
+                          bias: &Tensor,
+                          dilations: Uint32Array,
+                          group: u32,
+                          pads: Uint32Array,
+                          strides: Uint32Array,
+                          activation: u32) -> Tensor {
         let mut _dilations: Vec<usize> = vec![0; dilations.length() as usize];
         let mut _pads: Vec<usize> = vec![0; pads.length() as usize];
         let mut _strides: Vec<usize> = vec![0; strides.length() as usize];
@@ -1090,7 +1105,7 @@ impl Tensor {
             _strides[i as usize] = strides.get_index(i) as usize;
         }
 
-        return self._conv(kernel, Some(bias), &_dilations, group as usize, &_pads, &_strides);
+        return self._conv(kernel, Some(bias), &_dilations, group as usize, &_pads, &_strides, activation);
     }
 
     pub fn average_pool(&self,

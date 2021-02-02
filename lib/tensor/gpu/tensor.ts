@@ -293,8 +293,8 @@ export class GPUTensor extends Tensor implements GPUTensorI {
     group: number,
     pads: number[],
     strides: number[],
-    bias?: Tensor,
-    activation?: Activation
+    activation?: Activation,
+    bias?: Tensor
   ): Tensor {
     if (
       !(kernel instanceof GPUTensor) ||
