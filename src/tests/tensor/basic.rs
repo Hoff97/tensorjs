@@ -38,6 +38,17 @@ fn test_tensor_add() {
 }
 
 #[test]
+fn test_tensor_add_bc() {
+    let a = Tensor::new(&vec![1], &vec![1.]);
+    let b = Tensor::new(&vec![4], &vec![1.,2.,3.,4.]);
+    let expected = Tensor::new(&vec![4], &vec![2.,3.,4.,5.]);
+
+    let result = a.addition(&b);
+
+    assert!(result.compare(&expected, DELTA));
+}
+
+#[test]
 fn test_tensor_subtract() {
     let a = Tensor::new(&vec![2,2], &vec![1.,4.,9.,16.]);
     let b = Tensor::new(&vec![2,2], &vec![1.,2.,3.,4.]);
