@@ -11,6 +11,13 @@ models = [
         )
     },
     {
+        "name": "conv_no_bias_batchnorm",
+        "model": nn.Sequential(
+            nn.Conv2d(3, 4, (3,3), bias=False),
+            nn.BatchNorm2d(4)
+        )
+    },
+    {
         "name": "conv_batchnorm_relu",
         "model": nn.Sequential(
             nn.Conv2d(3, 4, (3,3)),
@@ -31,10 +38,12 @@ models = [
 batch_inputs = [
     torch.rand([10,3,6,6]),
     torch.rand([10,3,6,6]),
+    torch.rand([10,3,6,6]),
     torch.rand([10,3,6,6])
 ]
 
 dummy_inputs = [
+    torch.arange(0,1*3*6*6, dtype=torch.float32).reshape((1,3,6,6)),
     torch.arange(0,1*3*6*6, dtype=torch.float32).reshape((1,3,6,6)),
     torch.arange(0,1*3*6*6, dtype=torch.float32).reshape((1,3,6,6)),
     torch.arange(0,1*3*6*6, dtype=torch.float32).reshape((1,3,6,6))

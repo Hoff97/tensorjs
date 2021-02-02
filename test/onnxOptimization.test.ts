@@ -25,6 +25,10 @@ const tests = [
     inputsShape: [[1, 3, 6, 6]],
   },
   {
+    name: 'conv_no_bias_batchnorm',
+    inputsShape: [[1, 3, 6, 6]],
+  },
+  {
     name: 'conv_batchnorm_relu',
     inputsShape: [[1, 3, 6, 6]],
   },
