@@ -162,6 +162,35 @@ const values = await tensor.copy(32).getValues();
 Try to run your models with static input sizes. TensorJS will compile specialized versions of all operations
 after enough forward passes. For this the input shapes of the tensors have to be constant though.
 
+## Autograd functionality
+
+Automatic differentiation is supported. For this create variables from all your tensors:
+
+```typescript
+const a = new tjs.tensor.cpu.CPUTensor([2,2], [1,2,3,4]);
+const b = new tjs.tensor.cpu.CPUTensor([2,2], [5,6,7,8]);
+
+const varA = new tjs.autograd.Variable(a);
+const varB = new tjs.autograd.Variable(b);
+```
+
+Afterwards you can perform normal tensor operations:
+
+```typescript
+const mul = varA.matMul(varB);
+const sum = mul.sum();
+```
+
+To perform a backward pass, call backward on a scalar tensor (a tensor with shape `[1]`).
+All variables will have an attribute `.grad`, which is the gradient
+```typescript
+sum.backward();
+
+console.log(varA.grad);
+```
+
+Multiple backward passes will add up the gradients.
+
 # Documentation
 
 You can find the documentation [here](https://hoff97.github.io/tensorjs/).
