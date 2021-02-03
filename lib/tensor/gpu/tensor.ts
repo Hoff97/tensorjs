@@ -44,6 +44,7 @@ import {Dispatcher} from '../../ops/gpu/dispatcher';
 import {SignOperation} from '../../ops/gpu/unary/sign';
 import {NegateOperation} from '../../ops/gpu/unary/negate';
 import {ClipBackwardOperation} from '../../ops/gpu/util/clipBackward';
+import {ConvTransposeOperation} from '../../ops/gpu/conv/convTranspose';
 
 export class GPUTensor extends Tensor implements GPUTensorI {
   public memory: MemoryEntry;
@@ -367,7 +368,16 @@ export class GPUTensor extends Tensor implements GPUTensorI {
       );
     }
 
-    throw new Error('Not implemented!');
+    return defaultConvTransposeD.calc(
+      {
+        X: this,
+        W: kernel,
+        pads,
+        dilations,
+        strides,
+      },
+      this.precision
+    ) as GPUTensor;
   }
 
   averagePool_impl(
@@ -543,6 +553,9 @@ const defaultAveragePoolD = new Dispatcher(
 );
 const defaultConvBiasD = new Dispatcher(
   () => new ConvBiasOperation(gpuConstructor)
+);
+const defaultConvTransposeD = new Dispatcher(
+  () => new ConvTransposeOperation(gpuConstructor)
 );
 const defaultPadD = new Dispatcher(() => new PadOperation(gpuConstructor));
 const defaultUpsampleD = new Dispatcher(
