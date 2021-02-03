@@ -1,6 +1,6 @@
 import Tensor from '../lib/types';
 
-import {data} from './data/conv';
+import {convData} from './data/conv';
 
 const DELTA = 0.00001;
 
@@ -15,9 +15,9 @@ export default function testConv(
   constructor: TensorConstructor,
   wait?: Promise<void>
 ) {
-  for (let i = 0; i < data.length; i++) {
-    const dat = data[i];
-    describe(`${name} ${data[i].name}`, () => {
+  for (let i = 0; i < convData.length; i++) {
+    const dat = convData[i];
+    describe(`${name} ${convData[i].name}`, () => {
       for (let j = 0; j < dat.cases.length; j++) {
         const cas = dat.cases[j];
 

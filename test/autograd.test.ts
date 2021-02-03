@@ -503,5 +503,281 @@ for (const backend of backends) {
       //@ts-ignore
       expect(await vB.grad.compare(numericalGradB, 0.05)).toBeTrue();
     });
+
+    it('should work with convolution', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const x = backend.constructor([1, 1, 3, 3], [1, 2, 3, 4, 5, 6, 7, 8, 9]);
+      const w = backend.constructor([1, 1, 2, 2], [1, 2, 3, 4]);
+      const b = backend.constructor([1], [5]);
+      const ones = backend.constructor([1, 1, 2, 2], new Array(4).fill(1));
+
+      const vX = new Variable(x);
+      const vW = new Variable(w);
+      const vB = new Variable(b);
+
+      const xCPU = await toCPU(x);
+      const wCPU = await toCPU(w);
+      const bCPU = await toCPU(b);
+
+      const res = vX.conv(vW, vB) as Variable;
+      res.backward(ones);
+
+      const numericalGradX = await backend.toBackend(
+        numericalGradient(
+          xCPU,
+          (x: CPUTensor) => x.conv(wCPU, bCPU) as CPUTensor
+        )
+      );
+      const numericalGradW = await backend.toBackend(
+        numericalGradient(
+          wCPU,
+          (w: CPUTensor) => xCPU.conv(w, bCPU) as CPUTensor
+        )
+      );
+      const numericalGradB = await backend.toBackend(
+        numericalGradient(
+          bCPU,
+          (b: CPUTensor) => xCPU.conv(wCPU, b) as CPUTensor
+        )
+      );
+
+      //@ts-ignore
+      expect(await vX.grad.compare(numericalGradX, 0.5)).toBeTrue();
+      //@ts-ignore
+      expect(await vW.grad.compare(numericalGradW, 0.5)).toBeTrue();
+      //@ts-ignore
+      expect(await vB.grad.compare(numericalGradB, 0.5)).toBeTrue();
+    });
+
+    it('should work with strided convolution', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const x = backend.constructor(
+        [1, 1, 4, 4],
+        [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+      );
+      const w = backend.constructor([1, 1, 2, 2], [1, 2, 3, 4]);
+      const b = backend.constructor([1], [5]);
+      const ones = backend.constructor([1, 1, 2, 2], new Array(4).fill(1));
+
+      const vX = new Variable(x);
+      const vW = new Variable(w);
+      const vB = new Variable(b);
+
+      const xCPU = await toCPU(x);
+      const wCPU = await toCPU(w);
+      const bCPU = await toCPU(b);
+
+      const res = vX.conv(vW, vB, undefined, undefined, undefined, [
+        2,
+        2,
+      ]) as Variable;
+      res.backward(ones);
+
+      const numericalGradX = await backend.toBackend(
+        numericalGradient(
+          xCPU,
+          (x: CPUTensor) =>
+            x.conv(wCPU, bCPU, undefined, undefined, undefined, [
+              2,
+              2,
+            ]) as CPUTensor
+        )
+      );
+      const numericalGradW = await backend.toBackend(
+        numericalGradient(
+          wCPU,
+          (w: CPUTensor) =>
+            xCPU.conv(w, bCPU, undefined, undefined, undefined, [
+              2,
+              2,
+            ]) as CPUTensor
+        )
+      );
+      const numericalGradB = await backend.toBackend(
+        numericalGradient(
+          bCPU,
+          (b: CPUTensor) =>
+            xCPU.conv(wCPU, b, undefined, undefined, undefined, [
+              2,
+              2,
+            ]) as CPUTensor
+        )
+      );
+
+      //@ts-ignore
+      expect(await vX.grad.compare(numericalGradX, 0.5)).toBeTrue();
+      //@ts-ignore
+      expect(await vW.grad.compare(numericalGradW, 0.5)).toBeTrue();
+      //@ts-ignore
+      expect(await vB.grad.compare(numericalGradB, 0.5)).toBeTrue();
+    });
+
+    it('should work with dilated convolution', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const x = backend.constructor(
+        [1, 1, 4, 4],
+        [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+      );
+      const w = backend.constructor([1, 1, 2, 2], [1, 2, 3, 4]);
+      const b = backend.constructor([1], [5]);
+      const ones = backend.constructor([1, 1, 2, 2], new Array(4).fill(1));
+
+      const vX = new Variable(x);
+      const vW = new Variable(w);
+      const vB = new Variable(b);
+
+      const xCPU = await toCPU(x);
+      const wCPU = await toCPU(w);
+      const bCPU = await toCPU(b);
+
+      const res = vX.conv(vW, vB, [2, 2]) as Variable;
+      res.backward(ones);
+
+      const numericalGradX = await backend.toBackend(
+        numericalGradient(
+          xCPU,
+          (x: CPUTensor) => x.conv(wCPU, bCPU, [2, 2]) as CPUTensor
+        )
+      );
+      const numericalGradW = await backend.toBackend(
+        numericalGradient(
+          wCPU,
+          (w: CPUTensor) => xCPU.conv(w, bCPU, [2, 2]) as CPUTensor
+        )
+      );
+      const numericalGradB = await backend.toBackend(
+        numericalGradient(
+          bCPU,
+          (b: CPUTensor) => xCPU.conv(wCPU, b, [2, 2]) as CPUTensor
+        )
+      );
+
+      //@ts-ignore
+      expect(await vX.grad.compare(numericalGradX, 0.5)).toBeTrue();
+      //@ts-ignore
+      expect(await vW.grad.compare(numericalGradW, 0.5)).toBeTrue();
+      //@ts-ignore
+      expect(await vB.grad.compare(numericalGradB, 0.5)).toBeTrue();
+    });
+
+    it('should work with padded convolution', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const x = backend.constructor([1, 1, 3, 3], [1, 2, 3, 4, 5, 6, 7, 8, 9]);
+      const w = backend.constructor([1, 1, 2, 2], [1, 2, 3, 4]);
+      const b = backend.constructor([1], [5]);
+      const ones = backend.constructor([1, 1, 4, 4], new Array(4).fill(1));
+
+      const vX = new Variable(x);
+      const vW = new Variable(w);
+      const vB = new Variable(b);
+
+      const xCPU = await toCPU(x);
+      const wCPU = await toCPU(w);
+      const bCPU = await toCPU(b);
+
+      const res = vX.conv(vW, vB, undefined, undefined, [
+        1,
+        1,
+        1,
+        1,
+      ]) as Variable;
+      res.backward(ones);
+
+      const numericalGradX = await backend.toBackend(
+        numericalGradient(
+          xCPU,
+          (x: CPUTensor) =>
+            x.conv(wCPU, bCPU, undefined, undefined, [1, 1, 1, 1]) as CPUTensor
+        )
+      );
+      const numericalGradW = await backend.toBackend(
+        numericalGradient(
+          wCPU,
+          (w: CPUTensor) =>
+            xCPU.conv(w, bCPU, undefined, undefined, [1, 1, 1, 1]) as CPUTensor
+        )
+      );
+      const numericalGradB = await backend.toBackend(
+        numericalGradient(
+          bCPU,
+          (b: CPUTensor) =>
+            xCPU.conv(wCPU, b, undefined, undefined, [1, 1, 1, 1]) as CPUTensor
+        )
+      );
+
+      //@ts-ignore
+      expect(await vX.grad.compare(numericalGradX, 0.5)).toBeTrue();
+      //@ts-ignore
+      expect(await vW.grad.compare(numericalGradW, 0.5)).toBeTrue();
+      //@ts-ignore
+      expect(await vB.grad.compare(numericalGradB, 0.5)).toBeTrue();
+    });
+
+    it('should work with padded strided dilated convolution', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const x = backend.constructor([1, 1, 3, 3], [1, 2, 3, 4, 5, 6, 7, 8, 9]);
+      const w = backend.constructor([1, 1, 2, 2], [1, 2, 3, 4]);
+      const b = backend.constructor([1], [5]);
+      const ones = backend.constructor([1, 1, 2, 2], new Array(4).fill(1));
+
+      const vX = new Variable(x);
+      const vW = new Variable(w);
+      const vB = new Variable(b);
+
+      const xCPU = await toCPU(x);
+      const wCPU = await toCPU(w);
+      const bCPU = await toCPU(b);
+
+      const dil = [2, 2];
+      const pads = [1, 1, 1, 1];
+      const strd = [2, 2];
+
+      const res = vX.conv(vW, vB, dil, undefined, pads, strd) as Variable;
+      res.backward(ones);
+
+      const numericalGradX = await backend.toBackend(
+        numericalGradient(
+          xCPU,
+          (x: CPUTensor) =>
+            x.conv(wCPU, bCPU, dil, undefined, pads, strd) as CPUTensor
+        )
+      );
+      const numericalGradW = await backend.toBackend(
+        numericalGradient(
+          wCPU,
+          (w: CPUTensor) =>
+            xCPU.conv(w, bCPU, dil, undefined, pads, strd) as CPUTensor
+        )
+      );
+      const numericalGradB = await backend.toBackend(
+        numericalGradient(
+          bCPU,
+          (b: CPUTensor) =>
+            xCPU.conv(wCPU, b, dil, undefined, pads, strd) as CPUTensor
+        )
+      );
+
+      //@ts-ignore
+      expect(await vX.grad.compare(numericalGradX, 0.5)).toBeTrue();
+      //@ts-ignore
+      expect(await vW.grad.compare(numericalGradW, 0.5)).toBeTrue();
+      //@ts-ignore
+      expect(await vB.grad.compare(numericalGradB, 0.5)).toBeTrue();
+    });
   });
 }

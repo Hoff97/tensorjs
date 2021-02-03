@@ -278,6 +278,22 @@ export class WASMTensor extends Tensor {
     }
   }
 
+  protected convTranspose_impl(
+    kernel: Tensor,
+    dilations: number[],
+    group: number,
+    pads: number[],
+    strides: number[]
+  ): Tensor {
+    if (!(kernel instanceof WASMTensor)) {
+      throw new Error(
+        'Can only do transpose convolution of WASM tensor with WASM tensor'
+      );
+    }
+
+    throw new Error('Not implemented!');
+  }
+
   averagePool_impl(
     kernelShape: number[],
     pads: number[],

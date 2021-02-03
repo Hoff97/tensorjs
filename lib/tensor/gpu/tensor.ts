@@ -354,6 +354,22 @@ export class GPUTensor extends Tensor implements GPUTensorI {
     }
   }
 
+  protected convTranspose_impl(
+    kernel: Tensor,
+    dilations: number[],
+    group: number,
+    pads: number[],
+    strides: number[]
+  ): Tensor {
+    if (!(kernel instanceof GPUTensor)) {
+      throw new Error(
+        'Can only do transpose convolution of GPU tensor with GPU tensor'
+      );
+    }
+
+    throw new Error('Not implemented!');
+  }
+
   averagePool_impl(
     kernelShape: number[],
     pads: number[],

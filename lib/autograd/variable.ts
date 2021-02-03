@@ -17,6 +17,7 @@ import {ReshapeBack} from './ops/util/reshapeBack';
 import {AddBack} from './ops/binary/addBack';
 import {SubtractBack} from './ops/binary/subtractBack';
 import {MultiplyBack} from './ops/binary/multiplyBack';
+import {ConvBack} from './ops/conv/convBack';
 
 export class Variable extends Tensor implements VariableI {
   public grad?: Tensor;
@@ -275,6 +276,7 @@ export class Variable extends Tensor implements VariableI {
   protected reduceMeanSquare_impl(axes: number[], keepDims: boolean): Tensor {
     throw new Error('Method not implemented.');
   }
+
   protected conv_impl(
     kernel: Tensor,
     dilations: number[],
@@ -284,8 +286,43 @@ export class Variable extends Tensor implements VariableI {
     activation: Activation,
     bias?: Tensor
   ): Tensor {
+    if (
+      !(kernel instanceof Variable) ||
+      (bias !== undefined && !(bias instanceof Variable))
+    ) {
+      throw new Error(
+        'Can only do convolution with variable as kernel and bias'
+      );
+    }
+
+    if (activation !== 'id') {
+      throw new Error('Activation has to be ID for convolution with variables');
+    }
+
+    return new Variable(
+      this.value.conv(
+        kernel.value,
+        bias !== undefined ? bias.value : undefined,
+        dilations,
+        group,
+        pads,
+        strides
+      ),
+      undefined,
+      new ConvBack(this, kernel, strides, pads, dilations, group, bias)
+    );
+  }
+
+  protected convTranspose_impl(
+    kernel: Tensor,
+    dilations: number[],
+    group: number,
+    pads: number[],
+    strides: number[]
+  ): Tensor {
     throw new Error('Method not implemented.');
   }
+
   protected pad_impl(pads: number[], mode: PadMode, value: number): Tensor {
     throw new Error('Method not implemented.');
   }

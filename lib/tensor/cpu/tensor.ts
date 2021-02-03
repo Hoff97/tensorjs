@@ -18,6 +18,7 @@ import {
 } from '../../ops/cpu/basic';
 import {concat} from '../../ops/cpu/concat';
 import {conv} from '../../ops/cpu/conv';
+import {convTranspose} from '../../ops/cpu/convTranspose';
 import {expand} from '../../ops/cpu/expand';
 import {gather} from '../../ops/cpu/gather';
 import {gemm} from '../../ops/cpu/gemm';
@@ -320,6 +321,22 @@ export class CPUTensor extends Tensor {
       activation,
       bias as CPUTensor
     );
+  }
+
+  protected convTranspose_impl(
+    kernel: Tensor,
+    dilations: number[],
+    group: number,
+    pads: number[],
+    strides: number[]
+  ): Tensor {
+    if (!(kernel instanceof CPUTensor)) {
+      throw new Error(
+        'Can only do transpose convolution of CPU tensor with CPU tensor'
+      );
+    }
+
+    return convTranspose(this, kernel, dilations, group, pads, strides);
   }
 
   pad_impl(pads: number[], mode: PadMode, value: number): Tensor {

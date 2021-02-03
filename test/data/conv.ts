@@ -1,4 +1,4 @@
-export const data = [
+export const convData = [
   {
     name: 'conv with bias addition',
     cases: [

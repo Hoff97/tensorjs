@@ -292,6 +292,35 @@ export default abstract class Tensor {
   }
 
   /**
+   * Calculates the transpose convolution
+   *
+   * This tensor should have shape [N,C,D1,D2,...] where D1,D2,... are the spatial dimensions.
+   *
+   * @param kernel Convolution kernel with shape [M,C/G,K1,K2] where G is the group parameter
+   * @param dilations Per axis dilations for the spatial dimension. Defaults to 1 for all axes
+   * @param group Group parameter
+   * @param pads Padding to add to the input for each spatial dimension. Defaults to 0 for all axes
+   * @param strides Convolution stride for each spatial dimension. Defaults to 1 for all axes
+   */
+  convTranspose(
+    kernel: Tensor,
+    dilations?: number[],
+    group?: number,
+    pads?: number[],
+    strides?: number[]
+  ): Tensor {
+    const sh = this.getShape();
+    const dataRank = sh.length - 2;
+
+    dilations = dilations || new Array(dataRank).fill(1);
+    group = group || 1;
+    pads = pads || new Array(dataRank * 2).fill(0);
+    strides = strides || new Array(dataRank).fill(1);
+
+    return this.convTranspose_impl(kernel, dilations, group, pads, strides);
+  }
+
+  /**
    * Pads the input according to the padding mode. The input has shape [D1,D2,..]
    *
    * @example
@@ -971,6 +1000,14 @@ export default abstract class Tensor {
     strides: number[],
     activation: Activation,
     bias?: Tensor
+  ): Tensor;
+
+  protected abstract convTranspose_impl(
+    kernel: Tensor,
+    dilations: number[],
+    group: number,
+    pads: number[],
+    strides: number[]
   ): Tensor;
 
   protected abstract pad_impl(
