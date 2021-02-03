@@ -677,7 +677,7 @@ for (const backend of backends) {
       const x = backend.constructor([1, 1, 3, 3], [1, 2, 3, 4, 5, 6, 7, 8, 9]);
       const w = backend.constructor([1, 1, 2, 2], [1, 2, 3, 4]);
       const b = backend.constructor([1], [5]);
-      const ones = backend.constructor([1, 1, 4, 4], new Array(4).fill(1));
+      const ones = backend.constructor([1, 1, 4, 4], new Array(16).fill(1));
 
       const vX = new Variable(x);
       const vW = new Variable(w);
@@ -693,6 +693,7 @@ for (const backend of backends) {
         1,
         1,
       ]) as Variable;
+
       res.backward(ones);
 
       const numericalGradX = await backend.toBackend(
@@ -720,7 +721,7 @@ for (const backend of backends) {
       //@ts-ignore
       expect(await vX.grad.compare(numericalGradX, 0.5)).toBeTrue();
       //@ts-ignore
-      expect(await vW.grad.compare(numericalGradW, 0.5)).toBeTrue();
+      expect(await vW.grad.compare(numericalGradW, 0.8)).toBeTrue();
       //@ts-ignore
       expect(await vB.grad.compare(numericalGradB, 0.5)).toBeTrue();
     });

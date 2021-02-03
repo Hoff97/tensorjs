@@ -247,7 +247,9 @@ export class WASMTensor extends Tensor {
       !(kernel instanceof WASMTensor) ||
       (bias !== undefined && !(bias instanceof WASMTensor))
     ) {
-      throw new Error('Can only do convolution of CPU tensor with CPU tensor');
+      throw new Error(
+        'Can only do convolution of WASM tensor with WASM tensor'
+      );
     }
 
     const activationFlag = this.getActivationFlag(activation);
@@ -291,7 +293,15 @@ export class WASMTensor extends Tensor {
       );
     }
 
-    throw new Error('Not implemented!');
+    return new WASMTensor(
+      this.wasmTensor.conv_transpose(
+        kernel.wasmTensor,
+        new Uint32Array(dilations),
+        group,
+        new Uint32Array(pads),
+        new Uint32Array(strides)
+      )
+    );
   }
 
   averagePool_impl(

@@ -1,4 +1,4 @@
-use js_sys::{Uint32Array};
+use js_sys::Uint32Array;
 
 pub fn set_panic_hook() {
     // When the `console_error_panic_hook` feature is enabled, we can call the
@@ -14,8 +14,10 @@ pub fn set_panic_hook() {
 #[macro_export]
 macro_rules! assert_delta {
     ($x:expr, $y:expr, $d:expr) => {
-        if !($x - $y < $d || $y - $x < $d) { panic!(); }
-    }
+        if !($x - $y < $d || $y - $x < $d) {
+            panic!();
+        }
+    };
 }
 
 pub fn uint32_array(vec: &Vec<usize>) -> Uint32Array {
@@ -26,16 +28,37 @@ pub fn uint32_array(vec: &Vec<usize>) -> Uint32Array {
     result
 }
 
-pub fn conv_output_size(in_sizes: &Vec<usize>,
-                        kernels: &Vec<usize>,
-                        pads: &Vec<usize>,
-                        dilations: &Vec<usize>,
-                        strides: &Vec<usize>,
-                        kernel_offset: usize) -> Vec<usize> {
+pub fn conv_output_size(
+    in_sizes: &Vec<usize>,
+    kernels: &Vec<usize>,
+    pads: &Vec<usize>,
+    dilations: &Vec<usize>,
+    strides: &Vec<usize>,
+    kernel_offset: usize,
+) -> Vec<usize> {
     let mut result = vec![0; dilations.len()];
     for i in 0..dilations.len() {
-        let dkernel = dilations[i] * (kernels[i+kernel_offset] - 1) + 1;
-        result[i] =  ((in_sizes[i+2] + pads[i] + pads[i + dilations.len()] - dkernel) / strides[i]) + 1
+        let dkernel = dilations[i] * (kernels[i + kernel_offset] - 1) + 1;
+        result[i] =
+            ((in_sizes[i + 2] + pads[i] + pads[i + dilations.len()] - dkernel) / strides[i]) + 1
+    }
+    result
+}
+
+pub fn conv_transpose_output_size(
+    in_sizes: &Vec<usize>,
+    kernels: &Vec<usize>,
+    pads: &Vec<usize>,
+    dilations: &Vec<usize>,
+    strides: &Vec<usize>,
+    kernel_offset: usize,
+) -> Vec<usize> {
+    let mut result = vec![0; dilations.len()];
+    for i in 0..dilations.len() {
+        let dkernel = dilations[i] * (kernels[i + kernel_offset] - 1) + 1;
+
+        result[i] =
+            strides[i] * (in_sizes[i + 2] - 1) + pads[i] + pads[i + dilations.len()] - dkernel + 2;
     }
     result
 }
