@@ -19,6 +19,7 @@ import {SubtractBack} from './ops/binary/subtractBack';
 import {MultiplyBack} from './ops/binary/multiplyBack';
 import {ConvBack} from './ops/conv/convBack';
 import {DivideBack} from './ops/binary/divideBack';
+import {PowerBack} from './ops/binary/powerBack';
 
 export class Variable extends Tensor implements VariableI {
   public grad?: Tensor;
@@ -248,7 +249,7 @@ export class Variable extends Tensor implements VariableI {
     resultShape: readonly number[]
   ): Tensor {
     if (!(tensor instanceof Variable) || !(th instanceof Variable)) {
-      throw new Error('Can only add Variable tensor to Variable tensor');
+      throw new Error('Can only divide Variable tensor by Variable tensor');
     }
 
     const divResult = th.value.divide_impl(th.value, tensor.value, resultShape);
@@ -265,8 +266,25 @@ export class Variable extends Tensor implements VariableI {
     tensor: Tensor,
     resultShape: readonly number[]
   ): Tensor {
-    throw new Error('Method not implemented.');
+    if (!(tensor instanceof Variable) || !(th instanceof Variable)) {
+      throw new Error(
+        'Can only take Variable tensor to power of Variable tensor'
+      );
+    }
+
+    const powerResult = th.value.power_impl(
+      th.value,
+      tensor.value,
+      resultShape
+    );
+
+    return new Variable(
+      powerResult,
+      undefined,
+      new PowerBack(th, tensor, powerResult, resultShape)
+    );
   }
+
   protected gemm_impl(
     b: Tensor,
     aTranspose: boolean,

@@ -530,9 +530,9 @@ for (const backend of backends) {
       );
 
       //@ts-ignore
-      expect(await vA.grad.compare(numericalGradA, 0.1)).toBeTrue();
+      expect(await vA.grad.compare(numericalGradA, 0.05)).toBeTrue();
       //@ts-ignore
-      expect(await vB.grad.compare(numericalGradB, 0.1)).toBeTrue();
+      expect(await vB.grad.compare(numericalGradB, 0.05)).toBeTrue();
     });
 
     it('should work with broadcasted divide', async () => {
@@ -558,6 +558,68 @@ for (const backend of backends) {
       );
       const numericalGradB = await backend.toBackend(
         numericalGradient(bCPU, (b: CPUTensor) => aCPU.divide(b) as CPUTensor)
+      );
+
+      //@ts-ignore
+      expect(await vA.grad.compare(numericalGradA, 0.05)).toBeTrue();
+      //@ts-ignore
+      expect(await vB.grad.compare(numericalGradB, 0.05)).toBeTrue();
+    });
+
+    it('should work with power', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 2], [1, 2, 3, 4]);
+      const b = backend.constructor([2, 2], [1.1, 2.2, 3.3, 2.5]);
+      const ones = backend.constructor([2, 2], new Array(4).fill(1));
+
+      const vA = new Variable(a);
+      const vB = new Variable(b);
+
+      const aCPU = await toCPU(a);
+      const bCPU = await toCPU(b);
+
+      const res = vA.power(vB) as Variable;
+      res.backward(ones);
+
+      const numericalGradA = await backend.toBackend(
+        numericalGradient(aCPU, (a: CPUTensor) => a.power(bCPU) as CPUTensor)
+      );
+      const numericalGradB = await backend.toBackend(
+        numericalGradient(bCPU, (b: CPUTensor) => aCPU.power(b) as CPUTensor)
+      );
+
+      //@ts-ignore
+      expect(await vA.grad.compare(numericalGradA, 0.5)).toBeTrue();
+      //@ts-ignore
+      expect(await vB.grad.compare(numericalGradB, 0.5)).toBeTrue();
+    });
+
+    it('should work with broadcasted power', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 2], [1, 2, 3, 4]);
+      const b = backend.constructor([2], [1.5, 2.5]);
+      const ones = backend.constructor([2, 2], new Array(4).fill(1));
+
+      const vA = new Variable(a);
+      const vB = new Variable(b);
+
+      const aCPU = await toCPU(a);
+      const bCPU = await toCPU(b);
+
+      const res = vA.power(vB) as Variable;
+      res.backward(ones);
+
+      const numericalGradA = await backend.toBackend(
+        numericalGradient(aCPU, (a: CPUTensor) => a.power(bCPU) as CPUTensor)
+      );
+      const numericalGradB = await backend.toBackend(
+        numericalGradient(bCPU, (b: CPUTensor) => aCPU.power(b) as CPUTensor)
       );
 
       //@ts-ignore
