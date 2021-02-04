@@ -18,6 +18,7 @@ import {AddBack} from './ops/binary/addBack';
 import {SubtractBack} from './ops/binary/subtractBack';
 import {MultiplyBack} from './ops/binary/multiplyBack';
 import {ConvBack} from './ops/conv/convBack';
+import {DivideBack} from './ops/binary/divideBack';
 
 export class Variable extends Tensor implements VariableI {
   public grad?: Tensor;
@@ -33,7 +34,18 @@ export class Variable extends Tensor implements VariableI {
     }
   }
 
-  backward(grad: Tensor) {
+  backward(grad?: Tensor) {
+    if (grad === undefined) {
+      const ownShape = this.value.getShape();
+      if (ownShape.length === 1 && ownShape[0] === 1) {
+        grad = this.value.singleConstant(1);
+      } else {
+        throw new Error(
+          'Backward without an input gradient can only be done for tensors with shape [1]'
+        );
+      }
+    }
+
     if (this.grad !== undefined) {
       const oldGrad = this.grad;
       this.grad = this.grad.add(grad);
@@ -235,7 +247,17 @@ export class Variable extends Tensor implements VariableI {
     tensor: Tensor,
     resultShape: readonly number[]
   ): Tensor {
-    throw new Error('Method not implemented.');
+    if (!(tensor instanceof Variable) || !(th instanceof Variable)) {
+      throw new Error('Can only add Variable tensor to Variable tensor');
+    }
+
+    const divResult = th.value.divide_impl(th.value, tensor.value, resultShape);
+
+    return new Variable(
+      divResult,
+      undefined,
+      new DivideBack(th, tensor, divResult, resultShape)
+    );
   }
 
   power_impl(
