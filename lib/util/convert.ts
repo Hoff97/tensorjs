@@ -1,9 +1,35 @@
+import {Variable} from '../autograd/variable';
 import {CPUTensor} from '../tensor/cpu/tensor';
 import {GPUTensor} from '../tensor/gpu/tensor';
 import {WASMTensor} from '../tensor/wasm/tensor';
 import Tensor, {Precision} from '../types';
 
-export async function toCPU(tensor: Tensor) {
+export type Backend = 'CPU' | 'WASM' | 'GPU';
+
+export async function toBackend(
+  tensor: Tensor,
+  backend: Backend,
+  precision?: Precision
+) {
+  if (backend === 'CPU') {
+    return toCPU(tensor);
+  } else if (backend === 'WASM') {
+    return toWASM(tensor);
+  } else {
+    if (precision === undefined) {
+      precision = 32;
+    }
+    return toGPU(tensor, precision);
+  }
+}
+
+export async function toCPU(tensor: Tensor): Promise<Tensor> {
+  if (tensor instanceof Variable) {
+    return new Variable(
+      await toCPU(tensor.value),
+      tensor.grad !== undefined ? await toCPU(tensor.grad) : undefined
+    );
+  }
   if (tensor instanceof CPUTensor) {
     return tensor;
   }
@@ -11,7 +37,13 @@ export async function toCPU(tensor: Tensor) {
   return new CPUTensor(tensor.getShape(), values);
 }
 
-export async function toWASM(tensor: Tensor) {
+export async function toWASM(tensor: Tensor): Promise<Tensor> {
+  if (tensor instanceof Variable) {
+    return new Variable(
+      await toWASM(tensor.value),
+      tensor.grad !== undefined ? await toWASM(tensor.grad) : undefined
+    );
+  }
   if (tensor instanceof WASMTensor) {
     return tensor;
   }
@@ -25,7 +57,18 @@ export async function toWASM(tensor: Tensor) {
   );
 }
 
-export async function toGPU(tensor: Tensor, precision: Precision) {
+export async function toGPU(
+  tensor: Tensor,
+  precision: Precision
+): Promise<Tensor> {
+  if (tensor instanceof Variable) {
+    return new Variable(
+      await toGPU(tensor.value, precision),
+      tensor.grad !== undefined
+        ? await toGPU(tensor.grad, precision)
+        : undefined
+    );
+  }
   if (tensor instanceof GPUTensor) {
     return tensor;
   }

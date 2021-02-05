@@ -47,7 +47,7 @@ for (const backend of backends) {
 
       const numericalGrad = await backend.toBackend(
         numericalGradient(
-          await toCPU(a),
+          (await toCPU(a)) as CPUTensor,
           (a: CPUTensor) => a.exp() as CPUTensor
         )
       );
@@ -70,7 +70,7 @@ for (const backend of backends) {
 
       const numericalGrad = await backend.toBackend(
         numericalGradient(
-          await toCPU(a),
+          (await toCPU(a)) as CPUTensor,
           (a: CPUTensor) => a.log() as CPUTensor
         )
       );
@@ -93,7 +93,7 @@ for (const backend of backends) {
 
       const numericalGrad = await backend.toBackend(
         numericalGradient(
-          await toCPU(a),
+          (await toCPU(a)) as CPUTensor,
           (a: CPUTensor) => a.sqrt() as CPUTensor
         )
       );
@@ -116,7 +116,7 @@ for (const backend of backends) {
 
       const numericalGrad = await backend.toBackend(
         numericalGradient(
-          await toCPU(a),
+          (await toCPU(a)) as CPUTensor,
           (a: CPUTensor) => a.reshape([4]) as CPUTensor
         )
       );
@@ -139,7 +139,7 @@ for (const backend of backends) {
 
       const numericalGrad = await backend.toBackend(
         numericalGradient(
-          await toCPU(a),
+          (await toCPU(a)) as CPUTensor,
           (a: CPUTensor) => a.abs() as CPUTensor
         )
       );
@@ -162,7 +162,7 @@ for (const backend of backends) {
 
       const numericalGrad = await backend.toBackend(
         numericalGradient(
-          await toCPU(a),
+          (await toCPU(a)) as CPUTensor,
           (a: CPUTensor) => a.negate() as CPUTensor
         )
       );
@@ -250,7 +250,7 @@ for (const backend of backends) {
 
       const numericalGrad = await backend.toBackend(
         numericalGradient(
-          await toCPU(a),
+          (await toCPU(a)) as CPUTensor,
           (a: CPUTensor) => a.clip(0, 6) as CPUTensor
         )
       );
@@ -268,7 +268,7 @@ for (const backend of backends) {
 
       const v = new Variable(a);
 
-      const aCPU = await toCPU(a);
+      const aCPU = (await toCPU(a)) as CPUTensor;
 
       const res = v.repeat([3, 2]) as Variable;
       res.backward(ones);
@@ -290,7 +290,7 @@ for (const backend of backends) {
 
       const v = new Variable(a);
 
-      const aCPU = await toCPU(a);
+      const aCPU = (await toCPU(a)) as CPUTensor;
 
       const res = v.expand([3, 2, 2]) as Variable;
       res.backward(ones);
@@ -317,8 +317,8 @@ for (const backend of backends) {
       const vA = new Variable(a);
       const vB = new Variable(b);
 
-      const aCPU = await toCPU(a);
-      const bCPU = await toCPU(b);
+      const aCPU = (await toCPU(a)) as CPUTensor;
+      const bCPU = (await toCPU(b)) as CPUTensor;
 
       const res = vA.add(vB) as Variable;
       res.backward(ones);
@@ -346,8 +346,8 @@ for (const backend of backends) {
       const vA = new Variable(a);
       const vB = new Variable(b);
 
-      const aCPU = await toCPU(a);
-      const bCPU = await toCPU(b);
+      const aCPU = (await toCPU(a)) as CPUTensor;
+      const bCPU = (await toCPU(b)) as CPUTensor;
 
       const res = vA.add(vB) as Variable;
       res.backward(ones);
@@ -375,8 +375,8 @@ for (const backend of backends) {
       const vA = new Variable(a);
       const vB = new Variable(b);
 
-      const aCPU = await toCPU(a);
-      const bCPU = await toCPU(b);
+      const aCPU = (await toCPU(a)) as CPUTensor;
+      const bCPU = (await toCPU(b)) as CPUTensor;
 
       const res = vA.subtract(vB) as Variable;
       res.backward(ones);
@@ -404,8 +404,8 @@ for (const backend of backends) {
       const vA = new Variable(a);
       const vB = new Variable(b);
 
-      const aCPU = await toCPU(a);
-      const bCPU = await toCPU(b);
+      const aCPU = (await toCPU(a)) as CPUTensor;
+      const bCPU = (await toCPU(b)) as CPUTensor;
 
       const res = vA.subtract(vB) as Variable;
       res.backward(ones);
@@ -433,8 +433,8 @@ for (const backend of backends) {
       const vA = new Variable(a);
       const vB = new Variable(b);
 
-      const aCPU = await toCPU(a);
-      const bCPU = await toCPU(b);
+      const aCPU = (await toCPU(a)) as CPUTensor;
+      const bCPU = (await toCPU(b)) as CPUTensor;
 
       const res = vA.multiply(vB) as Variable;
       res.backward(ones);
@@ -462,8 +462,8 @@ for (const backend of backends) {
       const vA = new Variable(a);
       const vB = new Variable(b);
 
-      const aCPU = await toCPU(a);
-      const bCPU = await toCPU(b);
+      const aCPU = (await toCPU(a)) as CPUTensor;
+      const bCPU = (await toCPU(b)) as CPUTensor;
 
       const res = vA.multiply(vB) as Variable;
       res.backward(ones);
@@ -491,8 +491,8 @@ for (const backend of backends) {
       const vA = new Variable(a);
       const vB = new Variable(b);
 
-      const aCPU = await toCPU(a);
-      const bCPU = await toCPU(b);
+      const aCPU = (await toCPU(a)) as CPUTensor;
+      const bCPU = (await toCPU(b)) as CPUTensor;
 
       const res = vA.divide(vB) as Variable;
       res.backward(ones);
@@ -520,8 +520,8 @@ for (const backend of backends) {
       const vA = new Variable(a);
       const vB = new Variable(b);
 
-      const aCPU = await toCPU(a);
-      const bCPU = await toCPU(b);
+      const aCPU = (await toCPU(a)) as CPUTensor;
+      const bCPU = (await toCPU(b)) as CPUTensor;
 
       const res = vA.divide(vB) as Variable;
       res.backward(ones);
@@ -549,8 +549,8 @@ for (const backend of backends) {
       const vA = new Variable(a);
       const vB = new Variable(b);
 
-      const aCPU = await toCPU(a);
-      const bCPU = await toCPU(b);
+      const aCPU = (await toCPU(a)) as CPUTensor;
+      const bCPU = (await toCPU(b)) as CPUTensor;
 
       const res = vA.power(vB) as Variable;
       res.backward(ones);
@@ -578,8 +578,8 @@ for (const backend of backends) {
       const vA = new Variable(a);
       const vB = new Variable(b);
 
-      const aCPU = await toCPU(a);
-      const bCPU = await toCPU(b);
+      const aCPU = (await toCPU(a)) as CPUTensor;
+      const bCPU = (await toCPU(b)) as CPUTensor;
 
       const res = vA.power(vB) as Variable;
       res.backward(ones);
@@ -609,9 +609,9 @@ for (const backend of backends) {
       const vW = new Variable(w);
       const vB = new Variable(b);
 
-      const xCPU = await toCPU(x);
-      const wCPU = await toCPU(w);
-      const bCPU = await toCPU(b);
+      const xCPU = (await toCPU(x)) as CPUTensor;
+      const wCPU = (await toCPU(w)) as CPUTensor;
+      const bCPU = (await toCPU(b)) as CPUTensor;
 
       const res = vX.conv(vW, vB) as Variable;
       res.backward(ones);
@@ -657,9 +657,9 @@ for (const backend of backends) {
       const vW = new Variable(w);
       const vB = new Variable(b);
 
-      const xCPU = await toCPU(x);
-      const wCPU = await toCPU(w);
-      const bCPU = await toCPU(b);
+      const xCPU = (await toCPU(x)) as CPUTensor;
+      const wCPU = (await toCPU(w)) as CPUTensor;
+      const bCPU = (await toCPU(b)) as CPUTensor;
 
       const res = vX.conv(vW, vB, undefined, undefined, undefined, [
         2,
@@ -720,9 +720,9 @@ for (const backend of backends) {
       const vW = new Variable(w);
       const vB = new Variable(b);
 
-      const xCPU = await toCPU(x);
-      const wCPU = await toCPU(w);
-      const bCPU = await toCPU(b);
+      const xCPU = (await toCPU(x)) as CPUTensor;
+      const wCPU = (await toCPU(w)) as CPUTensor;
+      const bCPU = (await toCPU(b)) as CPUTensor;
 
       const res = vX.conv(vW, vB, [2, 2]) as Variable;
       res.backward(ones);
@@ -765,9 +765,9 @@ for (const backend of backends) {
       const vW = new Variable(w);
       const vB = new Variable(b);
 
-      const xCPU = await toCPU(x);
-      const wCPU = await toCPU(w);
-      const bCPU = await toCPU(b);
+      const xCPU = (await toCPU(x)) as CPUTensor;
+      const wCPU = (await toCPU(w)) as CPUTensor;
+      const bCPU = (await toCPU(b)) as CPUTensor;
 
       const res = vX.conv(vW, vB, undefined, undefined, [
         1,
@@ -819,9 +819,9 @@ for (const backend of backends) {
       const vW = new Variable(w);
       const vB = new Variable(b);
 
-      const xCPU = await toCPU(x);
-      const wCPU = await toCPU(w);
-      const bCPU = await toCPU(b);
+      const xCPU = (await toCPU(x)) as CPUTensor;
+      const wCPU = (await toCPU(w)) as CPUTensor;
+      const bCPU = (await toCPU(b)) as CPUTensor;
 
       const dil = [2, 2];
       const pads = [1, 1, 1, 1];
@@ -874,9 +874,9 @@ for (const backend of backends) {
       const vB = new Variable(b);
       const vC = new Variable(c);
 
-      const aCPU = await toCPU(a);
-      const bCPU = await toCPU(b);
-      const cCPU = await toCPU(c);
+      const aCPU = (await toCPU(a)) as CPUTensor;
+      const bCPU = (await toCPU(b)) as CPUTensor;
+      const cCPU = (await toCPU(c)) as CPUTensor;
 
       const res = vA.gemm(vB, false, false, 1, vC, 1) as Variable;
       res.backward(ones);
@@ -922,9 +922,9 @@ for (const backend of backends) {
       const vB = new Variable(b);
       const vC = new Variable(c);
 
-      const aCPU = await toCPU(a);
-      const bCPU = await toCPU(b);
-      const cCPU = await toCPU(c);
+      const aCPU = (await toCPU(a)) as CPUTensor;
+      const bCPU = (await toCPU(b)) as CPUTensor;
+      const cCPU = (await toCPU(c)) as CPUTensor;
 
       const res = vA.gemm(vB, true, false, 1, vC, 1) as Variable;
       res.backward(ones);
@@ -970,9 +970,9 @@ for (const backend of backends) {
       const vB = new Variable(b);
       const vC = new Variable(c);
 
-      const aCPU = await toCPU(a);
-      const bCPU = await toCPU(b);
-      const cCPU = await toCPU(c);
+      const aCPU = (await toCPU(a)) as CPUTensor;
+      const bCPU = (await toCPU(b)) as CPUTensor;
+      const cCPU = (await toCPU(c)) as CPUTensor;
 
       const res = vA.gemm(vB, false, true, 1, vC, 1) as Variable;
       res.backward(ones);
@@ -1018,9 +1018,9 @@ for (const backend of backends) {
       const vB = new Variable(b);
       const vC = new Variable(c);
 
-      const aCPU = await toCPU(a);
-      const bCPU = await toCPU(b);
-      const cCPU = await toCPU(c);
+      const aCPU = (await toCPU(a)) as CPUTensor;
+      const bCPU = (await toCPU(b)) as CPUTensor;
+      const cCPU = (await toCPU(c)) as CPUTensor;
 
       const res = vA.gemm(vB, true, true, 1, vC, 1) as Variable;
       res.backward(ones);
@@ -1066,9 +1066,9 @@ for (const backend of backends) {
       const vB = new Variable(b);
       const vC = new Variable(c);
 
-      const aCPU = await toCPU(a);
-      const bCPU = await toCPU(b);
-      const cCPU = await toCPU(c);
+      const aCPU = (await toCPU(a)) as CPUTensor;
+      const bCPU = (await toCPU(b)) as CPUTensor;
+      const cCPU = (await toCPU(c)) as CPUTensor;
 
       const res = vA.gemm(vB, true, true, 0.5, vC, 1) as Variable;
       res.backward(ones);
@@ -1114,9 +1114,9 @@ for (const backend of backends) {
       const vB = new Variable(b);
       const vC = new Variable(c);
 
-      const aCPU = await toCPU(a);
-      const bCPU = await toCPU(b);
-      const cCPU = await toCPU(c);
+      const aCPU = (await toCPU(a)) as CPUTensor;
+      const bCPU = (await toCPU(b)) as CPUTensor;
+      const cCPU = (await toCPU(c)) as CPUTensor;
 
       const res = vA.gemm(vB, true, true, 1, vC, 0.5) as Variable;
       res.backward(ones);
@@ -1153,7 +1153,7 @@ for (const backend of backends) {
       const a = backend.constructor([2, 3, 4], new Array(24).fill(5));
       const ones = backend.constructor([4, 2, 3], new Array(24).fill(1));
       const vA = new Variable(a);
-      const aCPU = await toCPU(a);
+      const aCPU = (await toCPU(a)) as CPUTensor;
 
       const permutation = [2, 0, 1];
 
