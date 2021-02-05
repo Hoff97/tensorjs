@@ -1,5 +1,5 @@
-import {Tensor} from '../../library';
-import {BackwardOp, VariableI} from '../types';
+import {Tensor} from '../../../library';
+import {BackwardOp, VariableI} from '../../types';
 
 export class MatMulBack implements BackwardOp {
   constructor(public a: VariableI, public b: VariableI) {}

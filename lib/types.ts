@@ -967,7 +967,7 @@ export default abstract class Tensor {
     resultShape: readonly number[]
   ): Tensor;
 
-  protected abstract gemm_impl(
+  abstract gemm_impl(
     b: Tensor,
     aTranspose: boolean,
     bTranspose: boolean,

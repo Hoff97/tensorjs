@@ -5,7 +5,7 @@ import {TensorValues, Activation, PadMode} from '../types';
 import {AbsBack} from './ops/unary/absBack';
 import {ExpBack} from './ops/unary/expBack';
 import {LogBack} from './ops/unary/logBack';
-import {MatMulBack} from './ops/matMulBack';
+import {MatMulBack} from './ops/matMul/matMulBack';
 import {NegateBack} from './ops/unary/negateBack';
 import {SqrtBack} from './ops/unary/sqrtBack';
 import {BackwardOp, VariableI} from './types';
@@ -20,6 +20,7 @@ import {MultiplyBack} from './ops/binary/multiplyBack';
 import {ConvBack} from './ops/conv/convBack';
 import {DivideBack} from './ops/binary/divideBack';
 import {PowerBack} from './ops/binary/powerBack';
+import {GemmBack} from './ops/matMul/gemmBack';
 
 export class Variable extends Tensor implements VariableI {
   public grad?: Tensor;
@@ -285,7 +286,7 @@ export class Variable extends Tensor implements VariableI {
     );
   }
 
-  protected gemm_impl(
+  gemm_impl(
     b: Tensor,
     aTranspose: boolean,
     bTranspose: boolean,
@@ -293,8 +294,27 @@ export class Variable extends Tensor implements VariableI {
     beta: number,
     C?: Tensor
   ): Tensor {
-    throw new Error('Method not implemented.');
+    if (
+      !(b instanceof Variable) ||
+      (C !== undefined && !(C instanceof Variable))
+    ) {
+      throw new Error('Can only do gemm with variable tensors');
+    }
+
+    return new Variable(
+      this.value.gemm_impl(
+        b.value,
+        aTranspose,
+        bTranspose,
+        alpha,
+        beta,
+        C !== undefined ? C.value : undefined
+      ),
+      undefined,
+      new GemmBack(this, b, aTranspose, bTranspose, alpha, beta, C)
+    );
   }
+
   protected sum_impl(axes: number[], keepDims: boolean): Tensor {
     throw new Error('Method not implemented.');
   }

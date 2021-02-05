@@ -21,13 +21,13 @@ const backends = [
       new WASMTensor(new Float32Array(values), new Uint32Array(shape)),
     toBackend: (tensor: Tensor) => toWASM(tensor),
     wait: wasmLoaded,
-  },
+  } /*,
   {
     name: 'GPU',
     constructor: (shape: ReadonlyArray<number>, values: number[]) =>
       new GPUTensor(new Float32Array(values), shape, 32),
     toBackend: (tensor: Tensor) => toGPU(tensor, 32),
-  },
+  }*/,
 ];
 
 for (const backend of backends) {
@@ -903,6 +903,312 @@ for (const backend of backends) {
       expect(await vW.grad.compare(numericalGradW, 0.5)).toBeTrue();
       //@ts-ignore
       expect(await vB.grad.compare(numericalGradB, 0.5)).toBeTrue();
+    });
+
+    it('should work gemm', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 2, 2], [1, 2, 3, 4, 5, 6, 7, 8]);
+      const b = backend.constructor(
+        [2, 2, 3],
+        [1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4]
+      );
+      const c = backend.constructor([3], [5, 6, 7]);
+      const ones = backend.constructor([2, 2, 3], new Array(12).fill(1));
+
+      const vA = new Variable(a);
+      const vB = new Variable(b);
+      const vC = new Variable(c);
+
+      const aCPU = await toCPU(a);
+      const bCPU = await toCPU(b);
+      const cCPU = await toCPU(c);
+
+      const res = vA.gemm(vB, false, false, 1, vC, 1) as Variable;
+      res.backward(ones);
+
+      const numericalGradA = await backend.toBackend(
+        numericalGradient(
+          aCPU,
+          (a: CPUTensor) => a.gemm(bCPU, false, false, 1, cCPU, 1) as CPUTensor
+        )
+      );
+      const numericalGradB = await backend.toBackend(
+        numericalGradient(
+          bCPU,
+          (b: CPUTensor) => aCPU.gemm(b, false, false, 1, cCPU, 1) as CPUTensor
+        )
+      );
+      const numericalGradC = await backend.toBackend(
+        numericalGradient(
+          cCPU,
+          (c: CPUTensor) => aCPU.gemm(bCPU, false, false, 1, c, 1) as CPUTensor
+        )
+      );
+
+      //@ts-ignore
+      expect(await vA.grad.compare(numericalGradA, 0.5)).toBeTrue();
+      //@ts-ignore
+      expect(await vB.grad.compare(numericalGradB, 0.5)).toBeTrue();
+      //@ts-ignore
+      expect(await vC.grad.compare(numericalGradC, 0.1)).toBeTrue();
+    });
+
+    it('should work gemm a transposed', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 2, 2], [1, 2, 3, 4, 5, 6, 7, 8]);
+      const b = backend.constructor(
+        [2, 2, 3],
+        [1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4]
+      );
+      const c = backend.constructor([3], [5, 6, 7]);
+      const ones = backend.constructor([2, 2, 3], new Array(12).fill(1));
+
+      const vA = new Variable(a);
+      const vB = new Variable(b);
+      const vC = new Variable(c);
+
+      const aCPU = await toCPU(a);
+      const bCPU = await toCPU(b);
+      const cCPU = await toCPU(c);
+
+      const res = vA.gemm(vB, true, false, 1, vC, 1) as Variable;
+      res.backward(ones);
+
+      const numericalGradA = await backend.toBackend(
+        numericalGradient(
+          aCPU,
+          (a: CPUTensor) => a.gemm(bCPU, true, false, 1, cCPU, 1) as CPUTensor
+        )
+      );
+      const numericalGradB = await backend.toBackend(
+        numericalGradient(
+          bCPU,
+          (b: CPUTensor) => aCPU.gemm(b, true, false, 1, cCPU, 1) as CPUTensor
+        )
+      );
+      const numericalGradC = await backend.toBackend(
+        numericalGradient(
+          cCPU,
+          (c: CPUTensor) => aCPU.gemm(bCPU, true, false, 1, c, 1) as CPUTensor
+        )
+      );
+
+      //@ts-ignore
+      expect(await vA.grad.compare(numericalGradA, 0.5)).toBeTrue();
+      //@ts-ignore
+      expect(await vB.grad.compare(numericalGradB, 0.5)).toBeTrue();
+      //@ts-ignore
+      expect(await vC.grad.compare(numericalGradC, 0.1)).toBeTrue();
+    });
+
+    it('should work gemm b transposed', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 2, 2], [1, 2, 3, 4, 5, 6, 7, 8]);
+      const b = backend.constructor(
+        [2, 3, 2],
+        [1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4]
+      );
+      const c = backend.constructor([3], [5, 6, 7]);
+      const ones = backend.constructor([2, 2, 3], new Array(12).fill(1));
+
+      const vA = new Variable(a);
+      const vB = new Variable(b);
+      const vC = new Variable(c);
+
+      const aCPU = await toCPU(a);
+      const bCPU = await toCPU(b);
+      const cCPU = await toCPU(c);
+
+      const res = vA.gemm(vB, false, true, 1, vC, 1) as Variable;
+      res.backward(ones);
+
+      const numericalGradA = await backend.toBackend(
+        numericalGradient(
+          aCPU,
+          (a: CPUTensor) => a.gemm(bCPU, false, true, 1, cCPU, 1) as CPUTensor
+        )
+      );
+      const numericalGradB = await backend.toBackend(
+        numericalGradient(
+          bCPU,
+          (b: CPUTensor) => aCPU.gemm(b, false, true, 1, cCPU, 1) as CPUTensor
+        )
+      );
+      const numericalGradC = await backend.toBackend(
+        numericalGradient(
+          cCPU,
+          (c: CPUTensor) => aCPU.gemm(bCPU, false, true, 1, c, 1) as CPUTensor
+        )
+      );
+
+      //@ts-ignore
+      expect(await vA.grad.compare(numericalGradA, 0.5)).toBeTrue();
+      //@ts-ignore
+      expect(await vB.grad.compare(numericalGradB, 0.5)).toBeTrue();
+      //@ts-ignore
+      expect(await vC.grad.compare(numericalGradC, 0.1)).toBeTrue();
+    });
+
+    it('should work gemm a and b transposed', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 2, 2], [1, 2, 3, 4, 5, 6, 7, 8]);
+      const b = backend.constructor(
+        [2, 3, 2],
+        [1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4]
+      );
+      const c = backend.constructor([3], [5, 6, 7]);
+      const ones = backend.constructor([2, 2, 3], new Array(12).fill(1));
+
+      const vA = new Variable(a);
+      const vB = new Variable(b);
+      const vC = new Variable(c);
+
+      const aCPU = await toCPU(a);
+      const bCPU = await toCPU(b);
+      const cCPU = await toCPU(c);
+
+      const res = vA.gemm(vB, true, true, 1, vC, 1) as Variable;
+      res.backward(ones);
+
+      const numericalGradA = await backend.toBackend(
+        numericalGradient(
+          aCPU,
+          (a: CPUTensor) => a.gemm(bCPU, true, true, 1, cCPU, 1) as CPUTensor
+        )
+      );
+      const numericalGradB = await backend.toBackend(
+        numericalGradient(
+          bCPU,
+          (b: CPUTensor) => aCPU.gemm(b, true, true, 1, cCPU, 1) as CPUTensor
+        )
+      );
+      const numericalGradC = await backend.toBackend(
+        numericalGradient(
+          cCPU,
+          (c: CPUTensor) => aCPU.gemm(bCPU, true, true, 1, c, 1) as CPUTensor
+        )
+      );
+
+      //@ts-ignore
+      expect(await vA.grad.compare(numericalGradA, 0.5)).toBeTrue();
+      //@ts-ignore
+      expect(await vB.grad.compare(numericalGradB, 0.5)).toBeTrue();
+      //@ts-ignore
+      expect(await vC.grad.compare(numericalGradC, 0.1)).toBeTrue();
+    });
+
+    it('should work gemm alpha=0.5', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 2, 2], [1, 2, 3, 4, 5, 6, 7, 8]);
+      const b = backend.constructor(
+        [2, 3, 2],
+        [1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4]
+      );
+      const c = backend.constructor([3], [5, 6, 7]);
+      const ones = backend.constructor([2, 2, 3], new Array(12).fill(1));
+
+      const vA = new Variable(a);
+      const vB = new Variable(b);
+      const vC = new Variable(c);
+
+      const aCPU = await toCPU(a);
+      const bCPU = await toCPU(b);
+      const cCPU = await toCPU(c);
+
+      const res = vA.gemm(vB, true, true, 0.5, vC, 1) as Variable;
+      res.backward(ones);
+
+      const numericalGradA = await backend.toBackend(
+        numericalGradient(
+          aCPU,
+          (a: CPUTensor) => a.gemm(bCPU, true, true, 0.5, cCPU, 1) as CPUTensor
+        )
+      );
+      const numericalGradB = await backend.toBackend(
+        numericalGradient(
+          bCPU,
+          (b: CPUTensor) => aCPU.gemm(b, true, true, 0.5, cCPU, 1) as CPUTensor
+        )
+      );
+      const numericalGradC = await backend.toBackend(
+        numericalGradient(
+          cCPU,
+          (c: CPUTensor) => aCPU.gemm(bCPU, true, true, 0.5, c, 1) as CPUTensor
+        )
+      );
+
+      //@ts-ignore
+      expect(await vA.grad.compare(numericalGradA, 0.5)).toBeTrue();
+      //@ts-ignore
+      expect(await vB.grad.compare(numericalGradB, 0.5)).toBeTrue();
+      //@ts-ignore
+      expect(await vC.grad.compare(numericalGradC, 0.1)).toBeTrue();
+    });
+
+    it('should work gemm beta=0.5', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 2, 2], [1, 2, 3, 4, 5, 6, 7, 8]);
+      const b = backend.constructor(
+        [2, 3, 2],
+        [1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4]
+      );
+      const c = backend.constructor([3], [5, 6, 7]);
+      const ones = backend.constructor([2, 2, 3], new Array(12).fill(1));
+
+      const vA = new Variable(a);
+      const vB = new Variable(b);
+      const vC = new Variable(c);
+
+      const aCPU = await toCPU(a);
+      const bCPU = await toCPU(b);
+      const cCPU = await toCPU(c);
+
+      const res = vA.gemm(vB, true, true, 1, vC, 0.5) as Variable;
+      res.backward(ones);
+
+      const numericalGradA = await backend.toBackend(
+        numericalGradient(
+          aCPU,
+          (a: CPUTensor) => a.gemm(bCPU, true, true, 1, cCPU, 0.5) as CPUTensor
+        )
+      );
+      const numericalGradB = await backend.toBackend(
+        numericalGradient(
+          bCPU,
+          (b: CPUTensor) => aCPU.gemm(b, true, true, 1, cCPU, 0.5) as CPUTensor
+        )
+      );
+      const numericalGradC = await backend.toBackend(
+        numericalGradient(
+          cCPU,
+          (c: CPUTensor) => aCPU.gemm(bCPU, true, true, 1, c, 0.5) as CPUTensor
+        )
+      );
+
+      //@ts-ignore
+      expect(await vA.grad.compare(numericalGradA, 0.5)).toBeTrue();
+      //@ts-ignore
+      expect(await vB.grad.compare(numericalGradB, 0.5)).toBeTrue();
+      //@ts-ignore
+      expect(await vC.grad.compare(numericalGradC, 0.3)).toBeTrue();
     });
   });
 }
