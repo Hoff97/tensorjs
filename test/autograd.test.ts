@@ -1210,5 +1210,31 @@ for (const backend of backends) {
       //@ts-ignore
       expect(await vC.grad.compare(numericalGradC, 0.3)).toBeTrue();
     });
+
+    it('should work with transpose', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 3, 4], new Array(24).fill(5));
+      const ones = backend.constructor([4, 2, 3], new Array(24).fill(1));
+      const vA = new Variable(a);
+      const aCPU = await toCPU(a);
+
+      const permutation = [2, 0, 1];
+
+      const res = vA.transpose(permutation) as Variable;
+      res.backward(ones);
+
+      const numericalGradA = await backend.toBackend(
+        numericalGradient(
+          aCPU,
+          (a: CPUTensor) => a.transpose(permutation) as CPUTensor
+        )
+      );
+
+      //@ts-ignore
+      expect(await vA.grad.compare(numericalGradA, 0.01)).toBeTrue();
+    });
   });
 }

@@ -21,6 +21,7 @@ import {ConvBack} from './ops/conv/convBack';
 import {DivideBack} from './ops/binary/divideBack';
 import {PowerBack} from './ops/binary/powerBack';
 import {GemmBack} from './ops/matMul/gemmBack';
+import {TransposeBack} from './ops/util/transposeBack';
 
 export class Variable extends Tensor implements VariableI {
   public grad?: Tensor;
@@ -40,7 +41,7 @@ export class Variable extends Tensor implements VariableI {
     if (grad === undefined) {
       const ownShape = this.value.getShape();
       if (ownShape.length === 1 && ownShape[0] === 1) {
-        grad = this.value.singleConstant(1);
+        grad = this.value;
       } else {
         throw new Error(
           'Backward without an input gradient can only be done for tensors with shape [1]'
@@ -82,6 +83,7 @@ export class Variable extends Tensor implements VariableI {
     if (this.grad !== undefined) {
       this.grad.delete();
     }
+    //TODO: Should the whole computation graph be deleted here?
   }
 
   protected reshape_impl(shape: readonly number[], copy: boolean): Tensor {
@@ -394,9 +396,15 @@ export class Variable extends Tensor implements VariableI {
   ): Tensor {
     throw new Error('Method not implemented.');
   }
+
   protected transpose_impl(permutation: number[]): Tensor {
-    throw new Error('Method not implemented.');
+    return new Variable(
+      this.value.transpose(permutation),
+      undefined,
+      new TransposeBack(this, permutation)
+    );
   }
+
   protected slice_impl(
     starts: number[],
     ends: number[],
