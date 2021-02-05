@@ -1252,5 +1252,88 @@ for (const backend of backends) {
 
       expect(await vA.grad?.compare(numericalGradA, 0.01)).toBeTrue();
     });
+
+    it('should work with sum square axis 1', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 3], [1, -2, 3, -4, -5, 6]);
+      const ones = backend.constructor([2], new Array(2).fill(1));
+      const vA = new Variable(a);
+      const aCPU = (await toCPU(a)) as CPUTensor;
+
+      const res = vA.sumSquare(1) as Variable;
+      res.backward(ones);
+
+      const numericalGradA = await backend.toBackend(
+        numericalGradient(aCPU, (a: CPUTensor) => a.sumSquare(1) as CPUTensor)
+      );
+
+      expect(await vA.grad?.compare(numericalGradA, 0.1)).toBeTrue();
+    });
+
+    it('should work with sum square axis 0', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 3], [1, -2, 3, -4, -5, 6]);
+      const ones = backend.constructor([3], new Array(3).fill(1));
+      const vA = new Variable(a);
+      const aCPU = (await toCPU(a)) as CPUTensor;
+
+      const res = vA.sumSquare(0) as Variable;
+      res.backward(ones);
+
+      const numericalGradA = await backend.toBackend(
+        numericalGradient(aCPU, (a: CPUTensor) => a.sumSquare(0) as CPUTensor)
+      );
+
+      expect(await vA.grad?.compare(numericalGradA, 0.1)).toBeTrue();
+    });
+
+    it('should work with sum square across all axes', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 3], [1, -2, 3, -4, -5, 6]);
+      const ones = backend.constructor([1], new Array(1).fill(1));
+      const vA = new Variable(a);
+      const aCPU = (await toCPU(a)) as CPUTensor;
+
+      const res = vA.sumSquare() as Variable;
+      res.backward(ones);
+
+      const numericalGradA = await backend.toBackend(
+        numericalGradient(aCPU, (a: CPUTensor) => a.sumSquare() as CPUTensor)
+      );
+
+      expect(await vA.grad?.compare(numericalGradA, 0.1)).toBeTrue();
+    });
+
+    it('should work with sum square keepDims = True', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 3], [1, -2, 3, -4, -5, 6]);
+      const ones = backend.constructor([1, 1], new Array(1).fill(1));
+      const vA = new Variable(a);
+      const aCPU = (await toCPU(a)) as CPUTensor;
+
+      const res = vA.sumSquare(undefined, true) as Variable;
+      res.backward(ones);
+
+      const numericalGradA = await backend.toBackend(
+        numericalGradient(
+          aCPU,
+          (a: CPUTensor) => a.sumSquare(undefined, true) as CPUTensor
+        )
+      );
+
+      expect(await vA.grad?.compare(numericalGradA, 0.1)).toBeTrue();
+    });
   });
 }
