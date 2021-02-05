@@ -444,7 +444,7 @@ export class GPUTensor extends Tensor implements GPUTensorI {
     return defaultRepeatD.calc({A: this, repeats}, this.precision) as GPUTensor;
   }
 
-  expand(shape: number[]): Tensor {
+  expand(shape: readonly number[]): Tensor {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [_shape, _o, resultShape] = this.alignShapes(this.shape, shape);
     if (compareShapes(this.shape, resultShape)) {

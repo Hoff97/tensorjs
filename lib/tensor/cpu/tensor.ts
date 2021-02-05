@@ -375,7 +375,7 @@ export class CPUTensor extends Tensor {
     return repeat(this, repeats);
   }
 
-  expand(shape: number[]): Tensor {
+  expand(shape: readonly number[]): Tensor {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [_shape, goal, resultShape] = this.alignShapes(this.shape, shape);
     if (compareShapes(this.shape, resultShape)) {

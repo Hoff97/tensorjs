@@ -373,7 +373,7 @@ export class WASMTensor extends Tensor {
     return new WASMTensor(this.wasmTensor.repeat(new Uint32Array(repeats)));
   }
 
-  expand(shape: number[]): Tensor {
+  expand(shape: readonly number[]): Tensor {
     const thisShape = this.getShape();
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

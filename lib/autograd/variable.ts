@@ -22,6 +22,7 @@ import {DivideBack} from './ops/binary/divideBack';
 import {PowerBack} from './ops/binary/powerBack';
 import {GemmBack} from './ops/matMul/gemmBack';
 import {TransposeBack} from './ops/util/transposeBack';
+import {SumBack} from './ops/reduce/sumBack';
 
 export class Variable extends Tensor implements VariableI {
   public grad?: Tensor;
@@ -164,7 +165,7 @@ export class Variable extends Tensor implements VariableI {
     );
   }
 
-  expand(shape: number[]): Tensor {
+  expand(shape: readonly number[]): Tensor {
     return new Variable(
       this.value.expand(shape),
       undefined,
@@ -318,8 +319,13 @@ export class Variable extends Tensor implements VariableI {
   }
 
   protected sum_impl(axes: number[], keepDims: boolean): Tensor {
-    throw new Error('Method not implemented.');
+    return new Variable(
+      this.value.sum(axes, keepDims),
+      undefined,
+      new SumBack(this, axes, keepDims)
+    );
   }
+
   protected sumSquare_impl(axes: number[], keepDims: boolean): Tensor {
     throw new Error('Method not implemented.');
   }

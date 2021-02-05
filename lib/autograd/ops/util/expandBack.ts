@@ -2,7 +2,7 @@ import {Tensor} from '../../../library';
 import {BackwardOp, VariableI} from '../../types';
 
 export class ExpandBack implements BackwardOp {
-  constructor(public a: VariableI, public shape: number[]) {}
+  constructor(public a: VariableI, public shape: readonly number[]) {}
 
   backward(grad: Tensor): void {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

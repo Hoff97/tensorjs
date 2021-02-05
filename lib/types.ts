@@ -865,7 +865,7 @@ export default abstract class Tensor {
    */
   abstract repeat(repeats: number[]): Tensor;
 
-  abstract expand(shape: number[]): Tensor;
+  abstract expand(shape: readonly number[]): Tensor;
 
   /**
    * Copy the tensor.
