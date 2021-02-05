@@ -52,8 +52,7 @@ for (const backend of backends) {
         )
       );
 
-      //@ts-ignore
-      expect(await v.grad.compare(numericalGrad, epsilon)).toBeTrue();
+      expect(await v.grad?.compare(numericalGrad, epsilon)).toBeTrue();
     });
 
     it('should work with log', async () => {
@@ -76,8 +75,7 @@ for (const backend of backends) {
         )
       );
 
-      //@ts-ignore
-      expect(await v.grad.compare(numericalGrad, epsilon)).toBeTrue();
+      expect(await v.grad?.compare(numericalGrad, epsilon)).toBeTrue();
     });
 
     it('should work with sqrt', async () => {
@@ -100,8 +98,7 @@ for (const backend of backends) {
         )
       );
 
-      //@ts-ignore
-      expect(await v.grad.compare(numericalGrad, epsilon)).toBeTrue();
+      expect(await v.grad?.compare(numericalGrad, epsilon)).toBeTrue();
     });
 
     it('should work with reshape', async () => {
@@ -124,8 +121,7 @@ for (const backend of backends) {
         )
       );
 
-      //@ts-ignore
-      expect(await v.grad.compare(numericalGrad, epsilon)).toBeTrue();
+      expect(await v.grad?.compare(numericalGrad, epsilon)).toBeTrue();
     });
 
     it('should work with abs', async () => {
@@ -148,8 +144,7 @@ for (const backend of backends) {
         )
       );
 
-      //@ts-ignore
-      expect(await v.grad.compare(numericalGrad, epsilon)).toBeTrue();
+      expect(await v.grad?.compare(numericalGrad, epsilon)).toBeTrue();
     });
 
     it('should work with negate', async () => {
@@ -172,8 +167,7 @@ for (const backend of backends) {
         )
       );
 
-      //@ts-ignore
-      expect(await v.grad.compare(numericalGrad, epsilon)).toBeTrue();
+      expect(await v.grad?.compare(numericalGrad, epsilon)).toBeTrue();
     });
 
     it('should work with matmul', async () => {
@@ -203,10 +197,8 @@ for (const backend of backends) {
         (b: CPUTensor) => a.matMul(b) as CPUTensor
       );
 
-      //@ts-ignore
-      expect(await vA.grad.compare(numericalGradA, 1)).toBeTrue();
-      //@ts-ignore
-      expect(await vB.grad.compare(numericalGradB, 1)).toBeTrue();
+      expect(await vA.grad?.compare(numericalGradA, 1)).toBeTrue();
+      expect(await vB.grad?.compare(numericalGradB, 1)).toBeTrue();
     });
 
     it('should work with concat', async () => {
@@ -239,10 +231,8 @@ for (const backend of backends) {
         (b: CPUTensor) => a.concat(b, 1) as CPUTensor
       );
 
-      //@ts-ignore
-      expect(await vA.grad.compare(numericalGradA, epsilon)).toBeTrue();
-      //@ts-ignore
-      expect(await vB.grad.compare(numericalGradB, epsilon)).toBeTrue();
+      expect(await vA.grad?.compare(numericalGradA, epsilon)).toBeTrue();
+      expect(await vB.grad?.compare(numericalGradB, epsilon)).toBeTrue();
     });
 
     it('should work with clip', async () => {
@@ -265,8 +255,7 @@ for (const backend of backends) {
         )
       );
 
-      //@ts-ignore
-      expect(await v.grad.compare(numericalGrad, epsilon)).toBeTrue();
+      expect(await v.grad?.compare(numericalGrad, epsilon)).toBeTrue();
     });
 
     it('should work with repeat', async () => {
@@ -288,8 +277,7 @@ for (const backend of backends) {
         numericalGradient(aCPU, (a: CPUTensor) => a.repeat([3, 2]) as CPUTensor)
       );
 
-      //@ts-ignore
-      expect(await v.grad.compare(numericalGrad, 0.1)).toBeTrue();
+      expect(await v.grad?.compare(numericalGrad, 0.1)).toBeTrue();
     });
 
     it('should work with expand', async () => {
@@ -314,8 +302,7 @@ for (const backend of backends) {
         )
       );
 
-      //@ts-ignore
-      expect(await v.grad.compare(numericalGrad, 0.1)).toBeTrue();
+      expect(await v.grad?.compare(numericalGrad, 0.1)).toBeTrue();
     });
 
     it('should work with add', async () => {
@@ -343,10 +330,8 @@ for (const backend of backends) {
         numericalGradient(bCPU, (b: CPUTensor) => aCPU.add(b) as CPUTensor)
       );
 
-      //@ts-ignore
-      expect(await vA.grad.compare(numericalGradA, epsilon)).toBeTrue();
-      //@ts-ignore
-      expect(await vB.grad.compare(numericalGradB, epsilon)).toBeTrue();
+      expect(await vA.grad?.compare(numericalGradA, epsilon)).toBeTrue();
+      expect(await vB.grad?.compare(numericalGradB, epsilon)).toBeTrue();
     });
 
     it('should work with broadcasted add', async () => {
@@ -374,10 +359,8 @@ for (const backend of backends) {
         numericalGradient(bCPU, (b: CPUTensor) => aCPU.add(b) as CPUTensor)
       );
 
-      //@ts-ignore
-      expect(await vA.grad.compare(numericalGradA, 0.05)).toBeTrue();
-      //@ts-ignore
-      expect(await vB.grad.compare(numericalGradB, 0.05)).toBeTrue();
+      expect(await vA.grad?.compare(numericalGradA, 0.05)).toBeTrue();
+      expect(await vB.grad?.compare(numericalGradB, 0.05)).toBeTrue();
     });
 
     it('should work with subtract', async () => {
@@ -405,10 +388,8 @@ for (const backend of backends) {
         numericalGradient(bCPU, (b: CPUTensor) => aCPU.subtract(b) as CPUTensor)
       );
 
-      //@ts-ignore
-      expect(await vA.grad.compare(numericalGradA, epsilon)).toBeTrue();
-      //@ts-ignore
-      expect(await vB.grad.compare(numericalGradB, epsilon)).toBeTrue();
+      expect(await vA.grad?.compare(numericalGradA, epsilon)).toBeTrue();
+      expect(await vB.grad?.compare(numericalGradB, epsilon)).toBeTrue();
     });
 
     it('should work with broadcasted subtract', async () => {
@@ -436,10 +417,8 @@ for (const backend of backends) {
         numericalGradient(bCPU, (b: CPUTensor) => aCPU.subtract(b) as CPUTensor)
       );
 
-      //@ts-ignore
-      expect(await vA.grad.compare(numericalGradA, 0.05)).toBeTrue();
-      //@ts-ignore
-      expect(await vB.grad.compare(numericalGradB, 0.05)).toBeTrue();
+      expect(await vA.grad?.compare(numericalGradA, 0.05)).toBeTrue();
+      expect(await vB.grad?.compare(numericalGradB, 0.05)).toBeTrue();
     });
 
     it('should work with multiply', async () => {
@@ -467,10 +446,8 @@ for (const backend of backends) {
         numericalGradient(bCPU, (b: CPUTensor) => aCPU.multiply(b) as CPUTensor)
       );
 
-      //@ts-ignore
-      expect(await vA.grad.compare(numericalGradA, 0.1)).toBeTrue();
-      //@ts-ignore
-      expect(await vB.grad.compare(numericalGradB, 0.1)).toBeTrue();
+      expect(await vA.grad?.compare(numericalGradA, 0.1)).toBeTrue();
+      expect(await vB.grad?.compare(numericalGradB, 0.1)).toBeTrue();
     });
 
     it('should work with broadcasted multiply', async () => {
@@ -498,10 +475,8 @@ for (const backend of backends) {
         numericalGradient(bCPU, (b: CPUTensor) => aCPU.multiply(b) as CPUTensor)
       );
 
-      //@ts-ignore
-      expect(await vA.grad.compare(numericalGradA, 0.05)).toBeTrue();
-      //@ts-ignore
-      expect(await vB.grad.compare(numericalGradB, 0.05)).toBeTrue();
+      expect(await vA.grad?.compare(numericalGradA, 0.05)).toBeTrue();
+      expect(await vB.grad?.compare(numericalGradB, 0.05)).toBeTrue();
     });
 
     it('should work with divide', async () => {
@@ -529,10 +504,8 @@ for (const backend of backends) {
         numericalGradient(bCPU, (b: CPUTensor) => aCPU.divide(b) as CPUTensor)
       );
 
-      //@ts-ignore
-      expect(await vA.grad.compare(numericalGradA, 0.05)).toBeTrue();
-      //@ts-ignore
-      expect(await vB.grad.compare(numericalGradB, 0.05)).toBeTrue();
+      expect(await vA.grad?.compare(numericalGradA, 0.05)).toBeTrue();
+      expect(await vB.grad?.compare(numericalGradB, 0.05)).toBeTrue();
     });
 
     it('should work with broadcasted divide', async () => {
@@ -560,10 +533,8 @@ for (const backend of backends) {
         numericalGradient(bCPU, (b: CPUTensor) => aCPU.divide(b) as CPUTensor)
       );
 
-      //@ts-ignore
-      expect(await vA.grad.compare(numericalGradA, 0.05)).toBeTrue();
-      //@ts-ignore
-      expect(await vB.grad.compare(numericalGradB, 0.05)).toBeTrue();
+      expect(await vA.grad?.compare(numericalGradA, 0.05)).toBeTrue();
+      expect(await vB.grad?.compare(numericalGradB, 0.05)).toBeTrue();
     });
 
     it('should work with power', async () => {
@@ -591,10 +562,8 @@ for (const backend of backends) {
         numericalGradient(bCPU, (b: CPUTensor) => aCPU.power(b) as CPUTensor)
       );
 
-      //@ts-ignore
-      expect(await vA.grad.compare(numericalGradA, 0.5)).toBeTrue();
-      //@ts-ignore
-      expect(await vB.grad.compare(numericalGradB, 0.5)).toBeTrue();
+      expect(await vA.grad?.compare(numericalGradA, 0.5)).toBeTrue();
+      expect(await vB.grad?.compare(numericalGradB, 0.5)).toBeTrue();
     });
 
     it('should work with broadcasted power', async () => {
@@ -622,10 +591,8 @@ for (const backend of backends) {
         numericalGradient(bCPU, (b: CPUTensor) => aCPU.power(b) as CPUTensor)
       );
 
-      //@ts-ignore
-      expect(await vA.grad.compare(numericalGradA, 0.05)).toBeTrue();
-      //@ts-ignore
-      expect(await vB.grad.compare(numericalGradB, 0.05)).toBeTrue();
+      expect(await vA.grad?.compare(numericalGradA, 0.05)).toBeTrue();
+      expect(await vB.grad?.compare(numericalGradB, 0.05)).toBeTrue();
     });
 
     it('should work with convolution', async () => {
@@ -668,12 +635,9 @@ for (const backend of backends) {
         )
       );
 
-      //@ts-ignore
-      expect(await vX.grad.compare(numericalGradX, 0.5)).toBeTrue();
-      //@ts-ignore
-      expect(await vW.grad.compare(numericalGradW, 0.5)).toBeTrue();
-      //@ts-ignore
-      expect(await vB.grad.compare(numericalGradB, 0.5)).toBeTrue();
+      expect(await vX.grad?.compare(numericalGradX, 0.5)).toBeTrue();
+      expect(await vW.grad?.compare(numericalGradW, 0.5)).toBeTrue();
+      expect(await vB.grad?.compare(numericalGradB, 0.5)).toBeTrue();
     });
 
     it('should work with strided convolution', async () => {
@@ -734,12 +698,9 @@ for (const backend of backends) {
         )
       );
 
-      //@ts-ignore
-      expect(await vX.grad.compare(numericalGradX, 0.5)).toBeTrue();
-      //@ts-ignore
-      expect(await vW.grad.compare(numericalGradW, 0.5)).toBeTrue();
-      //@ts-ignore
-      expect(await vB.grad.compare(numericalGradB, 0.5)).toBeTrue();
+      expect(await vX.grad?.compare(numericalGradX, 0.5)).toBeTrue();
+      expect(await vW.grad?.compare(numericalGradW, 0.5)).toBeTrue();
+      expect(await vB.grad?.compare(numericalGradB, 0.5)).toBeTrue();
     });
 
     it('should work with dilated convolution', async () => {
@@ -785,12 +746,9 @@ for (const backend of backends) {
         )
       );
 
-      //@ts-ignore
-      expect(await vX.grad.compare(numericalGradX, 0.5)).toBeTrue();
-      //@ts-ignore
-      expect(await vW.grad.compare(numericalGradW, 0.5)).toBeTrue();
-      //@ts-ignore
-      expect(await vB.grad.compare(numericalGradB, 0.5)).toBeTrue();
+      expect(await vX.grad?.compare(numericalGradX, 0.5)).toBeTrue();
+      expect(await vW.grad?.compare(numericalGradW, 0.5)).toBeTrue();
+      expect(await vB.grad?.compare(numericalGradB, 0.5)).toBeTrue();
     });
 
     it('should work with padded convolution', async () => {
@@ -842,12 +800,9 @@ for (const backend of backends) {
         )
       );
 
-      //@ts-ignore
-      expect(await vX.grad.compare(numericalGradX, 0.5)).toBeTrue();
-      //@ts-ignore
-      expect(await vW.grad.compare(numericalGradW, 0.8)).toBeTrue();
-      //@ts-ignore
-      expect(await vB.grad.compare(numericalGradB, 0.5)).toBeTrue();
+      expect(await vX.grad?.compare(numericalGradX, 0.5)).toBeTrue();
+      expect(await vW.grad?.compare(numericalGradW, 0.8)).toBeTrue();
+      expect(await vB.grad?.compare(numericalGradB, 0.5)).toBeTrue();
     });
 
     it('should work with padded strided dilated convolution', async () => {
@@ -897,12 +852,9 @@ for (const backend of backends) {
         )
       );
 
-      //@ts-ignore
-      expect(await vX.grad.compare(numericalGradX, 0.5)).toBeTrue();
-      //@ts-ignore
-      expect(await vW.grad.compare(numericalGradW, 0.5)).toBeTrue();
-      //@ts-ignore
-      expect(await vB.grad.compare(numericalGradB, 0.5)).toBeTrue();
+      expect(await vX.grad?.compare(numericalGradX, 0.5)).toBeTrue();
+      expect(await vW.grad?.compare(numericalGradW, 0.5)).toBeTrue();
+      expect(await vB.grad?.compare(numericalGradB, 0.5)).toBeTrue();
     });
 
     it('should work gemm', async () => {
@@ -948,12 +900,9 @@ for (const backend of backends) {
         )
       );
 
-      //@ts-ignore
-      expect(await vA.grad.compare(numericalGradA, 0.5)).toBeTrue();
-      //@ts-ignore
-      expect(await vB.grad.compare(numericalGradB, 0.5)).toBeTrue();
-      //@ts-ignore
-      expect(await vC.grad.compare(numericalGradC, 0.1)).toBeTrue();
+      expect(await vA.grad?.compare(numericalGradA, 0.5)).toBeTrue();
+      expect(await vB.grad?.compare(numericalGradB, 0.5)).toBeTrue();
+      expect(await vC.grad?.compare(numericalGradC, 0.1)).toBeTrue();
     });
 
     it('should work gemm a transposed', async () => {
@@ -999,12 +948,9 @@ for (const backend of backends) {
         )
       );
 
-      //@ts-ignore
-      expect(await vA.grad.compare(numericalGradA, 0.5)).toBeTrue();
-      //@ts-ignore
-      expect(await vB.grad.compare(numericalGradB, 0.5)).toBeTrue();
-      //@ts-ignore
-      expect(await vC.grad.compare(numericalGradC, 0.1)).toBeTrue();
+      expect(await vA.grad?.compare(numericalGradA, 0.5)).toBeTrue();
+      expect(await vB.grad?.compare(numericalGradB, 0.5)).toBeTrue();
+      expect(await vC.grad?.compare(numericalGradC, 0.1)).toBeTrue();
     });
 
     it('should work gemm b transposed', async () => {
@@ -1050,12 +996,9 @@ for (const backend of backends) {
         )
       );
 
-      //@ts-ignore
-      expect(await vA.grad.compare(numericalGradA, 0.5)).toBeTrue();
-      //@ts-ignore
-      expect(await vB.grad.compare(numericalGradB, 0.5)).toBeTrue();
-      //@ts-ignore
-      expect(await vC.grad.compare(numericalGradC, 0.1)).toBeTrue();
+      expect(await vA.grad?.compare(numericalGradA, 0.5)).toBeTrue();
+      expect(await vB.grad?.compare(numericalGradB, 0.5)).toBeTrue();
+      expect(await vC.grad?.compare(numericalGradC, 0.1)).toBeTrue();
     });
 
     it('should work gemm a and b transposed', async () => {
@@ -1101,12 +1044,9 @@ for (const backend of backends) {
         )
       );
 
-      //@ts-ignore
-      expect(await vA.grad.compare(numericalGradA, 0.5)).toBeTrue();
-      //@ts-ignore
-      expect(await vB.grad.compare(numericalGradB, 0.5)).toBeTrue();
-      //@ts-ignore
-      expect(await vC.grad.compare(numericalGradC, 0.1)).toBeTrue();
+      expect(await vA.grad?.compare(numericalGradA, 0.5)).toBeTrue();
+      expect(await vB.grad?.compare(numericalGradB, 0.5)).toBeTrue();
+      expect(await vC.grad?.compare(numericalGradC, 0.1)).toBeTrue();
     });
 
     it('should work gemm alpha=0.5', async () => {
@@ -1152,12 +1092,9 @@ for (const backend of backends) {
         )
       );
 
-      //@ts-ignore
-      expect(await vA.grad.compare(numericalGradA, 0.5)).toBeTrue();
-      //@ts-ignore
-      expect(await vB.grad.compare(numericalGradB, 0.5)).toBeTrue();
-      //@ts-ignore
-      expect(await vC.grad.compare(numericalGradC, 0.1)).toBeTrue();
+      expect(await vA.grad?.compare(numericalGradA, 0.5)).toBeTrue();
+      expect(await vB.grad?.compare(numericalGradB, 0.5)).toBeTrue();
+      expect(await vC.grad?.compare(numericalGradC, 0.1)).toBeTrue();
     });
 
     it('should work gemm beta=0.5', async () => {
@@ -1203,12 +1140,9 @@ for (const backend of backends) {
         )
       );
 
-      //@ts-ignore
-      expect(await vA.grad.compare(numericalGradA, 0.5)).toBeTrue();
-      //@ts-ignore
-      expect(await vB.grad.compare(numericalGradB, 0.5)).toBeTrue();
-      //@ts-ignore
-      expect(await vC.grad.compare(numericalGradC, 0.3)).toBeTrue();
+      expect(await vA.grad?.compare(numericalGradA, 0.5)).toBeTrue();
+      expect(await vB.grad?.compare(numericalGradB, 0.5)).toBeTrue();
+      expect(await vC.grad?.compare(numericalGradC, 0.3)).toBeTrue();
     });
 
     it('should work with transpose', async () => {
@@ -1233,8 +1167,7 @@ for (const backend of backends) {
         )
       );
 
-      //@ts-ignore
-      expect(await vA.grad.compare(numericalGradA, 0.01)).toBeTrue();
+      expect(await vA.grad?.compare(numericalGradA, 0.01)).toBeTrue();
     });
   });
 }
