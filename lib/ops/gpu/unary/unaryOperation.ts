@@ -19,8 +19,10 @@ export interface UnaryOpInput {
 }
 
 export abstract class UnaryOperation<
-  GPUTensor extends GPUTensorI
-> extends Operation<GPUTensor, UnaryOpInfo, UnaryOpInput> {
+  GPUTensor extends GPUTensorI,
+  UInfo extends UnaryOpInfo = UnaryOpInfo,
+  UInput extends UnaryOpInput = UnaryOpInput
+> extends Operation<GPUTensor, UInfo, UInput> {
   constructor(
     tensorConstructor: GPUTensorConstructor<GPUTensor>,
     allocator?: GPUMemoryAllocator
@@ -31,7 +33,7 @@ export abstract class UnaryOperation<
   abstract operation(input: string): string;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  getFragmentShader(info: UnaryOpInfo): string {
+  getFragmentShader(info: UInfo): string {
     return `
     void main() {
       initVars();
@@ -45,15 +47,15 @@ export abstract class UnaryOperation<
     return ['X'];
   }
 
-  calc(input: UnaryOpInput): GPUTensor {
+  calc(input: UInput): GPUTensor {
     return this.compute(input.input.shape, {X: input.input});
   }
 
-  getOutputShape(input: UnaryOpInput): readonly number[] {
+  getOutputShape(input: UInput): readonly number[] {
     return input.input.shape;
   }
 
-  compile(info: UnaryOpInfo, precision: Precision) {
+  compile(info: UInfo, precision: Precision) {
     if (info.shapeX !== undefined) {
       this.maxRank = info.shapeX.length;
     }
@@ -61,7 +63,7 @@ export abstract class UnaryOperation<
     super.compile(info, precision);
   }
 
-  getCompilationInfo(input: UnaryOpInput, precision: Precision): UnaryOpInfo {
+  getCompilationInfo(input: UInput, precision: Precision): UInfo {
     const outputShape = this.getOutputShape(input);
     const outputSize = defaultAllocator.getAllocationDimensions(
       getSize(outputShape),
@@ -75,10 +77,10 @@ export abstract class UnaryOperation<
       shapeOutput: this.getOutputShape(input),
       widthOutput: outputSize.width,
       heightOutput: outputSize.height,
-    };
+    } as UInfo;
   }
 
-  getInputInfoString(input: UnaryOpInput): string {
+  getInputInfoString(input: UInput): string {
     return `${input.input.shape}`;
   }
 }

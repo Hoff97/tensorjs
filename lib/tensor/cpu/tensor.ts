@@ -10,6 +10,7 @@ import {
   floor,
   log,
   multiply,
+  multiplyScalar,
   negate,
   power,
   sign,
@@ -178,6 +179,10 @@ export class CPUTensor extends Tensor {
     return negate(this);
   }
 
+  multiplyScalar(value: number): Tensor {
+    return multiplyScalar(this, value);
+  }
+
   sign(): Tensor {
     return sign(this);
   }
@@ -193,44 +198,54 @@ export class CPUTensor extends Tensor {
     return clipBackward(this, grad, this.getShape(), min, max);
   }
 
-  add_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor {
+  add_impl(
+    th: Tensor,
+    tensor: Tensor,
+    resultShape: readonly number[],
+    alpha: number,
+    beta: number
+  ): Tensor {
     if (!(tensor instanceof CPUTensor) || !(th instanceof CPUTensor)) {
       throw new Error('Can only add CPU tensor to CPU tensor');
     }
-    return add(th, tensor, resultShape);
+    return add(th, tensor, resultShape, alpha, beta);
   }
 
   subtract_impl(
     th: Tensor,
     tensor: Tensor,
-    resultShape: readonly number[]
+    resultShape: readonly number[],
+    alpha: number,
+    beta: number
   ): Tensor {
     if (!(tensor instanceof CPUTensor) || !(th instanceof CPUTensor)) {
       throw new Error('Can only subtract CPU tensor to CPU tensor');
     }
-    return subtract(th, tensor, resultShape);
+    return subtract(th, tensor, resultShape, alpha, beta);
   }
 
   multiply_impl(
     th: Tensor,
     tensor: Tensor,
-    resultShape: readonly number[]
+    resultShape: readonly number[],
+    alpha: number
   ): Tensor {
     if (!(tensor instanceof CPUTensor) || !(th instanceof CPUTensor)) {
       throw new Error('Can only add CPU tensor to CPU tensor');
     }
-    return multiply(th, tensor, resultShape);
+    return multiply(th, tensor, resultShape, alpha);
   }
 
   divide_impl(
     th: Tensor,
     tensor: Tensor,
-    resultShape: readonly number[]
+    resultShape: readonly number[],
+    alpha: number
   ): Tensor {
     if (!(tensor instanceof CPUTensor) || !(th instanceof CPUTensor)) {
       throw new Error('Can only add CPU tensor to CPU tensor');
     }
-    return divide(th, tensor, resultShape);
+    return divide(th, tensor, resultShape, alpha);
   }
 
   power_impl(

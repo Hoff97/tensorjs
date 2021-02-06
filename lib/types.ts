@@ -539,9 +539,21 @@ export default abstract class Tensor {
    * //  [5,6]]
    * ```
    */
-  add(tensor: Tensor) {
+  add(tensor: Tensor, alpha?: number, beta?: number) {
+    if (alpha === undefined) {
+      alpha = 1;
+    }
+    if (beta === undefined) {
+      beta = 1;
+    }
     const [th, tens, resultShape] = this.alignTensor(tensor);
-    return this.add_impl(th as Tensor, tens as Tensor, resultShape as number[]);
+    return this.add_impl(
+      th as Tensor,
+      tens as Tensor,
+      resultShape as number[],
+      alpha,
+      beta
+    );
   }
 
   /**
@@ -564,12 +576,21 @@ export default abstract class Tensor {
    * //  [5,6]]
    * ```
    */
-  subtract(tensor: Tensor) {
+  subtract(tensor: Tensor, alpha?: number, beta?: number) {
+    if (alpha === undefined) {
+      alpha = 1;
+    }
+    if (beta === undefined) {
+      beta = 1;
+    }
+
     const [th, tens, resultShape] = this.alignTensor(tensor);
     return this.subtract_impl(
       th as Tensor,
       tens as Tensor,
-      resultShape as number[]
+      resultShape as number[],
+      alpha,
+      beta
     );
   }
 
@@ -593,14 +614,20 @@ export default abstract class Tensor {
    *     [6,8]]
    * ```
    */
-  multiply(tensor: Tensor) {
+  multiply(tensor: Tensor, alpha?: number) {
+    if (alpha === undefined) {
+      alpha = 1;
+    }
     const [th, tens, resultShape] = this.alignTensor(tensor);
     return this.multiply_impl(
       th as Tensor,
       tens as Tensor,
-      resultShape as number[]
+      resultShape as number[],
+      alpha
     );
   }
+
+  abstract multiplyScalar(value: number): Tensor;
 
   /**
    * Divides two tensors. Supports broadcasting
@@ -622,12 +649,17 @@ export default abstract class Tensor {
    * //  [3.5,4]]
    * ```
    */
-  divide(tensor: Tensor) {
+  divide(tensor: Tensor, alpha?: number) {
+    if (alpha === undefined) {
+      alpha = 1;
+    }
+
     const [th, tens, resultShape] = this.alignTensor(tensor);
     return this.divide_impl(
       th as Tensor,
       tens as Tensor,
-      resultShape as number[]
+      resultShape as number[],
+      alpha
     );
   }
 
@@ -940,25 +972,31 @@ export default abstract class Tensor {
   abstract add_impl(
     th: Tensor,
     tensor: Tensor,
-    resultShape: readonly number[]
+    resultShape: readonly number[],
+    alpha: number,
+    beta: number
   ): Tensor;
 
   abstract subtract_impl(
     th: Tensor,
     tensor: Tensor,
-    resultShape: readonly number[]
+    resultShape: readonly number[],
+    alpha: number,
+    beta: number
   ): Tensor;
 
   abstract multiply_impl(
     th: Tensor,
     tensor: Tensor,
-    resultShape: readonly number[]
+    resultShape: readonly number[],
+    alpha: number
   ): Tensor;
 
   abstract divide_impl(
     th: Tensor,
     tensor: Tensor,
-    resultShape: readonly number[]
+    resultShape: readonly number[],
+    alpha: number
   ): Tensor;
 
   abstract power_impl(

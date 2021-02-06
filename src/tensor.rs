@@ -1178,20 +1178,24 @@ impl Tensor {
         self.unary_op(|x: f32| -x)
     }
 
-    pub fn addition(&self, other: &Tensor) -> Tensor {
-        return self.binary_op(other, |x: f32, y: f32| x + y);
+    pub fn multiply_scalar(&self, scalar: f32) -> Tensor {
+        self.unary_op(|x: f32| x * scalar)
     }
 
-    pub fn subtraction(&self, other: &Tensor) -> Tensor {
-        return self.binary_op(other, |x: f32, y: f32| x - y);
+    pub fn addition(&self, other: &Tensor, alpha: f32, beta: f32) -> Tensor {
+        return self.binary_op(other, |x: f32, y: f32| x * alpha + y * beta);
     }
 
-    pub fn multiply(&self, other: &Tensor) -> Tensor {
-        self.binary_op(other, |x: f32, y: f32| x * y)
+    pub fn subtraction(&self, other: &Tensor, alpha: f32, beta: f32) -> Tensor {
+        return self.binary_op(other, |x: f32, y: f32| x * alpha - y * beta);
     }
 
-    pub fn divide(&self, other: &Tensor) -> Tensor {
-        self.binary_op(other, |x: f32, y: f32| x / y)
+    pub fn multiply(&self, other: &Tensor, alpha: f32) -> Tensor {
+        self.binary_op(other, |x: f32, y: f32| x * alpha * y)
+    }
+
+    pub fn divide(&self, other: &Tensor, alpha: f32) -> Tensor {
+        self.binary_op(other, |x: f32, y: f32| x / y * alpha)
     }
 
     pub fn power(&self, other: &Tensor) -> Tensor {

@@ -73,6 +73,10 @@ export function negate(a: CPUTensor) {
   return positionWiseUnaryOp(a, o1 => -o1);
 }
 
+export function multiplyScalar(a: CPUTensor, scalar: number) {
+  return positionWiseUnaryOp(a, o1 => o1 * scalar);
+}
+
 export function clip(a: CPUTensor, min?: number, max?: number) {
   let f = (o1: number) => o1;
   if (min !== undefined && max !== undefined) {
@@ -89,33 +93,49 @@ export function clip(a: CPUTensor, min?: number, max?: number) {
 export function add(
   a: CPUTensor,
   b: CPUTensor,
-  resultShape: readonly number[]
+  resultShape: readonly number[],
+  alpha: number,
+  beta: number
 ) {
-  return positionWiseBinaryOp(a, b, (o1, o2) => o1 + o2, resultShape);
+  return positionWiseBinaryOp(
+    a,
+    b,
+    (o1, o2) => o1 * alpha + o2 * beta,
+    resultShape
+  );
 }
 
 export function subtract(
   a: CPUTensor,
   b: CPUTensor,
-  resultShape: readonly number[]
+  resultShape: readonly number[],
+  alpha: number,
+  beta: number
 ) {
-  return positionWiseBinaryOp(a, b, (o1, o2) => o1 - o2, resultShape);
+  return positionWiseBinaryOp(
+    a,
+    b,
+    (o1, o2) => o1 * alpha - o2 * beta,
+    resultShape
+  );
 }
 
 export function multiply(
   a: CPUTensor,
   b: CPUTensor,
-  resultShape: readonly number[]
+  resultShape: readonly number[],
+  alpha: number
 ) {
-  return positionWiseBinaryOp(a, b, (o1, o2) => o1 * o2, resultShape);
+  return positionWiseBinaryOp(a, b, (o1, o2) => o1 * o2 * alpha, resultShape);
 }
 
 export function divide(
   a: CPUTensor,
   b: CPUTensor,
-  resultShape: readonly number[]
+  resultShape: readonly number[],
+  alpha: number
 ) {
-  return positionWiseBinaryOp(a, b, (o1, o2) => o1 / o2, resultShape);
+  return positionWiseBinaryOp(a, b, (o1, o2) => (o1 / o2) * alpha, resultShape);
 }
 
 export function power(

@@ -518,7 +518,7 @@ export abstract class Operation<
     for (const i in inputTensors) {
       const t = inputTensors[i];
       if (t.memory.id === result.id) {
-        throw new Error(`Allocator return a framebuffer that is also an input
+        throw new Error(`Allocator returned a framebuffer that is also an input
                          Did you delete a GPU tensor that was still used elsewhere?`);
       }
     }

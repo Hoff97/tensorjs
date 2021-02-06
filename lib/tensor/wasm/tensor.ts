@@ -85,6 +85,10 @@ export class WASMTensor extends Tensor {
     return new WASMTensor(this.wasmTensor.negate());
   }
 
+  multiplyScalar(scalar: number): Tensor {
+    return new WASMTensor(this.wasmTensor.multiply_scalar(scalar));
+  }
+
   sign(): Tensor {
     return new WASMTensor(this.wasmTensor.sign());
   }
@@ -93,49 +97,59 @@ export class WASMTensor extends Tensor {
     th: Tensor,
     tensor: Tensor,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _resultShape: readonly number[]
+    _resultShape: readonly number[],
+    alpha: number,
+    beta: number
   ): Tensor {
     if (!(tensor instanceof WASMTensor) || !(th instanceof WASMTensor)) {
       throw new Error('Can only add WASM tensor to WASM tensor');
     }
 
-    return new WASMTensor(th.wasmTensor.addition(tensor.wasmTensor));
+    return new WASMTensor(
+      th.wasmTensor.addition(tensor.wasmTensor, alpha, beta)
+    );
   }
 
   subtract_impl(
     th: Tensor,
     tensor: Tensor,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    resultShape: readonly number[]
+    resultShape: readonly number[],
+    alpha: number,
+    beta: number
   ): Tensor {
     if (!(tensor instanceof WASMTensor) || !(th instanceof WASMTensor)) {
       throw new Error('Can only subtract WASM tensor from WASM tensor');
     }
-    return new WASMTensor(th.wasmTensor.subtraction(tensor.wasmTensor));
+    return new WASMTensor(
+      th.wasmTensor.subtraction(tensor.wasmTensor, alpha, beta)
+    );
   }
 
   multiply_impl(
     th: Tensor,
     tensor: Tensor,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    resultShape: readonly number[]
+    resultShape: readonly number[],
+    alpha: number
   ): Tensor {
     if (!(tensor instanceof WASMTensor) || !(th instanceof WASMTensor)) {
       throw new Error('Can only multiply WASM tensor with WASM tensor');
     }
-    return new WASMTensor(th.wasmTensor.multiply(tensor.wasmTensor));
+    return new WASMTensor(th.wasmTensor.multiply(tensor.wasmTensor, alpha));
   }
 
   divide_impl(
     th: Tensor,
     tensor: Tensor,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    resultShape: readonly number[]
+    resultShape: readonly number[],
+    alpha: number
   ): Tensor {
     if (!(tensor instanceof WASMTensor) || !(th instanceof WASMTensor)) {
       throw new Error('Can only divide WASM tensor by WASM tensor');
     }
-    return new WASMTensor(th.wasmTensor.divide(tensor.wasmTensor));
+    return new WASMTensor(th.wasmTensor.divide(tensor.wasmTensor, alpha));
   }
 
   power_impl(

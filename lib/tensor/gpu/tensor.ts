@@ -45,6 +45,7 @@ import {SignOperation} from '../../ops/gpu/unary/sign';
 import {NegateOperation} from '../../ops/gpu/unary/negate';
 import {ClipBackwardOperation} from '../../ops/gpu/util/clipBackward';
 import {ConvTransposeOperation} from '../../ops/gpu/conv/convTranspose';
+import {MultiplyScalarOperation} from '../../ops/gpu/unary/multiplyScalar';
 
 export class GPUTensor extends Tensor implements GPUTensorI {
   public memory: MemoryEntry;
@@ -158,16 +159,29 @@ export class GPUTensor extends Tensor implements GPUTensorI {
     return defaultNegateD.calc({input: this}, this.precision) as GPUTensor;
   }
 
+  multiplyScalar(scalar: number): Tensor {
+    return defaultMultiplyScalarD.calc(
+      {input: this, scalar},
+      this.precision
+    ) as GPUTensor;
+  }
+
   sign(): Tensor {
     return defaultSignD.calc({input: this}, this.precision) as GPUTensor;
   }
 
-  add_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor {
+  add_impl(
+    th: Tensor,
+    tensor: Tensor,
+    resultShape: readonly number[],
+    alpha: number,
+    beta: number
+  ): Tensor {
     if (!(tensor instanceof GPUTensor) || !(th instanceof GPUTensor)) {
       throw new Error('Can only add GPU tensor to GPU tensor');
     }
     return defaultAddD.calc(
-      {A: th, B: tensor, outputShape: resultShape},
+      {A: th, B: tensor, outputShape: resultShape, alpha, beta},
       this.precision
     ) as GPUTensor;
   }
@@ -175,13 +189,15 @@ export class GPUTensor extends Tensor implements GPUTensorI {
   subtract_impl(
     th: Tensor,
     tensor: Tensor,
-    resultShape: readonly number[]
+    resultShape: readonly number[],
+    alpha: number,
+    beta: number
   ): Tensor {
     if (!(tensor instanceof GPUTensor) || !(th instanceof GPUTensor)) {
       throw new Error('Can only subtract GPU tensor from GPU tensor');
     }
     return defaultSubtractD.calc(
-      {A: th, B: tensor, outputShape: resultShape},
+      {A: th, B: tensor, outputShape: resultShape, alpha, beta},
       this.precision
     ) as GPUTensor;
   }
@@ -189,13 +205,14 @@ export class GPUTensor extends Tensor implements GPUTensorI {
   multiply_impl(
     th: Tensor,
     tensor: Tensor,
-    resultShape: readonly number[]
+    resultShape: readonly number[],
+    alpha: number
   ): Tensor {
     if (!(tensor instanceof GPUTensor) || !(th instanceof GPUTensor)) {
       throw new Error('Can only multiply GPU tensor with GPU tensor');
     }
     return defaultMultiplyD.calc(
-      {A: th, B: tensor, outputShape: resultShape},
+      {A: th, B: tensor, outputShape: resultShape, alpha},
       this.precision
     ) as GPUTensor;
   }
@@ -203,13 +220,14 @@ export class GPUTensor extends Tensor implements GPUTensorI {
   divide_impl(
     th: Tensor,
     tensor: Tensor,
-    resultShape: readonly number[]
+    resultShape: readonly number[],
+    alpha: number
   ): Tensor {
     if (!(tensor instanceof GPUTensor) || !(th instanceof GPUTensor)) {
       throw new Error('Can only divide GPU tensor by GPU tensor');
     }
     return defaultDivideD.calc(
-      {A: th, B: tensor, outputShape: resultShape},
+      {A: th, B: tensor, outputShape: resultShape, alpha},
       this.precision
     ) as GPUTensor;
   }
@@ -545,6 +563,9 @@ const defaultSqrtD = new Dispatcher(() => new SqrtOperation(gpuConstructor));
 const defaultLogD = new Dispatcher(() => new LogOperation(gpuConstructor));
 const defaultNegateD = new Dispatcher(
   () => new NegateOperation(gpuConstructor)
+);
+const defaultMultiplyScalarD = new Dispatcher(
+  () => new MultiplyScalarOperation(gpuConstructor)
 );
 const defaultSignD = new Dispatcher(() => new SignOperation(gpuConstructor));
 

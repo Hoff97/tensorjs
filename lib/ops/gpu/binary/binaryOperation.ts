@@ -24,8 +24,10 @@ export interface BinaryOpInput {
 }
 
 export abstract class BinaryOperation<
-  GPUTensor extends GPUTensorI
-> extends Operation<GPUTensor, BinaryOpInfo, BinaryOpInput> {
+  GPUTensor extends GPUTensorI,
+  BInfo extends BinaryOpInfo = BinaryOpInfo,
+  BInput extends BinaryOpInput = BinaryOpInput
+> extends Operation<GPUTensor, BInfo, BInput> {
   constructor(
     tensorConstructor: GPUTensorConstructor<GPUTensor>,
     allocator?: GPUMemoryAllocator
@@ -36,7 +38,7 @@ export abstract class BinaryOperation<
   abstract getOp(a: string, b: string): string;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  getFragmentShader(info: BinaryOpInfo): string {
+  getFragmentShader(info: BInfo): string {
     return `
     float process(int[${this.maxRank}] index) {
       return ${this.getOp('_A(index)', '_B(index)')};
@@ -46,7 +48,7 @@ export abstract class BinaryOperation<
     `;
   }
 
-  getOutputShape(input: BinaryOpInput): readonly number[] {
+  getOutputShape(input: BInput): readonly number[] {
     return input.outputShape;
   }
 
@@ -54,11 +56,11 @@ export abstract class BinaryOperation<
     return ['A', 'B'];
   }
 
-  calc(input: BinaryOpInput): GPUTensor {
+  calc(input: BInput): GPUTensor {
     return this.compute(input.outputShape, {A: input.A, B: input.B});
   }
 
-  compile(info: BinaryOpInfo, precision: Precision) {
+  compile(info: BInfo, precision: Precision) {
     if (info.shapeA !== undefined) {
       this.maxRank = info.shapeA.length;
     }
@@ -69,7 +71,7 @@ export abstract class BinaryOperation<
     super.compile(info, precision);
   }
 
-  getCompilationInfo(input: BinaryOpInput, precision: Precision): BinaryOpInfo {
+  getCompilationInfo(input: BInput, precision: Precision): BInfo {
     const outputSize = defaultAllocator.getAllocationDimensions(
       getSize(input.outputShape),
       precision
@@ -85,7 +87,7 @@ export abstract class BinaryOperation<
       shapeOutput: input.outputShape,
       widthOutput: outputSize.width,
       heightOutput: outputSize.height,
-    };
+    } as BInfo;
   }
 
   getInputInfoString(input: BinaryOpInput): string {
