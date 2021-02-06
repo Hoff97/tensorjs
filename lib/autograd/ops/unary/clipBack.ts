@@ -13,4 +13,10 @@ export class ClipBack implements BackwardOp {
       this.input.value.clipBackward(grad, this.min, this.max)
     );
   }
+
+  delete(): void {
+    if (!this.input.isLeaf()) {
+      this.input.delete();
+    }
+  }
 }

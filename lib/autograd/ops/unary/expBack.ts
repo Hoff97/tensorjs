@@ -8,4 +8,10 @@ export class ExpBack implements BackwardOp {
     const gradExp = grad.multiply(this.exp);
     this.input.backward(gradExp);
   }
+
+  delete(): void {
+    if (!this.input.isLeaf()) {
+      this.input.delete();
+    }
+  }
 }

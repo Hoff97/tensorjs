@@ -27,4 +27,10 @@ export class SumBack implements BackwardOp {
 
     this.input.backward(grad.expand(inShape));
   }
+
+  delete(): void {
+    if (!this.input.isLeaf()) {
+      this.input.delete();
+    }
+  }
 }

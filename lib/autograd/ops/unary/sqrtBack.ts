@@ -10,4 +10,10 @@ export class SqrtBack implements BackwardOp {
     doubleSqrt.delete();
     this.input.backward(gradSqrt);
   }
+
+  delete(): void {
+    if (!this.input.isLeaf()) {
+      this.input.delete();
+    }
+  }
 }

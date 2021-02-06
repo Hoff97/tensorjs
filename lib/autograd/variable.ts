@@ -24,19 +24,35 @@ import {GemmBack} from './ops/matMul/gemmBack';
 import {TransposeBack} from './ops/util/transposeBack';
 import {SumBack} from './ops/reduce/sumBack';
 import {SumSquareBack} from './ops/reduce/sumSquareBack';
+import {throws} from 'assert';
+
+export interface VariableOptions {
+  grad?: Tensor;
+  backEdge?: BackwardOp;
+  noGrad?: boolean;
+}
 
 export class Variable extends Tensor implements VariableI {
   public grad?: Tensor;
 
   public backEdge?: BackwardOp;
 
-  constructor(public value: Tensor, grad?: Tensor, backEdge?: BackwardOp) {
-    super();
-    this.grad = grad;
+  public noGrad: boolean;
 
-    if (backEdge !== undefined) {
-      this.backEdge = backEdge;
+  constructor(public value: Tensor, options?: VariableOptions) {
+    super();
+
+    if (options === undefined) {
+      options = {};
     }
+
+    this.grad = options.grad;
+
+    if (options.backEdge !== undefined) {
+      this.backEdge = options.backEdge;
+    }
+
+    this.noGrad = options.noGrad || false;
   }
 
   backward(grad?: Tensor) {
@@ -60,16 +76,20 @@ export class Variable extends Tensor implements VariableI {
     }
 
     if (this.backEdge !== undefined) {
-      this.backEdge.backward(this.grad);
+      this.backEdge.backward(grad);
     }
   }
 
+  isLeaf() {
+    return this.backEdge === undefined;
+  }
+
   constantLike(value: number): Tensor {
-    return new Variable(this.value.constantLike(value));
+    return new Variable(this.value.constantLike(value), {noGrad: true});
   }
 
   singleConstant(value: number): Tensor {
-    return new Variable(this.value.singleConstant(value));
+    return new Variable(this.value.singleConstant(value), {noGrad: true});
   }
 
   getValues(): Promise<TensorValues> {
@@ -85,42 +105,58 @@ export class Variable extends Tensor implements VariableI {
     if (this.grad !== undefined) {
       this.grad.delete();
     }
-    //TODO: Should the whole computation graph be deleted here?
+    if (this.backEdge !== undefined) {
+      this.backEdge.delete();
+    }
   }
 
   protected reshape_impl(shape: readonly number[], copy: boolean): Tensor {
-    return new Variable(
-      this.value.reshape(shape, copy),
-      this.grad !== undefined ? this.grad.reshape(shape, copy) : undefined,
-      new ReshapeBack(this)
-    );
+    return new Variable(this.value.reshape(shape), {
+      backEdge: this.noGrad ? undefined : new ReshapeBack(this),
+      noGrad: this.noGrad,
+    });
   }
 
   exp(): Tensor {
     const exp = this.value.exp();
-    return new Variable(exp, undefined, new ExpBack(this, exp));
+    return new Variable(exp, {
+      backEdge: this.noGrad ? undefined : new ExpBack(this, exp),
+      noGrad: this.noGrad,
+    });
   }
 
   log(): Tensor {
-    return new Variable(this.value.log(), undefined, new LogBack(this));
+    return new Variable(this.value.log(), {
+      backEdge: this.noGrad ? undefined : new LogBack(this),
+      noGrad: this.noGrad,
+    });
   }
 
   sqrt(): Tensor {
     const sqrt = this.value.sqrt();
-    return new Variable(sqrt, undefined, new SqrtBack(this, sqrt));
+    return new Variable(sqrt, {
+      backEdge: this.noGrad ? undefined : new SqrtBack(this, sqrt),
+      noGrad: this.noGrad,
+    });
   }
 
   abs(): Tensor {
-    return new Variable(this.value.abs(), undefined, new AbsBack(this));
+    return new Variable(this.value.abs(), {
+      backEdge: this.noGrad ? undefined : new AbsBack(this),
+      noGrad: this.noGrad,
+    });
   }
 
   sign(): Tensor {
     // No back edge since the gradient will be zero anyway
-    return new Variable(this.value.sqrt(), undefined);
+    return new Variable(this.value.sqrt());
   }
 
   negate(): Tensor {
-    return new Variable(this.value.negate(), undefined, new NegateBack(this));
+    return new Variable(this.value.negate(), {
+      backEdge: this.noGrad ? undefined : new NegateBack(this),
+      noGrad: this.noGrad,
+    });
   }
 
   matMul(tensor: Tensor): Tensor {
@@ -128,30 +164,25 @@ export class Variable extends Tensor implements VariableI {
       throw new Error('MatMul can only be done with another variable');
     }
 
-    return new Variable(
-      this.value.matMul(tensor.value),
-      undefined,
-      new MatMulBack(this, tensor)
-    );
+    return new Variable(this.value.matMul(tensor.value), {
+      backEdge: new MatMulBack(this, tensor),
+    });
   }
 
   concat(tensor: Tensor, axis: number): Tensor {
     if (!(tensor instanceof Variable)) {
       throw new Error('Concat can only be done with another variable');
     }
-    return new Variable(
-      this.value.concat(tensor.value, axis),
-      undefined,
-      new ConcatBack(this, tensor, axis)
-    );
+    return new Variable(this.value.concat(tensor.value, axis), {
+      backEdge: new ConcatBack(this, tensor, axis),
+    });
   }
 
   clip(min?: number, max?: number): Tensor {
-    return new Variable(
-      this.value.clip(min, max),
-      undefined,
-      new ClipBack(this, min, max)
-    );
+    return new Variable(this.value.clip(min, max), {
+      backEdge: this.noGrad ? undefined : new ClipBack(this, min, max),
+      noGrad: this.noGrad,
+    });
   }
 
   clipBackward(grad: Tensor, min?: number, max?: number): Tensor {
@@ -159,26 +190,23 @@ export class Variable extends Tensor implements VariableI {
   }
 
   repeat(repeats: number[]): Tensor {
-    return new Variable(
-      this.value.repeat(repeats),
-      undefined,
-      new RepeatBack(this, repeats)
-    );
+    return new Variable(this.value.repeat(repeats), {
+      backEdge: this.noGrad ? undefined : new RepeatBack(this, repeats),
+      noGrad: this.noGrad,
+    });
   }
 
   expand(shape: readonly number[]): Tensor {
-    return new Variable(
-      this.value.expand(shape),
-      undefined,
-      new ExpandBack(this, shape)
-    );
+    return new Variable(this.value.expand(shape), {
+      backEdge: this.noGrad ? undefined : new ExpandBack(this, shape),
+      noGrad: this.noGrad,
+    });
   }
 
   copy(): Tensor {
-    return new Variable(
-      this.value.copy(),
-      this.grad !== undefined ? this.grad.copy() : undefined
-    );
+    return new Variable(this.value.copy(), {
+      grad: this.grad !== undefined ? this.grad.copy() : undefined,
+    });
   }
 
   gather(axis: number, indices: CPUTensor): Tensor {
@@ -213,8 +241,7 @@ export class Variable extends Tensor implements VariableI {
     }
     return new Variable(
       th.value.add_impl(th.value, tensor.value, resultShape),
-      undefined,
-      new AddBack(th, tensor, resultShape)
+      {backEdge: new AddBack(th, tensor, resultShape)}
     );
   }
 
@@ -228,8 +255,7 @@ export class Variable extends Tensor implements VariableI {
     }
     return new Variable(
       th.value.subtract_impl(th.value, tensor.value, resultShape),
-      undefined,
-      new SubtractBack(th, tensor, resultShape)
+      {backEdge: new SubtractBack(th, tensor, resultShape)}
     );
   }
 
@@ -243,8 +269,7 @@ export class Variable extends Tensor implements VariableI {
     }
     return new Variable(
       th.value.multiply_impl(th.value, tensor.value, resultShape),
-      undefined,
-      new MultiplyBack(th, tensor, resultShape)
+      {backEdge: new MultiplyBack(th, tensor, resultShape)}
     );
   }
 
@@ -259,11 +284,9 @@ export class Variable extends Tensor implements VariableI {
 
     const divResult = th.value.divide_impl(th.value, tensor.value, resultShape);
 
-    return new Variable(
-      divResult,
-      undefined,
-      new DivideBack(th, tensor, divResult, resultShape)
-    );
+    return new Variable(divResult, {
+      backEdge: new DivideBack(th, tensor, divResult, resultShape),
+    });
   }
 
   power_impl(
@@ -283,11 +306,9 @@ export class Variable extends Tensor implements VariableI {
       resultShape
     );
 
-    return new Variable(
-      powerResult,
-      undefined,
-      new PowerBack(th, tensor, powerResult, resultShape)
-    );
+    return new Variable(powerResult, {
+      backEdge: new PowerBack(th, tensor, powerResult, resultShape),
+    });
   }
 
   gemm_impl(
@@ -314,25 +335,24 @@ export class Variable extends Tensor implements VariableI {
         beta,
         C !== undefined ? C.value : undefined
       ),
-      undefined,
-      new GemmBack(this, b, aTranspose, bTranspose, alpha, beta, C)
+      {backEdge: new GemmBack(this, b, aTranspose, bTranspose, alpha, beta, C)}
     );
   }
 
   protected sum_impl(axes: number[], keepDims: boolean): Tensor {
-    return new Variable(
-      this.value.sum(axes, keepDims),
-      undefined,
-      new SumBack(this, axes, keepDims)
-    );
+    return new Variable(this.value.sum(axes, keepDims), {
+      backEdge: this.noGrad ? undefined : new SumBack(this, axes, keepDims),
+      noGrad: this.noGrad,
+    });
   }
 
   protected sumSquare_impl(axes: number[], keepDims: boolean): Tensor {
-    return new Variable(
-      this.value.sumSquare(axes, keepDims),
-      undefined,
-      new SumSquareBack(this, axes, keepDims)
-    );
+    return new Variable(this.value.sumSquare(axes, keepDims), {
+      backEdge: this.noGrad
+        ? undefined
+        : new SumSquareBack(this, axes, keepDims),
+      noGrad: this.noGrad,
+    });
   }
 
   protected product_impl(axes: number[], keepDims: boolean): Tensor {
@@ -382,8 +402,17 @@ export class Variable extends Tensor implements VariableI {
         pads,
         strides
       ),
-      undefined,
-      new ConvBack(this, kernel, strides, pads, dilations, group, bias)
+      {
+        backEdge: new ConvBack(
+          this,
+          kernel,
+          strides,
+          pads,
+          dilations,
+          group,
+          bias
+        ),
+      }
     );
   }
 
@@ -410,11 +439,10 @@ export class Variable extends Tensor implements VariableI {
   }
 
   protected transpose_impl(permutation: number[]): Tensor {
-    return new Variable(
-      this.value.transpose(permutation),
-      undefined,
-      new TransposeBack(this, permutation)
-    );
+    return new Variable(this.value.transpose(permutation), {
+      backEdge: this.noGrad ? undefined : new TransposeBack(this, permutation),
+      noGrad: this.noGrad,
+    });
   }
 
   protected slice_impl(

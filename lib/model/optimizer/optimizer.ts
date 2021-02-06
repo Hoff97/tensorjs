@@ -1,5 +1,4 @@
 import {Variable} from '../../autograd/variable';
-import {Tensor} from '../../library';
 import {Module} from '../module';
 
 export abstract class Optimizer {
@@ -13,7 +12,10 @@ export abstract class Optimizer {
 
   zeroGrads() {
     for (const parameter of this.parameters) {
-      parameter.grad = undefined;
+      if (parameter.grad !== undefined) {
+        parameter.grad.delete();
+        parameter.grad = undefined;
+      }
     }
   }
 }

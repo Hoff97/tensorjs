@@ -24,16 +24,30 @@ export class AddBack implements BackwardOp {
       }
     }
 
-    if (sumADims.length === 0) {
-      this.a.backward(grad.reshape(shapeA, false));
-    } else {
-      this.a.backward(grad.sum(sumADims).reshape(shapeA, false));
+    if (!this.a.noGrad) {
+      if (sumADims.length === 0) {
+        this.a.backward(grad.reshape(shapeA, false));
+      } else {
+        this.a.backward(grad.sum(sumADims).reshape(shapeA, false));
+      }
     }
 
-    if (sumBDims.length === 0) {
-      this.b.backward(grad.reshape(shapeB, false));
-    } else {
-      this.b.backward(grad.sum(sumBDims).reshape(shapeB, false));
+    if (!this.b.noGrad) {
+      if (sumBDims.length === 0) {
+        this.b.backward(grad.reshape(shapeB, false));
+      } else {
+        this.b.backward(grad.sum(sumBDims).reshape(shapeB, false));
+      }
+    }
+  }
+
+  delete(): void {
+    if (!this.a.isLeaf()) {
+      this.a.delete();
+    }
+
+    if (!this.b.isLeaf()) {
+      this.b.delete();
     }
   }
 }

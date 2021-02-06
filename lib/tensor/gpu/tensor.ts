@@ -115,10 +115,12 @@ export class GPUTensor extends Tensor implements GPUTensorI {
   }
 
   delete(): void {
-    this.deleted = true;
-    defaultAllocator.deallocate(this.memory);
-    //@ts-ignore
-    this.memory = undefined;
+    if (!this.deleted) {
+      this.deleted = true;
+      defaultAllocator.deallocate(this.memory);
+      //@ts-ignore
+      this.memory = undefined;
+    }
   }
 
   copy(precision?: Precision): Tensor {

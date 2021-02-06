@@ -11,7 +11,7 @@ export class SGD extends Optimizer {
     super(model);
 
     this.lrTensor = new CPUTensor([1], [lr]);
-    toBackend(this.lrTensor, this.model.backend).then(x => {
+    toBackend(this.lrTensor, this.model.backend, 32).then(x => {
       this.lrTensor = x;
     });
   }

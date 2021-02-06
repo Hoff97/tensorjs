@@ -20,4 +20,10 @@ export class ExpandBack implements BackwardOp {
 
     this.a.backward(grad.sum(sumDims).reshape(this.a.getShape()));
   }
+
+  delete(): void {
+    if (!this.a.isLeaf()) {
+      this.a.delete();
+    }
+  }
 }

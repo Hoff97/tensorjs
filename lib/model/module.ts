@@ -1,6 +1,6 @@
 import {Variable} from '../autograd/variable';
-import Tensor from '../types';
-import {Backend, toCPU} from '../util/convert';
+import Tensor, {Precision} from '../types';
+import {Backend, toCPU, toWASM, toGPU} from '../util/convert';
 
 export abstract class Module {
   public backend: Backend = 'CPU';
@@ -73,17 +73,17 @@ export abstract class Module {
     this.backend = 'WASM';
   }
 
-  async toGPU() {
+  async toGPU(precision: Precision) {
     const submodules = this.getSubModules();
     for (const submodule of submodules) {
-      await submodule.toGPU();
+      await submodule.toGPU(precision);
     }
 
     for (const k of Object.keys(this)) {
       //@ts-ignore
       if (this[k] instanceof Tensor) {
         //@ts-ignore
-        this[k] = await toGPU(this[k]);
+        this[k] = await toGPU(this[k], precision);
       }
     }
 

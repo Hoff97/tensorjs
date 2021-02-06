@@ -12,4 +12,10 @@ export class TransposeBack implements BackwardOp {
 
     this.a.backward(grad.transpose(inversePerm));
   }
+
+  delete(): void {
+    if (!this.a.isLeaf()) {
+      this.a.delete();
+    }
+  }
 }

@@ -515,6 +515,14 @@ export abstract class Operation<
     //@ts-ignore
     const result = this.allocator.allocate(resultSize, this.precision);
 
+    for (const i in inputTensors) {
+      const t = inputTensors[i];
+      if (t.memory.id === result.id) {
+        throw new Error(`Allocator return a framebuffer that is also an input
+                         Did you delete a GPU tensor that was still used elsewhere?`);
+      }
+    }
+
     const inputTextures: {[name: string]: Framebuffer2D} = {};
     for (const name in inputTensors) {
       inputTextures[name] = inputTensors[name].memory.frameBuffer;

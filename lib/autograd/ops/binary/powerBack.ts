@@ -25,41 +25,55 @@ export class PowerBack implements BackwardOp {
       }
     }
 
-    if (sumADims.length === 0) {
-      const multiplied = this.powerResult.multiply(this.b.value);
-      const divided = multiplied.divide(this.a.value);
-      multiplied.delete();
-      const gradPowA = grad.multiply(divided);
-      divided.delete();
-      this.a.backward(gradPowA.reshape(shapeA, false));
-    } else {
-      const multiplied = this.powerResult.multiply(this.b.value);
-      const divided = multiplied.divide(this.a.value);
-      multiplied.delete();
-      const gradPowA = grad.multiply(divided);
-      divided.delete();
-      const summed = gradPowA.sum(sumADims);
-      gradPowA.delete();
-      this.a.backward(summed.reshape(shapeA, false));
+    if (!this.a.noGrad) {
+      if (sumADims.length === 0) {
+        const multiplied = this.powerResult.multiply(this.b.value);
+        const divided = multiplied.divide(this.a.value);
+        multiplied.delete();
+        const gradPowA = grad.multiply(divided);
+        divided.delete();
+        this.a.backward(gradPowA.reshape(shapeA, false));
+      } else {
+        const multiplied = this.powerResult.multiply(this.b.value);
+        const divided = multiplied.divide(this.a.value);
+        multiplied.delete();
+        const gradPowA = grad.multiply(divided);
+        divided.delete();
+        const summed = gradPowA.sum(sumADims);
+        gradPowA.delete();
+        this.a.backward(summed.reshape(shapeA, false));
+      }
     }
 
-    if (sumBDims.length === 0) {
-      const lnA = this.a.value.log();
-      const mult = this.powerResult.multiply(lnA);
-      lnA.delete();
-      const gradB = grad.multiply(mult);
-      mult.delete();
+    if (!this.b.noGrad) {
+      if (sumBDims.length === 0) {
+        const lnA = this.a.value.log();
+        const mult = this.powerResult.multiply(lnA);
+        lnA.delete();
+        const gradB = grad.multiply(mult);
+        mult.delete();
 
-      this.b.backward(gradB.reshape(shapeB, false));
-    } else {
-      const lnA = this.a.value.log();
-      const mult = this.powerResult.multiply(lnA);
-      lnA.delete();
-      const gradB = grad.multiply(mult);
-      mult.delete();
-      const summed = gradB.sum(sumBDims);
-      gradB.delete();
-      this.b.backward(summed.reshape(shapeB, false));
+        this.b.backward(gradB.reshape(shapeB, false));
+      } else {
+        const lnA = this.a.value.log();
+        const mult = this.powerResult.multiply(lnA);
+        lnA.delete();
+        const gradB = grad.multiply(mult);
+        mult.delete();
+        const summed = gradB.sum(sumBDims);
+        gradB.delete();
+        this.b.backward(summed.reshape(shapeB, false));
+      }
+    }
+  }
+
+  delete(): void {
+    if (!this.a.isLeaf()) {
+      this.a.delete();
+    }
+
+    if (!this.b.isLeaf()) {
+      this.b.delete();
     }
   }
 }

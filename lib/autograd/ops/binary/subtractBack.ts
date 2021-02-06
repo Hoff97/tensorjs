@@ -24,19 +24,33 @@ export class SubtractBack implements BackwardOp {
       }
     }
 
-    if (sumADims.length === 0) {
-      this.a.backward(grad.reshape(shapeA, false));
-    } else {
-      this.a.backward(grad.sum(sumADims).reshape(shapeA, false));
+    if (!this.a.noGrad) {
+      if (sumADims.length === 0) {
+        this.a.backward(grad.reshape(shapeA));
+      } else {
+        this.a.backward(grad.sum(sumADims).reshape(shapeA, false));
+      }
     }
 
-    if (sumBDims.length === 0) {
-      this.b.backward(grad.negate().reshape(shapeB, false));
-    } else {
-      const summed = grad.sum(sumBDims);
-      const negated = summed.negate();
-      summed.delete();
-      this.b.backward(negated.reshape(shapeB, false));
+    if (!this.b.noGrad) {
+      if (sumBDims.length === 0) {
+        this.b.backward(grad.negate().reshape(shapeB, false));
+      } else {
+        const summed = grad.sum(sumBDims);
+        const negated = summed.negate();
+        summed.delete();
+        this.b.backward(negated.reshape(shapeB, false));
+      }
+    }
+  }
+
+  delete(): void {
+    if (!this.a.isLeaf()) {
+      this.a.delete();
+    }
+
+    if (!this.b.isLeaf()) {
+      this.b.delete();
     }
   }
 }

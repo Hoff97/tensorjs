@@ -7,7 +7,14 @@ export class ReshapeBack implements BackwardOp {
   backward(grad: Tensor): void {
     const shapeA = this.a.getShape();
 
-    //TODO: Should copy=False really be set here?
-    this.a.backward(grad.reshape(shapeA, false));
+    if (!this.a.noGrad) {
+      this.a.backward(grad.reshape(shapeA));
+    }
+  }
+
+  delete(): void {
+    if (!this.a.isLeaf()) {
+      this.a.delete();
+    }
   }
 }

@@ -10,4 +10,10 @@ export class AbsBack implements BackwardOp {
     sign.delete();
     this.input.backward(gradAbs);
   }
+
+  delete(): void {
+    if (!this.input.isLeaf()) {
+      this.input.delete();
+    }
+  }
 }

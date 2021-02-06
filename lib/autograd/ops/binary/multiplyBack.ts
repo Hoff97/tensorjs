@@ -24,22 +24,36 @@ export class MultiplyBack implements BackwardOp {
       }
     }
 
-    if (sumADims.length === 0) {
-      this.a.backward(grad.multiply(this.b.value).reshape(shapeA, false));
-    } else {
-      const mult = grad.multiply(this.b.value);
-      const summed = mult.sum(sumADims);
-      mult.delete();
-      this.a.backward(summed.reshape(shapeA, false));
+    if (!this.a.noGrad) {
+      if (sumADims.length === 0) {
+        this.a.backward(grad.multiply(this.b.value).reshape(shapeA, false));
+      } else {
+        const mult = grad.multiply(this.b.value);
+        const summed = mult.sum(sumADims);
+        mult.delete();
+        this.a.backward(summed.reshape(shapeA, false));
+      }
     }
 
-    if (sumBDims.length === 0) {
-      this.b.backward(grad.multiply(this.a.value).reshape(shapeB, false));
-    } else {
-      const mult = grad.multiply(this.a.value);
-      const summed = mult.sum(sumBDims);
-      mult.delete();
-      this.b.backward(summed.reshape(shapeB, false));
+    if (!this.b.noGrad) {
+      if (sumBDims.length === 0) {
+        this.b.backward(grad.multiply(this.a.value).reshape(shapeB, false));
+      } else {
+        const mult = grad.multiply(this.a.value);
+        const summed = mult.sum(sumBDims);
+        mult.delete();
+        this.b.backward(summed.reshape(shapeB, false));
+      }
+    }
+  }
+
+  delete(): void {
+    if (!this.a.isLeaf()) {
+      this.a.delete();
+    }
+
+    if (!this.b.isLeaf()) {
+      this.b.delete();
     }
   }
 }

@@ -7,4 +7,10 @@ export class NegateBack implements BackwardOp {
   backward(grad: Tensor): void {
     this.input.backward(grad.negate());
   }
+
+  delete(): void {
+    if (!this.input.isLeaf()) {
+      this.input.delete();
+    }
+  }
 }

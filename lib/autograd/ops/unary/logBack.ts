@@ -8,4 +8,10 @@ export class LogBack implements BackwardOp {
     const gradLog = grad.divide(this.input.value);
     this.input.backward(gradLog);
   }
+
+  delete(): void {
+    if (!this.input.isLeaf()) {
+      this.input.delete();
+    }
+  }
 }

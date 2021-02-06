@@ -25,10 +25,9 @@ export async function toBackend(
 
 export async function toCPU(tensor: Tensor): Promise<Tensor> {
   if (tensor instanceof Variable) {
-    return new Variable(
-      await toCPU(tensor.value),
-      tensor.grad !== undefined ? await toCPU(tensor.grad) : undefined
-    );
+    return new Variable(await toCPU(tensor.value), {
+      grad: tensor.grad !== undefined ? await toCPU(tensor.grad) : undefined,
+    });
   }
   if (tensor instanceof CPUTensor) {
     return tensor;
@@ -39,10 +38,9 @@ export async function toCPU(tensor: Tensor): Promise<Tensor> {
 
 export async function toWASM(tensor: Tensor): Promise<Tensor> {
   if (tensor instanceof Variable) {
-    return new Variable(
-      await toWASM(tensor.value),
-      tensor.grad !== undefined ? await toWASM(tensor.grad) : undefined
-    );
+    return new Variable(await toWASM(tensor.value), {
+      grad: tensor.grad !== undefined ? await toWASM(tensor.grad) : undefined,
+    });
   }
   if (tensor instanceof WASMTensor) {
     return tensor;
@@ -62,12 +60,12 @@ export async function toGPU(
   precision: Precision
 ): Promise<Tensor> {
   if (tensor instanceof Variable) {
-    return new Variable(
-      await toGPU(tensor.value, precision),
-      tensor.grad !== undefined
-        ? await toGPU(tensor.grad, precision)
-        : undefined
-    );
+    return new Variable(await toGPU(tensor.value, precision), {
+      grad:
+        tensor.grad !== undefined
+          ? await toGPU(tensor.grad, precision)
+          : undefined,
+    });
   }
   if (tensor instanceof GPUTensor) {
     return tensor;

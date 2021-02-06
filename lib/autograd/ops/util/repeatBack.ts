@@ -16,4 +16,10 @@ export class RepeatBack implements BackwardOp {
 
     this.a.backward(grad.reshape(gradNewShape, false).sum(sumAxes, false));
   }
+
+  delete(): void {
+    if (!this.a.isLeaf()) {
+      this.a.delete();
+    }
+  }
 }

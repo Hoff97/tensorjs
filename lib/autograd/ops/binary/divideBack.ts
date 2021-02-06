@@ -25,32 +25,46 @@ export class DivideBack implements BackwardOp {
       }
     }
 
-    if (sumADims.length === 0) {
-      this.a.backward(grad.divide(this.b.value).reshape(shapeA, false));
-    } else {
-      const mult = grad.divide(this.b.value);
-      const summed = mult.sum(sumADims);
-      mult.delete();
-      this.a.backward(summed.reshape(shapeA, false));
+    if (!this.a.noGrad) {
+      if (sumADims.length === 0) {
+        this.a.backward(grad.divide(this.b.value).reshape(shapeA, false));
+      } else {
+        const mult = grad.divide(this.b.value);
+        const summed = mult.sum(sumADims);
+        mult.delete();
+        this.a.backward(summed.reshape(shapeA, false));
+      }
     }
 
-    if (sumBDims.length === 0) {
-      const multiplied = grad.multiply(this.divResult);
-      const divided = multiplied.divide(this.b.value);
-      multiplied.delete();
-      const negated = divided.negate();
-      divided.delete();
+    if (!this.b.noGrad) {
+      if (sumBDims.length === 0) {
+        const multiplied = grad.multiply(this.divResult);
+        const divided = multiplied.divide(this.b.value);
+        multiplied.delete();
+        const negated = divided.negate();
+        divided.delete();
 
-      this.b.backward(negated.reshape(shapeB, false));
-    } else {
-      const multiplied = grad.multiply(this.divResult);
-      const divided = multiplied.divide(this.b.value);
-      multiplied.delete();
-      const negated = divided.negate();
-      divided.delete();
-      const summed = negated.sum(sumBDims);
-      negated.delete();
-      this.b.backward(summed.reshape(shapeB, false));
+        this.b.backward(negated.reshape(shapeB, false));
+      } else {
+        const multiplied = grad.multiply(this.divResult);
+        const divided = multiplied.divide(this.b.value);
+        multiplied.delete();
+        const negated = divided.negate();
+        divided.delete();
+        const summed = negated.sum(sumBDims);
+        negated.delete();
+        this.b.backward(summed.reshape(shapeB, false));
+      }
+    }
+  }
+
+  delete(): void {
+    if (!this.a.isLeaf()) {
+      this.a.delete();
+    }
+
+    if (!this.b.isLeaf()) {
+      this.b.delete();
     }
   }
 }

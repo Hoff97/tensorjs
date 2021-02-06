@@ -13,23 +13,27 @@ export class GemmBack implements BackwardOp {
   ) {}
 
   backward(grad: Tensor): void {
-    if (this.transB) {
-      const gradB = grad.gemm(this.a.value, true, this.transA, this.alpha);
-      this.b.backward(gradB);
-    } else {
-      const gradB = this.a.value.gemm(grad, !this.transA, false, this.alpha);
-      this.b.backward(gradB);
+    if (!this.b.noGrad) {
+      if (this.transB) {
+        const gradB = grad.gemm(this.a.value, true, this.transA, this.alpha);
+        this.b.backward(gradB);
+      } else {
+        const gradB = this.a.value.gemm(grad, !this.transA, false, this.alpha);
+        this.b.backward(gradB);
+      }
     }
 
-    if (this.transA) {
-      const gradA = this.b.value.gemm(grad, this.transB, true, this.alpha);
-      this.a.backward(gradA);
-    } else {
-      const gradA = grad.gemm(this.b.value, false, !this.transB, this.alpha);
-      this.a.backward(gradA);
+    if (!this.a.noGrad) {
+      if (this.transA) {
+        const gradA = this.b.value.gemm(grad, this.transB, true, this.alpha);
+        this.a.backward(gradA);
+      } else {
+        const gradA = grad.gemm(this.b.value, false, !this.transB, this.alpha);
+        this.a.backward(gradA);
+      }
     }
 
-    if (this.c !== undefined) {
+    if (this.c !== undefined && !this.c.noGrad) {
       const gradShape = grad.getShape();
       const cShape = this.c.getShape();
       const cSumDims = [];
@@ -46,6 +50,20 @@ export class GemmBack implements BackwardOp {
       }
 
       this.c.backward(gradC);
+    }
+  }
+
+  delete(): void {
+    if (!this.a.isLeaf()) {
+      this.a.delete();
+    }
+
+    if (!this.b.isLeaf()) {
+      this.b.delete();
+    }
+
+    if (this.c !== undefined && !this.c.isLeaf()) {
+      this.c.delete();
     }
   }
 }
