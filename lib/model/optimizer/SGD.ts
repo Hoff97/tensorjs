@@ -9,11 +9,6 @@ export class SGD extends Optimizer {
 
   constructor(model: Module, public lr = 0.001) {
     super(model);
-
-    this.lrTensor = new CPUTensor([1], [lr]);
-    toBackend(this.lrTensor, this.model.backend, 32).then(x => {
-      this.lrTensor = x;
-    });
   }
 
   step(): void {
@@ -21,10 +16,8 @@ export class SGD extends Optimizer {
       if (parameter.grad !== undefined) {
         const oldValue = parameter.value;
 
-        const scaled = parameter.grad.multiply(this.lrTensor);
-        parameter.value = parameter.value.subtract(scaled);
+        parameter.value = parameter.value.subtract(parameter.grad, this.lr);
 
-        scaled.delete();
         oldValue.delete();
       }
     }
