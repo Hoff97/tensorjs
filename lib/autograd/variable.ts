@@ -111,7 +111,7 @@ export class Variable extends Tensor implements VariableI {
   }
 
   protected reshape_impl(shape: readonly number[], copy: boolean): Tensor {
-    return new Variable(this.value.reshape(shape), {
+    return new Variable(this.value.reshape(shape, copy), {
       backEdge: this.noGrad ? undefined : new ReshapeBack(this),
       noGrad: this.noGrad,
     });
@@ -164,8 +164,11 @@ export class Variable extends Tensor implements VariableI {
       throw new Error('MatMul can only be done with another variable');
     }
 
+    const noGrad = this.noGrad && tensor.noGrad;
+
     return new Variable(this.value.matMul(tensor.value), {
-      backEdge: new MatMulBack(this, tensor),
+      backEdge: noGrad ? undefined : new MatMulBack(this, tensor),
+      noGrad,
     });
   }
 
@@ -173,8 +176,12 @@ export class Variable extends Tensor implements VariableI {
     if (!(tensor instanceof Variable)) {
       throw new Error('Concat can only be done with another variable');
     }
+
+    const noGrad = this.noGrad && tensor.noGrad;
+
     return new Variable(this.value.concat(tensor.value, axis), {
-      backEdge: new ConcatBack(this, tensor, axis),
+      backEdge: noGrad ? undefined : new ConcatBack(this, tensor, axis),
+      noGrad,
     });
   }
 
@@ -239,9 +246,15 @@ export class Variable extends Tensor implements VariableI {
     if (!(tensor instanceof Variable) || !(th instanceof Variable)) {
       throw new Error('Can only add Variable tensor to Variable tensor');
     }
+
+    const noGrad = th.noGrad && tensor.noGrad;
+
     return new Variable(
       th.value.add_impl(th.value, tensor.value, resultShape),
-      {backEdge: new AddBack(th, tensor, resultShape)}
+      {
+        backEdge: noGrad ? undefined : new AddBack(th, tensor, resultShape),
+        noGrad,
+      }
     );
   }
 
@@ -253,9 +266,17 @@ export class Variable extends Tensor implements VariableI {
     if (!(tensor instanceof Variable) || !(th instanceof Variable)) {
       throw new Error('Can only add Variable tensor to Variable tensor');
     }
+
+    const noGrad = th.noGrad && tensor.noGrad;
+
     return new Variable(
       th.value.subtract_impl(th.value, tensor.value, resultShape),
-      {backEdge: new SubtractBack(th, tensor, resultShape)}
+      {
+        backEdge: noGrad
+          ? undefined
+          : new SubtractBack(th, tensor, resultShape),
+        noGrad,
+      }
     );
   }
 
@@ -267,9 +288,17 @@ export class Variable extends Tensor implements VariableI {
     if (!(tensor instanceof Variable) || !(th instanceof Variable)) {
       throw new Error('Can only add Variable tensor to Variable tensor');
     }
+
+    const noGrad = th.noGrad && tensor.noGrad;
+
     return new Variable(
       th.value.multiply_impl(th.value, tensor.value, resultShape),
-      {backEdge: new MultiplyBack(th, tensor, resultShape)}
+      {
+        backEdge: noGrad
+          ? undefined
+          : new MultiplyBack(th, tensor, resultShape),
+        noGrad,
+      }
     );
   }
 
@@ -283,9 +312,13 @@ export class Variable extends Tensor implements VariableI {
     }
 
     const divResult = th.value.divide_impl(th.value, tensor.value, resultShape);
+    const noGrad = th.noGrad && tensor.noGrad;
 
     return new Variable(divResult, {
-      backEdge: new DivideBack(th, tensor, divResult, resultShape),
+      backEdge: noGrad
+        ? undefined
+        : new DivideBack(th, tensor, divResult, resultShape),
+      noGrad,
     });
   }
 
@@ -306,8 +339,13 @@ export class Variable extends Tensor implements VariableI {
       resultShape
     );
 
+    const noGrad = th.noGrad && tensor.noGrad;
+
     return new Variable(powerResult, {
-      backEdge: new PowerBack(th, tensor, powerResult, resultShape),
+      backEdge: noGrad
+        ? undefined
+        : new PowerBack(th, tensor, powerResult, resultShape),
+      noGrad,
     });
   }
 
@@ -326,6 +364,9 @@ export class Variable extends Tensor implements VariableI {
       throw new Error('Can only do gemm with variable tensors');
     }
 
+    const noGrad =
+      this.noGrad && b.noGrad && (C !== undefined ? C.noGrad : true);
+
     return new Variable(
       this.value.gemm_impl(
         b.value,
@@ -335,7 +376,12 @@ export class Variable extends Tensor implements VariableI {
         beta,
         C !== undefined ? C.value : undefined
       ),
-      {backEdge: new GemmBack(this, b, aTranspose, bTranspose, alpha, beta, C)}
+      {
+        backEdge: noGrad
+          ? undefined
+          : new GemmBack(this, b, aTranspose, bTranspose, alpha, beta, C),
+        noGrad,
+      }
     );
   }
 
@@ -393,6 +439,9 @@ export class Variable extends Tensor implements VariableI {
       throw new Error('Activation has to be ID for convolution with variables');
     }
 
+    const noGrad =
+      this.noGrad && kernel.noGrad && (bias !== undefined ? bias.noGrad : true);
+
     return new Variable(
       this.value.conv(
         kernel.value,
@@ -403,15 +452,10 @@ export class Variable extends Tensor implements VariableI {
         strides
       ),
       {
-        backEdge: new ConvBack(
-          this,
-          kernel,
-          strides,
-          pads,
-          dilations,
-          group,
-          bias
-        ),
+        backEdge: noGrad
+          ? undefined
+          : new ConvBack(this, kernel, strides, pads, dilations, group, bias),
+        noGrad,
       }
     );
   }
