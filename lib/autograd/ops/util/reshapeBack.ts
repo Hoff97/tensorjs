@@ -8,7 +8,11 @@ export class ReshapeBack implements BackwardOp {
     const shapeA = this.a.getShape();
 
     if (!this.a.noGrad) {
-      this.a.backward(grad.reshape(shapeA));
+      const gradA = grad.reshape(shapeA);
+      const needed = this.a.backward(gradA);
+      if (!needed) {
+        gradA.delete();
+      }
     }
   }
 

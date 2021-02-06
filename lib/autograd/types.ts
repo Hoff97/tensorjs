@@ -12,7 +12,7 @@ export interface VariableI extends Tensor {
 
   noGrad: boolean;
 
-  backward(grad: Tensor): void;
+  backward(grad: Tensor): boolean;
 
   isLeaf(): boolean;
   delete(): void;

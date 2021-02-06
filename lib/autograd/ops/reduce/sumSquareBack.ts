@@ -27,8 +27,12 @@ export class SumSquareBack implements BackwardOp {
 
     const expanded = grad.expand(inShape);
     const gradIn = expanded.multiply(this.input.value, 2);
+    expanded.delete();
 
-    this.input.backward(gradIn);
+    const needed = this.input.backward(gradIn);
+    if (!needed) {
+      gradIn.delete();
+    }
   }
 
   delete(): void {

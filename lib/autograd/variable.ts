@@ -56,7 +56,10 @@ export class Variable extends Tensor implements VariableI {
     this.noGrad = options.noGrad || false;
   }
 
-  backward(grad?: Tensor) {
+  /**
+   * Performs a backward pass and returns wether the grad is needed or can be deleted
+   */
+  backward(grad?: Tensor): boolean {
     if (grad === undefined) {
       const ownShape = this.value.getShape();
       if (ownShape.length === 1 && ownShape[0] === 1) {
@@ -68,17 +71,21 @@ export class Variable extends Tensor implements VariableI {
       }
     }
 
+    let needed = false;
+
     if (this.grad !== undefined) {
       const oldGrad = this.grad;
       this.grad = this.grad.add(grad);
       oldGrad.delete();
     } else {
       this.grad = grad;
+      needed = true;
     }
 
     if (this.backEdge !== undefined) {
       this.backEdge.backward(grad);
     }
+    return needed;
   }
 
   isLeaf() {

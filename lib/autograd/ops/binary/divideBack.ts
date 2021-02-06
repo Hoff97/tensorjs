@@ -27,32 +27,40 @@ export class DivideBack implements BackwardOp {
     }
 
     if (!this.a.noGrad) {
+      let gradA: Tensor;
       if (sumADims.length === 0) {
-        this.a.backward(
-          grad.divide(this.b.value, this.alpha).reshape(shapeA, false)
-        );
+        gradA = grad.divide(this.b.value, this.alpha).reshape(shapeA, false);
       } else {
         const mult = grad.divide(this.b.value, this.alpha);
         const summed = mult.sum(sumADims);
         mult.delete();
-        this.a.backward(summed.reshape(shapeA, false));
+        gradA = summed.reshape(shapeA, false);
+      }
+      const needed = this.a.backward(gradA);
+      if (!needed) {
+        gradA.delete();
       }
     }
 
     if (!this.b.noGrad) {
+      let gradB: Tensor;
       if (sumBDims.length === 0) {
         const multiplied = grad.multiply(this.divResult);
         const divided = multiplied.divide(this.b.value, -this.alpha);
         multiplied.delete();
 
-        this.b.backward(divided.reshape(shapeB, false));
+        gradB = divided.reshape(shapeB, false);
       } else {
         const multiplied = grad.multiply(this.divResult);
         const divided = multiplied.divide(this.b.value, -this.alpha);
         multiplied.delete();
         const summed = divided.sum(sumBDims);
         divided.delete();
-        this.b.backward(summed.reshape(shapeB, false));
+        gradB = summed.reshape(shapeB, false);
+      }
+      const needed = this.b.backward(gradB);
+      if (!needed) {
+        gradB.delete();
       }
     }
   }

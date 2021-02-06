@@ -27,34 +27,42 @@ export class SubtractBack implements BackwardOp {
     }
 
     if (!this.a.noGrad) {
+      let gradA: Tensor;
       if (sumADims.length === 0) {
         if (this.alpha === 1) {
-          this.a.backward(grad.reshape(shapeA));
+          gradA = grad.reshape(shapeA);
         } else {
-          this.a.backward(
-            grad.multiplyScalar(this.alpha).reshape(shapeA, false)
-          );
+          gradA = grad.multiplyScalar(this.alpha).reshape(shapeA, false);
         }
       } else {
         if (this.alpha === 1) {
-          this.a.backward(grad.sum(sumADims).reshape(shapeA, false));
+          gradA = grad.sum(sumADims).reshape(shapeA, false);
         } else {
           const summed = grad.sum(sumADims);
           const scaled = summed.multiplyScalar(this.alpha);
           summed.delete();
-          this.a.backward(scaled.reshape(shapeA, false));
+          gradA = scaled.reshape(shapeA, false);
         }
+      }
+      const needed = this.a.backward(gradA);
+      if (!needed) {
+        gradA.delete();
       }
     }
 
     if (!this.b.noGrad) {
+      let gradB: Tensor;
       if (sumBDims.length === 0) {
-        this.b.backward(grad.multiplyScalar(-this.beta).reshape(shapeB, false));
+        gradB = grad.multiplyScalar(-this.beta).reshape(shapeB, false);
       } else {
         const summed = grad.sum(sumBDims);
         const scaled = summed.multiplyScalar(-this.beta);
         summed.delete();
-        this.b.backward(scaled.reshape(shapeB, false));
+        gradB = scaled.reshape(shapeB, false);
+      }
+      const needed = this.b.backward(gradB);
+      if (!needed) {
+        gradB.delete();
       }
     }
   }

@@ -14,22 +14,28 @@ export class GemmBack implements BackwardOp {
 
   backward(grad: Tensor): void {
     if (!this.b.noGrad) {
+      let gradB: Tensor;
       if (this.transB) {
-        const gradB = grad.gemm(this.a.value, true, this.transA, this.alpha);
-        this.b.backward(gradB);
+        gradB = grad.gemm(this.a.value, true, this.transA, this.alpha);
       } else {
-        const gradB = this.a.value.gemm(grad, !this.transA, false, this.alpha);
-        this.b.backward(gradB);
+        gradB = this.a.value.gemm(grad, !this.transA, false, this.alpha);
+      }
+      const needed = this.b.backward(gradB);
+      if (!needed) {
+        gradB.delete();
       }
     }
 
     if (!this.a.noGrad) {
+      let gradA: Tensor;
       if (this.transA) {
-        const gradA = this.b.value.gemm(grad, this.transB, true, this.alpha);
-        this.a.backward(gradA);
+        gradA = this.b.value.gemm(grad, this.transB, true, this.alpha);
       } else {
-        const gradA = grad.gemm(this.b.value, false, !this.transB, this.alpha);
-        this.a.backward(gradA);
+        gradA = grad.gemm(this.b.value, false, !this.transB, this.alpha);
+      }
+      const needed = this.a.backward(gradA);
+      if (!needed) {
+        gradA.delete();
       }
     }
 
@@ -46,10 +52,15 @@ export class GemmBack implements BackwardOp {
 
       let gradC = grad.sum(cSumDims).reshape(cShape, false);
       if (this.beta !== 1) {
+        const oldGradC = gradC;
         gradC = gradC.multiplyScalar(this.beta);
+        oldGradC.delete();
       }
 
-      this.c.backward(gradC);
+      const needed = this.c.backward(gradC);
+      if (!needed) {
+        gradC.delete();
+      }
     }
   }
 

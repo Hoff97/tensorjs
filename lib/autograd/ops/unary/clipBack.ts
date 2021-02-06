@@ -9,9 +9,11 @@ export class ClipBack implements BackwardOp {
   ) {}
 
   backward(grad: Tensor): void {
-    this.input.backward(
-      this.input.value.clipBackward(grad, this.min, this.max)
-    );
+    const gradIn = this.input.value.clipBackward(grad, this.min, this.max);
+    const needed = this.input.backward(gradIn);
+    if (!needed) {
+      gradIn.delete();
+    }
   }
 
   delete(): void {
