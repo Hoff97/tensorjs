@@ -25,6 +25,7 @@ import {TransposeBack} from './ops/util/transposeBack';
 import {SumBack} from './ops/reduce/sumBack';
 import {SumSquareBack} from './ops/reduce/sumSquareBack';
 import {throws} from 'assert';
+import {MultiplyScalarBack} from './ops/unary/multiplyScalarBack';
 
 export interface VariableOptions {
   grad?: Tensor;
@@ -159,6 +160,13 @@ export class Variable extends Tensor implements VariableI {
     });
   }
 
+  multiplyScalar(value: number): Tensor {
+    return new Variable(this.value.multiplyScalar(value), {
+      backEdge: this.noGrad ? undefined : new MultiplyScalarBack(this, value),
+      noGrad: this.noGrad,
+    });
+  }
+
   matMul(tensor: Tensor): Tensor {
     if (!(tensor instanceof Variable)) {
       throw new Error('MatMul can only be done with another variable');
@@ -242,7 +250,13 @@ export class Variable extends Tensor implements VariableI {
     throw new Error('Method not implemented.');
   }
 
-  add_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor {
+  add_impl(
+    th: Tensor,
+    tensor: Tensor,
+    resultShape: readonly number[],
+    alpha: number,
+    beta: number
+  ): Tensor {
     if (!(tensor instanceof Variable) || !(th instanceof Variable)) {
       throw new Error('Can only add Variable tensor to Variable tensor');
     }
@@ -250,9 +264,11 @@ export class Variable extends Tensor implements VariableI {
     const noGrad = th.noGrad && tensor.noGrad;
 
     return new Variable(
-      th.value.add_impl(th.value, tensor.value, resultShape),
+      th.value.add_impl(th.value, tensor.value, resultShape, alpha, beta),
       {
-        backEdge: noGrad ? undefined : new AddBack(th, tensor, resultShape),
+        backEdge: noGrad
+          ? undefined
+          : new AddBack(th, tensor, resultShape, alpha, beta),
         noGrad,
       }
     );
@@ -261,7 +277,9 @@ export class Variable extends Tensor implements VariableI {
   subtract_impl(
     th: Tensor,
     tensor: Tensor,
-    resultShape: readonly number[]
+    resultShape: readonly number[],
+    alpha: number,
+    beta: number
   ): Tensor {
     if (!(tensor instanceof Variable) || !(th instanceof Variable)) {
       throw new Error('Can only add Variable tensor to Variable tensor');
@@ -270,11 +288,11 @@ export class Variable extends Tensor implements VariableI {
     const noGrad = th.noGrad && tensor.noGrad;
 
     return new Variable(
-      th.value.subtract_impl(th.value, tensor.value, resultShape),
+      th.value.subtract_impl(th.value, tensor.value, resultShape, alpha, beta),
       {
         backEdge: noGrad
           ? undefined
-          : new SubtractBack(th, tensor, resultShape),
+          : new SubtractBack(th, tensor, resultShape, alpha, beta),
         noGrad,
       }
     );
@@ -283,7 +301,8 @@ export class Variable extends Tensor implements VariableI {
   multiply_impl(
     th: Tensor,
     tensor: Tensor,
-    resultShape: readonly number[]
+    resultShape: readonly number[],
+    alpha: number
   ): Tensor {
     if (!(tensor instanceof Variable) || !(th instanceof Variable)) {
       throw new Error('Can only add Variable tensor to Variable tensor');
@@ -292,11 +311,11 @@ export class Variable extends Tensor implements VariableI {
     const noGrad = th.noGrad && tensor.noGrad;
 
     return new Variable(
-      th.value.multiply_impl(th.value, tensor.value, resultShape),
+      th.value.multiply_impl(th.value, tensor.value, resultShape, alpha),
       {
         backEdge: noGrad
           ? undefined
-          : new MultiplyBack(th, tensor, resultShape),
+          : new MultiplyBack(th, tensor, resultShape, alpha),
         noGrad,
       }
     );
@@ -305,19 +324,25 @@ export class Variable extends Tensor implements VariableI {
   divide_impl(
     th: Tensor,
     tensor: Tensor,
-    resultShape: readonly number[]
+    resultShape: readonly number[],
+    alpha: number
   ): Tensor {
     if (!(tensor instanceof Variable) || !(th instanceof Variable)) {
       throw new Error('Can only divide Variable tensor by Variable tensor');
     }
 
-    const divResult = th.value.divide_impl(th.value, tensor.value, resultShape);
+    const divResult = th.value.divide_impl(
+      th.value,
+      tensor.value,
+      resultShape,
+      alpha
+    );
     const noGrad = th.noGrad && tensor.noGrad;
 
     return new Variable(divResult, {
       backEdge: noGrad
         ? undefined
-        : new DivideBack(th, tensor, divResult, resultShape),
+        : new DivideBack(th, tensor, divResult, resultShape, alpha),
       noGrad,
     });
   }

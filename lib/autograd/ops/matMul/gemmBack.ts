@@ -46,7 +46,7 @@ export class GemmBack implements BackwardOp {
 
       let gradC = grad.sum(cSumDims).reshape(cShape, false);
       if (this.beta !== 1) {
-        gradC = gradC.multiply(gradC.singleConstant(this.beta));
+        gradC = gradC.multiplyScalar(this.beta);
       }
 
       this.c.backward(gradC);

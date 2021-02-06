@@ -1,12 +1,11 @@
 import {Tensor} from '../../../library';
 import {BackwardOp, VariableI} from '../../types';
 
-export class SqrtBack implements BackwardOp {
-  constructor(public input: VariableI, public sqrt: Tensor) {}
+export class MultiplyScalarBack implements BackwardOp {
+  constructor(public input: VariableI, public scalar: number) {}
 
   backward(grad: Tensor): void {
-    const gradSqrt = grad.divide(this.sqrt, 0.5);
-    this.input.backward(gradSqrt);
+    this.input.backward(grad.multiplyScalar(this.scalar));
   }
 
   delete(): void {

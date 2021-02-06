@@ -26,10 +26,7 @@ export class SumSquareBack implements BackwardOp {
     }
 
     const expanded = grad.expand(inShape);
-    const mult1 = expanded.multiply(this.input.value);
-    expanded.delete();
-    const gradIn = mult1.multiply(this.input.value.singleConstant(2));
-    mult1.delete();
+    const gradIn = expanded.multiply(this.input.value, 2);
 
     this.input.backward(gradIn);
   }

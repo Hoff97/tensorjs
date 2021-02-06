@@ -5,7 +5,9 @@ export class AddBack implements BackwardOp {
   constructor(
     public a: VariableI,
     public b: VariableI,
-    public shape: readonly number[]
+    public shape: readonly number[],
+    public alpha: number,
+    public beta: number
   ) {}
 
   backward(grad: Tensor): void {
@@ -26,17 +28,43 @@ export class AddBack implements BackwardOp {
 
     if (!this.a.noGrad) {
       if (sumADims.length === 0) {
-        this.a.backward(grad.reshape(shapeA, false));
+        if (this.alpha === 1) {
+          this.a.backward(grad.reshape(shapeA));
+        } else {
+          this.a.backward(
+            grad.multiplyScalar(this.alpha).reshape(shapeA, false)
+          );
+        }
       } else {
-        this.a.backward(grad.sum(sumADims).reshape(shapeA, false));
+        if (this.alpha === 1) {
+          this.a.backward(grad.sum(sumADims).reshape(shapeA, false));
+        } else {
+          const summed = grad.sum(sumADims);
+          const scaled = summed.multiplyScalar(this.alpha);
+          summed.delete();
+          this.a.backward(scaled.reshape(shapeA, false));
+        }
       }
     }
 
     if (!this.b.noGrad) {
       if (sumBDims.length === 0) {
-        this.b.backward(grad.reshape(shapeB, false));
+        if (this.beta === 1) {
+          this.b.backward(grad.reshape(shapeB));
+        } else {
+          this.b.backward(
+            grad.multiplyScalar(this.beta).reshape(shapeB, false)
+          );
+        }
       } else {
-        this.b.backward(grad.sum(sumBDims).reshape(shapeB, false));
+        if (this.beta === 1) {
+          this.b.backward(grad.sum(sumBDims).reshape(shapeB, false));
+        } else {
+          const summed = grad.sum(sumBDims);
+          const scaled = summed.multiplyScalar(this.beta);
+          summed.delete();
+          this.b.backward(scaled.reshape(shapeB, false));
+        }
       }
     }
   }

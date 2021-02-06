@@ -5,7 +5,8 @@ export class MultiplyBack implements BackwardOp {
   constructor(
     public a: VariableI,
     public b: VariableI,
-    public shape: readonly number[]
+    public shape: readonly number[],
+    public alpha: number
   ) {}
 
   backward(grad: Tensor): void {
@@ -26,9 +27,11 @@ export class MultiplyBack implements BackwardOp {
 
     if (!this.a.noGrad) {
       if (sumADims.length === 0) {
-        this.a.backward(grad.multiply(this.b.value).reshape(shapeA, false));
+        this.a.backward(
+          grad.multiply(this.b.value, this.alpha).reshape(shapeA, false)
+        );
       } else {
-        const mult = grad.multiply(this.b.value);
+        const mult = grad.multiply(this.b.value, this.alpha);
         const summed = mult.sum(sumADims);
         mult.delete();
         this.a.backward(summed.reshape(shapeA, false));
@@ -37,9 +40,11 @@ export class MultiplyBack implements BackwardOp {
 
     if (!this.b.noGrad) {
       if (sumBDims.length === 0) {
-        this.b.backward(grad.multiply(this.a.value).reshape(shapeB, false));
+        this.b.backward(
+          grad.multiply(this.a.value, this.alpha).reshape(shapeB, false)
+        );
       } else {
-        const mult = grad.multiply(this.a.value);
+        const mult = grad.multiply(this.a.value, this.alpha);
         const summed = mult.sum(sumBDims);
         mult.delete();
         this.b.backward(summed.reshape(shapeB, false));

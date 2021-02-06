@@ -6,7 +6,8 @@ export class DivideBack implements BackwardOp {
     public a: VariableI,
     public b: VariableI,
     public divResult: Tensor,
-    public shape: readonly number[]
+    public shape: readonly number[],
+    public alpha: number
   ) {}
 
   backward(grad: Tensor): void {
@@ -27,9 +28,11 @@ export class DivideBack implements BackwardOp {
 
     if (!this.a.noGrad) {
       if (sumADims.length === 0) {
-        this.a.backward(grad.divide(this.b.value).reshape(shapeA, false));
+        this.a.backward(
+          grad.divide(this.b.value, this.alpha).reshape(shapeA, false)
+        );
       } else {
-        const mult = grad.divide(this.b.value);
+        const mult = grad.divide(this.b.value, this.alpha);
         const summed = mult.sum(sumADims);
         mult.delete();
         this.a.backward(summed.reshape(shapeA, false));
@@ -39,20 +42,16 @@ export class DivideBack implements BackwardOp {
     if (!this.b.noGrad) {
       if (sumBDims.length === 0) {
         const multiplied = grad.multiply(this.divResult);
-        const divided = multiplied.divide(this.b.value);
+        const divided = multiplied.divide(this.b.value, -this.alpha);
         multiplied.delete();
-        const negated = divided.negate();
-        divided.delete();
 
-        this.b.backward(negated.reshape(shapeB, false));
+        this.b.backward(divided.reshape(shapeB, false));
       } else {
         const multiplied = grad.multiply(this.divResult);
-        const divided = multiplied.divide(this.b.value);
+        const divided = multiplied.divide(this.b.value, -this.alpha);
         multiplied.delete();
-        const negated = divided.negate();
+        const summed = divided.sum(sumBDims);
         divided.delete();
-        const summed = negated.sum(sumBDims);
-        negated.delete();
         this.b.backward(summed.reshape(shapeB, false));
       }
     }
