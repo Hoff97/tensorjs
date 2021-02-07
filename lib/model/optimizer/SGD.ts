@@ -11,7 +11,7 @@ export class SGD extends Optimizer {
       if (parameter.grad !== undefined) {
         const oldValue = parameter.value;
 
-        parameter.value = parameter.value.subtract(parameter.grad, this.lr);
+        parameter.value = parameter.value.subtract(parameter.grad, 1, this.lr);
 
         oldValue.delete();
       }
