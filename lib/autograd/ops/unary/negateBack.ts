@@ -5,7 +5,11 @@ export class NegateBack implements BackwardOp {
   constructor(public input: VariableI) {}
 
   backward(grad: Tensor): void {
-    this.input.backward(grad.negate());
+    const gradIn = grad.negate();
+    const needed = this.input.backward(gradIn);
+    if (!needed) {
+      gradIn.delete();
+    }
   }
 
   delete(): void {

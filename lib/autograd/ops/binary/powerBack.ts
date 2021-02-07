@@ -26,13 +26,14 @@ export class PowerBack implements BackwardOp {
     }
 
     if (!this.a.noGrad) {
+      let gradA: Tensor;
       if (sumADims.length === 0) {
         const multiplied = this.powerResult.multiply(this.b.value);
         const divided = multiplied.divide(this.a.value);
         multiplied.delete();
         const gradPowA = grad.multiply(divided);
         divided.delete();
-        this.a.backward(gradPowA.reshape(shapeA, false));
+        gradA = gradPowA.reshape(shapeA, false);
       } else {
         const multiplied = this.powerResult.multiply(this.b.value);
         const divided = multiplied.divide(this.a.value);
@@ -41,28 +42,37 @@ export class PowerBack implements BackwardOp {
         divided.delete();
         const summed = gradPowA.sum(sumADims);
         gradPowA.delete();
-        this.a.backward(summed.reshape(shapeA, false));
+        gradA = summed.reshape(shapeA, false);
+      }
+      const needed = this.a.backward(gradA);
+      if (!needed) {
+        gradA.delete();
       }
     }
 
     if (!this.b.noGrad) {
+      let gradB: Tensor;
       if (sumBDims.length === 0) {
         const lnA = this.a.value.log();
         const mult = this.powerResult.multiply(lnA);
         lnA.delete();
-        const gradB = grad.multiply(mult);
+        gradB = grad.multiply(mult);
         mult.delete();
 
-        this.b.backward(gradB.reshape(shapeB, false));
+        gradB = gradB.reshape(shapeB, false);
       } else {
         const lnA = this.a.value.log();
         const mult = this.powerResult.multiply(lnA);
         lnA.delete();
-        const gradB = grad.multiply(mult);
+        const _gradB = grad.multiply(mult);
         mult.delete();
-        const summed = gradB.sum(sumBDims);
+        const summed = _gradB.sum(sumBDims);
+        _gradB.delete();
+        gradB = summed.reshape(shapeB, false);
+      }
+      const needed = this.b.backward(gradB);
+      if (!needed) {
         gradB.delete();
-        this.b.backward(summed.reshape(shapeB, false));
       }
     }
   }

@@ -6,7 +6,10 @@ export class LogBack implements BackwardOp {
 
   backward(grad: Tensor): void {
     const gradLog = grad.divide(this.input.value);
-    this.input.backward(gradLog);
+    const needed = this.input.backward(gradLog);
+    if (!needed) {
+      gradLog.delete();
+    }
   }
 
   delete(): void {

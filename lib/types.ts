@@ -771,8 +771,10 @@ export default abstract class Tensor {
       const aRank = aShape.length;
       const cRank = cShape.length;
 
-      cShape = [...new Array(aRank - cRank).fill(1), ...cShape];
-      c = c.reshape(cShape, false);
+      if (aRank > cRank) {
+        cShape = [...new Array(aRank - cRank).fill(1), ...cShape];
+        c = c.reshape(cShape, false);
+      }
     }
 
     return this.gemm_impl(b, aTranspose, bTranspose, alpha, beta, c);

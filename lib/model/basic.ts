@@ -21,7 +21,7 @@ export class Linear extends Module {
     this.weights = new Variable(tensor);
 
     const biasVals = new Array(dimOut).fill(0);
-    const tensorBias = new CPUTensor([dimOut], biasVals);
+    const tensorBias = new CPUTensor([1, dimOut], biasVals);
     this.bias = new Variable(tensorBias);
   }
 

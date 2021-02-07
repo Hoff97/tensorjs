@@ -8,7 +8,14 @@ import {GPUTensor} from '../lib/tensor/gpu/tensor';
 
 const epsilon = 0.01;
 
-const backends = [
+interface Backend {
+  name: string;
+  constructor: (shape: ReadonlyArray<number>, values: number[]) => Tensor;
+  toBackend: (tensor: Tensor) => Promise<Tensor>;
+  wait?: Promise<void>;
+}
+
+const backends: Backend[] = [
   {
     name: 'CPU',
     constructor: (shape: ReadonlyArray<number>, values: number[]) =>

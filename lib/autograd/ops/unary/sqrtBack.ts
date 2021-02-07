@@ -6,7 +6,10 @@ export class SqrtBack implements BackwardOp {
 
   backward(grad: Tensor): void {
     const gradSqrt = grad.divide(this.sqrt, 0.5);
-    this.input.backward(gradSqrt);
+    const needed = this.input.backward(gradSqrt);
+    if (!needed) {
+      gradSqrt.delete();
+    }
   }
 
   delete(): void {

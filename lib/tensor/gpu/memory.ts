@@ -28,6 +28,8 @@ export class GPUMemoryAllocator {
 
   private maxSizeFactor: number;
 
+  public totalAllocations = 0;
+
   constructor(
     regl: Regl,
     orderedDictConstructor: () => OrderedDict<number, MemoryEntry>,
@@ -52,7 +54,7 @@ export class GPUMemoryAllocator {
     }
 
     const results = this.trees[precision].betweenBoundsFirst({
-      gte: size,
+      gte: texSize,
       lte: upperBound,
     });
     if (results.length === 0) {
@@ -75,6 +77,8 @@ export class GPUMemoryAllocator {
         id: this.entryId++,
         precision: precision,
       };
+
+      this.totalAllocations++;
 
       return memoryEntry;
     } else {
@@ -141,6 +145,8 @@ export class GPUMemoryAllocator {
       depthStencil: false,
     });
 
+    this.totalAllocations++;
+
     return {
       width: width,
       height: height,
@@ -172,6 +178,8 @@ export class GPUMemoryAllocator {
       depthStencil: false,
     });
 
+    this.totalAllocations++;
+
     return {
       width: width,
       height: height,
@@ -192,6 +200,8 @@ export class GPUMemoryAllocator {
       height: texture.height,
       depthStencil: false,
     });
+
+    this.totalAllocations++;
 
     return {
       width: texture.width,
@@ -215,5 +225,9 @@ export class GPUMemoryAllocator {
     }
 
     return {width, height};
+  }
+
+  public getNumEntries() {
+    return this.trees[16].numEntries + this.trees[32].numEntries;
   }
 }

@@ -8,7 +8,10 @@ export class AbsBack implements BackwardOp {
     const sign = this.input.value.sign();
     const gradAbs = grad.multiply(sign);
     sign.delete();
-    this.input.backward(gradAbs);
+    const needed = this.input.backward(gradAbs);
+    if (!needed) {
+      gradAbs.delete();
+    }
   }
 
   delete(): void {

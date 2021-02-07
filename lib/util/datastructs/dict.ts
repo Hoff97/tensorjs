@@ -3,6 +3,8 @@ import {OrderedDict, QueryResult, SearchQuery} from './types';
 export class Dict<K, V> implements OrderedDict<K, V> {
   private dict: {[key: number]: V[]};
 
+  public numEntries = 0;
+
   constructor(private toNumber: (key: K) => number) {
     this.dict = {};
   }
@@ -38,6 +40,7 @@ export class Dict<K, V> implements OrderedDict<K, V> {
     const k = this.toNumber(key);
     if (this.dict[k] !== undefined) {
       this.dict[k].pop();
+      this.numEntries--;
     }
   }
 
@@ -47,5 +50,6 @@ export class Dict<K, V> implements OrderedDict<K, V> {
       this.dict[k] = [];
     }
     this.dict[k].push(value);
+    this.numEntries++;
   }
 }

@@ -6,7 +6,10 @@ export class ExpBack implements BackwardOp {
 
   backward(grad: Tensor): void {
     const gradExp = grad.multiply(this.exp);
-    this.input.backward(gradExp);
+    const needed = this.input.backward(gradExp);
+    if (!needed) {
+      gradExp.delete();
+    }
   }
 
   delete(): void {

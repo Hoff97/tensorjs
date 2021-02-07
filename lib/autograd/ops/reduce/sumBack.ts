@@ -25,7 +25,11 @@ export class SumBack implements BackwardOp {
       grad = grad.reshape(newShape, false);
     }
 
-    this.input.backward(grad.expand(inShape));
+    grad = grad.expand(inShape);
+    const needed = this.input.backward(grad);
+    if (!needed) {
+      grad.delete();
+    }
   }
 
   delete(): void {

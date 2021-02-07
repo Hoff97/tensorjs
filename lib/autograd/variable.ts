@@ -119,7 +119,7 @@ export class Variable extends Tensor implements VariableI {
   }
 
   protected reshape_impl(shape: readonly number[], copy: boolean): Tensor {
-    return new Variable(this.value.reshape(shape, copy), {
+    return new Variable(this.value.reshape(shape), {
       backEdge: this.noGrad ? undefined : new ReshapeBack(this),
       noGrad: this.noGrad,
     });

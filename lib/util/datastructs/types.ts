@@ -13,4 +13,6 @@ export interface OrderedDict<K, V> {
   deleteFirst(key: K): void;
 
   insert(key: K, value: V): void;
+
+  numEntries: number;
 }

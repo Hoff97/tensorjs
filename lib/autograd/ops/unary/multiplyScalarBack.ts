@@ -5,7 +5,11 @@ export class MultiplyScalarBack implements BackwardOp {
   constructor(public input: VariableI, public scalar: number) {}
 
   backward(grad: Tensor): void {
-    this.input.backward(grad.multiplyScalar(this.scalar));
+    const gradIn = grad.multiplyScalar(this.scalar);
+    const needed = this.input.backward(gradIn);
+    if (!needed) {
+      gradIn.delete();
+    }
   }
 
   delete(): void {
