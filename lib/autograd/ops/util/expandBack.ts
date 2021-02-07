@@ -18,7 +18,7 @@ export class ExpandBack implements BackwardOp {
       }
     }
 
-    const gradA = grad.sum(sumDims).reshape(this.a.getShape()));
+    const gradA = grad.sum(sumDims).reshape(this.a.getShape());
     const needed = this.a.backward(gradA);
     if (!needed) {
       gradA.delete();

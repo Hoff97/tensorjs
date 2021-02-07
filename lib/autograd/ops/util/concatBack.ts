@@ -19,8 +19,8 @@ export class ConcatBack implements BackwardOp {
 
     if (!this.b.noGrad) {
       const gradB = grad.slice(
-        [0],
         [this.a.getShape()[this.axis]],
+        [grad.getShape()[this.axis]],
         [this.axis]
       );
       const needed = this.b.backward(gradB);

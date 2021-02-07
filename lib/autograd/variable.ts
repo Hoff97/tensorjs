@@ -24,8 +24,8 @@ import {GemmBack} from './ops/matMul/gemmBack';
 import {TransposeBack} from './ops/util/transposeBack';
 import {SumBack} from './ops/reduce/sumBack';
 import {SumSquareBack} from './ops/reduce/sumSquareBack';
-import {throws} from 'assert';
 import {MultiplyScalarBack} from './ops/unary/multiplyScalarBack';
+import {MeanBack} from './ops/reduce/meanBack';
 
 export interface VariableOptions {
   grad?: Tensor;
@@ -444,7 +444,10 @@ export class Variable extends Tensor implements VariableI {
   }
 
   protected reduceMean_impl(axes: number[], keepDims: boolean): Tensor {
-    throw new Error('Method not implemented.');
+    return new Variable(this.value.reduceMean(axes, keepDims), {
+      backEdge: this.noGrad ? undefined : new MeanBack(this, axes, keepDims),
+      noGrad: this.noGrad,
+    });
   }
 
   protected reduceMeanSquare_impl(axes: number[], keepDims: boolean): Tensor {
