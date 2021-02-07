@@ -39,6 +39,16 @@ export abstract class Module {
     return parameters;
   }
 
+  toBackend(backend: Backend) {
+    if (backend === 'CPU') {
+      return this.toCPU();
+    } else if (backend === 'WASM') {
+      return this.toWASM();
+    } else {
+      return this.toGPU(32);
+    }
+  }
+
   async toCPU() {
     const submodules = this.getSubModules();
     for (const submodule of submodules) {
