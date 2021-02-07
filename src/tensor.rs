@@ -1170,6 +1170,10 @@ impl Tensor {
         self.unary_op(|x: f32| x.abs())
     }
 
+    pub fn sigmoid(&self) -> Tensor {
+        self.unary_op(|x: f32| 1.0 / (1.0 + (-x).exp()))
+    }
+
     pub fn sign(&self) -> Tensor {
         self.unary_op(|x: f32| if x < 0. { -1. } else { 1. })
     }
@@ -1178,8 +1182,8 @@ impl Tensor {
         self.unary_op(|x: f32| -x)
     }
 
-    pub fn multiply_scalar(&self, scalar: f32) -> Tensor {
-        self.unary_op(|x: f32| x * scalar)
+    pub fn add_multiply_scalar(&self, factor: f32, add: f32) -> Tensor {
+        self.unary_op(|x: f32| x * factor + add)
     }
 
     pub fn addition(&self, other: &Tensor, alpha: f32, beta: f32) -> Tensor {

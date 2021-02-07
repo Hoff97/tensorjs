@@ -83,12 +83,16 @@ export class WASMTensor extends Tensor {
     return new WASMTensor(this.wasmTensor.abs());
   }
 
+  sigmoid(): Tensor {
+    return new WASMTensor(this.wasmTensor.sigmoid());
+  }
+
   negate(): Tensor {
     return new WASMTensor(this.wasmTensor.negate());
   }
 
-  multiplyScalar(scalar: number): Tensor {
-    return new WASMTensor(this.wasmTensor.multiply_scalar(scalar));
+  addMultiplyScalar(factor: number, add: number): Tensor {
+    return new WASMTensor(this.wasmTensor.add_multiply_scalar(factor, add));
   }
 
   sign(): Tensor {

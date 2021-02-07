@@ -1,11 +1,15 @@
 import {Tensor} from '../../../library';
 import {BackwardOp, VariableI} from '../../types';
 
-export class MultiplyScalarBack implements BackwardOp {
-  constructor(public input: VariableI, public scalar: number) {}
+export class SigmoidBack implements BackwardOp {
+  constructor(public input: VariableI, public sigmoid: Tensor) {}
 
   backward(grad: Tensor): void {
-    const gradIn = grad.multiplyScalar(this.scalar);
+    const oneMinus = this.sigmoid.addMultiplyScalar(-1, 1);
+    const mult = this.sigmoid.multiply(oneMinus);
+    oneMinus.delete();
+    const gradIn = mult.multiply(grad);
+    mult.delete();
     const needed = this.input.backward(gradIn);
     if (!needed) {
       gradIn.delete();

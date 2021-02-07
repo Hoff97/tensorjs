@@ -24,13 +24,14 @@ import {GemmBack} from './ops/matMul/gemmBack';
 import {TransposeBack} from './ops/util/transposeBack';
 import {SumBack} from './ops/reduce/sumBack';
 import {SumSquareBack} from './ops/reduce/sumSquareBack';
-import {MultiplyScalarBack} from './ops/unary/multiplyScalarBack';
+import {AddMultiplyScalarBack} from './ops/unary/addMultiplyScalarBack';
 import {MeanBack} from './ops/reduce/meanBack';
 import {MeanSquareBack} from './ops/reduce/meanSquareBack';
 import {SliceBack} from './ops/util/sliceBack';
 import {AveragePoolBack} from './ops/conv/averagePoolBack';
 import {PadBack} from './ops/conv/padBack';
 import {ProductBack} from './ops/reduce/productBack';
+import {SigmoidBack} from './ops/unary/sigmoidBack';
 
 export interface VariableOptions {
   grad?: Tensor;
@@ -160,6 +161,14 @@ export class Variable extends Tensor implements VariableI {
     });
   }
 
+  sigmoid(): Tensor {
+    const sigmoid = this.value.sigmoid();
+    return new Variable(sigmoid, {
+      backEdge: this.noGrad ? undefined : new SigmoidBack(this, sigmoid),
+      noGrad: this.noGrad,
+    });
+  }
+
   sign(): Tensor {
     // No back edge since the gradient will be zero anyway
     return new Variable(this.value.sqrt());
@@ -172,9 +181,11 @@ export class Variable extends Tensor implements VariableI {
     });
   }
 
-  multiplyScalar(value: number): Tensor {
-    return new Variable(this.value.multiplyScalar(value), {
-      backEdge: this.noGrad ? undefined : new MultiplyScalarBack(this, value),
+  addMultiplyScalar(factor: number, add: number): Tensor {
+    return new Variable(this.value.addMultiplyScalar(factor, add), {
+      backEdge: this.noGrad
+        ? undefined
+        : new AddMultiplyScalarBack(this, factor),
       noGrad: this.noGrad,
     });
   }

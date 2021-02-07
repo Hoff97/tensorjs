@@ -73,8 +73,12 @@ export function negate(a: CPUTensor) {
   return positionWiseUnaryOp(a, o1 => -o1);
 }
 
-export function multiplyScalar(a: CPUTensor, scalar: number) {
-  return positionWiseUnaryOp(a, o1 => o1 * scalar);
+export function addMultiplyScalar(a: CPUTensor, factor: number, add: number) {
+  return positionWiseUnaryOp(a, o1 => o1 * factor + add);
+}
+
+export function sigmoid(a: CPUTensor) {
+  return positionWiseUnaryOp(a, o1 => 1 / (1 + Math.exp(-o1)));
 }
 
 export function clip(a: CPUTensor, min?: number, max?: number) {

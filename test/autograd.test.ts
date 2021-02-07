@@ -1554,5 +1554,25 @@ for (const backend of backends) {
 
       expect(await vA.grad?.compare(numericalGradA, 0.8)).toBeTrue();
     });
+
+    it('should work with sigmoid', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 3], [-1, 2, -3, 4, -5, 6]);
+      const ones = backend.constructor([2, 3], new Array(6).fill(1));
+      const vA = new Variable(a);
+      const aCPU = (await toCPU(a)) as CPUTensor;
+
+      const res = vA.sigmoid() as Variable;
+      res.backward(ones);
+
+      const numericalGradA = await backend.toBackend(
+        numericalGradient(aCPU, (a: CPUTensor) => a.sigmoid() as CPUTensor)
+      );
+
+      expect(await vA.grad?.compare(numericalGradA, 0.05)).toBeTrue();
+    });
   });
 }

@@ -2,6 +2,7 @@ import {averagePool} from '../../ops/cpu/averagePool';
 import {
   abs,
   add,
+  addMultiplyScalar,
   ceil,
   clip,
   clipBackward,
@@ -10,9 +11,9 @@ import {
   floor,
   log,
   multiply,
-  multiplyScalar,
   negate,
   power,
+  sigmoid,
   sign,
   sqrt,
   subtract,
@@ -180,7 +181,15 @@ export class CPUTensor extends Tensor {
   }
 
   multiplyScalar(value: number): Tensor {
-    return multiplyScalar(this, value);
+    return addMultiplyScalar(this, value, 0);
+  }
+
+  addScalar(value: number): Tensor {
+    return addMultiplyScalar(this, 1, value);
+  }
+
+  addMultiplyScalar(factor: number, add: number): Tensor {
+    return addMultiplyScalar(this, factor, add);
   }
 
   sign(): Tensor {
@@ -196,6 +205,10 @@ export class CPUTensor extends Tensor {
       throw new Error('Can only do clipBackward with CPUTensor');
     }
     return clipBackward(this, grad, this.getShape(), min, max);
+  }
+
+  sigmoid(): Tensor {
+    return sigmoid(this);
   }
 
   add_impl(

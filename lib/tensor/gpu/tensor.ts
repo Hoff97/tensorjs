@@ -45,7 +45,8 @@ import {SignOperation} from '../../ops/gpu/unary/sign';
 import {NegateOperation} from '../../ops/gpu/unary/negate';
 import {ClipBackwardOperation} from '../../ops/gpu/util/clipBackward';
 import {ConvTransposeOperation} from '../../ops/gpu/conv/convTranspose';
-import {MultiplyScalarOperation} from '../../ops/gpu/unary/multiplyScalar';
+import {SigmoidOperation} from '../../ops/gpu/unary/sigmoid';
+import {AddMultiplyScalarOperation} from '../../ops/gpu/unary/addMultiplyScalar';
 
 export class GPUTensor extends Tensor implements GPUTensorI {
   public memory: MemoryEntry;
@@ -147,6 +148,10 @@ export class GPUTensor extends Tensor implements GPUTensorI {
     return defaultAbsD.calc({input: this}, this.precision) as GPUTensor;
   }
 
+  sigmoid(): Tensor {
+    return defaultSigmoidD.calc({input: this}, this.precision) as GPUTensor;
+  }
+
   floor(): Tensor {
     return defaultFloorD.calc({input: this}, this.precision) as GPUTensor;
   }
@@ -159,9 +164,9 @@ export class GPUTensor extends Tensor implements GPUTensorI {
     return defaultNegateD.calc({input: this}, this.precision) as GPUTensor;
   }
 
-  multiplyScalar(scalar: number): Tensor {
-    return defaultMultiplyScalarD.calc(
-      {input: this, scalar},
+  addMultiplyScalar(factor: number, add: number): Tensor {
+    return defaultAddMultiplyScalarD.calc(
+      {input: this, factor, add},
       this.precision
     ) as GPUTensor;
   }
@@ -553,6 +558,9 @@ const defaultGemmCD = new Dispatcher(() => new GemmCOperation(gpuConstructor));
 //Unary operations
 const defaultExpD = new Dispatcher(() => new ExpOperation(gpuConstructor));
 const defaultAbsD = new Dispatcher(() => new AbsOperation(gpuConstructor));
+const defaultSigmoidD = new Dispatcher(
+  () => new SigmoidOperation(gpuConstructor)
+);
 const defaultCeilD = new Dispatcher(() => new CeilOperation(gpuConstructor));
 const defaultFloorD = new Dispatcher(() => new FloorOperation(gpuConstructor));
 const defaultClipD = new Dispatcher(() => new ClipOperation(gpuConstructor));
@@ -564,8 +572,8 @@ const defaultLogD = new Dispatcher(() => new LogOperation(gpuConstructor));
 const defaultNegateD = new Dispatcher(
   () => new NegateOperation(gpuConstructor)
 );
-const defaultMultiplyScalarD = new Dispatcher(
-  () => new MultiplyScalarOperation(gpuConstructor)
+const defaultAddMultiplyScalarD = new Dispatcher(
+  () => new AddMultiplyScalarOperation(gpuConstructor)
 );
 const defaultSignD = new Dispatcher(() => new SignOperation(gpuConstructor));
 

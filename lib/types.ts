@@ -454,6 +454,11 @@ export default abstract class Tensor {
   abstract negate(): Tensor;
 
   /**
+   * Computes the element wise sigmoid of all values
+   */
+  abstract sigmoid(): Tensor;
+
+  /**
    * Computes the value-wise sign which is:
    *  - (-1) if x < 0
    *  - 1 otherwise
@@ -627,7 +632,15 @@ export default abstract class Tensor {
     );
   }
 
-  abstract multiplyScalar(value: number): Tensor;
+  multiplyScalar(value: number) {
+    return this.addMultiplyScalar(value, 0);
+  }
+
+  addScalar(value: number) {
+    return this.addMultiplyScalar(1, value);
+  }
+
+  abstract addMultiplyScalar(factor: number, add: number): Tensor;
 
   /**
    * Divides two tensors. Supports broadcasting
