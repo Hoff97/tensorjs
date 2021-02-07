@@ -56,9 +56,11 @@ export class WASMTensor extends Tensor {
   }
 
   delete(): void {
-    this.wasmTensor.free();
-    //@ts-ignore
-    this.wasmTensor = undefined;
+    if (this.wasmTensor !== undefined) {
+      this.wasmTensor.free();
+      //@ts-ignore
+      this.wasmTensor = undefined;
+    }
   }
 
   copy(): Tensor {
