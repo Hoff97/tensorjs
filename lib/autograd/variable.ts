@@ -27,6 +27,7 @@ import {SumSquareBack} from './ops/reduce/sumSquareBack';
 import {MultiplyScalarBack} from './ops/unary/multiplyScalarBack';
 import {MeanBack} from './ops/reduce/meanBack';
 import {MeanSquareBack} from './ops/reduce/meanSquareBack';
+import {SliceBack} from './ops/util/sliceBack';
 
 export interface VariableOptions {
   grad?: Tensor;
@@ -537,6 +538,11 @@ export class Variable extends Tensor implements VariableI {
     ends: number[],
     axes: number[]
   ): Tensor {
-    throw new Error('Method not implemented.');
+    return new Variable(this.value.slice(starts, ends, axes), {
+      backEdge: this.noGrad
+        ? undefined
+        : new SliceBack(this, starts, ends, axes),
+      noGrad: this.noGrad,
+    });
   }
 }
