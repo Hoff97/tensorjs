@@ -601,7 +601,7 @@ if (run) {
         const entriesBefore = defaultAllocator.getNumEntries();
 
         for (let i = 0; i < 5; i++) {
-          const pred = model.forward(vInput);
+          const pred = (await model.forward([vInput]))[0];
           const loss = pred.subtract(vY).sumSquare() as Variable;
           loss.backward();
           optim.step();
