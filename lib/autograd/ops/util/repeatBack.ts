@@ -14,7 +14,11 @@ export class RepeatBack implements BackwardOp {
       sumAxes.push(i * 2);
     }
 
-    this.a.backward(grad.reshape(gradNewShape, false).sum(sumAxes, false));
+    const gradA = grad.reshape(gradNewShape, false).sum(sumAxes, false);
+    const needed = this.a.backward(gradA);
+    if (!needed) {
+      gradA.delete();
+    }
   }
 
   delete(): void {

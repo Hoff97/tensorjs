@@ -7,12 +7,18 @@ export class MatMulBack implements BackwardOp {
   backward(grad: Tensor): void {
     if (!this.b.noGrad) {
       const gradB = this.a.value.gemm(grad, true, false);
-      this.b.backward(gradB);
+      const needed = this.b.backward(gradB);
+      if (!needed) {
+        gradB.delete();
+      }
     }
 
     if (!this.a.noGrad) {
       const gradA = grad.gemm(this.b.value, false, true);
-      this.a.backward(gradA);
+      const needed = this.a.backward(gradA);
+      if (!needed) {
+        gradA.delete();
+      }
     }
   }
 

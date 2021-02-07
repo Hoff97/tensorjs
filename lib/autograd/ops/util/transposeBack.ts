@@ -10,7 +10,11 @@ export class TransposeBack implements BackwardOp {
       inversePerm[this.permutation[i]] = i;
     }
 
-    this.a.backward(grad.transpose(inversePerm));
+    const gradA = grad.transpose(inversePerm);
+    const needed = this.a.backward(gradA);
+    if (!needed) {
+      gradA.delete();
+    }
   }
 
   delete(): void {
