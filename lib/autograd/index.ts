@@ -1,3 +1,3 @@
-import {Variable} from './variable';
+import {Variable, VariableOptions} from './variable';
 
-export {Variable};
+export {Variable, VariableOptions};

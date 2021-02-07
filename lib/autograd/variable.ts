@@ -34,11 +34,33 @@ import {ProductBack} from './ops/reduce/productBack';
 import {SigmoidBack} from './ops/unary/sigmoidBack';
 
 export interface VariableOptions {
+  /**
+   * The gradient can optionally be specified
+   */
   grad?: Tensor;
+
+  /**
+   * Backward edge of this variable
+   *
+   * You most likely do not want to use this
+   */
   backEdge?: BackwardOp;
+
+  /**
+   * When set to true, gradients will not be tracked for this
+   * variable. Useful for data that is passed into a model.
+   */
   noGrad?: boolean;
 }
 
+/**
+ * Tensor that also has a gradient associated to it
+ * When noGrad is false, a dynamic computation graph on
+ * this variable will be build.
+ *
+ * Once backward on a scalar variable (eg. a variable with shape [1])
+ * is called, the gradients for all variables will be computed
+ */
 export class Variable extends Tensor implements VariableI {
   public grad?: Tensor;
 
@@ -46,6 +68,9 @@ export class Variable extends Tensor implements VariableI {
 
   public noGrad: boolean;
 
+  /**
+   * Creates a variable whose value is the specified value
+   */
   constructor(public value: Tensor, options?: VariableOptions) {
     super();
 

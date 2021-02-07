@@ -1,5 +1,5 @@
-import {Module} from './module';
+import {Module, Mode} from './module';
 import * as basic from './basic';
 import * as optimizer from './optimizer/index';
 
-export {Module, basic, optimizer};
+export {Module, Mode, basic, optimizer};
