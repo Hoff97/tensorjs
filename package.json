@@ -15,12 +15,7 @@
   },
   "license": "MIT",
   "version": "0.1.10",
-  "type": "module",
   "types": "./dist/lib/library.d.ts",
-  "exports": {
-    ".": "./dist/lib/library.js",
-    "./": "./dist/lib/"
-  },
   "files": [
     "dist"
   ],
