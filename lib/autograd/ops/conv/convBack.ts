@@ -13,7 +13,7 @@ export class ConvBack implements BackwardOp {
   ) {}
 
   backward(grad: Tensor): void {
-    if (!this.x.noGrad) {
+    if (!this.w.noGrad) {
       const gradW = this.x.value.conv(
         grad,
         undefined,
@@ -41,7 +41,7 @@ export class ConvBack implements BackwardOp {
       }
     }
 
-    if (!this.w.noGrad) {
+    if (!this.x.noGrad) {
       const wShape = this.w.getShape();
 
       let xPads = [];
