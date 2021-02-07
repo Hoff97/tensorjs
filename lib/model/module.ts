@@ -4,6 +4,14 @@ import {Backend, toCPU, toWASM, toGPU} from '../util/convert';
 
 export type Mode = 'train' | 'inference';
 
+/**
+ * A module is a self contained unit that transforms
+ * a list of inputs when forward is called.
+ *
+ * It can be in two modes, training and inference.
+ * In training mode, gradients will be tracked, while
+ * in inference mode, only the forward pass will be calculated
+ */
 export abstract class Module {
   public backend: Backend = 'CPU';
 
