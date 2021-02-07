@@ -25,6 +25,7 @@ export class ConvRelu6 extends SequenceOptimization {
       clip.outputs,
       constants,
       onnxVersion,
+      conv.mode,
       conv.kernel,
       conv.bias,
       'relu6'

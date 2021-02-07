@@ -54,6 +54,7 @@ export class ConvBatchNorm extends SequenceOptimization {
       batchNorm.outputs,
       constants,
       onnxVersion,
+      conv.mode,
       newKernel,
       newBias
     );

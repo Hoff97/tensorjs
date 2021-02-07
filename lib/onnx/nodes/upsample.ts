@@ -1,3 +1,4 @@
+import {Mode} from '../../model/module';
 import {CPUTensor} from '../../tensor/cpu/tensor';
 import Tensor from '../../types';
 import {toCPU} from '../../util/convert';
@@ -5,21 +6,22 @@ import {OnnxNode} from '../node';
 import {Attributes, Constants} from '../types';
 
 export class UpsampleNode extends OnnxNode {
-  private mode: string;
+  private sampleMode: string;
 
   constructor(
     attributes: Attributes,
     inputs: string[],
     outputs: string[],
     constants: Constants,
-    onnxVersion: number
+    onnxVersion: number,
+    mode: Mode
   ) {
-    super(attributes, inputs, outputs, constants, onnxVersion);
+    super(attributes, inputs, outputs, constants, onnxVersion, mode);
 
     //@ts-ignore
-    this.mode = this.getAttributeString('mode');
+    this.sampleMode = this.getAttributeString('mode');
 
-    if (this.mode !== 'nearest') {
+    if (this.sampleMode !== 'nearest') {
       throw new Error(
         'Upsampling only supported with nearest neighbor sampling'
       );

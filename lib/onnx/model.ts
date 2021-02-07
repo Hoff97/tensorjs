@@ -1,6 +1,8 @@
 // eslint-disable-next-line node/no-extraneous-import
 import Long from 'long';
 import {onnx} from 'onnx-proto';
+import {Variable} from '../autograd/variable';
+import {Mode, Module} from '../model/module';
 import {glContext} from '../tensor/gpu/gl';
 import Tensor, {Precision} from '../types';
 import {toCPU, toGPU, toWASM} from '../util/convert';
@@ -23,7 +25,7 @@ interface IntermediaryRes {
   used: number;
 }
 
-interface ModelArgs {
+export interface ModelArgs {
   /**
    * Constants that should not be transferred to another device.
    *
@@ -41,9 +43,19 @@ interface ModelArgs {
    * Precision that should be used. Only has an effect on GPU.
    */
   precision?: Precision;
+
+  /**
+   * If the model should be loaded in training or inference mode.
+   * In inference mode, no gradients can be supported and
+   * the model expects tensors as input.
+   *
+   * In training model, gradients can be supported and
+   * the inputs should be variables (although maybe with noGrad: true)
+   */
+  mode?: Mode;
 }
 
-export class OnnxModel {
+export class OnnxModel extends Module {
   private version: number;
   private inputSet: Set<string> = new Set();
   private outputs: string[];
@@ -74,6 +86,7 @@ export class OnnxModel {
    * @param args Optional arguments for the model
    */
   constructor(buffer: ArrayBuffer | Uint8Array, args?: ModelArgs) {
+    super();
     if (args === undefined) {
       args = {};
     }
@@ -84,6 +97,8 @@ export class OnnxModel {
     this.noConvertNodes = new Set<number>(
       args.noConvertNodes !== undefined ? args.noConvertNodes : []
     );
+
+    this.mode = args.mode || 'inference';
 
     this.precision = args.precision || 32;
 
@@ -137,7 +152,8 @@ export class OnnxModel {
         inputs,
         outputs,
         this.constants,
-        this.version
+        this.version,
+        this.mode
       );
       this.nodes[i] = node;
       this.nodeIds.push(i);
@@ -181,7 +197,11 @@ export class OnnxModel {
     for (let i = 0; i < initializer.length; i++) {
       const tensorProto = initializer[i];
 
-      const tensor = createTensor(tensorProto);
+      let tensor: Tensor = createTensor(tensorProto);
+      if (this.mode === 'train') {
+        tensor = new Variable(tensor);
+      }
+
       //@ts-ignore
       this.constants[tensorProto.name] = tensor;
     }
@@ -537,5 +557,23 @@ export class OnnxModel {
     for (const nodeId of this.nodeIds) {
       this.nodes[nodeId].delete();
     }
+  }
+
+  getSubModules(): Module[] {
+    const modules: Module[] = super.getSubModules();
+    for (const nodeId of this.nodeIds) {
+      modules.push(this.nodes[nodeId]);
+    }
+    return modules;
+  }
+
+  getParameters(): Variable[] {
+    const parameters: Variable[] = super.getParameters();
+    for (const c in this.constants) {
+      if (this.constants[c] instanceof Variable) {
+        parameters.push(this.constants[c] as Variable);
+      }
+    }
+    return parameters;
   }
 }

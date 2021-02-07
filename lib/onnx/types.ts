@@ -1,4 +1,5 @@
 import {onnx} from 'onnx-proto';
+import {Mode} from '../model/module';
 import Tensor from '../types';
 import {OnnxNode} from './node';
 
@@ -8,7 +9,8 @@ export type NodeConstructor = (
   inputs: string[],
   outputs: string[],
   constants: Constants,
-  onnxVersion: number
+  onnxVersion: number,
+  mode: Mode
 ) => OnnxNode;
 export type Constants = {[name: string]: Tensor};
 

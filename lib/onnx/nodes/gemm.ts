@@ -1,3 +1,4 @@
+import {Mode} from '../../model/module';
 import Tensor from '../../types';
 import {OnnxNode} from '../node';
 import {Attributes, Constants} from '../types';
@@ -13,9 +14,10 @@ export class GemmNode extends OnnxNode {
     inputs: string[],
     outputs: string[],
     constants: Constants,
-    onnxVersion: number
+    onnxVersion: number,
+    mode: Mode
   ) {
-    super(attributes, inputs, outputs, constants, onnxVersion);
+    super(attributes, inputs, outputs, constants, onnxVersion, mode);
 
     this.alpha = this.getAttributeFloat('alpha') || 1.0;
     this.beta = this.getAttributeFloat('beta') || 1.0;

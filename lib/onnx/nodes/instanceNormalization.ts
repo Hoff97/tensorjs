@@ -1,3 +1,4 @@
+import {Mode} from '../../model/module';
 import {glContext} from '../../tensor/gpu/gl';
 import Tensor from '../../types';
 import {OnnxNode} from '../node';
@@ -11,9 +12,10 @@ export class InstanceNormalizationNode extends OnnxNode {
     inputs: string[],
     outputs: string[],
     constants: Constants,
-    onnxVersion: number
+    onnxVersion: number,
+    mode: Mode
   ) {
-    super(attributes, inputs, outputs, constants, onnxVersion);
+    super(attributes, inputs, outputs, constants, onnxVersion, mode);
 
     this.epsilon = this.getAttributeFloat('epsilon') || 1e-5;
 

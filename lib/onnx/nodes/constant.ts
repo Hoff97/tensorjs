@@ -1,3 +1,5 @@
+import {Variable} from '../../autograd';
+import {Mode} from '../../model/module';
 import Tensor, {Precision} from '../../types';
 import {toCPU, toGPU, toWASM} from '../../util/convert';
 import {OnnxNode} from '../node';
@@ -12,14 +14,19 @@ export class ConstantNode extends OnnxNode {
     inputs: string[],
     outputs: string[],
     constants: Constants,
-    onnxVersion: number
+    onnxVersion: number,
+    mode: Mode
   ) {
-    super(attributes, inputs, outputs, constants, onnxVersion);
+    super(attributes, inputs, outputs, constants, onnxVersion, mode);
 
     if (onnxVersion < 11) {
       const tensor = this.getAttributeTensor('value');
       if (tensor !== undefined && tensor !== null) {
         this.tensor = createTensor(tensor);
+
+        if (mode === 'train') {
+          this.tensor = new Variable(this.tensor);
+        }
       }
     }
   }

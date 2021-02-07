@@ -1,4 +1,5 @@
 import {Tensor} from '../../../library';
+import {Mode} from '../../../model/module';
 import types from '../../../types';
 import {OnnxNode} from '../../node';
 import {Attributes, Constants} from '../../types';
@@ -15,9 +16,10 @@ export abstract class ReduceNode extends OnnxNode {
     outputs: string[],
     constants: Constants,
     onnxVersion: number,
-    name: string
+    name: string,
+    mode: Mode
   ) {
-    super(attributes, inputs, outputs, constants, onnxVersion);
+    super(attributes, inputs, outputs, constants, onnxVersion, mode);
 
     this.axes = this.getAttributeInts('axes');
     const keep = this.getAttributeInt('keepdims');

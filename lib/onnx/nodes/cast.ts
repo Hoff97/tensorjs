@@ -1,3 +1,4 @@
+import {Mode} from '../../model/module';
 import {cast} from '../../ops/cpu/cast';
 import {CPUTensor} from '../../tensor/cpu/tensor';
 import Tensor from '../../types';
@@ -12,9 +13,10 @@ export class CastNode extends OnnxNode {
     inputs: string[],
     outputs: string[],
     constants: Constants,
-    onnxVersion: number
+    onnxVersion: number,
+    mode: Mode
   ) {
-    super(attributes, inputs, outputs, constants, onnxVersion);
+    super(attributes, inputs, outputs, constants, onnxVersion, mode);
 
     //@ts-ignore
     this.to = this.getAttributeString('to');

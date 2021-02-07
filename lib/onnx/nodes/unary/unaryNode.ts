@@ -1,3 +1,4 @@
+import {Mode} from '../../../model/module';
 import Tensor from '../../../types';
 import {OnnxNode} from '../../node';
 import {Attributes, Constants} from '../../types';
@@ -11,9 +12,10 @@ export abstract class UnaryNode extends OnnxNode {
     outputs: string[],
     constants: Constants,
     onnxVersion: number,
-    name: string
+    name: string,
+    mode: Mode
   ) {
-    super(attributes, inputs, outputs, constants, onnxVersion);
+    super(attributes, inputs, outputs, constants, onnxVersion, mode);
     this.name = name;
   }
 

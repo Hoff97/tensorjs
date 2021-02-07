@@ -2,9 +2,10 @@
 import Long from 'long';
 import {onnx} from 'onnx-proto';
 import {Precision, Tensor} from '../library';
+import {Mode, Module} from '../model/module';
 import {Attributes, Constants} from './types';
 
-export abstract class OnnxNode {
+export abstract class OnnxNode extends Module {
   protected onnxVersion: number;
 
   public inputs: string[];
@@ -18,8 +19,13 @@ export abstract class OnnxNode {
     inputs: string[],
     outputs: string[],
     constants: Constants,
-    onnxVersion: number
+    onnxVersion: number,
+    mode: Mode
   ) {
+    super();
+
+    this.mode = mode;
+
     for (let i = 0; i < attributes.length; i++) {
       this.attributes[attributes[i].name as string] = attributes[i];
     }

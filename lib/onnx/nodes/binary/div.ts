@@ -1,3 +1,4 @@
+import {Mode} from '../../../model/module';
 import Tensor from '../../../types';
 import {Attributes, Constants} from '../../types';
 import {BinaryNode} from './binaryNode';
@@ -8,9 +9,10 @@ export class DivNode extends BinaryNode {
     inputs: string[],
     outputs: string[],
     constants: Constants,
-    onnxVersion: number
+    onnxVersion: number,
+    mode: Mode
   ) {
-    super(attributes, inputs, outputs, constants, onnxVersion, 'Div');
+    super(attributes, inputs, outputs, constants, onnxVersion, 'Div', mode);
   }
 
   compute(a: Tensor, b: Tensor): Tensor {

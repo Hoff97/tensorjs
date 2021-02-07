@@ -1,3 +1,4 @@
+import {Mode} from '../../model/module';
 import {CPUTensor} from '../../tensor/cpu/tensor';
 import Tensor from '../../types';
 import {getSize} from '../../util/shape';
@@ -5,6 +6,8 @@ import {OnnxNode} from '../node';
 import {Attributes, Constants} from '../types';
 import {createTensor} from '../util';
 
+// This does not support gradients right now, mainly because
+// the forward pass needs to directly access the constant value
 export class ConstantOfShapeNode extends OnnxNode {
   private tensor?: CPUTensor;
 
@@ -13,9 +16,10 @@ export class ConstantOfShapeNode extends OnnxNode {
     inputs: string[],
     outputs: string[],
     constants: Constants,
-    onnxVersion: number
+    onnxVersion: number,
+    mode: Mode
   ) {
-    super(attributes, inputs, outputs, constants, onnxVersion);
+    super(attributes, inputs, outputs, constants, onnxVersion, mode);
 
     if (onnxVersion < 11) {
       const tensor = this.getAttributeTensor('value');

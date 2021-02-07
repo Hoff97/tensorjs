@@ -1,3 +1,4 @@
+import {Mode} from '../../model/module';
 import {Attributes, Constants} from '../types';
 import {ClipNode} from './clip';
 
@@ -7,9 +8,10 @@ export class ReluNode extends ClipNode {
     inputs: string[],
     outputs: string[],
     constants: Constants,
-    onnxVersion: number
+    onnxVersion: number,
+    mode: Mode
   ) {
-    super(attributes, inputs, outputs, constants, onnxVersion);
+    super(attributes, inputs, outputs, constants, onnxVersion, mode);
 
     this.max = undefined;
     this.min = 0;

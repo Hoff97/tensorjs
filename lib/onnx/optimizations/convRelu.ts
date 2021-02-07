@@ -25,6 +25,7 @@ export class ConvRelu extends SequenceOptimization {
       relu.outputs,
       constants,
       onnxVersion,
+      conv.mode,
       conv.kernel,
       conv.bias,
       'relu'

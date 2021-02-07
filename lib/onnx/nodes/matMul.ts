@@ -1,3 +1,4 @@
+import {Mode} from '../../model/module';
 import Tensor from '../../types';
 import {OnnxNode} from '../node';
 import {Attributes, Constants} from '../types';
@@ -8,9 +9,10 @@ export class MatMulNode extends OnnxNode {
     inputs: string[],
     outputs: string[],
     constants: Constants,
-    onnxVersion: number
+    onnxVersion: number,
+    mode: Mode
   ) {
-    super(attributes, inputs, outputs, constants, onnxVersion);
+    super(attributes, inputs, outputs, constants, onnxVersion, mode);
   }
 
   async forward(inputs: Tensor[]): Promise<Tensor[]> {

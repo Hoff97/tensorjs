@@ -1,3 +1,5 @@
+import {Variable} from '../../autograd/variable';
+import {Mode} from '../../model/module';
 import {CPUTensor} from '../../tensor/cpu/tensor';
 import Tensor, {Precision} from '../../types';
 import {toCPU, toGPU, toWASM} from '../../util/convert';
@@ -15,37 +17,20 @@ export class BatchNormalizationNode extends OnnxNode {
     inputs: string[],
     outputs: string[],
     constants: Constants,
-    onnxVersion: number
+    onnxVersion: number,
+    mode: Mode
   ) {
-    super(attributes, inputs, outputs, constants, onnxVersion);
+    super(attributes, inputs, outputs, constants, onnxVersion, mode);
 
     this.epsilon = this.getAttributeFloat('epsilon') || 1e-5;
     this.momentum = this.getAttributeFloat('momentum') || 0.9;
 
     this.epsTensor = new CPUTensor([1], [this.epsilon]);
+    if (mode === 'train') {
+      this.epsTensor = new Variable(this.epsTensor);
+    }
 
     //TODO: Handle lower onnxversions here
-  }
-
-  initialize(resolveConstant: (name: string) => Tensor) {
-    const scale = resolveConstant(this.inputs[1]);
-    const B = resolveConstant(this.inputs[2]);
-    const mean = resolveConstant(this.inputs[3]);
-    const variance = resolveConstant(this.inputs[4]);
-
-    if (
-      scale !== undefined &&
-      B !== undefined &&
-      mean !== undefined &&
-      variance !== undefined
-    ) {
-      const varSqrt = variance.add(this.epsTensor).sqrt();
-
-      //this.scale = scale.divide(varSqrt);
-      //this.bias = B.subtract(mean.multiply(this.scale));
-
-      varSqrt.delete();
-    }
   }
 
   async defaultForward(inputs: Tensor[]): Promise<Tensor[]> {

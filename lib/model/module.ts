@@ -2,10 +2,14 @@ import {Variable} from '../autograd/variable';
 import Tensor, {Precision} from '../types';
 import {Backend, toCPU, toWASM, toGPU} from '../util/convert';
 
+export type Mode = 'train' | 'inference';
+
 export abstract class Module {
   public backend: Backend = 'CPU';
 
-  abstract forward(input: Tensor): Tensor;
+  public mode: Mode = 'train';
+
+  abstract forward(inputs: Tensor[]): Promise<Tensor[]>;
 
   getSubModules(): Module[] {
     const modules: Module[] = [];

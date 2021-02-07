@@ -1,3 +1,5 @@
+import {Variable} from '../../autograd';
+import {Mode} from '../../model/module';
 import Tensor, {Activation, Precision} from '../../types';
 import {toCPU, toGPU, toWASM} from '../../util/convert';
 import {OnnxNode} from '../node';
@@ -20,11 +22,12 @@ export class ConvNode extends OnnxNode {
     outputs: string[],
     constants: Constants,
     onnxVersion: number,
+    mode: Mode,
     kernel?: Tensor,
     bias?: Tensor,
     activation?: Activation
   ) {
-    super(attributes, inputs, outputs, constants, onnxVersion);
+    super(attributes, inputs, outputs, constants, onnxVersion, mode);
 
     const autoPad = this.getAttributeString('autoPad');
     if (autoPad !== undefined) {
@@ -43,6 +46,12 @@ export class ConvNode extends OnnxNode {
 
     this.kernel = kernel;
     this.bias = bias;
+    if (mode === 'train' && this.kernel !== undefined) {
+      this.kernel = new Variable(this.kernel);
+    }
+    if (mode === 'train' && this.bias !== undefined) {
+      this.bias = new Variable(this.bias);
+    }
   }
 
   async forward(inputs: Tensor[]): Promise<Tensor[]> {

@@ -25,14 +25,14 @@ export class Linear extends Module {
     this.bias = new Variable(tensorBias);
   }
 
-  forward(input: Tensor): Tensor {
-    return input.gemm(this.weights, false, false, 1, this.bias);
+  async forward(inputs: Tensor[]): Promise<Tensor[]> {
+    return [inputs[0].gemm(this.weights, false, false, 1, this.bias)];
   }
 }
 
 export class Relu extends Module {
-  forward(input: Tensor): Tensor {
-    return input.clip(0);
+  async forward(inputs: Tensor[]): Promise<Tensor[]> {
+    return [inputs[0].clip(0)];
   }
 }
 
@@ -41,10 +41,10 @@ export class Sequential extends Module {
     super();
   }
 
-  forward(input: Tensor): Tensor {
-    let x = input;
+  async forward(inputs: Tensor[]): Promise<Tensor[]> {
+    let x = inputs;
     for (let i = 0; i < this.modules.length; i++) {
-      x = this.modules[i].forward(x);
+      x = await this.modules[i].forward(x);
     }
     return x;
   }
