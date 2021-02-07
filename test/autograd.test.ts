@@ -1402,5 +1402,74 @@ for (const backend of backends) {
 
       expect(await vA.grad?.compare(numericalGradA, 0.01)).toBeTrue();
     });
+
+    it('should work with mean square axis 1', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 3], [1, 2, 3, 4, 5, 6]);
+      const ones = backend.constructor([2], new Array(2).fill(1));
+      const vA = new Variable(a);
+      const aCPU = (await toCPU(a)) as CPUTensor;
+
+      const res = vA.reduceMeanSquare(1) as Variable;
+      res.backward(ones);
+
+      const numericalGradA = await backend.toBackend(
+        numericalGradient(
+          aCPU,
+          (a: CPUTensor) => a.reduceMeanSquare(1) as CPUTensor
+        )
+      );
+
+      expect(await vA.grad?.compare(numericalGradA, 0.05)).toBeTrue();
+    });
+
+    it('should work with mean square axis 0', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 3], [1, 2, 3, 4, 5, 6]);
+      const ones = backend.constructor([3], new Array(3).fill(1));
+      const vA = new Variable(a);
+      const aCPU = (await toCPU(a)) as CPUTensor;
+
+      const res = vA.reduceMeanSquare(0) as Variable;
+      res.backward(ones);
+
+      const numericalGradA = await backend.toBackend(
+        numericalGradient(
+          aCPU,
+          (a: CPUTensor) => a.reduceMeanSquare(0) as CPUTensor
+        )
+      );
+
+      expect(await vA.grad?.compare(numericalGradA, 0.05)).toBeTrue();
+    });
+
+    it('should work with mean square across all axes', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 3], [1, 2, 3, 4, 5, 6]);
+      const ones = backend.constructor([1], new Array(1).fill(1));
+      const vA = new Variable(a);
+      const aCPU = (await toCPU(a)) as CPUTensor;
+
+      const res = vA.reduceMeanSquare() as Variable;
+      res.backward(ones);
+
+      const numericalGradA = await backend.toBackend(
+        numericalGradient(
+          aCPU,
+          (a: CPUTensor) => a.reduceMeanSquare() as CPUTensor
+        )
+      );
+
+      expect(await vA.grad?.compare(numericalGradA, 0.05)).toBeTrue();
+    });
   });
 }
