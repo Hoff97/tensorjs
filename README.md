@@ -174,6 +174,13 @@ const varA = new tjs.autograd.Variable(a);
 const varB = new tjs.autograd.Variable(b);
 ```
 
+Or use the utility methods:
+```typescript
+const varA = tjs.autograd.Variable.create([2,2], [1,2,3,4], 'GPU');
+const videoElement = document.querySelector("#videoElement");
+const varB = tjs.autograd.Variable.fromData(videoElement);
+```
+
 Afterwards you can perform normal tensor operations:
 
 ```typescript
@@ -190,6 +197,7 @@ console.log(varA.grad);
 ```
 
 Multiple backward passes will add up the gradients.
+After you are done with the variable, delete the computation graph by calling `delete()`.
 
 # Documentation
 
