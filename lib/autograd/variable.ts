@@ -442,9 +442,11 @@ export class Variable extends Tensor implements VariableI {
   protected min_impl(axes: number[], keepDims: boolean): Tensor {
     throw new Error('Method not implemented.');
   }
+
   protected reduceMean_impl(axes: number[], keepDims: boolean): Tensor {
     throw new Error('Method not implemented.');
   }
+
   protected reduceMeanSquare_impl(axes: number[], keepDims: boolean): Tensor {
     throw new Error('Method not implemented.');
   }

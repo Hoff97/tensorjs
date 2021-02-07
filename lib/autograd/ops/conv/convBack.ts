@@ -14,16 +14,18 @@ export class ConvBack implements BackwardOp {
 
   backward(grad: Tensor): void {
     if (!this.x.noGrad) {
-      this.w.backward(
-        this.x.value.conv(
-          grad,
-          undefined,
-          this.strides,
-          this.group,
-          this.padding,
-          this.dilations
-        )
+      const gradW = this.x.value.conv(
+        grad,
+        undefined,
+        this.strides,
+        this.group,
+        this.padding,
+        this.dilations
       );
+      const needed = this.w.backward(gradW);
+      if (!needed) {
+        gradW.delete();
+      }
     }
 
     if (this.b !== undefined && !this.b.noGrad) {
@@ -32,7 +34,11 @@ export class ConvBack implements BackwardOp {
         biasSum.push(i + 2);
       }
 
-      this.b.backward(grad.sum(biasSum));
+      const gradB = grad.sum(biasSum);
+      const needed = this.b.backward(gradB);
+      if (!needed) {
+        gradB.delete();
+      }
     }
 
     if (!this.w.noGrad) {
@@ -43,15 +49,18 @@ export class ConvBack implements BackwardOp {
         xPads.push(wShape[i + 2] - this.padding[i] + this.dilations[i] - 2);
       }
       xPads = [...xPads, ...xPads];
-      this.x.backward(
-        grad.convTranspose(
-          this.w.value,
-          this.dilations,
-          this.group,
-          xPads,
-          this.strides
-        )
+
+      const gradX = grad.convTranspose(
+        this.w.value,
+        this.dilations,
+        this.group,
+        xPads,
+        this.strides
       );
+      const needed = this.x.backward(gradX);
+      if (!needed) {
+        gradX.delete();
+      }
     }
   }
 
