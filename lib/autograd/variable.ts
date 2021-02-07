@@ -28,6 +28,9 @@ import {MultiplyScalarBack} from './ops/unary/multiplyScalarBack';
 import {MeanBack} from './ops/reduce/meanBack';
 import {MeanSquareBack} from './ops/reduce/meanSquareBack';
 import {SliceBack} from './ops/util/sliceBack';
+import {AveragePoolBack} from './ops/conv/averagePoolBack';
+import {PadBack} from './ops/conv/padBack';
+import {ProductBack} from './ops/reduce/productBack';
 
 export interface VariableOptions {
   grad?: Tensor;
@@ -436,8 +439,15 @@ export class Variable extends Tensor implements VariableI {
   }
 
   protected product_impl(axes: number[], keepDims: boolean): Tensor {
-    throw new Error('Method not implemented.');
+    const product = this.value.product(axes, keepDims);
+    return new Variable(product, {
+      backEdge: this.noGrad
+        ? undefined
+        : new ProductBack(this, product, axes, keepDims),
+      noGrad: this.noGrad,
+    });
   }
+
   protected max_impl(axes: number[], keepDims: boolean): Tensor {
     throw new Error('Method not implemented.');
   }
@@ -515,15 +525,27 @@ export class Variable extends Tensor implements VariableI {
   }
 
   protected pad_impl(pads: number[], mode: PadMode, value: number): Tensor {
-    throw new Error('Method not implemented.');
+    return new Variable(this.value.pad(pads, mode, value), {
+      backEdge: this.noGrad ? undefined : new PadBack(this, pads, mode, value),
+      noGrad: this.noGrad,
+    });
   }
+
   protected averagePool_impl(
     kernelShape: number[],
     pads: number[],
     strides: number[],
     includePad: boolean
   ): Tensor {
-    throw new Error('Method not implemented.');
+    return new Variable(
+      this.value.averagePool(kernelShape, pads, strides, includePad),
+      {
+        backEdge: this.noGrad
+          ? undefined
+          : new AveragePoolBack(this, kernelShape, pads, strides, includePad),
+        noGrad: this.noGrad,
+      }
+    );
   }
 
   protected transpose_impl(permutation: number[]): Tensor {
