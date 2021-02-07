@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {Tensor} from '../library';
 import {CPUTensor} from '../tensor/cpu/tensor';
-import {TensorValues, Activation, PadMode} from '../types';
+import {TensorValues, Activation, PadMode, Precision} from '../types';
 import {AbsBack} from './ops/unary/absBack';
 import {ExpBack} from './ops/unary/expBack';
 import {LogBack} from './ops/unary/logBack';
@@ -32,6 +32,10 @@ import {AveragePoolBack} from './ops/conv/averagePoolBack';
 import {PadBack} from './ops/conv/padBack';
 import {ProductBack} from './ops/reduce/productBack';
 import {SigmoidBack} from './ops/unary/sigmoidBack';
+import {Backend} from '../util/convert';
+import {WASMTensor} from '../tensor/wasm/tensor';
+import {GPUTensor} from '../tensor/gpu/tensor';
+import REGL from 'regl';
 
 export interface VariableOptions {
   /**
@@ -85,6 +89,51 @@ export class Variable extends Tensor implements VariableI {
     }
 
     this.noGrad = options.noGrad || false;
+  }
+
+  static create(
+    shape: ReadonlyArray<number>,
+    values: number[] | Float32Array,
+    backend: Backend,
+    options?: VariableOptions,
+    precision?: Precision
+  ) {
+    let value: Tensor;
+    if (backend === 'CPU') {
+      value = new CPUTensor(shape, values);
+    } else if (backend === 'WASM') {
+      if (!(values instanceof Float32Array)) {
+        values = Float32Array.from(values);
+      }
+      value = new WASMTensor(values, new Uint32Array(shape));
+    } else {
+      if (!(values instanceof Float32Array)) {
+        values = Float32Array.from(values);
+      }
+      value = new GPUTensor(
+        values,
+        shape,
+        precision === undefined ? 32 : precision
+      );
+    }
+
+    return new Variable(value, options);
+  }
+
+  /**
+   * Creates a GPU variable from texture data (eg. Image/Video element)
+   */
+  static fromData(
+    data: REGL.TextureImageData,
+    options?: VariableOptions,
+    precision?: Precision
+  ) {
+    const tensor = GPUTensor.fromData(
+      data,
+      precision === undefined ? 32 : precision
+    );
+
+    return new Variable(tensor, options);
   }
 
   /**
