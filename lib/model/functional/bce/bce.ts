@@ -8,6 +8,17 @@ import {BCEBack} from './back/back';
 import {bce as bceCPU} from './cpu';
 import {defaultBCED} from './gpu';
 
+/**
+ * Calculates the binary cross entropy loss, given probabilities x
+ * and ground truth y. Returns a tensor of the same shape as
+ * x. To use for a loss, you have to sum over the result:
+ * ```typecript
+ * const loss = bce(x,y).sum();
+ * ```
+ *
+ * @param x Probabilities in [0,1]
+ * @param y Ground truth labels of the same shape as x.
+ */
 export function bce(x: Tensor, y: Tensor): Tensor {
   if (!sameType(x, y)) {
     throw new Error('BCE can only be computed for tensors of the same type');
