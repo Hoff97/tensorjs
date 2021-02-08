@@ -62,7 +62,8 @@
 					<h1>TensorJS</h1>
 				</a>
 				<p><img src="https://github.com/Hoff97/tensorjs/workflows/Test/badge.svg?branch=develop" alt="Test">
-				<img src="https://img.shields.io/npm/v/@hoff97/tensor-js" alt="Version"></p>
+					<img src="https://img.shields.io/npm/v/@hoff97/tensor-js" alt="Version">
+				<img src="https://img.shields.io/david/Hoff97/tensorjs" alt="David"></p>
 				<p>This is a JS/TS library for accelerated tensor computation intended to be
 					run in the browser. It contains an implementation for numpy-style
 				multidimensional arrays and their operators.</p>
@@ -196,6 +197,33 @@
 				</a>
 				<p>Try to run your models with static input sizes. TensorJS will compile specialized versions of all operations
 				after enough forward passes. For this the input shapes of the tensors have to be constant though.</p>
+				<a href="#autograd-functionality" id="autograd-functionality" style="color: inherit; text-decoration: none;">
+					<h2>Autograd functionality</h2>
+				</a>
+				<p>Automatic differentiation is supported. For this create variables from all your tensors:</p>
+				<pre><code class="language-typescript"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">a</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">tjs</span><span style="color: #000000">.</span><span style="color: #267F99">tensor</span><span style="color: #000000">.</span><span style="color: #267F99">cpu</span><span style="color: #000000">.</span><span style="color: #267F99">CPUTensor</span><span style="color: #000000">([</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">], [</span><span style="color: #098658">1</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">3</span><span style="color: #000000">,</span><span style="color: #098658">4</span><span style="color: #000000">]);</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">b</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">tjs</span><span style="color: #000000">.</span><span style="color: #267F99">tensor</span><span style="color: #000000">.</span><span style="color: #267F99">cpu</span><span style="color: #000000">.</span><span style="color: #267F99">CPUTensor</span><span style="color: #000000">([</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">], [</span><span style="color: #098658">5</span><span style="color: #000000">,</span><span style="color: #098658">6</span><span style="color: #000000">,</span><span style="color: #098658">7</span><span style="color: #000000">,</span><span style="color: #098658">8</span><span style="color: #000000">]);</span>
+
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">varA</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">tjs</span><span style="color: #000000">.</span><span style="color: #267F99">autograd</span><span style="color: #000000">.</span><span style="color: #267F99">Variable</span><span style="color: #000000">(</span><span style="color: #001080">a</span><span style="color: #000000">);</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">varB</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">tjs</span><span style="color: #000000">.</span><span style="color: #267F99">autograd</span><span style="color: #000000">.</span><span style="color: #267F99">Variable</span><span style="color: #000000">(</span><span style="color: #001080">b</span><span style="color: #000000">);</span>
+</code></pre>
+				<p>Or use the utility methods:</p>
+				<pre><code class="language-typescript"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">varA</span><span style="color: #000000"> = </span><span style="color: #001080">tjs</span><span style="color: #000000">.</span><span style="color: #001080">autograd</span><span style="color: #000000">.</span><span style="color: #001080">Variable</span><span style="color: #000000">.</span><span style="color: #795E26">create</span><span style="color: #000000">([</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">], [</span><span style="color: #098658">1</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">3</span><span style="color: #000000">,</span><span style="color: #098658">4</span><span style="color: #000000">], </span><span style="color: #A31515">&#039;GPU&#039;</span><span style="color: #000000">);</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">videoElement</span><span style="color: #000000"> = </span><span style="color: #001080">document</span><span style="color: #000000">.</span><span style="color: #795E26">querySelector</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;#videoElement&quot;</span><span style="color: #000000">);</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">varB</span><span style="color: #000000"> = </span><span style="color: #001080">tjs</span><span style="color: #000000">.</span><span style="color: #001080">autograd</span><span style="color: #000000">.</span><span style="color: #001080">Variable</span><span style="color: #000000">.</span><span style="color: #795E26">fromData</span><span style="color: #000000">(</span><span style="color: #001080">videoElement</span><span style="color: #000000">);</span>
+</code></pre>
+				<p>Afterwards you can perform normal tensor operations:</p>
+				<pre><code class="language-typescript"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">mul</span><span style="color: #000000"> = </span><span style="color: #001080">varA</span><span style="color: #000000">.</span><span style="color: #795E26">matMul</span><span style="color: #000000">(</span><span style="color: #001080">varB</span><span style="color: #000000">);</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">sum</span><span style="color: #000000"> = </span><span style="color: #001080">mul</span><span style="color: #000000">.</span><span style="color: #795E26">sum</span><span style="color: #000000">();</span>
+</code></pre>
+				<p>To perform a backward pass, call backward on a scalar tensor (a tensor with shape <code>[1]</code>).
+				All variables will have an attribute <code>.grad</code>, which is the gradient</p>
+				<pre><code class="language-typescript"><span style="color: #001080">sum</span><span style="color: #000000">.</span><span style="color: #795E26">backward</span><span style="color: #000000">();</span>
+
+<span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #001080">varA</span><span style="color: #000000">.</span><span style="color: #001080">grad</span><span style="color: #000000">);</span>
+</code></pre>
+				<p>Multiple backward passes will add up the gradients.
+				After you are done with the variable, delete the computation graph by calling <code>delete()</code>.</p>
 				<a href="#documentation" id="documentation" style="color: inherit; text-decoration: none;">
 					<h1>Documentation</h1>
 				</a>
@@ -207,15 +235,14 @@
 					<h2>Setup</h2>
 				</a>
 				<p>Make sure you have <a href="https://github.com/rustwasm/wasm-pack">wasm-pack</a> installed, then</p>
-				<pre><code class="language-sh"><span style="color: #000000">$ npm run build:wasm</span>
-<span style="color: #000000">$ npm install</span>
+				<pre><code class="language-sh"><span style="color: #000000">$ npm install</span>
 </code></pre>
 				<a href="#build" id="build" style="color: inherit; text-decoration: none;">
 					<h2>Build</h2>
 				</a>
 				<pre><code class="language-sh"><span style="color: #000000">$ npm run build</span>
 </code></pre>
-				<p>This will first build the rust into a WASM package and
+				<p>This will first build the rust code into a WASM package and
 				then build the whole library.</p>
 				<a href="#testing" id="testing" style="color: inherit; text-decoration: none;">
 					<h2>Testing</h2>
@@ -235,6 +262,7 @@
 					<li>Unit tests for all backends, which can be run individually
 					by <code>npm run test:integration</code></li>
 				</ul>
+				<p>Coverage reports are generated in <code>coverage</code>.</p>
 				<a href="#testing-the-gpu-implementation" id="testing-the-gpu-implementation" style="color: inherit; text-decoration: none;">
 					<h2>Testing the GPU implementation:</h2>
 				</a>
@@ -244,7 +272,7 @@
 				For this reason the GPU backend is not tested by default.</p>
 				<p>To run GPU tests, uncomment the lines in <code>./test/gpu.test.ts</code>,
 					set <code>run = true</code> in <code>./test/onnx.test.ts</code>, <code>./test/onnxPrecompiled.test.ts</code>
-					(and optionally <code>./test/onnxPrecompiled.test.ts</code> although the model
+					(and optionally <code>./test/onnxModel.test.ts</code> although the model
 					tests are quite performance intensive and should only be run on a suitable
 					computer),
 					change the <code>browsers</code> field in <code>karma.conf.js</code> to <code>ChromeGPU</code>.
@@ -271,31 +299,19 @@
 						<a href="modules.html">Exports</a>
 					</li>
 					<li class=" tsd-kind-namespace">
-						<a href="modules/onnx.html">onnx</a>
+						<a href="modules/autograd.html">autograd</a>
 					</li>
-					<li class=" tsd-kind-namespace tsd-parent-kind-namespace">
-						<a href="modules/onnx.model.html">onnx.model</a>
+					<li class=" tsd-kind-namespace">
+						<a href="modules/model.html">model</a>
+					</li>
+					<li class=" tsd-kind-namespace">
+						<a href="modules/onnx.html">onnx</a>
 					</li>
 					<li class=" tsd-kind-namespace">
 						<a href="modules/tensor.html">tensor</a>
 					</li>
-					<li class=" tsd-kind-namespace tsd-parent-kind-namespace">
-						<a href="modules/tensor.cpu.html">tensor.cpu</a>
-					</li>
-					<li class=" tsd-kind-namespace tsd-parent-kind-namespace">
-						<a href="modules/tensor.gpu.html">tensor.gpu</a>
-					</li>
-					<li class=" tsd-kind-namespace tsd-parent-kind-namespace">
-						<a href="modules/tensor.wasm.html">tensor.wasm</a>
-					</li>
 					<li class=" tsd-kind-namespace">
 						<a href="modules/util.html">util</a>
-					</li>
-					<li class=" tsd-kind-namespace tsd-parent-kind-namespace">
-						<a href="modules/util.convert.html">util.convert</a>
-					</li>
-					<li class=" tsd-kind-namespace tsd-parent-kind-namespace">
-						<a href="modules/util.shape.html">util.shape</a>
 					</li>
 				</ul>
 			</nav>
@@ -303,6 +319,15 @@
 				<ul class="before-current">
 					<li class=" tsd-kind-class">
 						<a href="classes/tensor.html" class="tsd-kind-icon">Tensor</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="modules.html#activation" class="tsd-kind-icon">Activation</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="modules.html#padmode" class="tsd-kind-icon">Pad<wbr>Mode</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="modules.html#precision" class="tsd-kind-icon">Precision</a>
 					</li>
 				</ul>
 			</nav>

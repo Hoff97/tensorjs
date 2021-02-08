@@ -80,6 +80,9 @@
 							<li>
 								<a href="tensor.wasm.wasmtensor.html" class="tsd-signature-type" data-tsd-kind="Class">WASMTensor</a>
 							</li>
+							<li>
+								<a href="autograd.variable.html" class="tsd-signature-type" data-tsd-kind="Class">Variable</a>
+							</li>
 						</ul>
 					</li>
 				</ul>
@@ -99,27 +102,33 @@
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#abs" class="tsd-kind-icon">abs</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#add" class="tsd-kind-icon">add</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><a href="tensor.html#add_impl" class="tsd-kind-icon">add_<wbr>impl</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#addmultiplyscalar" class="tsd-kind-icon">add<wbr>Multiply<wbr>Scalar</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#addscalar" class="tsd-kind-icon">add<wbr>Scalar</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#add_impl" class="tsd-kind-icon">add_<wbr>impl</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#alignshapes" class="tsd-kind-icon">align<wbr>Shapes</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#aligntensor" class="tsd-kind-icon">align<wbr>Tensor</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#averagepool" class="tsd-kind-icon">average<wbr>Pool</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><a href="tensor.html#averagepool_impl" class="tsd-kind-icon">average<wbr>Pool_<wbr>impl</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#ceil" class="tsd-kind-icon">ceil</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#clip" class="tsd-kind-icon">clip</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#clipbackward" class="tsd-kind-icon">clip<wbr>Backward</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#compare" class="tsd-kind-icon">compare</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#concat" class="tsd-kind-icon">concat</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#constantlike" class="tsd-kind-icon">constant<wbr>Like</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#conv" class="tsd-kind-icon">conv</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#convtranspose" class="tsd-kind-icon">conv<wbr>Transpose</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><a href="tensor.html#convtranspose_impl" class="tsd-kind-icon">conv<wbr>Transpose_<wbr>impl</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><a href="tensor.html#conv_impl" class="tsd-kind-icon">conv_<wbr>impl</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#copy" class="tsd-kind-icon">copy</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#delete" class="tsd-kind-icon">delete</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#divide" class="tsd-kind-icon">divide</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><a href="tensor.html#divide_impl" class="tsd-kind-icon">divide_<wbr>impl</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#divide_impl" class="tsd-kind-icon">divide_<wbr>impl</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#exp" class="tsd-kind-icon">exp</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#expand" class="tsd-kind-icon">expand</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#floor" class="tsd-kind-icon">floor</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#gather" class="tsd-kind-icon">gather</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#gemm" class="tsd-kind-icon">gemm</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><a href="tensor.html#gemm_impl" class="tsd-kind-icon">gemm_<wbr>impl</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#gemm_impl" class="tsd-kind-icon">gemm_<wbr>impl</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><a href="tensor.html#getaxes" class="tsd-kind-icon">get<wbr>Axes</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#getshape" class="tsd-kind-icon">get<wbr>Shape</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#getvalues" class="tsd-kind-icon">get<wbr>Values</a></li>
@@ -130,12 +139,14 @@
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#min" class="tsd-kind-icon">min</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><a href="tensor.html#min_impl" class="tsd-kind-icon">min_<wbr>impl</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#multiply" class="tsd-kind-icon">multiply</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><a href="tensor.html#multiply_impl" class="tsd-kind-icon">multiply_<wbr>impl</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#multiplyscalar" class="tsd-kind-icon">multiply<wbr>Scalar</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#multiply_impl" class="tsd-kind-icon">multiply_<wbr>impl</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#negate" class="tsd-kind-icon">negate</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#normalize" class="tsd-kind-icon">normalize</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#pad" class="tsd-kind-icon">pad</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><a href="tensor.html#pad_impl" class="tsd-kind-icon">pad_<wbr>impl</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#power" class="tsd-kind-icon">power</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><a href="tensor.html#power_impl" class="tsd-kind-icon">power_<wbr>impl</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#power_impl" class="tsd-kind-icon">power_<wbr>impl</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#product" class="tsd-kind-icon">product</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><a href="tensor.html#product_impl" class="tsd-kind-icon">product_<wbr>impl</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#reducemean" class="tsd-kind-icon">reduce<wbr>Mean</a></li>
@@ -145,12 +156,15 @@
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#repeat" class="tsd-kind-icon">repeat</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#reshape" class="tsd-kind-icon">reshape</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><a href="tensor.html#reshape_impl" class="tsd-kind-icon">reshape_<wbr>impl</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#sigmoid" class="tsd-kind-icon">sigmoid</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#sign" class="tsd-kind-icon">sign</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#singleconstant" class="tsd-kind-icon">single<wbr>Constant</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#slice" class="tsd-kind-icon">slice</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><a href="tensor.html#slice_impl" class="tsd-kind-icon">slice_<wbr>impl</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#softmax" class="tsd-kind-icon">softmax</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#sqrt" class="tsd-kind-icon">sqrt</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#subtract" class="tsd-kind-icon">subtract</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><a href="tensor.html#subtract_impl" class="tsd-kind-icon">subtract_<wbr>impl</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#subtract_impl" class="tsd-kind-icon">subtract_<wbr>impl</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#sum" class="tsd-kind-icon">sum</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tensor.html#sumsquare" class="tsd-kind-icon">sum<wbr>Square</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><a href="tensor.html#sumsquare_impl" class="tsd-kind-icon">sum<wbr>Square_<wbr>impl</a></li>
@@ -192,7 +206,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L397">types.ts:397</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L449">types.ts:449</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -208,13 +222,13 @@
 					<a name="add" class="tsd-anchor"></a>
 					<h3>add</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">add<span class="tsd-signature-symbol">(</span>tensor<span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></li>
+						<li class="tsd-signature tsd-kind-icon">add<span class="tsd-signature-symbol">(</span>tensor<span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a>, alpha<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span>, beta<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L474">types.ts:474</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L547">types.ts:547</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -245,22 +259,77 @@
 								<li>
 									<h5>tensor: <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h5>
 								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> alpha: <span class="tsd-signature-type">number</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> beta: <span class="tsd-signature-type">number</span></h5>
+								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
 						</li>
 					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-protected">
-					<a name="add_impl" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagProtected">Protected</span> <span class="tsd-flag ts-flagAbstract">Abstract</span> add_<wbr>impl</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-protected">
-						<li class="tsd-signature tsd-kind-icon">add_<wbr>impl<span class="tsd-signature-symbol">(</span>th<span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a>, tensor<span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a>, resultShape<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></li>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="addmultiplyscalar" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagAbstract">Abstract</span> add<wbr>Multiply<wbr>Scalar</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">add<wbr>Multiply<wbr>Scalar<span class="tsd-signature-symbol">(</span>factor<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, add<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L836">types.ts:836</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L643">types.ts:643</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>factor: <span class="tsd-signature-type">number</span></h5>
+								</li>
+								<li>
+									<h5>add: <span class="tsd-signature-type">number</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="addscalar" class="tsd-anchor"></a>
+					<h3>add<wbr>Scalar</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">add<wbr>Scalar<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L639">types.ts:639</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>value: <span class="tsd-signature-type">number</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="add_impl" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagAbstract">Abstract</span> add_<wbr>impl</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">add_<wbr>impl<span class="tsd-signature-symbol">(</span>th<span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a>, tensor<span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a>, resultShape<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span>, alpha<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, beta<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L987">types.ts:987</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -273,6 +342,12 @@
 								</li>
 								<li>
 									<h5>resultShape: <span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+								<li>
+									<h5>alpha: <span class="tsd-signature-type">number</span></h5>
+								</li>
+								<li>
+									<h5>beta: <span class="tsd-signature-type">number</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
@@ -289,7 +364,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L399">types.ts:399</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L468">types.ts:468</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -315,7 +390,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L428">types.ts:428</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L500">types.ts:500</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -348,7 +423,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L328">types.ts:328</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L375">types.ts:375</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -399,7 +474,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L874">types.ts:874</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L1072">types.ts:1072</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -431,7 +506,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L807">types.ts:807</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L952">types.ts:952</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -453,7 +528,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L744">types.ts:744</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L881">types.ts:881</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -481,6 +556,49 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="clipbackward" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagAbstract">Abstract</span> clip<wbr>Backward</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">clip<wbr>Backward<span class="tsd-signature-symbol">(</span>grad<span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a>, min<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span>, max<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L889">types.ts:889</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Backward pass for clip</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>grad: <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Gradient from which values should be selected</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> min: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Minimum value. Defaults to the minimum possible value</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> max: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Maximum value. Defaults to the maximum possible value</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
 					<a name="compare" class="tsd-anchor"></a>
 					<h3>compare</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -490,7 +608,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L61">types.ts:61</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L71">types.ts:71</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -546,7 +664,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L737">types.ts:737</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L874">types.ts:874</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -587,16 +705,44 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
-					<a name="conv" class="tsd-anchor"></a>
-					<h3>conv</h3>
+					<a name="constantlike" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagAbstract">Abstract</span> constant<wbr>Like</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">conv<span class="tsd-signature-symbol">(</span>kernel<span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a>, bias<span class="tsd-signature-symbol">?: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a>, dilations<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span>, group<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span>, pads<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span>, strides<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span>, activation<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Activation</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></li>
+						<li class="tsd-signature tsd-kind-icon">constant<wbr>Like<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L252">types.ts:252</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L30">types.ts:30</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Constructs a tensor with the same shape and the given value everywhere</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>value: <span class="tsd-signature-type">number</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="conv" class="tsd-anchor"></a>
+					<h3>conv</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">conv<span class="tsd-signature-symbol">(</span>kernel<span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a>, bias<span class="tsd-signature-symbol">?: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a>, dilations<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span>, group<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span>, pads<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span>, strides<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span>, activation<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">&quot;id&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;relu&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;relu6&quot;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L262">types.ts:262</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -645,10 +791,101 @@
 									</div>
 								</li>
 								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> activation: <span class="tsd-signature-type">Activation</span></h5>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> activation: <span class="tsd-signature-type">&quot;id&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;relu&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;relu6&quot;</span></h5>
 									<div class="tsd-comment tsd-typography">
 										<p>Optional activation to apply. Defaults to the identity (so no activation)</p>
 									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="convtranspose" class="tsd-anchor"></a>
+					<h3>conv<wbr>Transpose</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">conv<wbr>Transpose<span class="tsd-signature-symbol">(</span>kernel<span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a>, dilations<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span>, group<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span>, pads<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span>, strides<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L305">types.ts:305</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Calculates the transpose convolution</p>
+								</div>
+								<p>This tensor should have shape [N,C,D1,D2,...] where D1,D2,... are the spatial dimensions.</p>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>kernel: <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Convolution kernel with shape [M,C/G,K1,K2] where G is the group parameter</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> dilations: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Per axis dilations for the spatial dimension. Defaults to 1 for all axes</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> group: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Group parameter</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> pads: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Padding to add to the input for each spatial dimension. Defaults to 0 for all axes</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> strides: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Convolution stride for each spatial dimension. Defaults to 1 for all axes</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-protected">
+					<a name="convtranspose_impl" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagProtected">Protected</span> <span class="tsd-flag ts-flagAbstract">Abstract</span> conv<wbr>Transpose_<wbr>impl</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-protected">
+						<li class="tsd-signature tsd-kind-icon">conv<wbr>Transpose_<wbr>impl<span class="tsd-signature-symbol">(</span>kernel<span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a>, dilations<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span>, group<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, pads<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span>, strides<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L1058">types.ts:1058</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>kernel: <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h5>
+								</li>
+								<li>
+									<h5>dilations: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+								<li>
+									<h5>group: <span class="tsd-signature-type">number</span></h5>
+								</li>
+								<li>
+									<h5>pads: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+								<li>
+									<h5>strides: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
@@ -659,13 +896,13 @@
 					<a name="conv_impl" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagProtected">Protected</span> <span class="tsd-flag ts-flagAbstract">Abstract</span> conv_<wbr>impl</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-protected">
-						<li class="tsd-signature tsd-kind-icon">conv_<wbr>impl<span class="tsd-signature-symbol">(</span>kernel<span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a>, dilations<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span>, group<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, pads<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span>, strides<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span>, bias<span class="tsd-signature-symbol">?: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a>, activation<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Activation</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></li>
+						<li class="tsd-signature tsd-kind-icon">conv_<wbr>impl<span class="tsd-signature-symbol">(</span>kernel<span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a>, dilations<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span>, group<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, pads<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span>, strides<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span>, activation<span class="tsd-signature-symbol">: </span><a href="../modules.html#activation" class="tsd-signature-type" data-tsd-kind="Type alias">Activation</a>, bias<span class="tsd-signature-symbol">?: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L862">types.ts:862</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L1048">types.ts:1048</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -686,10 +923,10 @@
 									<h5>strides: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h5>
 								</li>
 								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> bias: <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h5>
+									<h5>activation: <a href="../modules.html#activation" class="tsd-signature-type" data-tsd-kind="Type alias">Activation</a></h5>
 								</li>
 								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> activation: <span class="tsd-signature-type">Activation</span></h5>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> bias: <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
@@ -706,7 +943,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L776">types.ts:776</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L921">types.ts:921</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -729,7 +966,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L35">types.ts:35</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L45">types.ts:45</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -751,13 +988,13 @@
 					<a name="divide" class="tsd-anchor"></a>
 					<h3>divide</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">divide<span class="tsd-signature-symbol">(</span>tensor<span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></li>
+						<li class="tsd-signature tsd-kind-icon">divide<span class="tsd-signature-symbol">(</span>tensor<span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a>, alpha<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L549">types.ts:549</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L665">types.ts:665</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -788,22 +1025,25 @@
 								<li>
 									<h5>tensor: <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h5>
 								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> alpha: <span class="tsd-signature-type">number</span></h5>
+								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
 						</li>
 					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-protected">
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
 					<a name="divide_impl" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagProtected">Protected</span> <span class="tsd-flag ts-flagAbstract">Abstract</span> divide_<wbr>impl</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-protected">
-						<li class="tsd-signature tsd-kind-icon">divide_<wbr>impl<span class="tsd-signature-symbol">(</span>th<span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a>, tensor<span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a>, resultShape<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></li>
+					<h3><span class="tsd-flag ts-flagAbstract">Abstract</span> divide_<wbr>impl</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">divide_<wbr>impl<span class="tsd-signature-symbol">(</span>th<span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a>, tensor<span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a>, resultShape<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span>, alpha<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L842">types.ts:842</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L1010">types.ts:1010</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -816,6 +1056,9 @@
 								</li>
 								<li>
 									<h5>resultShape: <span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+								<li>
+									<h5>alpha: <span class="tsd-signature-type">number</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
@@ -832,7 +1075,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L382">types.ts:382</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L434">types.ts:434</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -848,19 +1091,19 @@
 					<a name="expand" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagAbstract">Abstract</span> expand</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">expand<span class="tsd-signature-symbol">(</span>shape<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></li>
+						<li class="tsd-signature tsd-kind-icon">expand<span class="tsd-signature-symbol">(</span>shape<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L770">types.ts:770</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L915">types.ts:915</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>shape: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h5>
+									<h5>shape: <span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
@@ -877,7 +1120,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L802">types.ts:802</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L947">types.ts:947</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -899,7 +1142,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L797">types.ts:797</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L942">types.ts:942</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -947,7 +1190,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L639">types.ts:639</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L768">types.ts:768</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1001,17 +1244,17 @@
 						</li>
 					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-protected">
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
 					<a name="gemm_impl" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagProtected">Protected</span> <span class="tsd-flag ts-flagAbstract">Abstract</span> gemm_<wbr>impl</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-protected">
+					<h3><span class="tsd-flag ts-flagAbstract">Abstract</span> gemm_<wbr>impl</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
 						<li class="tsd-signature tsd-kind-icon">gemm_<wbr>impl<span class="tsd-signature-symbol">(</span>b<span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a>, aTranspose<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span>, bTranspose<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span>, alpha<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, beta<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, C<span class="tsd-signature-symbol">?: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L846">types.ts:846</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L1023">types.ts:1023</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1049,7 +1292,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L86">types.ts:86</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L96">types.ts:96</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1072,7 +1315,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L25">types.ts:25</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L25">types.ts:25</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1094,7 +1337,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L20">types.ts:20</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L20">types.ts:20</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1125,7 +1368,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L387">types.ts:387</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L439">types.ts:439</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1147,7 +1390,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L714">types.ts:714</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L851">types.ts:851</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1183,7 +1426,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L177">types.ts:177</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L187">types.ts:187</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1231,7 +1474,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L854">types.ts:854</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L1037">types.ts:1037</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1257,7 +1500,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L199">types.ts:199</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L209">types.ts:209</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1305,7 +1548,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L856">types.ts:856</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L1039">types.ts:1039</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1325,13 +1568,13 @@
 					<a name="multiply" class="tsd-anchor"></a>
 					<h3>multiply</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">multiply<span class="tsd-signature-symbol">(</span>tensor<span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></li>
+						<li class="tsd-signature tsd-kind-icon">multiply<span class="tsd-signature-symbol">(</span>tensor<span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a>, alpha<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L524">types.ts:524</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L622">types.ts:622</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1362,22 +1605,48 @@
 								<li>
 									<h5>tensor: <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h5>
 								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> alpha: <span class="tsd-signature-type">number</span></h5>
+								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
 						</li>
 					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-protected">
-					<a name="multiply_impl" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagProtected">Protected</span> <span class="tsd-flag ts-flagAbstract">Abstract</span> multiply_<wbr>impl</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-protected">
-						<li class="tsd-signature tsd-kind-icon">multiply_<wbr>impl<span class="tsd-signature-symbol">(</span>th<span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a>, tensor<span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a>, resultShape<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></li>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="multiplyscalar" class="tsd-anchor"></a>
+					<h3>multiply<wbr>Scalar</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">multiply<wbr>Scalar<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L840">types.ts:840</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L635">types.ts:635</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>value: <span class="tsd-signature-type">number</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="multiply_impl" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagAbstract">Abstract</span> multiply_<wbr>impl</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">multiply_<wbr>impl<span class="tsd-signature-symbol">(</span>th<span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a>, tensor<span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a>, resultShape<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span>, alpha<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L1003">types.ts:1003</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1391,7 +1660,32 @@
 								<li>
 									<h5>resultShape: <span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h5>
 								</li>
+								<li>
+									<h5>alpha: <span class="tsd-signature-type">number</span></h5>
+								</li>
 							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="negate" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagAbstract">Abstract</span> negate</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">negate<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L454">types.ts:454</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Negates all entries of the tensor</p>
+								</div>
+							</div>
 							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
 						</li>
 					</ul>
@@ -1406,7 +1700,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L834">types.ts:834</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L979">types.ts:979</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1443,13 +1737,13 @@
 					<a name="pad" class="tsd-anchor"></a>
 					<h3>pad</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">pad<span class="tsd-signature-symbol">(</span>pads<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span>, mode<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">PadMode</span>, value<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></li>
+						<li class="tsd-signature tsd-kind-icon">pad<span class="tsd-signature-symbol">(</span>pads<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span>, mode<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">&quot;constant&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;reflect&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;edge&quot;</span>, value<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L307">types.ts:307</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L356">types.ts:356</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1493,7 +1787,7 @@
 									</div>
 								</li>
 								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> mode: <span class="tsd-signature-type">PadMode</span></h5>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> mode: <span class="tsd-signature-type">&quot;constant&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;reflect&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;edge&quot;</span></h5>
 									<div class="tsd-comment tsd-typography">
 										<p>Padding mode. One of &#39;constant&#39;, &#39;edge&#39;, &#39;reflect&#39;. Defaults to &#39;constant&#39;</p>
 									</div>
@@ -1513,13 +1807,13 @@
 					<a name="pad_impl" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagProtected">Protected</span> <span class="tsd-flag ts-flagAbstract">Abstract</span> pad_<wbr>impl</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-protected">
-						<li class="tsd-signature tsd-kind-icon">pad_<wbr>impl<span class="tsd-signature-symbol">(</span>pads<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span>, mode<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">PadMode</span>, value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></li>
+						<li class="tsd-signature tsd-kind-icon">pad_<wbr>impl<span class="tsd-signature-symbol">(</span>pads<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span>, mode<span class="tsd-signature-symbol">: </span><a href="../modules.html#padmode" class="tsd-signature-type" data-tsd-kind="Type alias">PadMode</a>, value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L870">types.ts:870</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L1066">types.ts:1066</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1528,7 +1822,7 @@
 									<h5>pads: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h5>
 								</li>
 								<li>
-									<h5>mode: <span class="tsd-signature-type">PadMode</span></h5>
+									<h5>mode: <a href="../modules.html#padmode" class="tsd-signature-type" data-tsd-kind="Type alias">PadMode</a></h5>
 								</li>
 								<li>
 									<h5>value: <span class="tsd-signature-type">number</span></h5>
@@ -1548,7 +1842,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L574">types.ts:574</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L699">types.ts:699</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1584,17 +1878,17 @@
 						</li>
 					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-protected">
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
 					<a name="power_impl" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagProtected">Protected</span> <span class="tsd-flag ts-flagAbstract">Abstract</span> power_<wbr>impl</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-protected">
+					<h3><span class="tsd-flag ts-flagAbstract">Abstract</span> power_<wbr>impl</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
 						<li class="tsd-signature tsd-kind-icon">power_<wbr>impl<span class="tsd-signature-symbol">(</span>th<span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a>, tensor<span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a>, resultShape<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L844">types.ts:844</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L1017">types.ts:1017</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1623,7 +1917,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L155">types.ts:155</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L165">types.ts:165</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1671,7 +1965,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L852">types.ts:852</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L1035">types.ts:1035</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1697,7 +1991,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L214">types.ts:214</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L224">types.ts:224</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1736,7 +2030,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L230">types.ts:230</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L240">types.ts:240</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1775,7 +2069,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L860">types.ts:860</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L1043">types.ts:1043</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1801,7 +2095,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L858">types.ts:858</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L1041">types.ts:1041</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1827,7 +2121,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L768">types.ts:768</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L913">types.ts:913</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1876,7 +2170,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L350">types.ts:350</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L399">types.ts:399</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1914,7 +2208,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L377">types.ts:377</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L426">types.ts:426</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1931,6 +2225,82 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="sigmoid" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagAbstract">Abstract</span> sigmoid</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">sigmoid<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L459">types.ts:459</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Computes the element wise sigmoid of all values</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="sign" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagAbstract">Abstract</span> sign</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">sign<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L466">types.ts:466</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Computes the value-wise sign which is:</p>
+									<ul>
+										<li>(-1) if x &lt; 0</li>
+										<li>1 otherwise</li>
+									</ul>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="singleconstant" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagAbstract">Abstract</span> single<wbr>Constant</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">single<wbr>Constant<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L35">types.ts:35</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Constructs a tensor with shape [1] and the given value everywhere</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>value: <span class="tsd-signature-type">number</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
 					<a name="slice" class="tsd-anchor"></a>
 					<h3>slice</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -1940,7 +2310,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L680">types.ts:680</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L817">types.ts:817</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1998,7 +2368,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L881">types.ts:881</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L1081">types.ts:1081</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -2027,7 +2397,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L609">types.ts:609</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L738">types.ts:738</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2056,7 +2426,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L392">types.ts:392</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L444">types.ts:444</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2072,13 +2442,13 @@
 					<a name="subtract" class="tsd-anchor"></a>
 					<h3>subtract</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">subtract<span class="tsd-signature-symbol">(</span>tensor<span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></li>
+						<li class="tsd-signature tsd-kind-icon">subtract<span class="tsd-signature-symbol">(</span>tensor<span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a>, alpha<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span>, beta<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L499">types.ts:499</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L584">types.ts:584</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2109,22 +2479,28 @@
 								<li>
 									<h5>tensor: <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h5>
 								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> alpha: <span class="tsd-signature-type">number</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> beta: <span class="tsd-signature-type">number</span></h5>
+								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
 						</li>
 					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-protected">
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
 					<a name="subtract_impl" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagProtected">Protected</span> <span class="tsd-flag ts-flagAbstract">Abstract</span> subtract_<wbr>impl</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-protected">
-						<li class="tsd-signature tsd-kind-icon">subtract_<wbr>impl<span class="tsd-signature-symbol">(</span>th<span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a>, tensor<span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a>, resultShape<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></li>
+					<h3><span class="tsd-flag ts-flagAbstract">Abstract</span> subtract_<wbr>impl</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">subtract_<wbr>impl<span class="tsd-signature-symbol">(</span>th<span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a>, tensor<span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a>, resultShape<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span>, alpha<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, beta<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L838">types.ts:838</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L995">types.ts:995</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -2137,6 +2513,12 @@
 								</li>
 								<li>
 									<h5>resultShape: <span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+								<li>
+									<h5>alpha: <span class="tsd-signature-type">number</span></h5>
+								</li>
+								<li>
+									<h5>beta: <span class="tsd-signature-type">number</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a></h4>
@@ -2153,7 +2535,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L119">types.ts:119</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L129">types.ts:129</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2201,7 +2583,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L133">types.ts:133</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L143">types.ts:143</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2239,7 +2621,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L850">types.ts:850</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L1033">types.ts:1033</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -2265,7 +2647,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L849">types.ts:849</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L1032">types.ts:1032</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -2291,7 +2673,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L593">types.ts:593</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L722">types.ts:722</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2333,7 +2715,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L879">types.ts:879</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L1079">types.ts:1079</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -2356,7 +2738,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/26e1ea7/lib/types.ts#L825">types.ts:825</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L970">types.ts:970</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2414,7 +2796,13 @@
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="tensor.html#add" class="tsd-kind-icon">add</a>
 							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-protected">
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="tensor.html#addmultiplyscalar" class="tsd-kind-icon">add<wbr>Multiply<wbr>Scalar</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="tensor.html#addscalar" class="tsd-kind-icon">add<wbr>Scalar</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="tensor.html#add_impl" class="tsd-kind-icon">add_<wbr>impl</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
@@ -2436,13 +2824,25 @@
 								<a href="tensor.html#clip" class="tsd-kind-icon">clip</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="tensor.html#clipbackward" class="tsd-kind-icon">clip<wbr>Backward</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="tensor.html#compare" class="tsd-kind-icon">compare</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="tensor.html#concat" class="tsd-kind-icon">concat</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="tensor.html#constantlike" class="tsd-kind-icon">constant<wbr>Like</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="tensor.html#conv" class="tsd-kind-icon">conv</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="tensor.html#convtranspose" class="tsd-kind-icon">conv<wbr>Transpose</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-protected">
+								<a href="tensor.html#convtranspose_impl" class="tsd-kind-icon">conv<wbr>Transpose_<wbr>impl</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-protected">
 								<a href="tensor.html#conv_impl" class="tsd-kind-icon">conv_<wbr>impl</a>
@@ -2456,7 +2856,7 @@
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="tensor.html#divide" class="tsd-kind-icon">divide</a>
 							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-protected">
+							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="tensor.html#divide_impl" class="tsd-kind-icon">divide_<wbr>impl</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
@@ -2474,7 +2874,7 @@
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="tensor.html#gemm" class="tsd-kind-icon">gemm</a>
 							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-protected">
+							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="tensor.html#gemm_impl" class="tsd-kind-icon">gemm_<wbr>impl</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-protected">
@@ -2507,8 +2907,14 @@
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="tensor.html#multiply" class="tsd-kind-icon">multiply</a>
 							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-protected">
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="tensor.html#multiplyscalar" class="tsd-kind-icon">multiply<wbr>Scalar</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="tensor.html#multiply_impl" class="tsd-kind-icon">multiply_<wbr>impl</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="tensor.html#negate" class="tsd-kind-icon">negate</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="tensor.html#normalize" class="tsd-kind-icon">normalize</a>
@@ -2522,7 +2928,7 @@
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="tensor.html#power" class="tsd-kind-icon">power</a>
 							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-protected">
+							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="tensor.html#power_impl" class="tsd-kind-icon">power_<wbr>impl</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
@@ -2553,6 +2959,15 @@
 								<a href="tensor.html#reshape_impl" class="tsd-kind-icon">reshape_<wbr>impl</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="tensor.html#sigmoid" class="tsd-kind-icon">sigmoid</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="tensor.html#sign" class="tsd-kind-icon">sign</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="tensor.html#singleconstant" class="tsd-kind-icon">single<wbr>Constant</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="tensor.html#slice" class="tsd-kind-icon">slice</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-protected">
@@ -2567,7 +2982,7 @@
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="tensor.html#subtract" class="tsd-kind-icon">subtract</a>
 							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-protected">
+							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="tensor.html#subtract_impl" class="tsd-kind-icon">subtract_<wbr>impl</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
@@ -2595,6 +3010,15 @@
 					</li>
 				</ul>
 				<ul class="after-current">
+					<li class=" tsd-kind-type-alias">
+						<a href="../modules.html#activation" class="tsd-kind-icon">Activation</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="../modules.html#padmode" class="tsd-kind-icon">Pad<wbr>Mode</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="../modules.html#precision" class="tsd-kind-icon">Precision</a>
+					</li>
 				</ul>
 			</nav>
 		</div>

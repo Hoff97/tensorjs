@@ -64,6 +64,8 @@
 						<section class="tsd-index-section ">
 							<h3>Namespaces</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-namespace"><a href="modules/autograd.html" class="tsd-kind-icon">autograd</a></li>
+								<li class="tsd-kind-namespace"><a href="modules/model.html" class="tsd-kind-icon">model</a></li>
 								<li class="tsd-kind-namespace"><a href="modules/onnx.html" class="tsd-kind-icon">onnx</a></li>
 								<li class="tsd-kind-namespace"><a href="modules/tensor.html" class="tsd-kind-icon">tensor</a></li>
 								<li class="tsd-kind-namespace"><a href="modules/util.html" class="tsd-kind-icon">util</a></li>
@@ -75,7 +77,48 @@
 								<li class="tsd-kind-class"><a href="classes/tensor.html" class="tsd-kind-icon">Tensor</a></li>
 							</ul>
 						</section>
+						<section class="tsd-index-section ">
+							<h3>Type aliases</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-type-alias"><a href="modules.html#activation" class="tsd-kind-icon">Activation</a></li>
+								<li class="tsd-kind-type-alias"><a href="modules.html#padmode" class="tsd-kind-icon">Pad<wbr>Mode</a></li>
+								<li class="tsd-kind-type-alias"><a href="modules.html#precision" class="tsd-kind-icon">Precision</a></li>
+							</ul>
+						</section>
 					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Type aliases</h2>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias">
+					<a name="activation" class="tsd-anchor"></a>
+					<h3>Activation</h3>
+					<div class="tsd-signature tsd-kind-icon">Activation<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;id&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;relu&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;relu6&quot;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L1088">types.ts:1088</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias">
+					<a name="padmode" class="tsd-anchor"></a>
+					<h3>Pad<wbr>Mode</h3>
+					<div class="tsd-signature tsd-kind-icon">Pad<wbr>Mode<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;constant&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;reflect&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;edge&quot;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L4">types.ts:4</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias">
+					<a name="precision" class="tsd-anchor"></a>
+					<h3>Precision</h3>
+					<div class="tsd-signature tsd-kind-icon">Precision<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">16</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">32</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/946ebb8/lib/types.ts#L1090">types.ts:1090</a></li>
+						</ul>
+					</aside>
 				</section>
 			</section>
 		</div>
@@ -86,31 +129,19 @@
 						<a href="modules.html">Exports</a>
 					</li>
 					<li class=" tsd-kind-namespace">
-						<a href="modules/onnx.html">onnx</a>
+						<a href="modules/autograd.html">autograd</a>
 					</li>
-					<li class=" tsd-kind-namespace tsd-parent-kind-namespace">
-						<a href="modules/onnx.model.html">onnx.model</a>
+					<li class=" tsd-kind-namespace">
+						<a href="modules/model.html">model</a>
+					</li>
+					<li class=" tsd-kind-namespace">
+						<a href="modules/onnx.html">onnx</a>
 					</li>
 					<li class=" tsd-kind-namespace">
 						<a href="modules/tensor.html">tensor</a>
 					</li>
-					<li class=" tsd-kind-namespace tsd-parent-kind-namespace">
-						<a href="modules/tensor.cpu.html">tensor.cpu</a>
-					</li>
-					<li class=" tsd-kind-namespace tsd-parent-kind-namespace">
-						<a href="modules/tensor.gpu.html">tensor.gpu</a>
-					</li>
-					<li class=" tsd-kind-namespace tsd-parent-kind-namespace">
-						<a href="modules/tensor.wasm.html">tensor.wasm</a>
-					</li>
 					<li class=" tsd-kind-namespace">
 						<a href="modules/util.html">util</a>
-					</li>
-					<li class=" tsd-kind-namespace tsd-parent-kind-namespace">
-						<a href="modules/util.convert.html">util.convert</a>
-					</li>
-					<li class=" tsd-kind-namespace tsd-parent-kind-namespace">
-						<a href="modules/util.shape.html">util.shape</a>
 					</li>
 				</ul>
 			</nav>
@@ -118,6 +149,15 @@
 				<ul class="before-current">
 					<li class=" tsd-kind-class">
 						<a href="classes/tensor.html" class="tsd-kind-icon">Tensor</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="modules.html#activation" class="tsd-kind-icon">Activation</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="modules.html#padmode" class="tsd-kind-icon">Pad<wbr>Mode</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="modules.html#precision" class="tsd-kind-icon">Precision</a>
 					</li>
 				</ul>
 			</nav>
