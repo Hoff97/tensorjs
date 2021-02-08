@@ -1,5 +1,5 @@
-import { CPUTensor } from '../../tensor/cpu/tensor';
-import { incrementIndex } from '../../util/shape';
+import {CPUTensor} from '../../tensor/cpu/tensor';
+import {incrementIndex} from '../../util/shape';
 
 export function upsample(x: CPUTensor, scales: number[]) {
   const rank = x.shape.length;
@@ -15,7 +15,7 @@ export function upsample(x: CPUTensor, scales: number[]) {
   const inIx = new Array(rank);
   for (let i = 0; i < result.size; i++) {
     for (let j = 0; j < rank; j++) {
-      inIx[j] = Math.floor(outIx[j]/scales[j]);
+      inIx[j] = Math.floor(outIx[j] / scales[j]);
     }
 
     result.set(i, x.get(inIx));

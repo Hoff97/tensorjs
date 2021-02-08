@@ -1,5 +1,5 @@
-import { CPUTensor } from '../../tensor/cpu/tensor';
-import { incrementIndex } from '../../util/shape';
+import {CPUTensor} from '../../tensor/cpu/tensor';
+import {incrementIndex} from '../../util/shape';
 
 export function expand(x: CPUTensor, resultShape: readonly number[]) {
   const rank = x.shape.length;

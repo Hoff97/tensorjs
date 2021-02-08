@@ -1,17 +1,18 @@
-import { CPUTensor } from '../../tensor/cpu/tensor';
-import { PadMode } from '../../types';
-import { getSize, incrementIndex } from '../../util/shape';
-import { outputDimsSize } from '../util/conv';
+import {CPUTensor} from '../../tensor/cpu/tensor';
+import {PadMode} from '../../types';
+import {incrementIndex} from '../../util/shape';
 
-export function pad(x: CPUTensor,
-                    pads: number[],
-                    mode: PadMode,
-                    value: number) {
+export function pad(
+  x: CPUTensor,
+  pads: number[],
+  mode: PadMode,
+  value: number
+) {
   const rank = x.shape.length;
 
   const resultShape = [...x.shape];
   for (let i = 0; i < rank; i++) {
-    resultShape[i] += pads[i] + pads[i+rank];
+    resultShape[i] += pads[i] + pads[i + rank];
   }
 
   const Y = new CPUTensor(resultShape);
@@ -35,11 +36,13 @@ export function pad(x: CPUTensor,
   return Y;
 }
 
-function getPadValue(x: CPUTensor,
-                     index: number[],
-                     mode: PadMode,
-                     value: number,
-                     allInRange: boolean): number {
+function getPadValue(
+  x: CPUTensor,
+  index: number[],
+  mode: PadMode,
+  value: number,
+  allInRange: boolean
+): number {
   if (allInRange) {
     return x.get(index);
   }
@@ -61,7 +64,7 @@ function getPadValue(x: CPUTensor,
       if (index[j] < 0) {
         index[j] = -index[j];
       } else if (index[j] >= x.shape[j]) {
-        index[j] = 2*x.shape[j] - index[j] - 2;
+        index[j] = 2 * x.shape[j] - index[j] - 2;
       }
     }
   }

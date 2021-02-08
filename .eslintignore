@@ -1,0 +1,12 @@
+dist/
+docs/
+examples/
+pkg/
+target/
+lib/wasm/
+
+coverage/
+
+karma.conf.js
+
+webpack.config.js

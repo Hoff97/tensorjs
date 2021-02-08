@@ -1,29 +1,50 @@
-import { averagePool } from '../../ops/cpu/averagePool';
+import {averagePool} from '../../ops/cpu/averagePool';
 import {
   abs,
-  add, ceil, clip, divide, exp, floor, log, multiply, power, sqrt, subtract
+  add,
+  addMultiplyScalar,
+  ceil,
+  clip,
+  clipBackward,
+  divide,
+  exp,
+  floor,
+  log,
+  multiply,
+  negate,
+  power,
+  sigmoid,
+  sign,
+  sqrt,
+  subtract,
 } from '../../ops/cpu/basic';
-import { concat } from '../../ops/cpu/concat';
-import { conv } from '../../ops/cpu/conv';
-import { expand } from '../../ops/cpu/expand';
-import { gather } from '../../ops/cpu/gather';
-import { gemm } from '../../ops/cpu/gemm';
-import { matMul } from '../../ops/cpu/matMul';
-import { max } from '../../ops/cpu/max';
-import { min } from '../../ops/cpu/min';
-import { normalize } from '../../ops/cpu/normalize';
-import { pad } from '../../ops/cpu/pad';
-import { product } from '../../ops/cpu/product';
-import { reduceMean } from '../../ops/cpu/reduceMean';
-import { reduceMeanSquare } from '../../ops/cpu/reduceMeanSquare';
-import { repeat } from '../../ops/cpu/repeat';
-import { slice } from '../../ops/cpu/slice';
-import { sum } from '../../ops/cpu/sum';
-import { sumSquare } from '../../ops/cpu/sumSquare';
-import { transpose } from '../../ops/cpu/transpose';
-import { upsample } from '../../ops/cpu/upsample';
-import Tensor, { PadMode, TensorValues } from '../../types';
-import { compareShapes, computeStrides, getSize, indexToPos } from '../../util/shape';
+import {concat} from '../../ops/cpu/concat';
+import {conv} from '../../ops/cpu/conv';
+import {convTranspose} from '../../ops/cpu/convTranspose';
+import {expand} from '../../ops/cpu/expand';
+import {gather} from '../../ops/cpu/gather';
+import {gemm} from '../../ops/cpu/gemm';
+import {matMul} from '../../ops/cpu/matMul';
+import {max} from '../../ops/cpu/max';
+import {min} from '../../ops/cpu/min';
+import {normalize} from '../../ops/cpu/normalize';
+import {pad} from '../../ops/cpu/pad';
+import {product} from '../../ops/cpu/product';
+import {reduceMean} from '../../ops/cpu/reduceMean';
+import {reduceMeanSquare} from '../../ops/cpu/reduceMeanSquare';
+import {repeat} from '../../ops/cpu/repeat';
+import {slice} from '../../ops/cpu/slice';
+import {sum} from '../../ops/cpu/sum';
+import {sumSquare} from '../../ops/cpu/sumSquare';
+import {transpose} from '../../ops/cpu/transpose';
+import {upsample} from '../../ops/cpu/upsample';
+import Tensor, {Activation, PadMode, TensorValues} from '../../types';
+import {
+  compareShapes,
+  computeStrides,
+  getSize,
+  indexToPos,
+} from '../../util/shape';
 
 export class CPUTensor extends Tensor {
   public values: TensorValues;
@@ -36,9 +57,13 @@ export class CPUTensor extends Tensor {
 
   public type: string;
 
-  public deleted: boolean = false;
+  public deleted = false;
 
-  constructor(shape: ReadonlyArray<number>, values?: TensorValues | number[], type?: string) {
+  constructor(
+    shape: ReadonlyArray<number>,
+    values?: TensorValues | number[],
+    type?: string
+  ) {
     super();
 
     this.shape = shape;
@@ -48,26 +73,24 @@ export class CPUTensor extends Tensor {
     if (values !== undefined) {
       if (values instanceof Float32Array || values instanceof Int32Array) {
         this.values = values;
-        this.type = values instanceof Float32Array ? "float" : "int";
-      } else if (type === "int") {
+        this.type = values instanceof Float32Array ? 'float' : 'int';
+      } else if (type === 'int') {
         this.values = Int32Array.from(values);
-        this.type = "int";
-      } else if (values === null ) {
-        //Prototype tensor that wont hold any data, but can be used for static inference in ONNX models
-        this.values = null;
+        this.type = 'int';
       } else {
         this.values = Float32Array.from(values);
-        this.type = "float";
+        this.type = 'float';
       }
     } else {
-      if (type === "int") {
+      if (type === 'int') {
         this.values = new Int32Array(this.size);
-        this.type = "int";
+        this.type = 'int';
       } else {
         this.values = new Float32Array(this.size);
-        this.type = "float";
+        this.type = 'float';
       }
     }
+    this.type = 'float';
   }
 
   getValues() {
@@ -78,11 +101,20 @@ export class CPUTensor extends Tensor {
     return this.shape;
   }
 
+  constantLike(value: number): Tensor {
+    return new CPUTensor(this.shape, new Float32Array(this.size).fill(value));
+  }
+
+  singleConstant(value: number): Tensor {
+    return new CPUTensor([1], [value]);
+  }
+
   async cpu(): Promise<CPUTensor> {
     return this;
   }
 
   delete(): void {
+    //@ts-ignore
     this.values = undefined;
     this.deleted = true;
   }
@@ -144,39 +176,96 @@ export class CPUTensor extends Tensor {
     return ceil(this);
   }
 
+  negate(): Tensor {
+    return negate(this);
+  }
+
+  multiplyScalar(value: number): Tensor {
+    return addMultiplyScalar(this, value, 0);
+  }
+
+  addScalar(value: number): Tensor {
+    return addMultiplyScalar(this, 1, value);
+  }
+
+  addMultiplyScalar(factor: number, add: number): Tensor {
+    return addMultiplyScalar(this, factor, add);
+  }
+
+  sign(): Tensor {
+    return sign(this);
+  }
+
   clip(min?: number, max?: number): Tensor {
     return clip(this, min, max);
   }
 
-  add_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor {
+  clipBackward(grad: Tensor, min?: number, max?: number): Tensor {
+    if (!(grad instanceof CPUTensor)) {
+      throw new Error('Can only do clipBackward with CPUTensor');
+    }
+    return clipBackward(this, grad, this.getShape(), min, max);
+  }
+
+  sigmoid(): Tensor {
+    return sigmoid(this);
+  }
+
+  add_impl(
+    th: Tensor,
+    tensor: Tensor,
+    resultShape: readonly number[],
+    alpha: number,
+    beta: number
+  ): Tensor {
     if (!(tensor instanceof CPUTensor) || !(th instanceof CPUTensor)) {
       throw new Error('Can only add CPU tensor to CPU tensor');
     }
-    return add(th, tensor, resultShape);
+    return add(th, tensor, resultShape, alpha, beta);
   }
 
-  subtract_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor {
+  subtract_impl(
+    th: Tensor,
+    tensor: Tensor,
+    resultShape: readonly number[],
+    alpha: number,
+    beta: number
+  ): Tensor {
     if (!(tensor instanceof CPUTensor) || !(th instanceof CPUTensor)) {
       throw new Error('Can only subtract CPU tensor to CPU tensor');
     }
-    return subtract(th, tensor, resultShape);
+    return subtract(th, tensor, resultShape, alpha, beta);
   }
 
-  multiply_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor {
+  multiply_impl(
+    th: Tensor,
+    tensor: Tensor,
+    resultShape: readonly number[],
+    alpha: number
+  ): Tensor {
     if (!(tensor instanceof CPUTensor) || !(th instanceof CPUTensor)) {
       throw new Error('Can only add CPU tensor to CPU tensor');
     }
-    return multiply(th, tensor, resultShape);
+    return multiply(th, tensor, resultShape, alpha);
   }
 
-  divide_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor {
+  divide_impl(
+    th: Tensor,
+    tensor: Tensor,
+    resultShape: readonly number[],
+    alpha: number
+  ): Tensor {
     if (!(tensor instanceof CPUTensor) || !(th instanceof CPUTensor)) {
       throw new Error('Can only add CPU tensor to CPU tensor');
     }
-    return divide(th, tensor, resultShape);
+    return divide(th, tensor, resultShape, alpha);
   }
 
-  power_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor {
+  power_impl(
+    th: Tensor,
+    tensor: Tensor,
+    resultShape: readonly number[]
+  ): Tensor {
     if (!(tensor instanceof CPUTensor) || !(th instanceof CPUTensor)) {
       throw new Error('Can only take CPU tensor to power of CPU tensor');
     }
@@ -191,8 +280,17 @@ export class CPUTensor extends Tensor {
     return matMul(this, tensor);
   }
 
-  gemm_impl(b: Tensor, aTranspose: boolean, bTranspose: boolean, alpha: number, beta: number, c?: Tensor): Tensor {
-    if (!(b instanceof CPUTensor && (c === undefined || c instanceof CPUTensor))) {
+  gemm_impl(
+    b: Tensor,
+    aTranspose: boolean,
+    bTranspose: boolean,
+    alpha: number,
+    beta: number,
+    c?: Tensor
+  ): Tensor {
+    if (
+      !(b instanceof CPUTensor && (c === undefined || c instanceof CPUTensor))
+    ) {
       throw new Error('Can only do gemm with CPU tensors');
     }
     return gemm(this, b, aTranspose, bTranspose, alpha, beta, c as CPUTensor);
@@ -205,7 +303,6 @@ export class CPUTensor extends Tensor {
   sumSquare_impl(axes: number[], keepDims: boolean): Tensor {
     return sumSquare(this, axes, keepDims);
   }
-
 
   product_impl(axes: number[], keepDims: boolean): Tensor {
     return product(this, axes, keepDims);
@@ -227,21 +324,59 @@ export class CPUTensor extends Tensor {
     return reduceMeanSquare(this, axes, keepDims);
   }
 
-  conv_impl(kernel: Tensor, dilations: number[], group: number, pads: number[], strides: number[], bias?: Tensor): Tensor {
-    if (!(kernel instanceof CPUTensor) || (bias !== undefined && !(bias instanceof CPUTensor))) {
+  conv_impl(
+    kernel: Tensor,
+    dilations: number[],
+    group: number,
+    pads: number[],
+    strides: number[],
+    activation: Activation,
+    bias?: Tensor
+  ): Tensor {
+    if (
+      !(kernel instanceof CPUTensor) ||
+      (bias !== undefined && !(bias instanceof CPUTensor))
+    ) {
       throw new Error('Can only do convolution of CPU tensor with CPU tensor');
     }
-    return conv(this, kernel, dilations, group, pads, strides, bias as CPUTensor);
+    return conv(
+      this,
+      kernel,
+      dilations,
+      group,
+      pads,
+      strides,
+      activation,
+      bias as CPUTensor
+    );
+  }
+
+  protected convTranspose_impl(
+    kernel: Tensor,
+    dilations: number[],
+    group: number,
+    pads: number[],
+    strides: number[]
+  ): Tensor {
+    if (!(kernel instanceof CPUTensor)) {
+      throw new Error(
+        'Can only do transpose convolution of CPU tensor with CPU tensor'
+      );
+    }
+
+    return convTranspose(this, kernel, dilations, group, pads, strides);
   }
 
   pad_impl(pads: number[], mode: PadMode, value: number): Tensor {
     return pad(this, pads, mode, value);
   }
 
-  averagePool_impl(kernelShape: number[],
-                    pads: number[],
-                    strides: number[],
-                    includePad: boolean): Tensor {
+  averagePool_impl(
+    kernelShape: number[],
+    pads: number[],
+    strides: number[],
+    includePad: boolean
+  ): Tensor {
     return averagePool(this, kernelShape, pads, strides, includePad);
   }
 
@@ -268,7 +403,8 @@ export class CPUTensor extends Tensor {
     return repeat(this, repeats);
   }
 
-  expand(shape: number[]): Tensor {
+  expand(shape: readonly number[]): Tensor {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [_shape, goal, resultShape] = this.alignShapes(this.shape, shape);
     if (compareShapes(this.shape, resultShape)) {
       return this.copy();
@@ -288,8 +424,19 @@ export class CPUTensor extends Tensor {
     return upsample(this, scales);
   }
 
-  normalize(mean: Tensor, variance: Tensor, epsilon: number, scale: Tensor, bias: Tensor): Tensor {
-    if (!(mean instanceof CPUTensor) || !(variance instanceof CPUTensor) || !(scale instanceof CPUTensor) || !(bias instanceof CPUTensor)) {
+  normalize(
+    mean: Tensor,
+    variance: Tensor,
+    epsilon: number,
+    scale: Tensor,
+    bias: Tensor
+  ): Tensor {
+    if (
+      !(mean instanceof CPUTensor) ||
+      !(variance instanceof CPUTensor) ||
+      !(scale instanceof CPUTensor) ||
+      !(bias instanceof CPUTensor)
+    ) {
       throw new Error('Can only normalize with CPU tensors');
     }
     return normalize(this, mean, variance, epsilon, scale, bias);

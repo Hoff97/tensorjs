@@ -1,15 +1,18 @@
-import { BinaryOperation } from "../../../ops/gpu/binary/binaryOperation";
-import { MultiplyOperation } from "../../../ops/gpu/binary/multiply";
-import { gpuConstructor, GPUTensor } from "../../../tensor/gpu/tensor";
-import types from "../../../types";
-import { Attributes, Constants } from "../../types";
-import { BinaryNode } from "./binaryNode";
+import {Mode} from '../../../model/module';
+import types from '../../../types';
+import {Attributes, Constants} from '../../types';
+import {BinaryNode} from './binaryNode';
 
 export class MulNode extends BinaryNode {
-  constructor(attributes: Attributes, inputs: string[], outputs: string[], constants: Constants, onnxVersion: number) {
-    super(attributes, inputs, outputs, constants, onnxVersion);
-
-    this.name = 'Mul';
+  constructor(
+    attributes: Attributes,
+    inputs: string[],
+    outputs: string[],
+    constants: Constants,
+    onnxVersion: number,
+    mode: Mode
+  ) {
+    super(attributes, inputs, outputs, constants, onnxVersion, 'Mul', mode);
   }
 
   compute(a: types, b: types): types {

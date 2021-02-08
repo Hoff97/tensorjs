@@ -43,6 +43,9 @@ pub fn compute_strides(shape: &Vec<usize>) -> Vec<usize> {
         return vec![];
     }
     if rank == 1 {
+        if shape[0] == 1 {
+            return vec![0];
+        }
         return vec![1];
     }
 
@@ -95,6 +98,9 @@ pub fn compute_strides_uint32(shape: &Uint32Array) -> Vec<usize> {
         return vec![];
     }
     if rank == 1 {
+        if shape.get_index(0) == 0 {
+            return vec![0];
+        }
         return vec![1];
     }
 

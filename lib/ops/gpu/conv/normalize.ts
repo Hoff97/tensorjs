@@ -1,10 +1,9 @@
-import { defaultAllocator } from "../../../tensor/gpu/gl";
-import { GPUTensorConstructor, GPUTensorI } from "../../../tensor/gpu/interface";
-import { GPUMemoryAllocator } from "../../../tensor/gpu/memory";
-import { Precision } from "../../../types";
-import { getSize } from "../../../util/shape";
-import { Input, Operation } from "../operation";
-
+import {defaultAllocator} from '../../../tensor/gpu/gl';
+import {GPUTensorConstructor, GPUTensorI} from '../../../tensor/gpu/interface';
+import {GPUMemoryAllocator} from '../../../tensor/gpu/memory';
+import {Precision} from '../../../types';
+import {getSize} from '../../../util/shape';
+import {Input, Operation} from '../operation';
 
 export interface NormalizeOpInfo {
   shapeX?: readonly number[];
@@ -27,7 +26,7 @@ export interface NormalizeOpInfo {
   widthBias?: number;
   heightBias?: number;
 
-  shapeOutput?: readonly number[],
+  shapeOutput?: readonly number[];
   widthOutput?: number;
   heightOutput?: number;
 
@@ -43,8 +42,15 @@ export interface NormalizeOpInput {
   Bias: GPUTensorI;
 }
 
-export class NormalizeOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTensor, NormalizeOpInfo, NormalizeOpInput> {
-  constructor(tensorConstructor: GPUTensorConstructor<GPUTensor>, allocator?: GPUMemoryAllocator) {
+export class NormalizeOperation<GPUTensor extends GPUTensorI> extends Operation<
+  GPUTensor,
+  NormalizeOpInfo,
+  NormalizeOpInput
+> {
+  constructor(
+    tensorConstructor: GPUTensorConstructor<GPUTensor>,
+    allocator?: GPUMemoryAllocator
+  ) {
     super(tensorConstructor, allocator);
   }
 
@@ -55,11 +61,10 @@ export class NormalizeOperation<GPUTensor extends GPUTensorI> extends Operation<
   }
 
   getUniformAttrs(): Input[] {
-    return [
-      { name: "epsilon", type: "float" }
-    ];
+    return [{name: 'epsilon', type: 'float'}];
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getFragmentShader(info: NormalizeOpInfo): string {
     return `
     float process(int[${this.maxRank}] index) {
@@ -78,17 +83,21 @@ export class NormalizeOperation<GPUTensor extends GPUTensorI> extends Operation<
   }
 
   getTextureNames(): string[] {
-    return ["X", "Mean", "Variance", "Scale", "Bias"];
+    return ['X', 'Mean', 'Variance', 'Scale', 'Bias'];
   }
 
   calc(input: NormalizeOpInput): GPUTensor {
-    return this.compute(input.X.shape, {
-      X: input.X,
-      Mean: input.Mean,
-      Variance: input.Variance,
-      Scale: input.Scale,
-      Bias: input.Bias
-    }, { epsilon: input.epsilon });
+    return this.compute(
+      input.X.shape,
+      {
+        X: input.X,
+        Mean: input.Mean,
+        Variance: input.Variance,
+        Scale: input.Scale,
+        Bias: input.Bias,
+      },
+      {epsilon: input.epsilon}
+    );
   }
 
   compile(info: NormalizeOpInfo, precision: Precision) {
@@ -99,9 +108,15 @@ export class NormalizeOperation<GPUTensor extends GPUTensorI> extends Operation<
     super.compile(info, precision);
   }
 
-  getCompilationInfo(input: NormalizeOpInput, precision: Precision): NormalizeOpInfo {
+  getCompilationInfo(
+    input: NormalizeOpInput,
+    precision: Precision
+  ): NormalizeOpInfo {
     const outputShape = this.getOutputShape(input);
-    const outputSize = defaultAllocator.getAllocationDimensions(getSize(outputShape), precision);
+    const outputSize = defaultAllocator.getAllocationDimensions(
+      getSize(outputShape),
+      precision
+    );
 
     return {
       shapeX: input.X.shape,
@@ -128,7 +143,7 @@ export class NormalizeOperation<GPUTensor extends GPUTensorI> extends Operation<
       widthOutput: outputSize.width,
       heightOutput: outputSize.height,
 
-      epsilon: input.epsilon
+      epsilon: input.epsilon,
     };
   }
 

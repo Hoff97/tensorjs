@@ -2,6 +2,7 @@
 
 ![Test](https://github.com/Hoff97/tensorjs/workflows/Test/badge.svg?branch=develop)
 ![Version](https://img.shields.io/npm/v/@hoff97/tensor-js)
+![David](https://img.shields.io/david/Hoff97/tensorjs)
 
 This is a JS/TS library for accelerated tensor computation intended to be
 run in the browser. It contains an implementation for numpy-style
@@ -161,6 +162,43 @@ const values = await tensor.copy(32).getValues();
 Try to run your models with static input sizes. TensorJS will compile specialized versions of all operations
 after enough forward passes. For this the input shapes of the tensors have to be constant though.
 
+## Autograd functionality
+
+Automatic differentiation is supported. For this create variables from all your tensors:
+
+```typescript
+const a = new tjs.tensor.cpu.CPUTensor([2,2], [1,2,3,4]);
+const b = new tjs.tensor.cpu.CPUTensor([2,2], [5,6,7,8]);
+
+const varA = new tjs.autograd.Variable(a);
+const varB = new tjs.autograd.Variable(b);
+```
+
+Or use the utility methods:
+```typescript
+const varA = tjs.autograd.Variable.create([2,2], [1,2,3,4], 'GPU');
+const videoElement = document.querySelector("#videoElement");
+const varB = tjs.autograd.Variable.fromData(videoElement);
+```
+
+Afterwards you can perform normal tensor operations:
+
+```typescript
+const mul = varA.matMul(varB);
+const sum = mul.sum();
+```
+
+To perform a backward pass, call backward on a scalar tensor (a tensor with shape `[1]`).
+All variables will have an attribute `.grad`, which is the gradient
+```typescript
+sum.backward();
+
+console.log(varA.grad);
+```
+
+Multiple backward passes will add up the gradients.
+After you are done with the variable, delete the computation graph by calling `delete()`.
+
 # Documentation
 
 You can find the documentation [here](https://hoff97.github.io/tensorjs/).
@@ -172,7 +210,6 @@ You can find the documentation [here](https://hoff97.github.io/tensorjs/).
 Make sure you have [wasm-pack](https://github.com/rustwasm/wasm-pack) installed, then
 
 ```sh
-$ npm run build:wasm
 $ npm install
 ```
 
@@ -182,7 +219,7 @@ $ npm install
 $ npm run build
 ```
 
-This will first build the rust into a WASM package and
+This will first build the rust code into a WASM package and
 then build the whole library.
 
 ## Testing
@@ -207,6 +244,8 @@ This will run:
 - Unit tests for all backends, which can be run individually
   by `npm run test:integration`
 
+Coverage reports are generated in `coverage`.
+
 ## Testing the GPU implementation:
 
 The tests are run in a Headless Chrome by default.
@@ -216,7 +255,7 @@ For this reason the GPU backend is not tested by default.
 
 To run GPU tests, uncomment the lines in `./test/gpu.test.ts`,
 set `run = true` in `./test/onnx.test.ts`, `./test/onnxPrecompiled.test.ts`
-(and optionally `./test/onnxPrecompiled.test.ts` although the model
+(and optionally `./test/onnxModel.test.ts` although the model
 tests are quite performance intensive and should only be run on a suitable
 computer),
 change the `browsers` field in `karma.conf.js` to `ChromeGPU`.

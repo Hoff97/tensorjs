@@ -1,16 +1,15 @@
-import { defaultAllocator } from "../../../tensor/gpu/gl";
-import { GPUTensorConstructor, GPUTensorI } from "../../../tensor/gpu/interface";
-import { GPUMemoryAllocator } from "../../../tensor/gpu/memory";
-import { PadMode, Precision } from "../../../types";
-import { getSize } from "../../../util/shape";
-import { Input, Operation } from "../operation";
-
+import {defaultAllocator} from '../../../tensor/gpu/gl';
+import {GPUTensorConstructor, GPUTensorI} from '../../../tensor/gpu/interface';
+import {GPUMemoryAllocator} from '../../../tensor/gpu/memory';
+import {PadMode, Precision} from '../../../types';
+import {getSize} from '../../../util/shape';
+import {Input, Operation} from '../operation';
 
 export interface PadInfo {
   shapeX?: readonly number[];
   widthX?: number;
   heightX?: number;
-  shapeOutput?: readonly number[],
+  shapeOutput?: readonly number[];
   widthOutput?: number;
   heightOutput?: number;
 
@@ -26,11 +25,19 @@ export interface PadInput {
   value: number;
 }
 
-export class PadOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTensor, PadInfo, PadInput> {
-  constructor(tensorConstructor: GPUTensorConstructor<GPUTensor>, allocator?: GPUMemoryAllocator) {
+export class PadOperation<GPUTensor extends GPUTensorI> extends Operation<
+  GPUTensor,
+  PadInfo,
+  PadInput
+> {
+  constructor(
+    tensorConstructor: GPUTensorConstructor<GPUTensor>,
+    allocator?: GPUMemoryAllocator
+  ) {
     super(tensorConstructor, allocator);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getFragmentShader(info: PadInfo): string {
     return `
     float process(int index[${this.maxRank}]) {
@@ -92,12 +99,12 @@ export class PadOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTen
   }
 
   getTextureNames(): string[] {
-    return ["X"];
+    return ['X'];
   }
 
   getVariables() {
     return `
-    ${this.getVarModifier('pads')} int pads[${this.maxRank*2}];
+    ${this.getVarModifier('pads')} int pads[${this.maxRank * 2}];
     ${this.getVarModifier('value')} float value;
     ${this.getVarModifier('mode')} int mode;
     `;
@@ -105,27 +112,31 @@ export class PadOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTen
 
   getUniformAttrs(): Input[] {
     return [
-      { name: "value", type: "float" },
-      { name: "pads", length: this.maxRank*2 },
-      { name: "mode" }
+      {name: 'value', type: 'float'},
+      {name: 'pads', length: this.maxRank * 2},
+      {name: 'mode'},
     ];
   }
 
   getModeFlag(mode: PadMode) {
-    return mode === "constant" ? 0 : mode === "reflect" ? 1 : 2;
+    return mode === 'constant' ? 0 : mode === 'reflect' ? 1 : 2;
   }
 
   calc(input: PadInput): GPUTensor {
-    if (this.fullyStatic) {
-      return this.compute(this.outputShape, {X: input.input });
+    if (this.fullyStatic && this.outputShape !== undefined) {
+      return this.compute(this.outputShape, {X: input.input});
     }
     const resultShape = this.getOutputShape(input);
 
-    return this.compute(resultShape, {X: input.input}, {
-      pads: this.copyPad(input.pads, this.maxRank*2),
-      value: input.value,
-      mode: this.getModeFlag(input.mode)
-    });
+    return this.compute(
+      resultShape,
+      {X: input.input},
+      {
+        pads: this.copyPad(input.pads, this.maxRank * 2),
+        value: input.value,
+        mode: this.getModeFlag(input.mode),
+      }
+    );
   }
 
   getOutputShape(input: PadInput): readonly number[] {
@@ -133,7 +144,7 @@ export class PadOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTen
 
     const resultShape = [...input.input.shape];
     for (let i = 0; i < rank; i++) {
-      resultShape[i] += input.pads[i] + input.pads[i+rank];
+      resultShape[i] += input.pads[i] + input.pads[i + rank];
     }
 
     return resultShape;
@@ -145,7 +156,7 @@ export class PadOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTen
     }
 
     if (info.mode !== undefined && typeof info.mode === 'string') {
-      info.mode = this.getModeFlag(info.mode as any);
+      info.mode = this.getModeFlag(info.mode);
     }
 
     super.compile(info, precision);
@@ -153,7 +164,10 @@ export class PadOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTen
 
   getCompilationInfo(input: PadInput, precision: Precision): PadInfo {
     const outputShape = this.getOutputShape(input);
-    const outputSize = defaultAllocator.getAllocationDimensions(getSize(outputShape), precision);
+    const outputSize = defaultAllocator.getAllocationDimensions(
+      getSize(outputShape),
+      precision
+    );
 
     return {
       shapeX: input.input.shape,
@@ -166,7 +180,7 @@ export class PadOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTen
 
       pads: input.pads,
       mode: this.getModeFlag(input.mode),
-      value: input.value
+      value: input.value,
     };
   }
 

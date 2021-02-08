@@ -1,12 +1,8 @@
-import { Tensor } from "../../../library";
-import { PoolOperation } from "../../../ops/gpu/pool/pool";
-import { PrototypeTensor } from "../../../tensor/cpu/prototype";
-import { CPUTensor } from "../../../tensor/cpu/tensor";
-import { GPUTensor } from "../../../tensor/gpu/tensor";
-import types, { Precision } from "../../../types";
-import { getSize } from "../../../util/shape";
-import { OnnxNode } from "../../node";
-import { Attributes, Constants } from "../../types";
+import {Tensor} from '../../../library';
+import {Mode} from '../../../model/module';
+import types from '../../../types';
+import {OnnxNode} from '../../node';
+import {Attributes, Constants} from '../../types';
 
 export abstract class ReduceNode extends OnnxNode {
   protected axes?: number[];
@@ -14,13 +10,23 @@ export abstract class ReduceNode extends OnnxNode {
 
   protected name: string;
 
-  constructor(attributes: Attributes, inputs: string[], outputs: string[], constants: Constants, onnxVersion: number) {
-    super(attributes, inputs, outputs, constants, onnxVersion);
+  constructor(
+    attributes: Attributes,
+    inputs: string[],
+    outputs: string[],
+    constants: Constants,
+    onnxVersion: number,
+    name: string,
+    mode: Mode
+  ) {
+    super(attributes, inputs, outputs, constants, onnxVersion, mode);
 
-    this.axes = this.getAttributeInts("axes");
-    const keep = this.getAttributeInt("keepdims");
+    this.axes = this.getAttributeInts('axes');
+    const keep = this.getAttributeInt('keepdims');
 
     this.keepDims = keep === 1 || keep === undefined;
+
+    this.name = name;
   }
 
   abstract calc(input: Tensor): Tensor;
@@ -41,10 +47,11 @@ export abstract class ReduceNode extends OnnxNode {
 
   async forward(inputs: types[]): Promise<types[]> {
     if (this.onnxVersion < 11) {
-
       return [this.calc(inputs[0])];
     }
-    throw new Error(`${this.name} is not implemented for onnx version ${this.onnxVersion}`);
+    throw new Error(
+      `${this.name} is not implemented for onnx version ${this.onnxVersion}`
+    );
   }
 
   getType() {

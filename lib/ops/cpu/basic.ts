@@ -1,5 +1,5 @@
-import { CPUTensor } from '../../tensor/cpu/tensor';
-import { checkEquivShapes, compareShapes, incrementIndex } from '../../util/shape';
+import {CPUTensor} from '../../tensor/cpu/tensor';
+import {checkEquivShapes, incrementIndex} from '../../util/shape';
 
 // eslint-disable-next-line no-unused-vars
 type UnaryOperator = (o: number) => number;
@@ -16,9 +16,16 @@ export function positionWiseUnaryOp(a: CPUTensor, op: UnaryOperator) {
   return result;
 }
 
-export function positionWiseBinaryOp(a: CPUTensor, b: CPUTensor, op: BinaryOperator, resultShape: readonly number[]) {
+export function positionWiseBinaryOp(
+  a: CPUTensor,
+  b: CPUTensor,
+  op: BinaryOperator,
+  resultShape: readonly number[]
+) {
   if (!checkEquivShapes(a.shape, b.shape)) {
-    throw new Error('The shapes of the two tensors should be the same for a binary operation');
+    throw new Error(
+      'The shapes of the two tensors should be the same for a binary operation'
+    );
   }
 
   const result = new CPUTensor(resultShape);
@@ -35,27 +42,43 @@ export function positionWiseBinaryOp(a: CPUTensor, b: CPUTensor, op: BinaryOpera
 }
 
 export function exp(a: CPUTensor) {
-  return positionWiseUnaryOp(a, (o1) => Math.exp(o1));
+  return positionWiseUnaryOp(a, o1 => Math.exp(o1));
 }
 
 export function log(a: CPUTensor) {
-  return positionWiseUnaryOp(a, (o1) => Math.log(o1));
+  return positionWiseUnaryOp(a, o1 => Math.log(o1));
 }
 
 export function sqrt(a: CPUTensor) {
-  return positionWiseUnaryOp(a, (o1) => Math.sqrt(o1));
+  return positionWiseUnaryOp(a, o1 => Math.sqrt(o1));
 }
 
 export function abs(a: CPUTensor) {
-  return positionWiseUnaryOp(a, (o1) => Math.abs(o1));
+  return positionWiseUnaryOp(a, o1 => Math.abs(o1));
 }
 
 export function floor(a: CPUTensor) {
-  return positionWiseUnaryOp(a, (o1) => Math.floor(o1));
+  return positionWiseUnaryOp(a, o1 => Math.floor(o1));
 }
 
 export function ceil(a: CPUTensor) {
-  return positionWiseUnaryOp(a, (o1) => Math.ceil(o1));
+  return positionWiseUnaryOp(a, o1 => Math.ceil(o1));
+}
+
+export function sign(a: CPUTensor) {
+  return positionWiseUnaryOp(a, o1 => (o1 < 0 ? -1 : 1));
+}
+
+export function negate(a: CPUTensor) {
+  return positionWiseUnaryOp(a, o1 => -o1);
+}
+
+export function addMultiplyScalar(a: CPUTensor, factor: number, add: number) {
+  return positionWiseUnaryOp(a, o1 => o1 * factor + add);
+}
+
+export function sigmoid(a: CPUTensor) {
+  return positionWiseUnaryOp(a, o1 => 1 / (1 + Math.exp(-o1)));
 }
 
 export function clip(a: CPUTensor, min?: number, max?: number) {
@@ -71,22 +94,81 @@ export function clip(a: CPUTensor, min?: number, max?: number) {
   return positionWiseUnaryOp(a, f);
 }
 
-export function add(a: CPUTensor, b: CPUTensor, resultShape: readonly number[]) {
-  return positionWiseBinaryOp(a, b, (o1, o2) => o1 + o2, resultShape);
+export function add(
+  a: CPUTensor,
+  b: CPUTensor,
+  resultShape: readonly number[],
+  alpha: number,
+  beta: number
+) {
+  return positionWiseBinaryOp(
+    a,
+    b,
+    (o1, o2) => o1 * alpha + o2 * beta,
+    resultShape
+  );
 }
 
-export function subtract(a: CPUTensor, b: CPUTensor, resultShape: readonly number[]) {
-  return positionWiseBinaryOp(a, b, (o1, o2) => o1 - o2, resultShape);
+export function subtract(
+  a: CPUTensor,
+  b: CPUTensor,
+  resultShape: readonly number[],
+  alpha: number,
+  beta: number
+) {
+  return positionWiseBinaryOp(
+    a,
+    b,
+    (o1, o2) => o1 * alpha - o2 * beta,
+    resultShape
+  );
 }
 
-export function multiply(a: CPUTensor, b: CPUTensor, resultShape: readonly number[]) {
-  return positionWiseBinaryOp(a, b, (o1, o2) => o1 * o2, resultShape);
+export function multiply(
+  a: CPUTensor,
+  b: CPUTensor,
+  resultShape: readonly number[],
+  alpha: number
+) {
+  return positionWiseBinaryOp(a, b, (o1, o2) => o1 * o2 * alpha, resultShape);
 }
 
-export function divide(a: CPUTensor, b: CPUTensor, resultShape: readonly number[]) {
-  return positionWiseBinaryOp(a, b, (o1, o2) => o1 / o2, resultShape);
+export function divide(
+  a: CPUTensor,
+  b: CPUTensor,
+  resultShape: readonly number[],
+  alpha: number
+) {
+  return positionWiseBinaryOp(a, b, (o1, o2) => (o1 / o2) * alpha, resultShape);
 }
 
-export function power(a: CPUTensor, b: CPUTensor, resultShape: readonly number[]) {
-  return positionWiseBinaryOp(a, b, (o1, o2) =>  Math.pow(o1, o2), resultShape);
+export function power(
+  a: CPUTensor,
+  b: CPUTensor,
+  resultShape: readonly number[]
+) {
+  return positionWiseBinaryOp(a, b, (o1, o2) => Math.pow(o1, o2), resultShape);
+}
+
+export function clipBackward(
+  value: CPUTensor,
+  grad: CPUTensor,
+  resultShape: readonly number[],
+  min?: number,
+  max?: number
+) {
+  return positionWiseBinaryOp(
+    value,
+    grad,
+    (v, g) => {
+      if (min !== undefined && v < min) {
+        return 0;
+      }
+      if (max !== undefined && v > max) {
+        return 0;
+      }
+      return g;
+    },
+    resultShape
+  );
 }

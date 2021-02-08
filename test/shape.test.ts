@@ -1,5 +1,10 @@
 import {
-  getSize, computeStrides, indexToPos, posToIndex, incrementIndex, decrementIndex
+  getSize,
+  computeStrides,
+  indexToPos,
+  posToIndex,
+  incrementIndex,
+  decrementIndex,
 } from '../lib/util/shape';
 
 describe('Get size', () => {
@@ -118,7 +123,7 @@ describe('Increment index', () => {
   });
 
   it('should work for higher ranks', () => {
-    const shape = [2,3,4];
+    const shape = [2, 3, 4];
     const strides = computeStrides(shape);
 
     const ix1 = posToIndex(1, strides);
@@ -169,7 +174,7 @@ describe('Decrement index', () => {
   });
 
   it('should work for higher ranks', () => {
-    const shape = [2,3,4];
+    const shape = [2, 3, 4];
     const strides = computeStrides(shape);
 
     const ix1 = posToIndex(1, strides);

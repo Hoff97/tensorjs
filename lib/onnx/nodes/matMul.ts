@@ -1,10 +1,18 @@
-import Tensor from "../../types";
-import { OnnxNode } from "../node";
-import { Attributes, Constants } from "../types";
+import {Mode} from '../../model/module';
+import Tensor from '../../types';
+import {OnnxNode} from '../node';
+import {Attributes, Constants} from '../types';
 
 export class MatMulNode extends OnnxNode {
-  constructor(attributes: Attributes, inputs: string[], outputs: string[], constants: Constants, onnxVersion: number) {
-    super(attributes, inputs, outputs, constants, onnxVersion);
+  constructor(
+    attributes: Attributes,
+    inputs: string[],
+    outputs: string[],
+    constants: Constants,
+    onnxVersion: number,
+    mode: Mode
+  ) {
+    super(attributes, inputs, outputs, constants, onnxVersion, mode);
   }
 
   async forward(inputs: Tensor[]): Promise<Tensor[]> {
@@ -13,12 +21,14 @@ export class MatMulNode extends OnnxNode {
 
     if (this.onnxVersion < 13 && this.onnxVersion >= 9) {
       if (A.getShape().length !== B.getShape().length) {
-        throw new Error("Automatic broadcasting in MatMul not supported yet");
+        throw new Error('Automatic broadcasting in MatMul not supported yet');
       }
 
       return [A.gemm(B)];
     }
-    throw new Error(`Matmul with onnx version ${this.onnxVersion} not yet implemented`);
+    throw new Error(
+      `Matmul with onnx version ${this.onnxVersion} not yet implemented`
+    );
   }
 
   getType() {

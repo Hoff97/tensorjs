@@ -1,15 +1,11 @@
-import Long from "long";
-import { onnx } from "onnx-proto";
-import { Tensor } from "../library";
-import { PrototypeTensor } from "../tensor/cpu/prototype";
-import { CPUTensor } from "../tensor/cpu/tensor";
-import { defaultAllocator } from "../tensor/gpu/gl";
-import { GPUMemoryAllocator, MemoryEntry } from "../tensor/gpu/memory";
-import { GPUTensor } from "../tensor/gpu/tensor";
-import { Precision } from "../types";
-import { Attributes, Constants } from "./types";
+// eslint-disable-next-line node/no-extraneous-import
+import Long from 'long';
+import {onnx} from 'onnx-proto';
+import {Precision, Tensor} from '../library';
+import {Mode, Module} from '../model/module';
+import {Attributes, Constants} from './types';
 
-export abstract class OnnxNode {
+export abstract class OnnxNode extends Module {
   protected onnxVersion: number;
 
   public inputs: string[];
@@ -18,9 +14,20 @@ export abstract class OnnxNode {
   public variableInputs: number;
   public attributes: {[name: string]: onnx.IAttributeProto} = {};
 
-  constructor(attributes: Attributes, inputs: string[], outputs: string[], constants: Constants, onnxVersion: number) {
+  constructor(
+    attributes: Attributes,
+    inputs: string[],
+    outputs: string[],
+    constants: Constants,
+    onnxVersion: number,
+    mode: Mode
+  ) {
+    super();
+
+    this.mode = mode;
+
     for (let i = 0; i < attributes.length; i++) {
-      this.attributes[attributes[i].name] = attributes[i];
+      this.attributes[attributes[i].name as string] = attributes[i];
     }
     this.inputs = inputs;
     this.outputs = outputs;
@@ -35,7 +42,8 @@ export abstract class OnnxNode {
     }
   }
 
-  initialize(resolveConstant: (name: string) => Tensor) {}
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  initialize(resolveConstant: (name: string) => Tensor | undefined) {}
 
   getAttribute(name: string) {
     return this.attributes[name];
@@ -45,24 +53,27 @@ export abstract class OnnxNode {
     const attr = this.attributes[name];
     if (attr !== undefined) {
       const str = attr.s;
-      if (str !== undefined) {
-        return new TextDecoder("utf-8").decode(str);
+      if (str !== undefined && str !== null) {
+        // eslint-disable-next-line node/no-unsupported-features/node-builtins
+        return new TextDecoder('utf-8').decode(str);
       }
       return undefined;
     }
     return undefined;
   }
 
-  getAttributeInts(name: string): number[] {
+  getAttributeInts(name: string) {
     const attr = this.attributes[name];
     if (attr !== undefined) {
       const result = this.attributes[name].ints;
-      for (let i = 0; i < result.length; i++) {
-        if (Long.isLong(result[i])) {
-          result[i] = (result[i] as Long).toNumber();
+      if (result !== undefined && result !== null) {
+        for (let i = 0; i < result.length; i++) {
+          if (Long.isLong(result[i])) {
+            result[i] = (result[i] as Long).toNumber();
+          }
         }
+        return result as number[];
       }
-      return result as any;
     }
     return undefined;
   }
@@ -82,7 +93,7 @@ export abstract class OnnxNode {
   getAttributeFloat(name: string) {
     const attr = this.attributes[name];
     if (attr !== undefined) {
-      let result = attr.f;
+      const result = attr.f;
       return result;
     }
     return undefined;
@@ -91,7 +102,7 @@ export abstract class OnnxNode {
   getAttributeTensor(name: string) {
     const attr = this.attributes[name];
     if (attr !== undefined) {
-      let result = attr.t;
+      const result = attr.t;
       return result;
     }
     return undefined;
@@ -99,6 +110,7 @@ export abstract class OnnxNode {
 
   async toCPU() {}
   async toWASM() {}
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async toGPU(precision: Precision) {}
 
   abstract forward(inputs: Tensor[]): Promise<Tensor[]>;

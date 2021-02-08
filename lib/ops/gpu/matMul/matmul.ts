@@ -1,9 +1,9 @@
-import { defaultAllocator } from "../../../tensor/gpu/gl";
-import { GPUTensorConstructor, GPUTensorI } from "../../../tensor/gpu/interface";
-import { GPUMemoryAllocator } from "../../../tensor/gpu/memory";
-import { Precision } from "../../../types";
-import { getSize } from "../../../util/shape";
-import { Operation } from "../operation";
+import {defaultAllocator} from '../../../tensor/gpu/gl';
+import {GPUTensorConstructor, GPUTensorI} from '../../../tensor/gpu/interface';
+import {GPUMemoryAllocator} from '../../../tensor/gpu/memory';
+import {Precision} from '../../../types';
+import {getSize} from '../../../util/shape';
+import {Operation} from '../operation';
 
 export interface MatMulInfo {
   shapeA?: readonly number[];
@@ -12,7 +12,7 @@ export interface MatMulInfo {
   shapeB?: readonly number[];
   widthB?: number;
   heightB?: number;
-  shapeOutput?: readonly number[],
+  shapeOutput?: readonly number[];
   widthOutput?: number;
   heightOutput?: number;
 }
@@ -22,15 +22,23 @@ export interface MatMulInput {
   B: GPUTensorI;
 }
 
-export class MatMulOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTensor, MatMulInfo, MatMulInput> {
+export class MatMulOperation<GPUTensor extends GPUTensorI> extends Operation<
+  GPUTensor,
+  MatMulInfo,
+  MatMulInput
+> {
   protected maxIterations = 1000000;
 
-  constructor(tensorConstructor: GPUTensorConstructor<GPUTensor>, allocator?: GPUMemoryAllocator) {
+  constructor(
+    tensorConstructor: GPUTensorConstructor<GPUTensor>,
+    allocator?: GPUMemoryAllocator
+  ) {
     super(tensorConstructor, allocator);
 
     this.maxRank = 2;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getFragmentShader(info: MatMulInfo): string {
     return `
     float process(int index[${this.maxRank}]) {
@@ -66,13 +74,13 @@ export class MatMulOperation<GPUTensor extends GPUTensorI> extends Operation<GPU
   }
 
   getTextureNames(): string[] {
-    return ["A", "B"];
+    return ['A', 'B'];
   }
 
   calc(input: MatMulInput): GPUTensor {
     const outputShape = this.getOutputShape(input);
 
-    return this.compute(outputShape, {A: input.A, B: input.B})
+    return this.compute(outputShape, {A: input.A, B: input.B});
   }
 
   getOutputShape(input: MatMulInput): readonly number[] {
@@ -81,9 +89,9 @@ export class MatMulOperation<GPUTensor extends GPUTensorI> extends Operation<GPU
 
   compile(info: MatMulInfo, precision: Precision) {
     if (info.shapeA !== undefined) {
-      this.maxIterations = info.shapeA[1]
+      this.maxIterations = info.shapeA[1];
     } else if (info.shapeB !== undefined) {
-      this.maxIterations = info.shapeB[0]
+      this.maxIterations = info.shapeB[0];
     }
 
     super.compile(info, precision);
@@ -91,7 +99,10 @@ export class MatMulOperation<GPUTensor extends GPUTensorI> extends Operation<GPU
 
   getCompilationInfo(input: MatMulInput, precision: Precision): MatMulInfo {
     const outputShape = this.getOutputShape(input);
-    const outputSize = defaultAllocator.getAllocationDimensions(getSize(outputShape), precision);
+    const outputSize = defaultAllocator.getAllocationDimensions(
+      getSize(outputShape),
+      precision
+    );
 
     return {
       shapeA: input.A.shape,
@@ -104,7 +115,7 @@ export class MatMulOperation<GPUTensor extends GPUTensorI> extends Operation<GPU
 
       shapeOutput: outputShape,
       widthOutput: outputSize.width,
-      heightOutput: outputSize.height
+      heightOutput: outputSize.height,
     };
   }
 

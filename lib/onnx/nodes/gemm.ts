@@ -1,11 +1,7 @@
-import { GemmCOperation, GemmInfo, GemmInput, GemmOperation } from "../../ops/gpu/matMul/gemm";
-import { PrototypeTensor } from "../../tensor/cpu/prototype";
-import { CPUTensor } from "../../tensor/cpu/tensor";
-import { gpuConstructor, GPUTensor } from "../../tensor/gpu/tensor";
-import Tensor, { Precision } from "../../types";
-import { getSize } from "../../util/shape";
-import { OnnxNode } from "../node";
-import { Attributes, Constants } from "../types";
+import {Mode} from '../../model/module';
+import Tensor from '../../types';
+import {OnnxNode} from '../node';
+import {Attributes, Constants} from '../types';
 
 export class GemmNode extends OnnxNode {
   private alpha: number;
@@ -13,14 +9,21 @@ export class GemmNode extends OnnxNode {
   private transA: boolean;
   private transB: boolean;
 
-  constructor(attributes: Attributes, inputs: string[], outputs: string[], constants: Constants, onnxVersion: number) {
-    super(attributes, inputs, outputs, constants, onnxVersion);
+  constructor(
+    attributes: Attributes,
+    inputs: string[],
+    outputs: string[],
+    constants: Constants,
+    onnxVersion: number,
+    mode: Mode
+  ) {
+    super(attributes, inputs, outputs, constants, onnxVersion, mode);
 
-    this.alpha = this.getAttributeFloat("alpha") || 1.0;
-    this.beta = this.getAttributeFloat("beta") || 1.0;
+    this.alpha = this.getAttributeFloat('alpha') || 1.0;
+    this.beta = this.getAttributeFloat('beta') || 1.0;
 
-    const transA = this.getAttributeInt("transA");
-    const transB = this.getAttributeInt("transB");
+    const transA = this.getAttributeInt('transA');
+    const transB = this.getAttributeInt('transB');
 
     this.transA = transA === 1;
     this.transB = transB === 1;
@@ -34,7 +37,9 @@ export class GemmNode extends OnnxNode {
 
       return [a.gemm(b, this.transA, this.transB, this.alpha, c, this.beta)];
     }
-    throw new Error(`Gemm is not implemented for onnx version ${this.onnxVersion}`);
+    throw new Error(
+      `Gemm is not implemented for onnx version ${this.onnxVersion}`
+    );
   }
 
   getType() {

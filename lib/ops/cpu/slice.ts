@@ -1,13 +1,18 @@
-import { CPUTensor } from '../../tensor/cpu/tensor';
-import { incrementIndex } from '../../util/shape';
+import {CPUTensor} from '../../tensor/cpu/tensor';
+import {incrementIndex} from '../../util/shape';
 
-export function slice(x: CPUTensor, starts: number[], ends: number[], axis: number[]) {
+export function slice(
+  x: CPUTensor,
+  starts: number[],
+  ends: number[],
+  axis: number[]
+) {
   const rank = x.shape.length;
 
   const resultShape = [...x.shape];
   let axIx = 0;
   for (let i = 0; i < rank && axIx < axis.length; i++) {
-    if (i == axis[axIx]) {
+    if (i === axis[axIx]) {
       resultShape[i] = ends[axIx] - starts[axIx];
       axIx++;
     }

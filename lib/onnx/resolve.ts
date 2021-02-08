@@ -1,72 +1,211 @@
-import { AddNode } from "./nodes/binary/add";
-import { BatchNormalizationNode } from "./nodes/batchNormalization";
-import { CastNode } from "./nodes/cast";
-import { CeilNode } from "./nodes/unary/ceil";
-import { ClipNode } from "./nodes/clip";
-import { ConcatNode } from "./nodes/concat";
-import { ConstantNode } from "./nodes/constant";
-import { ConstantOfShapeNode } from "./nodes/constantOfShape";
-import { ConvNode } from "./nodes/conv";
-import { DivNode } from "./nodes/binary/div";
-import { ExpNode } from "./nodes/unary/exp";
-import { ExpandNode } from "./nodes/expand";
-import { FloorNode } from "./nodes/unary/floor";
-import { GatherNode } from "./nodes/gather";
-import { GemmNode } from "./nodes/gemm";
-import { InstanceNormalizationNode } from "./nodes/instanceNormalization";
-import { MatMulNode } from "./nodes/matMul";
-import { MulNode } from "./nodes/binary/mul";
-import { PadNode } from "./nodes/pad";
-import { ReduceMaxNode } from "./nodes/reduce/reduceMax";
-import { ReduceMeanNode } from "./nodes/reduce/reduceMean";
-import { ReduceSumNode } from "./nodes/reduce/reduceSum";
-import { ReduceSumSquareNode } from "./nodes/reduce/reduceSumSquare";
-import { ReluNode } from "./nodes/relu";
-import { ReshapeNode } from "./nodes/reshape";
-import { ShapeNode } from "./nodes/shape";
-import { SliceNode } from "./nodes/slice";
-import { SoftmaxNode } from "./nodes/softmax";
-import { SubNode } from "./nodes/binary/sub";
-import { TileNode } from "./nodes/tile";
-import { TransposeNode } from "./nodes/transpose";
-import { UnsqueezeNode } from "./nodes/unsqueeze";
-import { UpsampleNode } from "./nodes/upsample";
-import { NodeConstructor } from "./types";
-import { GlobalAveragePoolNode } from "./nodes/globalAveragePool";
+import {AddNode} from './nodes/binary/add';
+import {BatchNormalizationNode} from './nodes/batchNormalization';
+import {CastNode} from './nodes/cast';
+import {CeilNode} from './nodes/unary/ceil';
+import {ClipNode} from './nodes/clip';
+import {ConcatNode} from './nodes/concat';
+import {ConstantNode} from './nodes/constant';
+import {ConstantOfShapeNode} from './nodes/constantOfShape';
+import {ConvNode} from './nodes/conv';
+import {DivNode} from './nodes/binary/div';
+import {ExpNode} from './nodes/unary/exp';
+import {ExpandNode} from './nodes/expand';
+import {FloorNode} from './nodes/unary/floor';
+import {GatherNode} from './nodes/gather';
+import {GemmNode} from './nodes/gemm';
+import {InstanceNormalizationNode} from './nodes/instanceNormalization';
+import {MatMulNode} from './nodes/matMul';
+import {MulNode} from './nodes/binary/mul';
+import {PadNode} from './nodes/pad';
+import {ReduceMaxNode} from './nodes/reduce/reduceMax';
+import {ReduceMeanNode} from './nodes/reduce/reduceMean';
+import {ReduceSumNode} from './nodes/reduce/reduceSum';
+import {ReduceSumSquareNode} from './nodes/reduce/reduceSumSquare';
+import {ReluNode} from './nodes/relu';
+import {ReshapeNode} from './nodes/reshape';
+import {ShapeNode} from './nodes/shape';
+import {SliceNode} from './nodes/slice';
+import {SoftmaxNode} from './nodes/softmax';
+import {SubNode} from './nodes/binary/sub';
+import {TileNode} from './nodes/tile';
+import {TransposeNode} from './nodes/transpose';
+import {UnsqueezeNode} from './nodes/unsqueeze';
+import {UpsampleNode} from './nodes/upsample';
+import {NodeConstructor} from './types';
+import {GlobalAveragePoolNode} from './nodes/globalAveragePool';
 
 export const nodeResolve: {[opType: string]: NodeConstructor} = {
-  'Conv': (attributes, inputs, outputs, constants, onnxVersion) => new ConvNode(attributes, inputs, outputs, constants, onnxVersion),
-  'BatchNormalization': (attributes, inputs, outputs, constants, onnxVersion) => new BatchNormalizationNode(attributes, inputs, outputs, constants, onnxVersion),
-  'Clip': (attributes, inputs, outputs, constants, onnxVersion) => new ClipNode(attributes, inputs, outputs, constants, onnxVersion),
-  'Add': (attributes, inputs, outputs, constants, onnxVersion) => new AddNode(attributes, inputs, outputs, constants, onnxVersion),
-  'ReduceMean': (attributes, inputs, outputs, constants, onnxVersion) => new ReduceMeanNode(attributes, inputs, outputs, constants, onnxVersion),
-  'Gemm': (attributes, inputs, outputs, constants, onnxVersion) => new GemmNode(attributes, inputs, outputs, constants, onnxVersion),
-  'Constant': (attributes, inputs, outputs, constants, onnxVersion) => new ConstantNode(attributes, inputs, outputs, constants, onnxVersion),
-  'Reshape': (attributes, inputs, outputs, constants, onnxVersion) => new ReshapeNode(attributes, inputs, outputs, constants, onnxVersion),
-  'Tile': (attributes, inputs, outputs, constants, onnxVersion) => new TileNode(attributes, inputs, outputs, constants, onnxVersion),
-  'MatMul': (attributes, inputs, outputs, constants, onnxVersion) => new MatMulNode(attributes, inputs, outputs, constants, onnxVersion),
-  'Exp': (attributes, inputs, outputs, constants, onnxVersion) => new ExpNode(attributes, inputs, outputs, constants, onnxVersion),
-  'ReduceSum': (attributes, inputs, outputs, constants, onnxVersion) => new ReduceSumNode(attributes, inputs, outputs, constants, onnxVersion),
-  'ReduceMax': (attributes, inputs, outputs, constants, onnxVersion) => new ReduceMaxNode(attributes, inputs, outputs, constants, onnxVersion),
-  'ReduceSumSquare': (attributes, inputs, outputs, constants, onnxVersion) => new ReduceSumSquareNode(attributes, inputs, outputs, constants, onnxVersion),
-  'Sub': (attributes, inputs, outputs, constants, onnxVersion) => new SubNode(attributes, inputs, outputs, constants, onnxVersion),
-  'Mul': (attributes, inputs, outputs, constants, onnxVersion) => new MulNode(attributes, inputs, outputs, constants, onnxVersion),
-  'Div': (attributes, inputs, outputs, constants, onnxVersion) => new DivNode(attributes, inputs, outputs, constants, onnxVersion),
-  'Unsqueeze': (attributes, inputs, outputs, constants, onnxVersion) => new UnsqueezeNode(attributes, inputs, outputs, constants, onnxVersion),
-  'Concat': (attributes, inputs, outputs, constants, onnxVersion) => new ConcatNode(attributes, inputs, outputs, constants, onnxVersion),
-  'ConstantOfShape': (attributes, inputs, outputs, constants, onnxVersion) => new ConstantOfShapeNode(attributes, inputs, outputs, constants, onnxVersion),
-  'Expand': (attributes, inputs, outputs, constants, onnxVersion) => new ExpandNode(attributes, inputs, outputs, constants, onnxVersion),
-  'InstanceNormalization': (attributes, inputs, outputs, constants, onnxVersion) => new InstanceNormalizationNode(attributes, inputs, outputs, constants, onnxVersion),
-  'Pad': (attributes, inputs, outputs, constants, onnxVersion) => new PadNode(attributes, inputs, outputs, constants, onnxVersion),
-  'Relu': (attributes, inputs, outputs, constants, onnxVersion) => new ReluNode(attributes, inputs, outputs, constants, onnxVersion),
-  'Shape': (attributes, inputs, outputs, constants, onnxVersion) => new ShapeNode(attributes, inputs, outputs, constants, onnxVersion),
-  'Gather': (attributes, inputs, outputs, constants, onnxVersion) => new GatherNode(attributes, inputs, outputs, constants, onnxVersion),
-  'Cast': (attributes, inputs, outputs, constants, onnxVersion) => new CastNode(attributes, inputs, outputs, constants, onnxVersion),
-  'Floor': (attributes, inputs, outputs, constants, onnxVersion) => new FloorNode(attributes, inputs, outputs, constants, onnxVersion),
-  'Ceil': (attributes, inputs, outputs, constants, onnxVersion) => new CeilNode(attributes, inputs, outputs, constants, onnxVersion),
-  'Slice': (attributes, inputs, outputs, constants, onnxVersion) => new SliceNode(attributes, inputs, outputs, constants, onnxVersion),
-  'Upsample': (attributes, inputs, outputs, constants, onnxVersion) => new UpsampleNode(attributes, inputs, outputs, constants, onnxVersion),
-  'Transpose': (attributes, inputs, outputs, constants, onnxVersion) => new TransposeNode(attributes, inputs, outputs, constants, onnxVersion),
-  'Softmax': (attributes, inputs, outputs, constants, onnxVersion) => new SoftmaxNode(attributes, inputs, outputs, constants, onnxVersion),
-  'GlobalAveragePool': (attributes, inputs, outputs, constants, onnxVersion) => new GlobalAveragePoolNode(attributes, inputs, outputs, constants, onnxVersion),
+  Conv: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new ConvNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  BatchNormalization: (
+    attributes,
+    inputs,
+    outputs,
+    constants,
+    onnxVersion,
+    mode
+  ) =>
+    new BatchNormalizationNode(
+      attributes,
+      inputs,
+      outputs,
+      constants,
+      onnxVersion,
+      mode
+    ),
+  Clip: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new ClipNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Add: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new AddNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  ReduceMean: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new ReduceMeanNode(
+      attributes,
+      inputs,
+      outputs,
+      constants,
+      onnxVersion,
+      mode
+    ),
+  Gemm: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new GemmNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Constant: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new ConstantNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Reshape: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new ReshapeNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Tile: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new TileNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  MatMul: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new MatMulNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Exp: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new ExpNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  ReduceSum: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new ReduceSumNode(
+      attributes,
+      inputs,
+      outputs,
+      constants,
+      onnxVersion,
+      mode
+    ),
+  ReduceMax: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new ReduceMaxNode(
+      attributes,
+      inputs,
+      outputs,
+      constants,
+      onnxVersion,
+      mode
+    ),
+  ReduceSumSquare: (
+    attributes,
+    inputs,
+    outputs,
+    constants,
+    onnxVersion,
+    mode
+  ) =>
+    new ReduceSumSquareNode(
+      attributes,
+      inputs,
+      outputs,
+      constants,
+      onnxVersion,
+      mode
+    ),
+  Sub: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new SubNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Mul: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new MulNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Div: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new DivNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Unsqueeze: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new UnsqueezeNode(
+      attributes,
+      inputs,
+      outputs,
+      constants,
+      onnxVersion,
+      mode
+    ),
+  Concat: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new ConcatNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  ConstantOfShape: (
+    attributes,
+    inputs,
+    outputs,
+    constants,
+    onnxVersion,
+    mode
+  ) =>
+    new ConstantOfShapeNode(
+      attributes,
+      inputs,
+      outputs,
+      constants,
+      onnxVersion,
+      mode
+    ),
+  Expand: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new ExpandNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  InstanceNormalization: (
+    attributes,
+    inputs,
+    outputs,
+    constants,
+    onnxVersion,
+    mode
+  ) =>
+    new InstanceNormalizationNode(
+      attributes,
+      inputs,
+      outputs,
+      constants,
+      onnxVersion,
+      mode
+    ),
+  Pad: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new PadNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Relu: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new ReluNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Shape: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new ShapeNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Gather: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new GatherNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Cast: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new CastNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Floor: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new FloorNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Ceil: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new CeilNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Slice: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new SliceNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Upsample: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new UpsampleNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Transpose: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new TransposeNode(
+      attributes,
+      inputs,
+      outputs,
+      constants,
+      onnxVersion,
+      mode
+    ),
+  Softmax: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new SoftmaxNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  GlobalAveragePool: (
+    attributes,
+    inputs,
+    outputs,
+    constants,
+    onnxVersion,
+    mode
+  ) =>
+    new GlobalAveragePoolNode(
+      attributes,
+      inputs,
+      outputs,
+      constants,
+      onnxVersion,
+      mode
+    ),
 };

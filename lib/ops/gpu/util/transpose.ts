@@ -1,17 +1,16 @@
-import { defaultAllocator } from "../../../tensor/gpu/gl";
-import { GPUTensorConstructor, GPUTensorI } from "../../../tensor/gpu/interface";
-import { GPUMemoryAllocator } from "../../../tensor/gpu/memory";
-import { Precision } from "../../../types";
-import { computeStrides, getSize } from "../../../util/shape";
-import { Input, Operation } from "../operation";
-
+import {defaultAllocator} from '../../../tensor/gpu/gl';
+import {GPUTensorConstructor, GPUTensorI} from '../../../tensor/gpu/interface';
+import {GPUMemoryAllocator} from '../../../tensor/gpu/memory';
+import {Precision} from '../../../types';
+import {computeStrides, getSize} from '../../../util/shape';
+import {Input, Operation} from '../operation';
 
 export interface TransposeInfo {
   shapeA?: readonly number[];
   widthA?: number;
   heightA?: number;
 
-  shapeOutput?: readonly number[],
+  shapeOutput?: readonly number[];
   widthOutput?: number;
   heightOutput?: number;
 
@@ -24,8 +23,15 @@ export interface TransposeInput {
   permutation: readonly number[];
 }
 
-export class TransposeOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTensor, TransposeInfo, TransposeInput> {
-  constructor(tensorConstructor: GPUTensorConstructor<GPUTensor>, allocator?: GPUMemoryAllocator) {
+export class TransposeOperation<GPUTensor extends GPUTensorI> extends Operation<
+  GPUTensor,
+  TransposeInfo,
+  TransposeInput
+> {
+  constructor(
+    tensorConstructor: GPUTensorConstructor<GPUTensor>,
+    allocator?: GPUMemoryAllocator
+  ) {
     super(tensorConstructor, allocator);
   }
 
@@ -36,11 +42,10 @@ export class TransposeOperation<GPUTensor extends GPUTensorI> extends Operation<
   }
 
   getUniformAttrs(): Input[] {
-    return [
-      { name: "mappedStrides", length: this.maxRank }
-    ];
+    return [{name: 'mappedStrides', length: this.maxRank}];
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getFragmentShader(info: TransposeInfo): string {
     return `
     float process(int index[${this.maxRank}]) {
@@ -52,11 +57,11 @@ export class TransposeOperation<GPUTensor extends GPUTensorI> extends Operation<
   }
 
   getTextureNames(): string[] {
-    return ["A"];
+    return ['A'];
   }
 
   calc(input: TransposeInput): GPUTensor {
-    if (this.fullyStatic) {
+    if (this.fullyStatic && this.outputShape !== undefined) {
       return this.compute(this.outputShape, {A: input.A});
     }
 
@@ -70,7 +75,11 @@ export class TransposeOperation<GPUTensor extends GPUTensorI> extends Operation<
       mappedStrides[i] = inputStrides[input.permutation[i]];
     }
 
-    return this.compute(outputShape, {A: input.A}, {mappedStrides: this.pad(mappedStrides)});
+    return this.compute(
+      outputShape,
+      {A: input.A},
+      {mappedStrides: this.pad(mappedStrides)}
+    );
   }
 
   getOutputShape(input: TransposeInput): readonly number[] {
@@ -106,9 +115,15 @@ export class TransposeOperation<GPUTensor extends GPUTensorI> extends Operation<
     super.compile(info, precision);
   }
 
-  getCompilationInfo(input: TransposeInput, precision: Precision): TransposeInfo {
+  getCompilationInfo(
+    input: TransposeInput,
+    precision: Precision
+  ): TransposeInfo {
     const outputShape = this.getOutputShape(input);
-    const outputSize = defaultAllocator.getAllocationDimensions(getSize(outputShape), precision);
+    const outputSize = defaultAllocator.getAllocationDimensions(
+      getSize(outputShape),
+      precision
+    );
 
     const rank = input.A.shape.length;
 
@@ -127,7 +142,7 @@ export class TransposeOperation<GPUTensor extends GPUTensorI> extends Operation<
       widthOutput: outputSize.width,
       heightOutput: outputSize.height,
 
-      mappedStrides
+      mappedStrides,
     };
   }
 

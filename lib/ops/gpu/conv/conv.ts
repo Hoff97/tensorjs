@@ -1,12 +1,11 @@
-import { getSize } from "../../../util/shape";
-import { outputDimsSize } from "../../util/conv";
+import {getSize} from '../../../util/shape';
+import {outputDimsSize} from '../../util/conv';
 
-import { GPUTensorConstructor, GPUTensorI } from "../../../tensor/gpu/interface";
-import { GPUMemoryAllocator } from "../../../tensor/gpu/memory";
-import { Input, Operation } from "../operation";
-import { Activation, Precision } from "../../../types";
-import { defaultAllocator } from "../../../tensor/gpu/gl";
-
+import {GPUTensorConstructor, GPUTensorI} from '../../../tensor/gpu/interface';
+import {GPUMemoryAllocator} from '../../../tensor/gpu/memory';
+import {Input, Operation} from '../operation';
+import {Activation, Precision} from '../../../types';
+import {defaultAllocator} from '../../../tensor/gpu/gl';
 
 export interface ConvInfo {
   shapeX?: readonly number[];
@@ -15,7 +14,7 @@ export interface ConvInfo {
   shapeW?: readonly number[];
   widthW?: number;
   heightW?: number;
-  shapeOutput?: readonly number[],
+  shapeOutput?: readonly number[];
   widthOutput?: number;
   heightOutput?: number;
 
@@ -39,10 +38,17 @@ export interface ConvInput {
   activation: Activation;
 }
 
-export class ConvOperation<GPUTensor extends GPUTensorI, ConvInf extends ConvInfo = ConvInfo, ConvIn extends ConvInput = ConvInput> extends Operation<GPUTensor, ConvInf, ConvIn> {
+export class ConvOperation<
+  GPUTensor extends GPUTensorI,
+  ConvInf extends ConvInfo = ConvInfo,
+  ConvIn extends ConvInput = ConvInput
+> extends Operation<GPUTensor, ConvInf, ConvIn> {
   protected maxIterations = 1000000;
 
-  constructor(tensorConstructor: GPUTensorConstructor<GPUTensor>, allocator?: GPUMemoryAllocator) {
+  constructor(
+    tensorConstructor: GPUTensorConstructor<GPUTensor>,
+    allocator?: GPUMemoryAllocator
+  ) {
     super(tensorConstructor, allocator);
   }
 
@@ -62,7 +68,7 @@ export class ConvOperation<GPUTensor extends GPUTensorI, ConvInf extends ConvInf
         break;
       }
     }
-    `
+    `;
   }
 
   getMainBody() {
@@ -124,6 +130,7 @@ export class ConvOperation<GPUTensor extends GPUTensorI, ConvInf extends ConvInf
     `;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getFragmentShader(info: ConvInfo): string {
     return `
     float process(int index[${this.maxRank}]) {
@@ -145,34 +152,34 @@ export class ConvOperation<GPUTensor extends GPUTensorI, ConvInf extends ConvInf
   }
 
   getTextureNames(): string[] {
-    return ["X", "W"];
+    return ['X', 'W'];
   }
 
   getUniformAttrs(): Input[] {
     return [
-      { name: "CG" },
-      { name: "kernelSize" },
-      { name: "C" },
-      { name: "dataRank" },
-      { name: "pads", length: this.maxRank*2 },
-      { name: "strides", length: this.maxRank },
-      { name: "dilations", length: this.maxRank },
-      { name: "activation" }
+      {name: 'CG'},
+      {name: 'kernelSize'},
+      {name: 'C'},
+      {name: 'dataRank'},
+      {name: 'pads', length: this.maxRank * 2},
+      {name: 'strides', length: this.maxRank},
+      {name: 'dilations', length: this.maxRank},
+      {name: 'activation'},
     ];
   }
 
   getActivationFlag(activation: Activation) {
-    if (activation === "id") {
+    if (activation === 'id') {
       return 0;
-    } else if (activation === "relu") {
+    } else if (activation === 'relu') {
       return 1;
-    } else if (activation === "relu6") {
+    } else {
       return 2;
     }
   }
 
   calc(input: ConvInput): GPUTensor {
-    if (this.fullyStatic) {
+    if (this.fullyStatic && this.outputShape !== undefined) {
       return this.compute(this.outputShape, {X: input.X, W: input.W});
     }
 
@@ -185,18 +192,31 @@ export class ConvOperation<GPUTensor extends GPUTensorI, ConvInf extends ConvInf
 
     const kernelSize = getSize(W);
 
-    const R = outputDimsSize(D, W, input.pads.slice(0, input.pads.length/2), input.pads.slice(input.pads.length/2), input.dilations, input.strides);
+    const R = outputDimsSize(
+      D,
+      W,
+      input.pads.slice(0, input.pads.length / 2),
+      input.pads.slice(input.pads.length / 2),
+      input.dilations,
+      input.strides
+    );
     let outputShape = [N, M];
     outputShape = outputShape.concat(R);
 
-    return this.compute(outputShape, {X: input.X, W: input.W}, {
-      CG, kernelSize, C,
-      dataRank: D.length,
-      pads: this.copyPad(input.pads, this.maxRank*2),
-      strides: this.copyPad(input.strides),
-      dilations: this.copyPad(input.dilations),
-      activation: this.getActivationFlag(input.activation)
-    })
+    return this.compute(
+      outputShape,
+      {X: input.X, W: input.W},
+      {
+        CG,
+        kernelSize,
+        C,
+        dataRank: D.length,
+        pads: this.copyPad(input.pads, this.maxRank * 2),
+        strides: this.copyPad(input.strides),
+        dilations: this.copyPad(input.dilations),
+        activation: this.getActivationFlag(input.activation),
+      }
+    );
   }
 
   getOutputShape(input: ConvIn): readonly number[] {
@@ -205,7 +225,14 @@ export class ConvOperation<GPUTensor extends GPUTensorI, ConvInf extends ConvInf
     const W = input.W.shape.slice(2);
     const M = input.W.shape[0];
 
-    const R = outputDimsSize(D, W, input.pads.slice(0, input.pads.length/2), input.pads.slice(input.pads.length/2), input.dilations, input.strides);
+    const R = outputDimsSize(
+      D,
+      W,
+      input.pads.slice(0, input.pads.length / 2),
+      input.pads.slice(input.pads.length / 2),
+      input.dilations,
+      input.strides
+    );
     let outputShape = [N, M];
     outputShape = outputShape.concat(R);
 
@@ -225,7 +252,7 @@ export class ConvOperation<GPUTensor extends GPUTensorI, ConvInf extends ConvInf
 
       this.maxRank = info.shapeX.length;
     }
-    if (info.activation !== undefined && typeof info.activation === "string") {
+    if (info.activation !== undefined && typeof info.activation === 'string') {
       info.activation = this.getActivationFlag(info.activation);
     }
 
@@ -234,7 +261,10 @@ export class ConvOperation<GPUTensor extends GPUTensorI, ConvInf extends ConvInf
 
   getCompilationInfo(input: ConvIn, precision: Precision): ConvInf {
     const outputShape = this.getOutputShape(input);
-    const outputSize = defaultAllocator.getAllocationDimensions(getSize(outputShape), precision);
+    const outputSize = defaultAllocator.getAllocationDimensions(
+      getSize(outputShape),
+      precision
+    );
 
     const kernelSize = getSize(input.W.shape.slice(2));
 
@@ -262,7 +292,7 @@ export class ConvOperation<GPUTensor extends GPUTensorI, ConvInf extends ConvInf
       kernelSize: kernelSize,
       dataRank: D.length,
       C: C,
-      activation: this.getActivationFlag(input.activation)
+      activation: this.getActivationFlag(input.activation),
     } as ConvInf;
   }
 
@@ -270,7 +300,6 @@ export class ConvOperation<GPUTensor extends GPUTensorI, ConvInf extends ConvInf
     return `${input.X.shape}-${input.W.shape}-${input.dilations}-${input.pads}-${input.dilations}-${input.strides}-${input.activation}`;
   }
 }
-
 
 export interface ConvBiasInput extends ConvInput {
   B: GPUTensorI;
@@ -282,13 +311,19 @@ export interface ConvBiasInfo extends ConvInfo {
   heightB?: number;
 }
 
-export class ConvBiasOperation<GPUTensor extends GPUTensorI> extends ConvOperation<GPUTensor, ConvBiasInfo, ConvBiasInput> {
+export class ConvBiasOperation<
+  GPUTensor extends GPUTensorI
+> extends ConvOperation<GPUTensor, ConvBiasInfo, ConvBiasInput> {
   protected maxIterations = 1000000;
 
-  constructor(tensorConstructor: GPUTensorConstructor<GPUTensor>, allocator?: GPUMemoryAllocator) {
+  constructor(
+    tensorConstructor: GPUTensorConstructor<GPUTensor>,
+    allocator?: GPUMemoryAllocator
+  ) {
     super(tensorConstructor, allocator);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getFragmentShader(info: ConvBiasInfo): string {
     return `
     float process(int index[${this.maxRank}]) {
@@ -301,6 +336,8 @@ export class ConvBiasOperation<GPUTensor extends GPUTensorI> extends ConvOperati
 
       if (activation == 1) {
         res = max(0.0, res);
+      } else if (activation == 2) {
+        res = max(0.0, min(res,6.0));
       }
 
       return res;
@@ -311,7 +348,7 @@ export class ConvBiasOperation<GPUTensor extends GPUTensorI> extends ConvOperati
   }
 
   getTextureNames(): string[] {
-    return ["X", "W", "B"];
+    return ['X', 'W', 'B'];
   }
 
   calc(input: ConvBiasInput): GPUTensor {
@@ -324,18 +361,31 @@ export class ConvBiasOperation<GPUTensor extends GPUTensorI> extends ConvOperati
 
     const kernelSize = getSize(W);
 
-    const R = outputDimsSize(D, W, input.pads.slice(0, input.pads.length/2), input.pads.slice(input.pads.length/2), input.dilations, input.strides);
+    const R = outputDimsSize(
+      D,
+      W,
+      input.pads.slice(0, input.pads.length / 2),
+      input.pads.slice(input.pads.length / 2),
+      input.dilations,
+      input.strides
+    );
     let outputShape = [N, M];
     outputShape = outputShape.concat(R);
 
-    return this.compute(outputShape, {X: input.X, W: input.W, B: input.B}, {
-      CG, kernelSize, C,
-      dataRank: D.length,
-      pads: this.copyPad(input.pads, this.maxRank*2),
-      strides: this.copyPad(input.strides),
-      dilations: this.copyPad(input.dilations),
-      activation: this.getActivationFlag(input.activation)
-    })
+    return this.compute(
+      outputShape,
+      {X: input.X, W: input.W, B: input.B},
+      {
+        CG,
+        kernelSize,
+        C,
+        dataRank: D.length,
+        pads: this.copyPad(input.pads, this.maxRank * 2),
+        strides: this.copyPad(input.strides),
+        dilations: this.copyPad(input.dilations),
+        activation: this.getActivationFlag(input.activation),
+      }
+    );
   }
 
   getCompilationInfo(input: ConvBiasInput, precision: Precision): ConvBiasInfo {
@@ -346,7 +396,7 @@ export class ConvBiasOperation<GPUTensor extends GPUTensorI> extends ConvOperati
 
       shapeB: input.B.shape,
       widthB: input.B.memory.width,
-      heightB: input.B.memory.height
+      heightB: input.B.memory.height,
     };
   }
 

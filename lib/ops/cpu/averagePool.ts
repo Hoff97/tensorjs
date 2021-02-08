@@ -1,12 +1,14 @@
-import { CPUTensor } from '../../tensor/cpu/tensor';
-import { getSize, incrementIndex } from '../../util/shape';
-import { outputDimsSize } from '../util/conv';
+import {CPUTensor} from '../../tensor/cpu/tensor';
+import {getSize, incrementIndex} from '../../util/shape';
+import {outputDimsSize} from '../util/conv';
 
-export function averagePool(x: CPUTensor,
-                            kernelShape: number[],
-                            pads: number[],
-                            strides: number[],
-                            includePad: boolean) {
+export function averagePool(
+  x: CPUTensor,
+  kernelShape: number[],
+  pads: number[],
+  strides: number[],
+  includePad: boolean
+) {
   const N = x.shape[0];
   const C = x.shape[1];
   const D = x.shape.slice(2);
@@ -15,7 +17,14 @@ export function averagePool(x: CPUTensor,
 
   const kernelSize = getSize(kernelShape);
 
-  const R = outputDimsSize(D, kernelShape, pads.slice(0, pads.length/2), pads.slice(pads.length/2), new Array(dataRank).fill(1), strides);
+  const R = outputDimsSize(
+    D,
+    kernelShape,
+    pads.slice(0, pads.length / 2),
+    pads.slice(pads.length / 2),
+    new Array(dataRank).fill(1),
+    strides
+  );
   const outputSize = getSize(R);
   let outputShape = [N, C];
   outputShape = outputShape.concat(R);
@@ -26,7 +35,6 @@ export function averagePool(x: CPUTensor,
   for (let n = 0; n < N; n++) {
     // Iterate over all output channels
     for (let c = 0; c < C; c++) {
-
       const outputIndices = new Array(R.length).fill(0);
       outputIndices.unshift(n, c);
       for (let oIx = 0; oIx < outputSize; oIx++) {
@@ -44,7 +52,8 @@ export function averagePool(x: CPUTensor,
             const stride = strides.length === 0 ? 1 : strides[axis];
             const pad = pads.length === 0 ? 0 : pads[axis];
 
-            const ix = outputIndices[axis + 2] * stride - pad + kernelIndices[axis];
+            const ix =
+              outputIndices[axis + 2] * stride - pad + kernelIndices[axis];
 
             if (ix < 0 || ix >= D[axis]) {
               skip = true;
@@ -66,7 +75,7 @@ export function averagePool(x: CPUTensor,
           incrementIndex(kernelIndices, kernelShape);
         }
 
-        result = result/count;
+        result = result / count;
 
         Y.set(outputIndices, result);
 

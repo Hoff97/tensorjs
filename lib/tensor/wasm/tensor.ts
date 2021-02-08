@@ -1,11 +1,12 @@
-import Tensor, { PadMode } from '../../types';
-import { compareShapes } from '../../util/shape';
+import {Activation} from '../../library';
+import Tensor, {PadMode} from '../../types';
+import {compareShapes} from '../../util/shape';
 
-import { Tensor as WT } from '../../wasm/rust_wasm_tensor';
-import { CPUTensor } from '../cpu/tensor';
+import {Tensor as WT} from '../../wasm/rust_wasm_tensor';
+import {CPUTensor} from '../cpu/tensor';
 
 let WASMT: typeof WT;
-export let wasmLoaded: Promise<void> = new Promise((resolve, reject) => {
+export const wasmLoaded: Promise<void> = new Promise(resolve => {
   import('../../wasm/rust_wasm_tensor').then(x => {
     WASMT = x.Tensor;
     resolve();
@@ -20,7 +21,9 @@ export class WASMTensor extends Tensor {
 
     if (values instanceof Float32Array) {
       if (shape === undefined) {
-        throw new Error('Need the shape when creating a Wasm tensor from values');
+        throw new Error(
+          'Need the shape when creating a Wasm tensor from values'
+        );
       }
       this.wasmTensor = WASMT.create(shape, values);
     } else {
@@ -36,13 +39,28 @@ export class WASMTensor extends Tensor {
     return Array.from(this.wasmTensor.get_shape());
   }
 
+  constantLike(value: number): Tensor {
+    // TODO: Maybe more efficient in WASM?
+    return new WASMTensor(
+      new Float32Array(this.wasmTensor.size).fill(value),
+      this.wasmTensor.get_shape()
+    );
+  }
+
+  singleConstant(value: number): Tensor {
+    return new WASMTensor(new Float32Array([value]), new Uint32Array([1]));
+  }
+
   async wasm(): Promise<WASMTensor> {
     return this;
   }
 
   delete(): void {
-    this.wasmTensor.free();
-    this.wasmTensor = undefined;
+    if (this.wasmTensor !== undefined) {
+      this.wasmTensor.free();
+      //@ts-ignore
+      this.wasmTensor = undefined;
+    }
   }
 
   copy(): Tensor {
@@ -65,36 +83,87 @@ export class WASMTensor extends Tensor {
     return new WASMTensor(this.wasmTensor.abs());
   }
 
-  add_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor {
+  sigmoid(): Tensor {
+    return new WASMTensor(this.wasmTensor.sigmoid());
+  }
+
+  negate(): Tensor {
+    return new WASMTensor(this.wasmTensor.negate());
+  }
+
+  addMultiplyScalar(factor: number, add: number): Tensor {
+    return new WASMTensor(this.wasmTensor.add_multiply_scalar(factor, add));
+  }
+
+  sign(): Tensor {
+    return new WASMTensor(this.wasmTensor.sign());
+  }
+
+  add_impl(
+    th: Tensor,
+    tensor: Tensor,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _resultShape: readonly number[],
+    alpha: number,
+    beta: number
+  ): Tensor {
     if (!(tensor instanceof WASMTensor) || !(th instanceof WASMTensor)) {
       throw new Error('Can only add WASM tensor to WASM tensor');
     }
 
-    return new WASMTensor(th.wasmTensor.addition(tensor.wasmTensor));
+    return new WASMTensor(
+      th.wasmTensor.addition(tensor.wasmTensor, alpha, beta)
+    );
   }
 
-  subtract_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor {
+  subtract_impl(
+    th: Tensor,
+    tensor: Tensor,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    resultShape: readonly number[],
+    alpha: number,
+    beta: number
+  ): Tensor {
     if (!(tensor instanceof WASMTensor) || !(th instanceof WASMTensor)) {
       throw new Error('Can only subtract WASM tensor from WASM tensor');
     }
-    return new WASMTensor(th.wasmTensor.subtraction(tensor.wasmTensor));
+    return new WASMTensor(
+      th.wasmTensor.subtraction(tensor.wasmTensor, alpha, beta)
+    );
   }
 
-  multiply_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor {
+  multiply_impl(
+    th: Tensor,
+    tensor: Tensor,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    resultShape: readonly number[],
+    alpha: number
+  ): Tensor {
     if (!(tensor instanceof WASMTensor) || !(th instanceof WASMTensor)) {
       throw new Error('Can only multiply WASM tensor with WASM tensor');
     }
-    return new WASMTensor(th.wasmTensor.multiply(tensor.wasmTensor));
+    return new WASMTensor(th.wasmTensor.multiply(tensor.wasmTensor, alpha));
   }
 
-  divide_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor {
+  divide_impl(
+    th: Tensor,
+    tensor: Tensor,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    resultShape: readonly number[],
+    alpha: number
+  ): Tensor {
     if (!(tensor instanceof WASMTensor) || !(th instanceof WASMTensor)) {
       throw new Error('Can only divide WASM tensor by WASM tensor');
     }
-    return new WASMTensor(th.wasmTensor.divide(tensor.wasmTensor));
+    return new WASMTensor(th.wasmTensor.divide(tensor.wasmTensor, alpha));
   }
 
-  power_impl(th: Tensor, tensor: Tensor, resultShape: readonly number[]): Tensor {
+  power_impl(
+    th: Tensor,
+    tensor: Tensor,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    resultShape: readonly number[]
+  ): Tensor {
     if (!(tensor instanceof WASMTensor) || !(th instanceof WASMTensor)) {
       throw new Error('Can only take WASM tensor to power of WASM tensor');
     }
@@ -108,14 +177,34 @@ export class WASMTensor extends Tensor {
     return new WASMTensor(this.wasmTensor.matmul(tensor.wasmTensor));
   }
 
-  gemm_impl(b: Tensor, aTranspose: boolean, bTranspose: boolean, alpha: number, beta: number, c?: Tensor): Tensor {
-    if (!(b instanceof WASMTensor && (c === undefined || c instanceof WASMTensor))) {
+  gemm_impl(
+    b: Tensor,
+    aTranspose: boolean,
+    bTranspose: boolean,
+    alpha: number,
+    beta: number,
+    c?: Tensor
+  ): Tensor {
+    if (
+      !(b instanceof WASMTensor && (c === undefined || c instanceof WASMTensor))
+    ) {
       throw new Error('Can only do gemm with CPU tensors');
     }
     if (c !== undefined) {
-      return new WASMTensor(this.wasmTensor.gemm_with_c(b.wasmTensor, aTranspose, bTranspose, alpha, (c as WASMTensor).wasmTensor, beta));
+      return new WASMTensor(
+        this.wasmTensor.gemm_with_c(
+          b.wasmTensor,
+          aTranspose,
+          bTranspose,
+          alpha,
+          (c as WASMTensor).wasmTensor,
+          beta
+        )
+      );
     } else {
-      return new WASMTensor(this.wasmTensor.gemm(b.wasmTensor, aTranspose, bTranspose, alpha));
+      return new WASMTensor(
+        this.wasmTensor.gemm(b.wasmTensor, aTranspose, bTranspose, alpha)
+      );
     }
   }
 
@@ -124,11 +213,15 @@ export class WASMTensor extends Tensor {
   }
 
   sumSquare_impl(axes: number[], keepDims: boolean): Tensor {
-    return new WASMTensor(this.wasmTensor.sum_square(new Uint32Array(axes), keepDims));
+    return new WASMTensor(
+      this.wasmTensor.sum_square(new Uint32Array(axes), keepDims)
+    );
   }
 
   product_impl(axes: number[], keepDims: boolean): Tensor {
-    return new WASMTensor(this.wasmTensor.product(new Uint32Array(axes), keepDims));
+    return new WASMTensor(
+      this.wasmTensor.product(new Uint32Array(axes), keepDims)
+    );
   }
 
   max_impl(axes: number[], keepDims: boolean): Tensor {
@@ -140,26 +233,111 @@ export class WASMTensor extends Tensor {
   }
 
   reduceMean_impl(axes: number[], keepDims: boolean): Tensor {
-    return new WASMTensor(this.wasmTensor.reduce_mean(new Uint32Array(axes), keepDims));
+    return new WASMTensor(
+      this.wasmTensor.reduce_mean(new Uint32Array(axes), keepDims)
+    );
   }
 
   reduceMeanSquare_impl(axes: number[], keepDims: boolean): Tensor {
-    return new WASMTensor(this.wasmTensor.reduce_mean_square(new Uint32Array(axes), keepDims));
+    return new WASMTensor(
+      this.wasmTensor.reduce_mean_square(new Uint32Array(axes), keepDims)
+    );
   }
 
-  conv_impl(kernel: Tensor, dilations: number[], group: number, pads: number[], strides: number[], bias?: Tensor): Tensor {
-    if (!(kernel instanceof WASMTensor) || (bias !== undefined && !(bias instanceof WASMTensor))) {
-      throw new Error('Can only do convolution of CPU tensor with CPU tensor');
-    }
-    if (bias !== undefined) {
-      return new WASMTensor(this.wasmTensor.conv_with_bias(kernel.wasmTensor, (bias as WASMTensor).wasmTensor, new Uint32Array(dilations), group, new Uint32Array(pads), new Uint32Array(strides)));
+  getActivationFlag(activation: Activation) {
+    if (activation === 'id') {
+      return 0;
+    } else if (activation === 'relu') {
+      return 1;
     } else {
-      return new WASMTensor(this.wasmTensor.conv(kernel.wasmTensor, new Uint32Array(dilations), group, new Uint32Array(pads), new Uint32Array(strides)));
+      return 2;
     }
   }
 
-  averagePool_impl(kernelShape: number[], pads: number[], strides: number[], includePad: boolean): Tensor {
-    return new WASMTensor(this.wasmTensor.average_pool(new Uint32Array(kernelShape), new Uint32Array(pads), new Uint32Array(strides), includePad));
+  conv_impl(
+    kernel: Tensor,
+    dilations: number[],
+    group: number,
+    pads: number[],
+    strides: number[],
+    activation: Activation,
+    bias?: Tensor
+  ): Tensor {
+    if (
+      !(kernel instanceof WASMTensor) ||
+      (bias !== undefined && !(bias instanceof WASMTensor))
+    ) {
+      throw new Error(
+        'Can only do convolution of WASM tensor with WASM tensor'
+      );
+    }
+
+    const activationFlag = this.getActivationFlag(activation);
+
+    if (bias !== undefined) {
+      return new WASMTensor(
+        this.wasmTensor.conv_with_bias(
+          kernel.wasmTensor,
+          (bias as WASMTensor).wasmTensor,
+          new Uint32Array(dilations),
+          group,
+          new Uint32Array(pads),
+          new Uint32Array(strides),
+          activationFlag
+        )
+      );
+    } else {
+      return new WASMTensor(
+        this.wasmTensor.conv(
+          kernel.wasmTensor,
+          new Uint32Array(dilations),
+          group,
+          new Uint32Array(pads),
+          new Uint32Array(strides),
+          activationFlag
+        )
+      );
+    }
+  }
+
+  protected convTranspose_impl(
+    kernel: Tensor,
+    dilations: number[],
+    group: number,
+    pads: number[],
+    strides: number[]
+  ): Tensor {
+    if (!(kernel instanceof WASMTensor)) {
+      throw new Error(
+        'Can only do transpose convolution of WASM tensor with WASM tensor'
+      );
+    }
+
+    return new WASMTensor(
+      this.wasmTensor.conv_transpose(
+        kernel.wasmTensor,
+        new Uint32Array(dilations),
+        group,
+        new Uint32Array(pads),
+        new Uint32Array(strides)
+      )
+    );
+  }
+
+  averagePool_impl(
+    kernelShape: number[],
+    pads: number[],
+    strides: number[],
+    includePad: boolean
+  ): Tensor {
+    return new WASMTensor(
+      this.wasmTensor.average_pool(
+        new Uint32Array(kernelShape),
+        new Uint32Array(pads),
+        new Uint32Array(strides),
+        includePad
+      )
+    );
   }
 
   reshape_impl(shape: number[]): Tensor {
@@ -175,16 +353,38 @@ export class WASMTensor extends Tensor {
   }
 
   transpose_impl(permutation: number[]): Tensor {
-    return new WASMTensor(this.wasmTensor.transpose(new Uint32Array(permutation)));
+    return new WASMTensor(
+      this.wasmTensor.transpose(new Uint32Array(permutation))
+    );
   }
 
   clip(min?: number, max?: number): Tensor {
     if (min !== undefined && max !== undefined) {
       return new WASMTensor(this.wasmTensor.clip(min, max));
-    } else if (min !== undefined ) {
+    } else if (min !== undefined) {
       return new WASMTensor(this.wasmTensor.clip_min(min));
     } else if (max !== undefined) {
       return new WASMTensor(this.wasmTensor.clip_max(max));
+    }
+    return this.copy();
+  }
+
+  clipBackward(grad: Tensor, min?: number, max?: number): Tensor {
+    if (!(grad instanceof WASMTensor)) {
+      throw new Error('Can only do grad backward with Wasm tensor');
+    }
+    if (min !== undefined && max !== undefined) {
+      return new WASMTensor(
+        this.wasmTensor.clip_backward(min, max, grad.wasmTensor)
+      );
+    } else if (min !== undefined) {
+      return new WASMTensor(
+        this.wasmTensor.clip_min_backward(min, grad.wasmTensor)
+      );
+    } else if (max !== undefined) {
+      return new WASMTensor(
+        this.wasmTensor.clip_max_backward(max, grad.wasmTensor)
+      );
     }
     return this.copy();
   }
@@ -193,9 +393,10 @@ export class WASMTensor extends Tensor {
     return new WASMTensor(this.wasmTensor.repeat(new Uint32Array(repeats)));
   }
 
-  expand(shape: number[]): Tensor {
+  expand(shape: readonly number[]): Tensor {
     const thisShape = this.getShape();
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [_shape, goal, resultShape] = this.alignShapes(thisShape, shape);
     if (compareShapes(thisShape, resultShape)) {
       return this.copy();
@@ -203,21 +404,35 @@ export class WASMTensor extends Tensor {
 
     const reshaped = this.reshape(_shape, false) as WASMTensor;
 
-    return new WASMTensor(reshaped.wasmTensor.expand(new Uint32Array(resultShape)));
+    return new WASMTensor(
+      reshaped.wasmTensor.expand(new Uint32Array(resultShape))
+    );
   }
 
   static padModeToInt = {
-    'constant': 0,
-    'reflect': 1,
-    'edge': 2
-  }
+    constant: 0,
+    reflect: 1,
+    edge: 2,
+  };
 
   pad_impl(pads: number[], mode: PadMode, value: number): Tensor {
-    return new WASMTensor(this.wasmTensor.pad(new Uint32Array(pads), WASMTensor.padModeToInt[mode],value))
+    return new WASMTensor(
+      this.wasmTensor.pad(
+        new Uint32Array(pads),
+        WASMTensor.padModeToInt[mode],
+        value
+      )
+    );
   }
 
   gather(axis: number, indices: CPUTensor): Tensor {
-    return new WASMTensor(this.wasmTensor.gather(axis, indices.values as Int32Array, new Uint32Array(indices.shape)));
+    return new WASMTensor(
+      this.wasmTensor.gather(
+        axis,
+        indices.values as Int32Array,
+        new Uint32Array(indices.shape)
+      )
+    );
   }
 
   floor(): Tensor {
@@ -229,17 +444,42 @@ export class WASMTensor extends Tensor {
   }
 
   slice_impl(starts: number[], ends: number[], axes: number[]): Tensor {
-    return new WASMTensor(this.wasmTensor.slice(new Uint32Array(starts), new Uint32Array(ends), new Uint32Array(axes)));
+    return new WASMTensor(
+      this.wasmTensor.slice(
+        new Uint32Array(starts),
+        new Uint32Array(ends),
+        new Uint32Array(axes)
+      )
+    );
   }
 
   upsample(scales: number[]): Tensor {
     return new WASMTensor(this.wasmTensor.upsample(new Float32Array(scales)));
   }
 
-  normalize(mean: Tensor, variance: Tensor, epsilon: number, scale: Tensor, bias: Tensor): Tensor {
-    if (!(mean instanceof WASMTensor) || !(variance instanceof WASMTensor) || !(scale instanceof WASMTensor) || !(bias instanceof WASMTensor)) {
+  normalize(
+    mean: Tensor,
+    variance: Tensor,
+    epsilon: number,
+    scale: Tensor,
+    bias: Tensor
+  ): Tensor {
+    if (
+      !(mean instanceof WASMTensor) ||
+      !(variance instanceof WASMTensor) ||
+      !(scale instanceof WASMTensor) ||
+      !(bias instanceof WASMTensor)
+    ) {
       throw new Error('Can only normalize with CPU tensors');
     }
-    return new WASMTensor(this.wasmTensor.normalize(mean.wasmTensor, variance.wasmTensor, epsilon, scale.wasmTensor, bias.wasmTensor));
+    return new WASMTensor(
+      this.wasmTensor.normalize(
+        mean.wasmTensor,
+        variance.wasmTensor,
+        epsilon,
+        scale.wasmTensor,
+        bias.wasmTensor
+      )
+    );
   }
 }

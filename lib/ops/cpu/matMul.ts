@@ -1,4 +1,4 @@
-import { CPUTensor } from '../../tensor/cpu/tensor';
+import {CPUTensor} from '../../tensor/cpu/tensor';
 
 export function matMul(a: CPUTensor, b: CPUTensor) {
   if (a.shape.length !== 2 || b.shape.length !== 2) {
@@ -6,7 +6,9 @@ export function matMul(a: CPUTensor, b: CPUTensor) {
   }
 
   if (a.shape[1] !== b.shape[0]) {
-    throw new Error('Matmul expects dimension 1 of operand 1 to equal dimension 0 of operand 2');
+    throw new Error(
+      'Matmul expects dimension 1 of operand 1 to equal dimension 0 of operand 2'
+    );
   }
 
   const m = a.shape[0];

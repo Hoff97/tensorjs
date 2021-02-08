@@ -1,7 +1,7 @@
 import testBasic from './basic';
 import testAggregate from './aggregate';
-import { WASMTensor } from '../lib/tensor/wasm/tensor';
-import { wasmLoaded } from '../lib/tensor/wasm/tensor';
+import {WASMTensor} from '../lib/tensor/wasm/tensor';
+import {wasmLoaded} from '../lib/tensor/wasm/tensor';
 import testConv from './conv';
 import testPool from './pool';
 

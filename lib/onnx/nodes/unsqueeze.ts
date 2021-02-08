@@ -1,27 +1,30 @@
-import { CopyInfo, CopyOperation } from "../../ops/gpu/util/copy";
-import { PrototypeTensor } from "../../tensor/cpu/prototype";
-import { CPUTensor } from "../../tensor/cpu/tensor";
-import { gpuConstructor, GPUTensor } from "../../tensor/gpu/tensor";
-import Tensor, { Precision } from "../../types";
-import { getSize } from "../../util/shape";
-import { OnnxNode } from "../node";
-import { Attributes, Constants } from "../types";
+import {Mode} from '../../model/module';
+import Tensor from '../../types';
+import {OnnxNode} from '../node';
+import {Attributes, Constants} from '../types';
 
 export class UnsqueezeNode extends OnnxNode {
-  private axes: number[];
+  private axes?: number[];
 
-  constructor(attributes: Attributes, inputs: string[], outputs: string[], constants: Constants, onnxVersion: number) {
-    super(attributes, inputs, outputs, constants, onnxVersion);
+  constructor(
+    attributes: Attributes,
+    inputs: string[],
+    outputs: string[],
+    constants: Constants,
+    onnxVersion: number,
+    mode: Mode
+  ) {
+    super(attributes, inputs, outputs, constants, onnxVersion, mode);
 
     if (onnxVersion < 13) {
-      this.axes = this.getAttributeInts("axes");
+      this.axes = this.getAttributeInts('axes');
     }
   }
 
   async forward(inputs: Tensor[]): Promise<Tensor[]> {
     const x = inputs[0];
 
-    if (this.onnxVersion < 13) {
+    if (this.onnxVersion < 13 && this.axes !== undefined) {
       const currShape = x.getShape();
       const newShape = [];
       let axIx = 0;
@@ -38,9 +41,10 @@ export class UnsqueezeNode extends OnnxNode {
 
       return [x.reshape(newShape)];
     }
-    throw new Error(`Unsqueeze with onnx version ${this.onnxVersion} not yet implemented`);
+    throw new Error(
+      `Unsqueeze with onnx version ${this.onnxVersion} not yet implemented`
+    );
   }
-
 
   getType() {
     return 'Unsqueeze';

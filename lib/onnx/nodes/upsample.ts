@@ -1,25 +1,36 @@
-import { CPUTensor } from "../../tensor/cpu/tensor";
-import Tensor from "../../types";
-import { toCPU } from "../../util/convert";
-import { OnnxNode } from "../node";
-import { Attributes, Constants } from "../types";
+import {Mode} from '../../model/module';
+import {CPUTensor} from '../../tensor/cpu/tensor';
+import Tensor from '../../types';
+import {toCPU} from '../../util/convert';
+import {OnnxNode} from '../node';
+import {Attributes, Constants} from '../types';
 
 export class UpsampleNode extends OnnxNode {
-  private mode: string;
+  private sampleMode: string;
 
-  constructor(attributes: Attributes, inputs: string[], outputs: string[], constants: Constants, onnxVersion: number) {
-    super(attributes, inputs, outputs, constants, onnxVersion);
+  constructor(
+    attributes: Attributes,
+    inputs: string[],
+    outputs: string[],
+    constants: Constants,
+    onnxVersion: number,
+    mode: Mode
+  ) {
+    super(attributes, inputs, outputs, constants, onnxVersion, mode);
 
-    this.mode = this.getAttributeString("mode");
+    //@ts-ignore
+    this.sampleMode = this.getAttributeString('mode');
 
-    if (this.mode !== "nearest") {
-      throw new Error("Upsampling only supported with nearest neighbor sampling");
+    if (this.sampleMode !== 'nearest') {
+      throw new Error(
+        'Upsampling only supported with nearest neighbor sampling'
+      );
     }
   }
 
   async getScales(scale: Tensor) {
     if (!(scale instanceof CPUTensor)) {
-      console.warn("Scales tensor for upsample not on CPU, need to transfer!");
+      console.warn('Scales tensor for upsample not on CPU, need to transfer!');
       scale = await toCPU(scale);
     }
 
@@ -34,7 +45,7 @@ export class UpsampleNode extends OnnxNode {
 
   async forward(inputs: Tensor[]): Promise<Tensor[]> {
     const x = inputs[0];
-    let scale = inputs[1];
+    const scale = inputs[1];
 
     const scales = await this.getScales(scale);
 

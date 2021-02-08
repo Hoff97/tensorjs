@@ -1,16 +1,15 @@
-import { defaultAllocator } from "../../../tensor/gpu/gl";
-import { GPUTensorConstructor, GPUTensorI } from "../../../tensor/gpu/interface";
-import { GPUMemoryAllocator } from "../../../tensor/gpu/memory";
-import { PadMode, Precision } from "../../../types";
-import { getSize } from "../../../util/shape";
-import { Input, Operation } from "../operation";
-
+import {defaultAllocator} from '../../../tensor/gpu/gl';
+import {GPUTensorConstructor, GPUTensorI} from '../../../tensor/gpu/interface';
+import {GPUMemoryAllocator} from '../../../tensor/gpu/memory';
+import {Precision} from '../../../types';
+import {getSize} from '../../../util/shape';
+import {Input, Operation} from '../operation';
 
 export interface UpsampleInfo {
   shapeX?: readonly number[];
   widthX?: number;
   heightX?: number;
-  shapeOutput?: readonly number[],
+  shapeOutput?: readonly number[];
   widthOutput?: number;
   heightOutput?: number;
 
@@ -22,11 +21,19 @@ export interface UpsampleInput {
   scales: readonly number[];
 }
 
-export class UpsampleOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTensor, UpsampleInfo, UpsampleInput> {
-  constructor(tensorConstructor: GPUTensorConstructor<GPUTensor>, allocator?: GPUMemoryAllocator) {
+export class UpsampleOperation<GPUTensor extends GPUTensorI> extends Operation<
+  GPUTensor,
+  UpsampleInfo,
+  UpsampleInput
+> {
+  constructor(
+    tensorConstructor: GPUTensorConstructor<GPUTensor>,
+    allocator?: GPUMemoryAllocator
+  ) {
     super(tensorConstructor, allocator);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getFragmentShader(info: UpsampleInfo): string {
     return `
     float process(int index[${this.maxRank}]) {
@@ -49,7 +56,7 @@ export class UpsampleOperation<GPUTensor extends GPUTensorI> extends Operation<G
   }
 
   getTextureNames(): string[] {
-    return ["X"];
+    return ['X'];
   }
 
   getVariables() {
@@ -59,21 +66,23 @@ export class UpsampleOperation<GPUTensor extends GPUTensorI> extends Operation<G
   }
 
   getUniformAttrs(): Input[] {
-    return [
-      { name: "scales", length: this.maxRank, type: "float" }
-    ];
+    return [{name: 'scales', length: this.maxRank, type: 'float'}];
   }
 
   calc(input: UpsampleInput): GPUTensor {
-    if (this.fullyStatic) {
+    if (this.fullyStatic && this.outputShape !== undefined) {
       return this.compute(this.outputShape, {X: input.X});
     }
 
     const resultShape = this.getOutputShape(input);
 
-    return this.compute(resultShape, {X: input.X}, {
-      scales: this.copyPad(input.scales)
-    });
+    return this.compute(
+      resultShape,
+      {X: input.X},
+      {
+        scales: this.copyPad(input.scales),
+      }
+    );
   }
 
   getOutputShape(input: UpsampleInput): readonly number[] {
@@ -97,7 +106,10 @@ export class UpsampleOperation<GPUTensor extends GPUTensorI> extends Operation<G
 
   getCompilationInfo(input: UpsampleInput, precision: Precision): UpsampleInfo {
     const outputShape = this.getOutputShape(input);
-    const outputSize = defaultAllocator.getAllocationDimensions(getSize(outputShape), precision);
+    const outputSize = defaultAllocator.getAllocationDimensions(
+      getSize(outputShape),
+      precision
+    );
 
     return {
       shapeX: input.X.shape,
@@ -108,7 +120,7 @@ export class UpsampleOperation<GPUTensor extends GPUTensorI> extends Operation<G
       widthOutput: outputSize.width,
       heightOutput: outputSize.height,
 
-      scales: input.scales
+      scales: input.scales,
     };
   }
 

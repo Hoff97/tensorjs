@@ -1,7 +1,14 @@
-import { CPUTensor } from '../../tensor/cpu/tensor';
-import { incrementIndex } from '../../util/shape';
+import {CPUTensor} from '../../tensor/cpu/tensor';
+import {incrementIndex} from '../../util/shape';
 
-export function normalize(x: CPUTensor, mean: CPUTensor, variance: CPUTensor, epsilon: number, scale: CPUTensor, bias: CPUTensor) {
+export function normalize(
+  x: CPUTensor,
+  mean: CPUTensor,
+  variance: CPUTensor,
+  epsilon: number,
+  scale: CPUTensor,
+  bias: CPUTensor
+) {
   const rank = x.shape.length;
 
   const resultShape = [...x.shape];
@@ -10,7 +17,9 @@ export function normalize(x: CPUTensor, mean: CPUTensor, variance: CPUTensor, ep
 
   const outIx = new Array(rank).fill(0);
   for (let i = 0; i < result.size; i++) {
-    let res = (x.get(outIx) - mean.get(outIx))/Math.sqrt(variance.get(outIx) + epsilon);
+    let res =
+      (x.get(outIx) - mean.get(outIx)) /
+      Math.sqrt(variance.get(outIx) + epsilon);
 
     res = res * scale.get(outIx) + bias.get(outIx);
 

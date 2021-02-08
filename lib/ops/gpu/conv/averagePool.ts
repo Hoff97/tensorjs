@@ -1,12 +1,11 @@
-import { getSize } from "../../../util/shape";
-import { outputDimsSize } from "../../util/conv";
+import {getSize} from '../../../util/shape';
+import {outputDimsSize} from '../../util/conv';
 
-import { GPUTensorConstructor, GPUTensorI } from "../../../tensor/gpu/interface";
-import { GPUMemoryAllocator } from "../../../tensor/gpu/memory";
-import { Input, Operation } from "../operation";
-import { Precision } from "../../../types";
-import { defaultAllocator } from "../../../tensor/gpu/gl";
-
+import {GPUTensorConstructor, GPUTensorI} from '../../../tensor/gpu/interface';
+import {GPUMemoryAllocator} from '../../../tensor/gpu/memory';
+import {Input, Operation} from '../operation';
+import {Precision} from '../../../types';
+import {defaultAllocator} from '../../../tensor/gpu/gl';
 
 export interface AveragePoolInfo {
   shapeX?: readonly number[];
@@ -15,7 +14,7 @@ export interface AveragePoolInfo {
 
   kernelShape?: readonly number[];
 
-  shapeOutput?: readonly number[],
+  shapeOutput?: readonly number[];
   widthOutput?: number;
   heightOutput?: number;
 
@@ -35,10 +34,15 @@ export interface AveragePoolInput {
   includePad: boolean;
 }
 
-export class AveragePoolOperation<GPUTensor extends GPUTensorI> extends Operation<GPUTensor, AveragePoolInfo, AveragePoolInput> {
+export class AveragePoolOperation<
+  GPUTensor extends GPUTensorI
+> extends Operation<GPUTensor, AveragePoolInfo, AveragePoolInput> {
   protected maxIterations = 1000000;
 
-  constructor(tensorConstructor: GPUTensorConstructor<GPUTensor>, allocator?: GPUMemoryAllocator) {
+  constructor(
+    tensorConstructor: GPUTensorConstructor<GPUTensor>,
+    allocator?: GPUMemoryAllocator
+  ) {
     super(tensorConstructor, allocator);
   }
 
@@ -57,7 +61,7 @@ export class AveragePoolOperation<GPUTensor extends GPUTensorI> extends Operatio
         break;
       }
     }
-    `
+    `;
   }
 
   getVariables() {
@@ -71,6 +75,7 @@ export class AveragePoolOperation<GPUTensor extends GPUTensorI> extends Operatio
     `;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getFragmentShader(info: AveragePoolInfo): string {
     return `
     float process(int index[${this.maxRank}]) {
@@ -123,22 +128,22 @@ export class AveragePoolOperation<GPUTensor extends GPUTensorI> extends Operatio
   }
 
   getTextureNames(): string[] {
-    return ["X"];
+    return ['X'];
   }
 
   getUniformAttrs(): Input[] {
     return [
-      { name: "kernelSize" },
-      { name: "dataRank" },
-      { name: "includePad" },
-      { name: "pads", length: this.maxRank*2 },
-      { name: "strides", length: this.maxRank },
-      { name: "kernelShape", length: this.maxRank }
+      {name: 'kernelSize'},
+      {name: 'dataRank'},
+      {name: 'includePad'},
+      {name: 'pads', length: this.maxRank * 2},
+      {name: 'strides', length: this.maxRank},
+      {name: 'kernelShape', length: this.maxRank},
     ];
   }
 
   calc(input: AveragePoolInput): GPUTensor {
-    if (this.fullyStatic) {
+    if (this.fullyStatic && this.outputShape !== undefined) {
       return this.compute(this.outputShape, {X: input.X});
     }
     const N = input.X.shape[0];
@@ -147,17 +152,29 @@ export class AveragePoolOperation<GPUTensor extends GPUTensorI> extends Operatio
 
     const kernelSize = getSize(input.kernelShape);
 
-    const R = outputDimsSize(D, input.kernelShape, input.pads.slice(0, input.pads.length/2), input.pads.slice(input.pads.length/2), new Array(D.length).fill(1), input.strides);
+    const R = outputDimsSize(
+      D,
+      input.kernelShape,
+      input.pads.slice(0, input.pads.length / 2),
+      input.pads.slice(input.pads.length / 2),
+      new Array(D.length).fill(1),
+      input.strides
+    );
     let outputShape = [N, C];
     outputShape = outputShape.concat(R);
 
-    return this.compute(outputShape, {X: input.X}, {
-      kernelSize, includePad: input.includePad ? 1 : 0,
-      dataRank: D.length,
-      pads: this.copyPad(input.pads, this.maxRank*2),
-      strides: this.copyPad(input.strides),
-      kernelShape: this.copyPad(input.kernelShape)
-    })
+    return this.compute(
+      outputShape,
+      {X: input.X},
+      {
+        kernelSize,
+        includePad: input.includePad ? 1 : 0,
+        dataRank: D.length,
+        pads: this.copyPad(input.pads, this.maxRank * 2),
+        strides: this.copyPad(input.strides),
+        kernelShape: this.copyPad(input.kernelShape),
+      }
+    );
   }
 
   getOutputShape(input: AveragePoolInput): readonly number[] {
@@ -165,7 +182,14 @@ export class AveragePoolOperation<GPUTensor extends GPUTensorI> extends Operatio
     const C = input.X.shape[1];
     const D = input.X.shape.slice(2);
 
-    const R = outputDimsSize(D, input.kernelShape, input.pads.slice(0, input.pads.length/2), input.pads.slice(input.pads.length/2), new Array(D.length).fill(1), input.strides);
+    const R = outputDimsSize(
+      D,
+      input.kernelShape,
+      input.pads.slice(0, input.pads.length / 2),
+      input.pads.slice(input.pads.length / 2),
+      new Array(D.length).fill(1),
+      input.strides
+    );
     let outputShape = [N, C];
     outputShape = outputShape.concat(R);
 
@@ -187,9 +211,15 @@ export class AveragePoolOperation<GPUTensor extends GPUTensorI> extends Operatio
     super.compile(info, precision);
   }
 
-  getCompilationInfo(input: AveragePoolInput, precision: Precision): AveragePoolInfo {
+  getCompilationInfo(
+    input: AveragePoolInput,
+    precision: Precision
+  ): AveragePoolInfo {
     const outputShape = this.getOutputShape(input);
-    const outputSize = defaultAllocator.getAllocationDimensions(getSize(outputShape), precision);
+    const outputSize = defaultAllocator.getAllocationDimensions(
+      getSize(outputShape),
+      precision
+    );
 
     const kernelSize = getSize(input.kernelShape);
 
@@ -209,7 +239,7 @@ export class AveragePoolOperation<GPUTensor extends GPUTensorI> extends Operatio
 
       kernelSize: kernelSize,
       dataRank: input.X.shape.length - 2,
-      includePad: input.includePad ? 1 : 0
+      includePad: input.includePad ? 1 : 0,
     };
   }
 

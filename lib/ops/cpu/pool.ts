@@ -1,13 +1,20 @@
-import { CPUTensor } from '../../tensor/cpu/tensor';
-import { getSize, incrementIndex, indexToPos, computeStrides } from '../../util/shape';
+import {CPUTensor} from '../../tensor/cpu/tensor';
+import {
+  getSize,
+  incrementIndex,
+  indexToPos,
+  computeStrides,
+} from '../../util/shape';
 
-import { poolResultShape } from '../util/pool';
+import {poolResultShape} from '../util/pool';
 
-export function pool(a: CPUTensor,
-                     axes: number[],
-                     operation: (a: number, b?: number) => number,
-                     keepDims: boolean,
-                     postProcess?: (a: number) => number): CPUTensor {
+export function pool(
+  a: CPUTensor,
+  axes: number[],
+  operation: (a: number, b?: number) => number,
+  keepDims: boolean,
+  postProcess?: (a: number) => number
+): CPUTensor {
   const inputShape = a.getShape();
   const inputSize = getSize(inputShape);
   const [resultShape, ixMap] = poolResultShape(inputShape, axes, keepDims);

@@ -1,0 +1,39 @@
+name: Check builds of examples
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2-beta
+        with:
+          node-version: '12'
+      - uses: jetli/wasm-pack-action@v0.3.0
+        with:
+          version: 'latest'
+      - name: Build
+        run: |
+          npm install
+          npm run build
+          npm pack
+      - name: Build style example
+        run: |
+          cd examples/style
+          npm install
+          npm run build
+      - name: Build mobilenet example
+        run: |
+          cd examples/mobilenet
+          npm install
+          npm run build
+      - name: Build trainer example
+        run: |
+          cd examples/trainer
+          npm install
+          npm run build
