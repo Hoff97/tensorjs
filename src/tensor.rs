@@ -1206,6 +1206,26 @@ impl Tensor {
         self.binary_op(other, |x: f32, y: f32| x.powf(y))
     }
 
+    pub fn bce(&self, other: &Tensor) -> Tensor {
+        return self.binary_op(other, |x: f32, y: f32| {
+            if y == 1.0 {
+                return -x.ln();
+            } else {
+                return -((1.0 - x).ln());
+            }
+        });
+    }
+
+    pub fn bce_back(&self, other: &Tensor) -> Tensor {
+        return self.binary_op(other, |x: f32, y: f32| {
+            if y == 1.0 {
+                return -1.0 / x;
+            } else {
+                return 1.0 / (1.0 - x);
+            }
+        });
+    }
+
     pub fn matmul(&self, other: &Tensor) -> Tensor {
         let m = self.shape[0];
         let n = self.shape[1];

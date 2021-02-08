@@ -5,6 +5,7 @@ import Tensor from '../lib/types';
 import {toCPU, toGPU, toWASM} from '../lib/util/convert';
 import {wasmLoaded, WASMTensor} from '../lib/tensor/wasm/tensor';
 import {GPUTensor} from '../lib/tensor/gpu/tensor';
+import {bce} from '../lib/model/functional/bce/bce';
 
 const epsilon = 0.01;
 
@@ -1573,6 +1574,31 @@ for (const backend of backends) {
       );
 
       expect(await vA.grad?.compare(numericalGradA, 0.05)).toBeTrue();
+    });
+
+    it('should work for bce', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const x = backend.constructor([2, 2], [0.4, 0.5, 0.6, 0.7]);
+      const y = backend.constructor([2, 2], [1, 0, 1, 0]);
+      const ones = backend.constructor([2, 2], new Array(4).fill(1));
+
+      const vX = new Variable(x);
+      const vY = new Variable(y);
+
+      const xCPU = (await toCPU(x)) as CPUTensor;
+      const yCPU = (await toCPU(y)) as CPUTensor;
+
+      const res = bce(vX, vY) as Variable;
+      res.backward(ones);
+
+      const numericalGradX = await backend.toBackend(
+        numericalGradient(xCPU, (x: CPUTensor) => bce(x, yCPU) as CPUTensor)
+      );
+
+      expect(await vX.grad?.compare(numericalGradX, 0.01)).toBeTrue();
     });
   });
 }

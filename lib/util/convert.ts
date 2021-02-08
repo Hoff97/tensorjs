@@ -76,3 +76,19 @@ export async function toGPU(
   }
   return new GPUTensor(values as Float32Array, tensor.getShape(), precision);
 }
+
+export function sameType(a: Tensor, b: Tensor): boolean {
+  if (a instanceof Variable && b instanceof Variable) {
+    return sameType(a.value, b.value);
+  }
+  if (a instanceof CPUTensor && b instanceof CPUTensor) {
+    return true;
+  }
+  if (a instanceof WASMTensor && b instanceof WASMTensor) {
+    return true;
+  }
+  if (a instanceof GPUTensor && b instanceof GPUTensor) {
+    return true;
+  }
+  return false;
+}
