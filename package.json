@@ -16,6 +16,7 @@
   "license": "MIT",
   "version": "0.1.11",
   "types": "./dist/lib/library.d.ts",
+  "main": "./dist/lib/library.js",
   "files": [
     "dist"
   ],

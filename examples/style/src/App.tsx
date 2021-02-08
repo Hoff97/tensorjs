@@ -3,7 +3,6 @@ import './App.css';
 import { loadModel } from './inference';
 
 import * as tjs from '@hoff97/tensor-js';
-import { GPUTensor } from '../../../dist/lib/tensor/gpu/tensor';
 
 interface AppState {
   img: any;
@@ -109,7 +108,7 @@ class App extends React.Component<{}, AppState> {
     console.log(transposed.getShape());
     tensor.delete();
 
-    const t = (transposed as tjs.tensor.gpu.GPUTensor).copy(32) as GPUTensor;
+    const t = (transposed as tjs.tensor.gpu.GPUTensor).copy(32) as tjs.tensor.gpu.GPUTensor;
     transposed.delete();
 
     t.getValues().then(x => {
