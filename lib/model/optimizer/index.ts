@@ -1,4 +1,4 @@
-import {Adam} from './Adam';
+import {Adam} from './adam/Adam';
 import {Optimizer} from './optimizer';
 import {SGD} from './SGD';
 
