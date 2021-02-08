@@ -8,8 +8,9 @@ import {defaultUpdateValueD} from './updateParams';
 /**
  * Implements the Adam optimizer
  *
- * This is currently quite slow, since a lot of computation steps
- * have to happen in the parameter update step
+ * This is currently quite slow on the CPU and WASM backends. On the GPU
+ * backend, one update step is only slightly lower than an update step of SGD
+ * and will converge a lot quicker.
  */
 export class Adam extends Optimizer {
   public moment1?: (Tensor | undefined)[];
