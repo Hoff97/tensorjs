@@ -4,7 +4,7 @@
   "private": true,
   "homepage": ".",
   "dependencies": {
-    "@hoff97/tensor-js": "file:../../hoff97-tensor-js-0.1.11.tgz",
+    "@hoff97/tensor-js": "file:../..",
     "@testing-library/jest-dom": "^5.11.8",
     "@testing-library/react": "^11.2.3",
     "@testing-library/user-event": "^12.6.0",

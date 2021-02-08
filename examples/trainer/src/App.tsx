@@ -5,7 +5,6 @@ import Plot from 'react-plotly.js';
 import { Linear, Relu, Sequential } from '@hoff97/tensor-js/dist/lib/model/basic';
 import { Adam } from '@hoff97/tensor-js/dist/lib/model/optimizer/adam/Adam';
 import { Variable } from '@hoff97/tensor-js/dist/lib/autograd/variable';
-import { CPUTensor } from '@hoff97/tensor-js/dist/lib/tensor/cpu/tensor';
 import { SGD } from '@hoff97/tensor-js/dist/lib/model/optimizer/SGD';
 import { Button, FormControl, Grid, InputLabel, MenuItem, Select, Slider, Typography } from '@material-ui/core';
 import LinearProgress from '@material-ui/core/LinearProgress';
