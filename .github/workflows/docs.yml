@@ -3,48 +3,54 @@ name: Release Docs
 on:
   push:
     branches:
-    - master
+      - master
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-node@v2-beta
-      with:
-        node-version: '12'
-    - uses: jetli/wasm-pack-action@v0.3.0
-      with:
-        version: 'latest'
-    - name: Build
-      run: |
-        npm install
-        npm run build
-    - name: Build docs
-      run: |
-        npm run docs
-      env:
-        CI: true
-    - name: Build style example
-      run: |
-        cd examples/style
-        npm install
-        npm run build
-    - name: Build mobilenet
-      run: |
-        cd examples/mobilenet
-        npm install
-        npm run build
-    - name: Copy build examples
-      run: |
-        mkdir -p docs/examples
-        cp -r examples/style/build docs/examples/style
-        cp -r examples/mobilenet/build docs/examples/mobilenet
-    - name: Deploy documentation
-      uses: JamesIves/github-pages-deploy-action@3.7.1
-      with:
-        GITHUB_TOKEN: ${{ secrets.DOCS_TOKEN }}
-        BRANCH: gh-pages
-        FOLDER: docs
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2-beta
+        with:
+          node-version: '12'
+      - uses: jetli/wasm-pack-action@v0.3.0
+        with:
+          version: 'latest'
+      - name: Build
+        run: |
+          npm install
+          npm run build
+          npm pack
+      - name: Build docs
+        run: |
+          npm run docs
+        env:
+          CI: true
+      - name: Build style example
+        run: |
+          cd examples/style
+          npm install
+          npm run build
+      - name: Build mobilenet
+        run: |
+          cd examples/mobilenet
+          npm install
+          npm run build
+      - name: Build trainer
+        run: |
+          cd examples/trainer
+          npm install
+          npm run build
+      - name: Copy build examples
+        run: |
+          mkdir -p docs/examples
+          cp -r examples/style/build docs/examples/style
+          cp -r examples/mobilenet/build docs/examples/mobilenet
+          cp -r examples/trainer/build docs/examples/trainer
+      - name: Deploy documentation
+        uses: JamesIves/github-pages-deploy-action@3.7.1
+        with:
+          GITHUB_TOKEN: ${{ secrets.DOCS_TOKEN }}
+          BRANCH: gh-pages
+          FOLDER: docs
