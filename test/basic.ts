@@ -1,4 +1,5 @@
 /* eslint-disable prettier/prettier */
+import {bce} from '../lib/model/functional';
 import Tensor from '../lib/types';
 
 const epsilon = 0.00001;
@@ -1113,6 +1114,40 @@ export default function testBasic(
       ).toBeTruthy();
 
       input.delete();
+      expected.delete();
+    });
+  });
+
+  describe(`${name} sigmoid`, () => {
+    it('should compute the sigmoid', async () => {
+      if (wait) {
+        await wait;
+      }
+
+      const input = constructor([4], [0, -1, 1, 2]);
+      const expected = constructor([4], [0.5, 0.26894, 0.73106, 0.8808]);
+
+      expect(await input.sigmoid().compare(expected, 0.01)).toBeTruthy();
+
+      input.delete();
+      expected.delete();
+    });
+  });
+
+  describe(`${name} bce`, () => {
+    it('should compute the binary cross entropy loss', async () => {
+      if (wait) {
+        await wait;
+      }
+
+      const x = constructor([4], [1 / Math.E, 1 - 1 / Math.E, 0.5, 0.5]);
+      const y = constructor([4], [1, 0, 1, 0]);
+      const expected = constructor([4], [1, 1, 0.6931471, 0.6931471]);
+
+      expect(await bce(x, y).compare(expected, 0.01)).toBeTruthy();
+
+      x.delete();
+      y.delete();
       expected.delete();
     });
   });
