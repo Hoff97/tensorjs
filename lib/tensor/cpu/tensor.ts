@@ -33,6 +33,7 @@ import {product} from '../../ops/cpu/product';
 import {reduceMean} from '../../ops/cpu/reduceMean';
 import {reduceMeanSquare} from '../../ops/cpu/reduceMeanSquare';
 import {repeat} from '../../ops/cpu/repeat';
+import {setValues} from '../../ops/cpu/setValues';
 import {slice} from '../../ops/cpu/slice';
 import {sum} from '../../ops/cpu/sum';
 import {sumSquare} from '../../ops/cpu/sumSquare';
@@ -150,6 +151,13 @@ export class CPUTensor extends Tensor {
     }
 
     this.values[pos] = value;
+  }
+
+  setValues(values: Tensor, starts: number[]): Tensor {
+    if (!(values instanceof CPUTensor)) {
+      throw new Error('Can only set CPU values to CPU values');
+    }
+    return setValues(this, values, starts);
   }
 
   exp(): Tensor {

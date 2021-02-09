@@ -9,7 +9,7 @@ import {defaultUpdateValueD} from './updateParams';
  * Implements the Adam optimizer
  *
  * This is currently quite slow on the CPU and WASM backends. On the GPU
- * backend, one update step is only slightly lower than an update step of SGD
+ * backend, one update step is only slightly slower than an update step of SGD
  * and will converge a lot quicker.
  */
 export class Adam extends Optimizer {

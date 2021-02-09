@@ -1109,6 +1109,49 @@ impl Tensor {
             values,
         }
     }
+
+    pub fn _set_values(&self, value_tensor: &Tensor, starts: &Vec<usize>) -> Tensor {
+        let rank = self.shape.len();
+        let mut result_shape = vec![0; rank];
+        for i in 0..rank {
+            result_shape[i] = self.shape[i];
+        }
+
+        let result_strides = compute_strides(&result_shape);
+        let result_size = get_size(&result_shape);
+
+        let mut values = vec![0.0; result_size];
+
+        let mut out_ix = vec![0; rank];
+        let mut values_ix = vec![0; rank];
+
+        for i in 0..result_size {
+            let mut in_values = true;
+            for j in 0..rank {
+                if out_ix[j] < starts[j] || out_ix[j] >= (value_tensor.shape[j] + starts[j]) {
+                    in_values = false;
+                    break;
+                } else {
+                    values_ix[j] = out_ix[j] - starts[j];
+                }
+            }
+
+            if in_values {
+                values[i] = value_tensor.get(&values_ix);
+            } else {
+                values[i] = self.values[i];
+            }
+
+            increment_index(&mut out_ix, &result_shape);
+        }
+
+        Tensor {
+            shape: result_shape,
+            strides: result_strides,
+            size: result_size,
+            values,
+        }
+    }
 }
 
 #[wasm_bindgen]
@@ -1284,6 +1327,14 @@ impl Tensor {
         }
 
         return arr;
+    }
+
+    pub fn set_values(&self, values: &Tensor, starts: Uint32Array) -> Tensor {
+        let mut _starts: Vec<usize> = vec![0; starts.length() as usize];
+        for i in 0..starts.length() {
+            _starts[i as usize] = starts.get_index(i) as usize;
+        }
+        return self._set_values(values, &_starts);
     }
 
     pub fn sum(&self, axes: Uint32Array, keep_dims: bool) -> Tensor {

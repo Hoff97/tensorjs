@@ -47,6 +47,7 @@ import {ClipBackwardOperation} from '../../ops/gpu/util/clipBackward';
 import {ConvTransposeOperation} from '../../ops/gpu/conv/convTranspose';
 import {SigmoidOperation} from '../../ops/gpu/unary/sigmoid';
 import {AddMultiplyScalarOperation} from '../../ops/gpu/unary/addMultiplyScalar';
+import {SetValuesOperation} from '../../ops/gpu/util/setValues';
 
 export class GPUTensor extends Tensor implements GPUTensorI {
   public memory: MemoryEntry;
@@ -173,6 +174,16 @@ export class GPUTensor extends Tensor implements GPUTensorI {
 
   sign(): Tensor {
     return defaultSignD.calc({input: this}, this.precision) as GPUTensor;
+  }
+
+  setValues(values: Tensor, starts: number[]): Tensor {
+    if (!(values instanceof GPUTensor)) {
+      throw new Error('Can only set GPU values to GPU tensor');
+    }
+    return defaultSetValuesD.calc(
+      {A: this, Values: values, starts},
+      this.precision
+    ) as GPUTensor;
   }
 
   add_impl(
@@ -626,6 +637,9 @@ const defaultMinD = new Dispatcher(() => new MinOperation(gpuConstructor));
 //Util
 const defaultConcatD = new Dispatcher(
   () => new ConcatOperation(gpuConstructor)
+);
+const defaultSetValuesD = new Dispatcher(
+  () => new SetValuesOperation(gpuConstructor)
 );
 const defaultCopyD = new Dispatcher(() => new CopyOperation(gpuConstructor));
 const defaultExpandD = new Dispatcher(

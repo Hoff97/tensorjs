@@ -942,6 +942,25 @@ export default abstract class Tensor {
   abstract gather(axis: number, indices: CPUTensor): Tensor;
 
   /**
+   * Sets the values in the current tensor to the given values.
+   * Starts at the specified start indices at each axis.
+   * Note that this will not occur in place, but will generate
+   * a new tensor.
+   *
+   * @example
+   * ```typescript
+   * const a = new CPUTensor([2,2],[1,2,3,4]);
+   * const b = new CPUTensor([1,2],[5,6])
+   *
+   * a.set(b,[1,0]);
+   * //Will be
+   * // [[1,2],
+   * //  [5,6]]
+   * ```
+   */
+  abstract setValues(values: Tensor, starts: number[]): Tensor;
+
+  /**
    * Rounds each tensor value to the nearest upper integer
    */
   abstract floor(): Tensor;
