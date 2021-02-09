@@ -99,6 +99,15 @@ export class WASMTensor extends Tensor {
     return new WASMTensor(this.wasmTensor.sign());
   }
 
+  setValues(values: Tensor, starts: number[]): Tensor {
+    if (!(values instanceof WASMTensor)) {
+      throw new Error('Can only set WASM values to WASM values');
+    }
+    return new WASMTensor(
+      this.wasmTensor.set_values(values.wasmTensor, new Uint32Array(starts))
+    );
+  }
+
   add_impl(
     th: Tensor,
     tensor: Tensor,

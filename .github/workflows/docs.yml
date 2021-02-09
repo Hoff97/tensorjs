@@ -42,12 +42,18 @@ jobs:
           cd examples/trainer
           npm install
           npm run build
+      - name: Build face touch example
+        run: |
+          cd examples/facetouch
+          npm install
+          npm run build
       - name: Copy build examples
         run: |
           mkdir -p docs/examples
           cp -r examples/style/build docs/examples/style
           cp -r examples/mobilenet/build docs/examples/mobilenet
           cp -r examples/trainer/build docs/examples/trainer
+          cp -r examples/facetouch/build docs/examples/facetouch
       - name: Deploy documentation
         uses: JamesIves/github-pages-deploy-action@3.7.1
         with:

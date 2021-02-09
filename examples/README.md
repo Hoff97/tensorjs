@@ -8,3 +8,4 @@ The following examples currently exist:
 - [Style transfer](https://github.com/Hoff97/tensorjs/tree/develop/examples/style)
 - [Mobile Net Classification](https://github.com/Hoff97/tensorjs/tree/develop/examples/mobilenet)
 - [Training visualization](https://github.com/Hoff97/tensorjs/tree/develop/examples/trainer)
+- [Face touch detection](https://github.com/Hoff97/tensorjs/tree/develop/examples/facetouch)

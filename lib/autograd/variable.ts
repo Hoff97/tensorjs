@@ -264,6 +264,10 @@ export class Variable extends Tensor implements VariableI {
     });
   }
 
+  setValues(values: Tensor, starts: number[]): Tensor {
+    throw new Error('Method not implemented.');
+  }
+
   matMul(tensor: Tensor): Tensor {
     if (!(tensor instanceof Variable)) {
       throw new Error('MatMul can only be done with another variable');

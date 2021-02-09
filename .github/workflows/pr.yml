@@ -37,3 +37,8 @@ jobs:
           cd examples/trainer
           npm install
           npm run build
+      - name: Build face touch example
+        run: |
+          cd examples/facetouch
+          npm install
+          npm run build

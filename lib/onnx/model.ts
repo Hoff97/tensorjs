@@ -58,7 +58,6 @@ export interface ModelArgs {
 export class OnnxModel extends Module {
   private version: number;
   private inputSet: Set<string> = new Set();
-  private outputs: string[];
 
   private nodes: {[id: number]: OnnxNode} = {};
   private nodeIds: NodeId[] = [];
@@ -78,6 +77,7 @@ export class OnnxModel extends Module {
   private precision: Precision;
 
   public inputs: onnx.IValueInfoProto[];
+  public outputs: string[];
 
   /**
    * Builds a new onnx model
@@ -213,6 +213,8 @@ export class OnnxModel extends Module {
    * @param wait Number of milliseconds to wait between each layer. This
    *             is especially useful, if your model is complex and
    *             you dont want your model to block your whole application.
+   * @param returnIntermediary return after the given intermediary result
+   *                           has been computed.
    */
   async forward(inputs: Tensor[], wait?: number): Promise<Tensor[]> {
     const intermediaryRes: {[name: string]: IntermediaryRes} = {};
@@ -440,14 +442,19 @@ export class OnnxModel extends Module {
     this.prune();
   }
 
-  private prune() {
+  public prune(intermediariesToDelete?: string[]) {
     // eslint-disable-next-line no-constant-condition
     while (true) {
-      const nodesToDelete = this.pruneIntermediaries();
+      const nodesToDelete = this.pruneIntermediaries(intermediariesToDelete);
+
+      intermediariesToDelete = [];
 
       if (nodesToDelete.size > 0) {
         nodesToDelete.forEach(id => {
-          this.removeNode(id, new Set());
+          const interToDelete = this.removeNode(id, new Set());
+          intermediariesToDelete = intermediariesToDelete?.concat(
+            interToDelete
+          );
         });
       } else {
         break;
@@ -455,18 +462,39 @@ export class OnnxModel extends Module {
     }
   }
 
-  private pruneIntermediaries() {
+  private pruneIntermediaries(intermediariesToDelete?: string[]) {
     const nodesToDelete = new Set<number>();
 
-    const intermediariesToDelete: string[] = [];
+    if (intermediariesToDelete === undefined) {
+      intermediariesToDelete = [];
+    }
+
+    for (let i = 0; i < intermediariesToDelete.length; i++) {
+      const id = intermediariesToDelete[i];
+      const nodeOutputId = this.getNodeWithOutput(id);
+      if (nodeOutputId !== undefined) {
+        nodesToDelete.add(nodeOutputId);
+      }
+      const nodeInputId = this.getNodeWithInput(id);
+      if (nodeInputId !== undefined) {
+        nodesToDelete.add(nodeInputId);
+      }
+    }
 
     for (const id in this.intermediaries) {
       const intermediary = this.intermediaries[id];
-      if (intermediary.to.length === 0) {
+      if (
+        intermediary.to.length === 0 &&
+        this.outputs.find(x => x === id) === undefined
+      ) {
         intermediariesToDelete.push(id);
-        const nodeId = this.getNodeWithOutput(id);
-        if (nodeId !== undefined) {
-          nodesToDelete.add(nodeId);
+        const nodeOutputId = this.getNodeWithOutput(id);
+        if (nodeOutputId !== undefined) {
+          nodesToDelete.add(nodeOutputId);
+        }
+        const nodeInputId = this.getNodeWithInput(id);
+        if (nodeInputId !== undefined) {
+          nodesToDelete.add(nodeInputId);
         }
       }
     }
@@ -478,7 +506,10 @@ export class OnnxModel extends Module {
     return nodesToDelete;
   }
 
-  private removeNode(nodeId: number, preserveIntermediaries: Set<string>) {
+  private removeNode(
+    nodeId: number,
+    preserveIntermediaries: Set<string>
+  ): string[] {
     const node = this.nodes[nodeId];
     for (const input of node.inputs) {
       if (this.intermediaries[input] !== undefined) {
@@ -487,13 +518,19 @@ export class OnnxModel extends Module {
         );
       }
     }
+
+    const intermediariesToDelete = [];
     if (!preserveIntermediaries.has(node.outputs[0])) {
-      delete this.intermediaries[node.outputs[0]];
+      intermediariesToDelete.push(node.outputs[0]);
     }
 
     this.nodeIds = this.nodeIds.filter(x => x.toString() !== nodeId.toString());
     this.nodes[nodeId].delete();
     delete this.nodes[nodeId];
+
+    this.defaultReady = this.defaultReady.filter(x => x !== nodeId);
+
+    return intermediariesToDelete;
   }
 
   private insertNode(node: OnnxNode) {
