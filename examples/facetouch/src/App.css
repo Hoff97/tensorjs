@@ -1,0 +1,42 @@
+.App {
+  margin: 10px;
+  margin: auto;
+  width: 75%;
+  padding: 10px;
+}
+
+#canvas {
+  margin: 5px;
+  box-shadow: 10px 5px 5px #CCC;
+}
+
+#img {
+  margin: 5px;
+  box-shadow: 10px 5px 5px #CCC;
+}
+
+#videoElement {
+  margin: auto;
+}
+
+div.mainContent {
+  text-align: center;
+  margin-top: 20px;
+  align-items: center;
+  justify-content: center;
+}
+
+.progress {
+  width: 320px;
+  margin: auto;
+}
+
+video {
+  margin: 5px;
+}
+
+.settings {
+  width: 25%;
+  position: absolute !important;
+  right: 12.9%;
+}
