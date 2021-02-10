@@ -73,19 +73,21 @@ const models = [
   },
   {
     size: 0.25,
-    name: 'mobilenet025'
+    name: 'mobilenet025',
+    outputs: ['473'],
+    prune: ['474']
   }
 ]
 
 class App extends React.Component<{}, AppState> {
   private model?: tjs.onnx.model.OnnxModel = undefined;
-  private classifier?: tjs.model.Module;
+  private classifier?: tjs.model.basic.Linear;
 
   private mean?: tjs.Tensor;
   private varSqrt?: tjs.Tensor;
 
-  private meanMobilenet = new tjs.tensor.gpu.GPUTensor(new Float32Array([0.485, 0.456, 0.406]), [3,1,1], 16);
-  private stdMobilenet = new tjs.tensor.gpu.GPUTensor(new Float32Array([0.229, 0.224, 0.225]), [3,1,1], 16);
+  private meanMobilenet = new tjs.tensor.gpu.GPUTensor(new Float32Array([0.485, 0.456, 0.406]), [3,1,1], 32);
+  private stdMobilenet = new tjs.tensor.gpu.GPUTensor(new Float32Array([0.229, 0.224, 0.225]), [3,1,1], 32);
 
   private data?: tjs.tensor.gpu.GPUTensor;
 
@@ -119,19 +121,57 @@ class App extends React.Component<{}, AppState> {
   }
 
   componentDidMount() {
-    this.getVideo();
+    this.getVideo().then(x => {
+      this.checkStorage();
+    });
+  }
+
+  async checkStorage() {
+    const model = localStorage.getItem('model');
+    const mean = localStorage.getItem('mean');
+    const varSqrt = localStorage.getItem('varSqrt');
+    const classifierValues = localStorage.getItem('classifierValues');
+
+    if (model !== null && mean !== null && varSqrt !== null && classifierValues !== null) {
+      const parsedClassifier = JSON.parse(classifierValues);
+
+      this.classifier = new Linear(featureDim, 1, true);
+      this.classifier.weights = Variable.create([featureDim, 1], parsedClassifier[0], 'GPU');
+      this.classifier.bias = Variable.create([1], parsedClassifier[1], 'GPU');
+
+      this.mean = new tjs.tensor.gpu.GPUTensor(new Float32Array(JSON.parse(mean)), [featureDim], 32);
+      this.varSqrt = new tjs.tensor.gpu.GPUTensor(new Float32Array(JSON.parse(varSqrt)), [featureDim], 32);
+
+      await this.setModel(model);
+      this.setState({
+        stage: 'monitoring',
+        prediction: 0,
+      });
+
+      await wait(1000);
+
+      const reshaped = this.prepareVideo() as tjs.Tensor;
+
+      this.model?.forward([reshaped]).then(results => {
+        reshaped.delete();
+        this.process(results);
+      });
+    }
   }
 
   async setModel(name: string) {
+    const model = models.find(x => x.name === name);
+
     this.setState({
-      model: name
+      model: name,
+      stage: 'start'
     });
 
     this.model = await loadModel(name);
 
     if (this.model !== undefined) {
-      this.model.outputs = ["472"];
-      this.model.prune(["473"]);
+      this.model.outputs = model?.outputs || ['472'];
+      this.model.prune(model?.prune || ["473"]);
     }
 
     this.model?.optimize();
@@ -152,28 +192,26 @@ class App extends React.Component<{}, AppState> {
   }
 
   prepareVideo() {
-    if (this.videoTensor !== undefined) {
-      const video: HTMLVideoElement = (document.querySelector("#videoElement") as any);
+  const video: HTMLVideoElement = (document.querySelector("#videoElement") as any);
 
-      this.videoTensor = tjs.tensor.gpu.GPUTensor.fromData(video, 32);
+    this.videoTensor = tjs.tensor.gpu.GPUTensor.fromData(video, 32);
 
-      let [height, width] = this.videoTensor.shape.slice(0,2);
+    let [height, width] = this.videoTensor.shape.slice(0,2);
 
-      const sliced = this.videoTensor.slice([0], [3], [2]);
+    const sliced = this.videoTensor.slice([0], [3], [2]);
 
-      this.videoTensor.delete();
+    this.videoTensor.delete();
 
-      const transposed = sliced.transpose([2, 0, 1]);
-      sliced.delete();
+    const transposed = sliced.transpose([2, 0, 1]);
+    sliced.delete();
 
-      const scaled = transposed.subtract(this.meanMobilenet);
-      transposed.delete();
-      const normalized = scaled.divide(this.stdMobilenet);
-      scaled.delete();
+    const scaled = transposed.subtract(this.meanMobilenet);
+    transposed.delete();
+    const normalized = scaled.divide(this.stdMobilenet);
+    scaled.delete();
 
-      const reshaped = normalized.reshape([1,3,height,width], false);
-      return reshaped;
-    }
+    const reshaped = normalized.reshape([1,3,height,width], false);
+    return reshaped;
   }
 
   async prepareTraining() {
@@ -395,12 +433,32 @@ class App extends React.Component<{}, AppState> {
 
     await wait(1000);
 
+    this.saveModelSettings();
+
     const reshaped = this.prepareVideo() as tjs.Tensor;
 
     this.model?.forward([reshaped]).then(results => {
       reshaped.delete();
       this.process(results);
     });
+  }
+
+  async saveModelSettings() {
+    const params = this.classifier?.getParameters() as Variable[];
+    const paramValues = [];
+    for (let param of params) {
+      paramValues.push(Array.from(await param.getValues()));
+    }
+
+    localStorage.setItem('classifierValues', JSON.stringify(paramValues));
+
+    const meanValues = Array.from(await this.mean?.getValues() as any);
+    localStorage.setItem('mean', JSON.stringify(meanValues));
+
+    const stdValues = Array.from(await this.varSqrt?.getValues() as any);
+    localStorage.setItem('varSqrt', JSON.stringify(stdValues));
+
+    localStorage.setItem('model', this.state.model);
   }
 
   toggleNotification(value: boolean) {
@@ -461,14 +519,16 @@ class App extends React.Component<{}, AppState> {
       this.numIts = 0;
     }
 
-    await wait(1000);
+    if (this.state.stage === 'monitoring') {
+      await wait(1000);
 
-    const reshaped = this.prepareVideo() as tjs.Tensor;
+      const reshaped = this.prepareVideo() as tjs.Tensor;
 
-    this.model?.forward([reshaped]).then(results => {
-      reshaped.delete();
-      this.process(results);
-    });
+      this.model?.forward([reshaped]).then(results => {
+        reshaped.delete();
+        this.process(results);
+      });
+    }
   }
 
   getCorrect(predVals: number[], ys: number[]) {
