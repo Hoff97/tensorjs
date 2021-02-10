@@ -18,10 +18,11 @@ import Slider from '@material-ui/core/Slider';
 import Grid from '@material-ui/core/Grid';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
+import FormControl from '@material-ui/core/FormControl';
+import InputLabel from '@material-ui/core/InputLabel';
+import MenuItem from '@material-ui/core/MenuItem';
+import Select from '@material-ui/core/Select';
 
-const numTrainSamples = 64;
-const numValidationSamples = 0;
-const numSamples = numTrainSamples + numValidationSamples;
 //const featureDim = 64;
 const featureDim = 1280;
 
@@ -36,6 +37,9 @@ interface AppState {
   numIterations: number;
   sound: boolean;
   notification: boolean;
+  model: string;
+  numTrainSamples: number;
+  numValidationSamples: number;
 }
 
 function wait(t: number) {
@@ -54,10 +58,28 @@ async function countDown(n: number, t: number, cb: (n: number) => void) {
   cb(0);
 }
 
+const models = [
+  {
+    size: 1.0,
+    name: 'mobilenet100'
+  },
+  {
+    size: 0.5,
+    name: 'mobilenet050'
+  },
+  {
+    size: 0.35,
+    name: 'mobilenet035'
+  },
+  {
+    size: 0.25,
+    name: 'mobilenet025'
+  }
+]
+
 class App extends React.Component<{}, AppState> {
   private model?: tjs.onnx.model.OnnxModel = undefined;
   private classifier?: tjs.model.Module;
-  private modelCompiled = false;
 
   private mean?: tjs.Tensor;
   private varSqrt?: tjs.Tensor;
@@ -65,13 +87,11 @@ class App extends React.Component<{}, AppState> {
   private meanMobilenet = new tjs.tensor.gpu.GPUTensor(new Float32Array([0.485, 0.456, 0.406]), [3,1,1], 16);
   private stdMobilenet = new tjs.tensor.gpu.GPUTensor(new Float32Array([0.229, 0.224, 0.225]), [3,1,1], 16);
 
-  private data = new tjs.tensor.gpu.GPUTensor(new Float32Array(numSamples*featureDim).fill(0), [numSamples, featureDim], 32);
+  private data?: tjs.tensor.gpu.GPUTensor;
 
   private trainingResultsCollected = 0;
 
   private videoTensor?: tjs.tensor.gpu.GPUTensor;
-
-  private start = Date.now().valueOf();
 
   private audio?: HTMLAudioElement;
 
@@ -86,19 +106,35 @@ class App extends React.Component<{}, AppState> {
       threshold: 0.5,
       sound: true,
       notification: false,
+      model: 'mobilenet050',
+      numTrainSamples: 64,
+      numValidationSamples: 0
     };
   }
 
   componentWillMount() {
-    loadModel('mobilenet050').then(x => {
-      if (x !== undefined) {
-        this.model = x;
-
-        this.getVideo();
-      }
-    });
+    this.setModel('mobilenet050');
 
     this.audio = new Audio('alerts/beep.wav');
+  }
+
+  componentDidMount() {
+    this.getVideo();
+  }
+
+  async setModel(name: string) {
+    this.setState({
+      model: name
+    });
+
+    this.model = await loadModel(name);
+
+    if (this.model !== undefined) {
+      this.model.outputs = ["472"];
+      this.model.prune(["473"]);
+    }
+
+    this.model?.optimize();
   }
 
   async getVideo() {
@@ -140,27 +176,21 @@ class App extends React.Component<{}, AppState> {
     }
   }
 
-  async compileModel() {
+  async prepareTraining() {
     const video: HTMLVideoElement = (document.querySelector("#videoElement") as any);
     this.videoTensor = tjs.tensor.gpu.GPUTensor.fromData(video, 32);
-    if (this.videoTensor !== undefined && !this.modelCompiled) {
+    if (this.videoTensor !== undefined) {
       this.setState({
         ...this.state,
         stage: 'compiling'
       });
 
-      this.modelCompiled = true;
+      const numSamples = this.state.numTrainSamples + this.state.numValidationSamples;
 
       const reshaped = this.prepareVideo() as tjs.Tensor;
 
-      if (this.model !== undefined) {
-        this.model.outputs = ["472"];
-        this.model.prune(["473"]);
-      }
+      this.data = new tjs.tensor.gpu.GPUTensor(new Float32Array(numSamples*featureDim).fill(0), [numSamples, featureDim], 32);
 
-      this.model?.optimize();
-
-      console.log('Compiled');
       console.log('Doing forward pass');
 
       await countDown(3, 1000, (n: number) => {
@@ -191,9 +221,13 @@ class App extends React.Component<{}, AppState> {
     const processed = this.processResult(tensors);
 
     const oldResults = this.data;
+    //@ts-ignore
     this.data = this.data.setValues(processed, [this.trainingResultsCollected, 0]) as tjs.tensor.gpu.GPUTensor;
     processed.delete();
+    //@ts-ignore
     oldResults.delete();
+
+    const numSamples = this.state.numTrainSamples + this.state.numValidationSamples;
 
     this.trainingResultsCollected++;
 
@@ -275,12 +309,18 @@ class App extends React.Component<{}, AppState> {
   }
 
   async prepareData() {
-    const trainData1 = this.data.slice([0],[numTrainSamples/2],[0]);
-    const trainData2 = this.data.slice([numSamples/2],[numSamples/2 + numTrainSamples/2],[0]);
+    const numSamples = this.state.numTrainSamples + this.state.numValidationSamples;
+
+    //@ts-ignore
+    const trainData1 = this.data.slice([0],[this.state.numTrainSamples/2],[0]);
+    //@ts-ignore
+    const trainData2 = this.data.slice([numSamples/2],[numSamples/2 + this.state.numTrainSamples/2],[0]);
     let trainData = trainData1.concat(trainData2, 0);
 
-    const valData1 = this.data.slice([numTrainSamples/2],[numSamples/2],[0]);
-    const valData2 = this.data.slice([numSamples/2 + numTrainSamples/2],[numSamples],[0]);
+    //@ts-ignore
+    const valData1 = this.data.slice([this.state.numTrainSamples/2],[numSamples/2],[0]);
+    //@ts-ignore
+    const valData2 = this.data.slice([numSamples/2 + this.state.numTrainSamples/2],[numSamples],[0]);
     let valData = valData1.concat(valData2, 0);
 
     trainData = await this.normalizeResults(trainData);
@@ -292,11 +332,11 @@ class App extends React.Component<{}, AppState> {
     valData = normalizedValData;
 
     const trainX = new Variable(trainData, {noGrad: true});
-    const trainYs = [...new Array(numTrainSamples/2).fill(0),...new Array(numTrainSamples/2).fill(1)]
-    const trainY = Variable.create([numTrainSamples, 1], new Float32Array(trainYs), 'GPU', {noGrad: true});
+    const trainYs = [...new Array(this.state.numTrainSamples/2).fill(0),...new Array(this.state.numTrainSamples/2).fill(1)]
+    const trainY = Variable.create([this.state.numTrainSamples, 1], new Float32Array(trainYs), 'GPU', {noGrad: true});
 
     const valX = new Variable(valData, {noGrad: true});
-    const valYs = [...new Array(numValidationSamples/2).fill(0),...new Array(numValidationSamples/2).fill(1)]
+    const valYs = [...new Array(this.state.numValidationSamples/2).fill(0),...new Array(this.state.numValidationSamples/2).fill(1)]
 
     return {trainX, trainYs, trainY, valX, valYs};
   }
@@ -463,7 +503,16 @@ class App extends React.Component<{}, AppState> {
 
   renderSettings() {
     return (
-      <Accordion className="settings">
+      <div className="settings">
+        {this.renderGeneralSettings()}
+        {this.renderModelSettings()}
+      </div>
+    );
+  }
+
+  renderGeneralSettings() {
+    return (
+      <Accordion>
         <AccordionSummary
           aria-controls="panel1a-content"
           id="panel1a-header"
@@ -536,9 +585,86 @@ class App extends React.Component<{}, AppState> {
     );
   }
 
+  renderModelSettings() {
+    const marks = [
+      {
+        value: 16,
+        label: '16',
+      },
+      {
+        value: 32,
+        label: '32',
+      },
+      {
+        value: 64,
+        label: '64',
+      },
+      {
+        value: 128,
+        label: '128',
+      },
+      {
+        value: 256,
+        label: '256',
+      },
+    ];
+
+    return (
+      <Accordion>
+        <AccordionSummary
+          aria-controls="panel1a-content"
+          id="panel1a-header"
+        >
+          <Typography variant="h5">Model</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Grid container spacing={1}>
+            <Grid item xs={12}>
+              <Typography id="slider-threshold-label" gutterBottom>
+                Model Size
+              </Typography><div></div>
+            </Grid>
+            <Grid item xs={12}>
+              <FormControl>
+                <InputLabel id="label-model-size">Age</InputLabel>
+                <Select
+                  labelId="label-model-size"
+                  id="model-size"
+                  value={this.state.model}
+                  onChange={(event) => this.setModel(event.target.value as any)}
+                >
+                  {models.map(x => (
+                    <MenuItem value={x.name}>{x.size}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12}>
+              <Typography id="slider-train-samples-label" gutterBottom>
+                Number of training samples
+              </Typography><div></div>
+            </Grid>
+            <Grid item xs={12}>
+              <Slider
+                aria-labelledby="slider-train-samples-label"
+                value={this.state.numTrainSamples}
+                step={null}
+                valueLabelDisplay="auto"
+                marks={marks}
+                min={16}
+                max={256}
+                onChange={(ev, v) => this.setState({numTrainSamples: v as number})}
+              />
+            </Grid>
+          </Grid>
+        </AccordionDetails>
+      </Accordion>
+    );
+  }
+
   renderState() {
     if (this.state.stage === 'start') {
-      return (<Button variant="contained" color="primary" onClick={() => this.compileModel()}>Start</Button>);
+      return (<Button variant="contained" color="primary" onClick={() => this.prepareTraining()}>Start</Button>);
     } else if (this.state.stage === 'compiling') {
       return (<> Dont touch your face until the bar is full. Starting in {this.state.countDown} seconds. </>);
     } else if (this.state.stage === 'trainData-1' || this.state.stage === 'trainData-2') {
