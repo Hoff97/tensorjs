@@ -7,7 +7,10 @@ import {models} from '../test/data/models';
 const dataDir = 'test/data/onnx';
 
 const opsetToTag = {
+  '7': 'v1.2.3',
+  '8': 'v1.3.0',
   '9': 'v1.4.0',
+  '10': 'v1.5.0',
 };
 
 function loadOnnxUnitTests() {
@@ -21,9 +24,17 @@ function loadOnnxUnitTests() {
 
     for (const enabledTest of enabledTests) {
       console.log(enabledTest);
-      execSync(
-        `cp -r tmp/onnx/onnx/backend/test/data/node/${enabledTest} ${copyDir}/${enabledTest}`
-      );
+      if (typeof enabledTest === 'string') {
+        execSync(
+          `cp -r tmp/onnx/onnx/backend/test/data/node/${enabledTest} ${copyDir}/${enabledTest}`
+        );
+      } else {
+        if (enabledTest.opsets.find(os => os === opset) !== undefined) {
+          execSync(
+            `cp -r tmp/onnx/onnx/backend/test/data/node/${enabledTest.name} ${copyDir}/${enabledTest.name}`
+          );
+        }
+      }
     }
     execSync('rm -rf tmp/onnx');
   }

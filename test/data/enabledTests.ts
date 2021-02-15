@@ -1,4 +1,13 @@
-export const enabledTests = [
+export const opsetVersions = ['7', '8', '9', '10'];
+
+export interface TestSpec {
+  name: string;
+  opsets?: string[];
+}
+
+export type Test = string | TestSpec;
+
+export const enabledTests: Test[] = [
   //  "test_abs",
   //  "test_acos",
   //  "test_acos_example",
@@ -48,8 +57,8 @@ export const enabledTests = [
   //  "test_averagepool_3d_default",
   'test_basic_conv_without_padding',
   'test_basic_conv_with_padding',
-  'test_batchnorm_epsilon',
-  'test_batchnorm_example',
+  {name: 'test_batchnorm_epsilon', opsets: ['9', '10']},
+  {name: 'test_batchnorm_example', opsets: ['9', '10']},
   //  "test_cast_DOUBLE_to_FLOAT",
   //  "test_cast_DOUBLE_to_FLOAT16",
   //  "test_cast_FLOAT16_to_DOUBLE",
@@ -61,13 +70,13 @@ export const enabledTests = [
   'test_ceil',
   'test_ceil_example',
   'test_clip',
-  'test_clip_default_inbounds',
+  {name: 'test_clip_default_inbounds', opsets: ['9', '10']},
   'test_clip_default_max',
   'test_clip_default_min',
   'test_clip_example',
-  'test_clip_inbounds',
-  'test_clip_outbounds',
-  'test_clip_splitbounds',
+  {name: 'test_clip_inbounds', opsets: ['9', '10']},
+  {name: 'test_clip_outbounds', opsets: ['9', '10']},
+  {name: 'test_clip_splitbounds', opsets: ['9', '10']},
   //  "test_compress_0",
   //  "test_compress_1",
   //  "test_compress_default_axis",
@@ -78,7 +87,7 @@ export const enabledTests = [
   'test_concat_3d_axis_1',
   'test_concat_3d_axis_2',
   'test_constant',
-  'test_constantofshape_float_ones',
+  {name: 'test_constantofshape_float_ones', opsets: ['9', '10']},
   //  "test_constantofshape_int_zeros",
   'test_constant_pad',
   //  "test_convtranspose",
@@ -116,8 +125,8 @@ export const enabledTests = [
   //  "test_equal_bcast",
   // "test_erf",
   'test_exp',
-  'test_expand_dim_changed',
-  'test_expand_dim_unchanged',
+  {name: 'test_expand_dim_changed', opsets: ['9', '10']},
+  {name: 'test_expand_dim_unchanged', opsets: ['9', '10']},
   'test_exp_example',
   // "test_eyelike_populate_off_main_diagonal",
   // "test_eyelike_with_dtype",
@@ -152,8 +161,8 @@ export const enabledTests = [
   //  "test_hardsigmoid_default",
   //  "test_hardsigmoid_example",
   //  "test_identity",
-  'test_instancenorm_epsilon',
-  'test_instancenorm_example',
+  {name: 'test_instancenorm_epsilon', opsets: ['9', '10']},
+  {name: 'test_instancenorm_example', opsets: ['9', '10']},
   //  "test_isnan",
   //  "test_leakyrelu",
   //  "test_leakyrelu_default",
