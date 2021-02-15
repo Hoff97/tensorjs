@@ -1,3 +1,4 @@
+import {BroadcastShape, ReduceShape, Reverse, ShapeType} from './inference';
 import {CPUTensor} from './tensor/cpu/tensor';
 import {compareShapes, getSize} from './util/shape';
 
@@ -5,7 +6,7 @@ export type PadMode = 'constant' | 'reflect' | 'edge';
 
 export type TensorValues = Float32Array | Int32Array;
 
-export default abstract class Tensor {
+export default abstract class Tensor<Shape extends ShapeType = number[]> {
   /**
    * Gets the values of the tensor as a Float32 or Int32 Array
    *
@@ -27,12 +28,12 @@ export default abstract class Tensor {
   /**
    * Constructs a tensor with the same shape and the given value everywhere
    */
-  abstract constantLike(value: number): Tensor;
+  abstract constantLike(value: number): Tensor<Shape>;
 
   /**
    * Constructs a tensor with shape [1] and the given value everywhere
    */
-  abstract singleConstant(value: number): Tensor;
+  abstract singleConstant(value: number): Tensor<[1]>;
 
   /**
    * Deletes the tensor. Has the following effects depending on the backend
@@ -126,10 +127,13 @@ export default abstract class Tensor {
    * a.sum(0, true); //Will be [[5,7,9]]
    * ```
    */
-  sum(axes?: number | number[], keepDims?: boolean): Tensor {
+  sum<Axes extends number[] | number, KeepDims extends boolean = boolean>(
+    axes?: Axes,
+    keepDims?: KeepDims
+  ): Tensor<ReduceShape<Shape, Axes, KeepDims>> {
     const ax = this.getAxes(axes);
-    keepDims = keepDims || false;
-    return this.sum_impl(ax, keepDims);
+    const keep = keepDims || false;
+    return this.sum_impl(ax, keep);
   }
 
   /**
@@ -140,10 +144,13 @@ export default abstract class Tensor {
    * @param keepDims Wether the summation axes will be kept with size 1
    *
    */
-  sumSquare(axes?: number | number[], keepDims?: boolean): Tensor {
+  sumSquare<Axes extends number[] | number, KeepDims extends boolean = boolean>(
+    axes?: Axes,
+    keepDims?: KeepDims
+  ): Tensor<ReduceShape<Shape, Axes, KeepDims>> {
     const ax = this.getAxes(axes);
-    keepDims = keepDims || false;
-    return this.sumSquare_impl(ax, keepDims);
+    const keep = keepDims || false;
+    return this.sumSquare_impl(ax, keep);
   }
 
   /**
@@ -497,7 +504,7 @@ export default abstract class Tensor {
    *
    * @param tensor Tensor of which the shapes should be aligned
    */
-  alignTensor(tensor: Tensor) {
+  alignTensor(tensor: Tensor): [Tensor, Tensor, readonly number[]] {
     let thisShape = this.getShape();
     let thatShape = tensor.getShape();
     if (compareShapes(thisShape, thatShape)) {
@@ -544,7 +551,11 @@ export default abstract class Tensor {
    * //  [5,6]]
    * ```
    */
-  add(tensor: Tensor, alpha?: number, beta?: number) {
+  add<Shape2 extends ShapeType = number[]>(
+    tensor: Tensor<Shape2>,
+    alpha?: number,
+    beta?: number
+  ): Tensor<BroadcastShape<Reverse<Shape>, Reverse<Shape2>>> {
     if (alpha === undefined) {
       alpha = 1;
     }
