@@ -7,6 +7,7 @@ import {Attributes, Constants} from '../types';
 
 export class UpsampleNode extends OnnxNode {
   private sampleMode: string;
+  private scales?: number[];
 
   constructor(
     attributes: Attributes,
@@ -26,9 +27,24 @@ export class UpsampleNode extends OnnxNode {
         'Upsampling only supported with nearest neighbor sampling'
       );
     }
+
+    if (this.onnxVersion < 9) {
+      const scales = this.getAttributeFloats('scales');
+      if (scales !== undefined && scales !== null) {
+        this.scales = scales;
+      } else {
+        throw new Error(
+          `Upsample node with onnx version ${this.onnxVersion} is missing scales attribute`
+        );
+      }
+    }
   }
 
-  async getScales(scale: Tensor) {
+  async getScales(scale: Tensor): Promise<number[]> {
+    if (this.onnxVersion < 9) {
+      return this.scales as number[];
+    }
+
     if (!(scale instanceof CPUTensor)) {
       console.warn('Scales tensor for upsample not on CPU, need to transfer!');
       scale = await toCPU(scale);
