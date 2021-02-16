@@ -33,6 +33,7 @@ import {UnsqueezeNode} from './nodes/unsqueeze';
 import {UpsampleNode} from './nodes/upsample';
 import {NodeConstructor} from './types';
 import {GlobalAveragePoolNode} from './nodes/conv/globalAveragePool';
+import {AbsNode} from './nodes/unary/abs';
 
 export const nodeResolve: {[opType: string]: NodeConstructor} = {
   Conv: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
@@ -177,6 +178,8 @@ export const nodeResolve: {[opType: string]: NodeConstructor} = {
     new FloorNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   Ceil: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
     new CeilNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Abs: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new AbsNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   Slice: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
     new SliceNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   Upsample: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
