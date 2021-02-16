@@ -6,6 +6,7 @@ import {
   ceil,
   clip,
   clipBackward,
+  cos,
   divide,
   exp,
   floor,
@@ -15,8 +16,10 @@ import {
   power,
   sigmoid,
   sign,
+  sin,
   sqrt,
   subtract,
+  tan,
 } from '../../ops/cpu/basic';
 import {concat} from '../../ops/cpu/concat';
 import {conv} from '../../ops/cpu/conv';
@@ -174,6 +177,18 @@ export class CPUTensor extends Tensor {
 
   abs(): Tensor {
     return abs(this);
+  }
+
+  sin(): Tensor {
+    return sin(this);
+  }
+
+  cos(): Tensor {
+    return cos(this);
+  }
+
+  tan(): Tensor {
+    return tan(this);
   }
 
   floor(): Tensor {

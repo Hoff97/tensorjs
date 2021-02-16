@@ -36,6 +36,9 @@ import {Backend} from '../util/convert';
 import {WASMTensor} from '../tensor/wasm/tensor';
 import {GPUTensor} from '../tensor/gpu/tensor';
 import REGL from 'regl';
+import {SinBack} from './ops/unary/sinBack';
+import {CosBack} from './ops/unary/cosBack';
+import {TanBack} from './ops/unary/tanBack';
 
 export interface VariableOptions {
   /**
@@ -231,6 +234,27 @@ export class Variable extends Tensor implements VariableI {
   abs(): Tensor {
     return new Variable(this.value.abs(), {
       backEdge: this.noGrad ? undefined : new AbsBack(this),
+      noGrad: this.noGrad,
+    });
+  }
+
+  sin(): Tensor {
+    return new Variable(this.value.sin(), {
+      backEdge: this.noGrad ? undefined : new SinBack(this),
+      noGrad: this.noGrad,
+    });
+  }
+
+  cos(): Tensor {
+    return new Variable(this.value.cos(), {
+      backEdge: this.noGrad ? undefined : new CosBack(this),
+      noGrad: this.noGrad,
+    });
+  }
+
+  tan(): Tensor {
+    return new Variable(this.value.tan(), {
+      backEdge: this.noGrad ? undefined : new TanBack(this),
       noGrad: this.noGrad,
     });
   }

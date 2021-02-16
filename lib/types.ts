@@ -449,6 +449,21 @@ export default abstract class Tensor {
   abstract abs(): Tensor;
 
   /**
+   * Takes the sinus of each value of the tensor
+   */
+  abstract sin(): Tensor;
+
+  /**
+   * Takes the cosine of each value of the tensor
+   */
+  abstract cos(): Tensor;
+
+  /**
+   * Takes the tangens of each value of the tensor
+   */
+  abstract tan(): Tensor;
+
+  /**
    * Negates all entries of the tensor
    */
   abstract negate(): Tensor;

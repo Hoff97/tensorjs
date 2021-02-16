@@ -37,6 +37,9 @@ import {AbsNode} from './nodes/unary/abs';
 import {LogNode} from './nodes/unary/log';
 import {SqrtNode} from './nodes/unary/sqrt';
 import {SignNode} from './nodes/unary/sign';
+import {TanNode} from './nodes/unary/tan';
+import {CosNode} from './nodes/unary/cos';
+import {SinNode} from './nodes/unary/sin';
 
 export const nodeResolve: {[opType: string]: NodeConstructor} = {
   Conv: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
@@ -189,6 +192,12 @@ export const nodeResolve: {[opType: string]: NodeConstructor} = {
     new CeilNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   Abs: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
     new AbsNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Sin: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new SinNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Cos: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new CosNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Tan: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new TanNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   Slice: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
     new SliceNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   Upsample: (attributes, inputs, outputs, constants, onnxVersion, mode) =>

@@ -83,6 +83,18 @@ export class WASMTensor extends Tensor {
     return new WASMTensor(this.wasmTensor.abs());
   }
 
+  sin(): Tensor {
+    return new WASMTensor(this.wasmTensor.sin());
+  }
+
+  cos(): Tensor {
+    return new WASMTensor(this.wasmTensor.cos());
+  }
+
+  tan(): Tensor {
+    return new WASMTensor(this.wasmTensor.tan());
+  }
+
   sigmoid(): Tensor {
     return new WASMTensor(this.wasmTensor.sigmoid());
   }

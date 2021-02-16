@@ -48,6 +48,9 @@ import {ConvTransposeOperation} from '../../ops/gpu/conv/convTranspose';
 import {SigmoidOperation} from '../../ops/gpu/unary/sigmoid';
 import {AddMultiplyScalarOperation} from '../../ops/gpu/unary/addMultiplyScalar';
 import {SetValuesOperation} from '../../ops/gpu/util/setValues';
+import {SinOperation} from '../../ops/gpu/unary/sin';
+import {CosOperation} from '../../ops/gpu/unary/cos';
+import {TanOperation} from '../../ops/gpu/unary/tan';
 
 export class GPUTensor extends Tensor implements GPUTensorI {
   public memory: MemoryEntry;
@@ -147,6 +150,18 @@ export class GPUTensor extends Tensor implements GPUTensorI {
 
   abs(): Tensor {
     return defaultAbsD.calc({input: this}, this.precision) as GPUTensor;
+  }
+
+  sin(): Tensor {
+    return defaultSinD.calc({input: this}, this.precision) as GPUTensor;
+  }
+
+  cos(): Tensor {
+    return defaultCosD.calc({input: this}, this.precision) as GPUTensor;
+  }
+
+  tan(): Tensor {
+    return defaultTanD.calc({input: this}, this.precision) as GPUTensor;
   }
 
   sigmoid(): Tensor {
@@ -569,6 +584,9 @@ const defaultGemmCD = new Dispatcher(() => new GemmCOperation(gpuConstructor));
 //Unary operations
 const defaultExpD = new Dispatcher(() => new ExpOperation(gpuConstructor));
 const defaultAbsD = new Dispatcher(() => new AbsOperation(gpuConstructor));
+const defaultSinD = new Dispatcher(() => new SinOperation(gpuConstructor));
+const defaultCosD = new Dispatcher(() => new CosOperation(gpuConstructor));
+const defaultTanD = new Dispatcher(() => new TanOperation(gpuConstructor));
 const defaultSigmoidD = new Dispatcher(
   () => new SigmoidOperation(gpuConstructor)
 );

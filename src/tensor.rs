@@ -1213,6 +1213,18 @@ impl Tensor {
         self.unary_op(|x: f32| x.abs())
     }
 
+    pub fn sin(&self) -> Tensor {
+        self.unary_op(|x: f32| x.sin())
+    }
+
+    pub fn cos(&self) -> Tensor {
+        self.unary_op(|x: f32| x.cos())
+    }
+
+    pub fn tan(&self) -> Tensor {
+        self.unary_op(|x: f32| x.tan())
+    }
+
     pub fn sigmoid(&self) -> Tensor {
         self.unary_op(|x: f32| 1.0 / (1.0 + (-x).exp()))
     }

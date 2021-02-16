@@ -57,6 +57,18 @@ export function abs(a: CPUTensor) {
   return positionWiseUnaryOp(a, o1 => Math.abs(o1));
 }
 
+export function sin(a: CPUTensor) {
+  return positionWiseUnaryOp(a, o1 => Math.sin(o1));
+}
+
+export function cos(a: CPUTensor) {
+  return positionWiseUnaryOp(a, o1 => Math.cos(o1));
+}
+
+export function tan(a: CPUTensor) {
+  return positionWiseUnaryOp(a, o1 => Math.tan(o1));
+}
+
 export function floor(a: CPUTensor) {
   return positionWiseUnaryOp(a, o1 => Math.floor(o1));
 }

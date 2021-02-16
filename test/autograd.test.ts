@@ -155,6 +155,75 @@ for (const backend of backends) {
       expect(await v.grad?.compare(numericalGrad, epsilon)).toBeTrue();
     });
 
+    it('should work with sin', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 2], [-2, -1, 0.5, 1]);
+      const ones = backend.constructor([2, 2], [1, 1, 1, 1]);
+
+      const v = new Variable(a);
+
+      const res = v.sin() as Variable;
+      res.backward(ones);
+
+      const numericalGrad = await backend.toBackend(
+        numericalGradient(
+          (await toCPU(a)) as CPUTensor,
+          (a: CPUTensor) => a.sin() as CPUTensor
+        )
+      );
+
+      expect(await v.grad?.compare(numericalGrad, epsilon)).toBeTrue();
+    });
+
+    it('should work with cos', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 2], [-2, -1, 0.5, 1]);
+      const ones = backend.constructor([2, 2], [1, 1, 1, 1]);
+
+      const v = new Variable(a);
+
+      const res = v.cos() as Variable;
+      res.backward(ones);
+
+      const numericalGrad = await backend.toBackend(
+        numericalGradient(
+          (await toCPU(a)) as CPUTensor,
+          (a: CPUTensor) => a.cos() as CPUTensor
+        )
+      );
+
+      expect(await v.grad?.compare(numericalGrad, epsilon)).toBeTrue();
+    });
+
+    it('should work with tan', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 2], [-0.7, -0.3, 0.5, 0.7]);
+      const ones = backend.constructor([2, 2], [1, 1, 1, 1]);
+
+      const v = new Variable(a);
+
+      const res = v.tan() as Variable;
+      res.backward(ones);
+
+      const numericalGrad = await backend.toBackend(
+        numericalGradient(
+          (await toCPU(a)) as CPUTensor,
+          (a: CPUTensor) => a.tan() as CPUTensor
+        )
+      );
+
+      expect(await v.grad?.compare(numericalGrad, epsilon)).toBeTrue();
+    });
+
     it('should work with negate', async () => {
       if (backend.wait !== undefined) {
         await backend.wait;
