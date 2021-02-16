@@ -51,7 +51,7 @@ if (run) {
             // eslint-disable-next-line no-constant-condition
             while (true) {
               const resp = await fetch(
-                `onnx/${opset}/${test}/test_data_set_0/input_${i}.pb`
+                `onnx/${opset}/${testName}/test_data_set_0/input_${i}.pb`
               );
               if (resp.status !== 200) {
                 break;
@@ -65,7 +65,7 @@ if (run) {
             }
 
             const respOut = await fetch(
-              `onnx/${opset}/${test}/test_data_set_0/output_0.pb`
+              `onnx/${opset}/${testName}/test_data_set_0/output_0.pb`
             );
             const bufferOut = await respOut.arrayBuffer();
             const arr = new Uint8Array(bufferOut);

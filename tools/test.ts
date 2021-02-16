@@ -11,6 +11,8 @@ const opsetToTag = {
   '8': 'v1.3.0',
   '9': 'v1.4.0',
   '10': 'v1.5.0',
+  '11': 'v1.6.0',
+  '12': 'v1.7.0',
 };
 
 function loadOnnxUnitTests() {
