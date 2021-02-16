@@ -8,7 +8,7 @@ export interface TestSpec {
 export type Test = string | TestSpec;
 
 export const enabledTests: Test[] = [
-  //  "test_abs",
+  'test_abs',
   //  "test_acos",
   //  "test_acos_example",
   //  "test_acosh",
