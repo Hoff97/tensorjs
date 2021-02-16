@@ -69,4 +69,4 @@ for (const operator in supportedOperators) {
   res += line;
 }
 
-writeFileSync('Operators.md', res);
+writeFileSync('doc/Operators.md', res);

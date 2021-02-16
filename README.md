@@ -115,7 +115,7 @@ const buffer = await res.arrayBuffer();
 const model = new tjs.onnx.model.OnnxModel(buffer);
 ```
 
-To see all supported operators, check the [supported operator list](https://github.com/Hoff97/tensorjs/blob/master/Operators.md).
+To see all supported operators, check the [supported operator list](https://github.com/Hoff97/tensorjs/blob/master/doc/Operators.md).
 
 You will very likely want to run this model on the GPU. To do this:
 ```typescript
@@ -205,6 +205,10 @@ After you are done with the variable, delete the computation graph by calling `d
 
 You can find the documentation [here](https://hoff97.github.io/tensorjs/).
 
+# Contributing
+
+See [Contributing.md](https://github.com/Hoff97/tensorjs/blob/develop/doc/Contributing.md)
+
 # Development
 
-See [Development.md](https://github.com/Hoff97/tensorjs/blob/develop/Development.md)
+See [Development.md](https://github.com/Hoff97/tensorjs/blob/develop/doc/Development.md)
