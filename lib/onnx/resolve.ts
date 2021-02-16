@@ -6,17 +6,17 @@ import {ClipNode} from './nodes/clip';
 import {ConcatNode} from './nodes/concat';
 import {ConstantNode} from './nodes/constant';
 import {ConstantOfShapeNode} from './nodes/constantOfShape';
-import {ConvNode} from './nodes/conv';
+import {ConvNode} from './nodes/conv/conv';
 import {DivNode} from './nodes/binary/div';
 import {ExpNode} from './nodes/unary/exp';
 import {ExpandNode} from './nodes/expand';
 import {FloorNode} from './nodes/unary/floor';
 import {GatherNode} from './nodes/gather';
 import {GemmNode} from './nodes/gemm';
-import {InstanceNormalizationNode} from './nodes/instanceNormalization';
+import {InstanceNormalizationNode} from './nodes/conv/instanceNormalization';
 import {MatMulNode} from './nodes/matMul';
 import {MulNode} from './nodes/binary/mul';
-import {PadNode} from './nodes/pad';
+import {PadNode} from './nodes/conv/pad';
 import {ReduceMaxNode} from './nodes/reduce/reduceMax';
 import {ReduceMeanNode} from './nodes/reduce/reduceMean';
 import {ReduceSumNode} from './nodes/reduce/reduceSum';
@@ -32,7 +32,7 @@ import {TransposeNode} from './nodes/transpose';
 import {UnsqueezeNode} from './nodes/unsqueeze';
 import {UpsampleNode} from './nodes/upsample';
 import {NodeConstructor} from './types';
-import {GlobalAveragePoolNode} from './nodes/globalAveragePool';
+import {GlobalAveragePoolNode} from './nodes/conv/globalAveragePool';
 
 export const nodeResolve: {[opType: string]: NodeConstructor} = {
   Conv: (attributes, inputs, outputs, constants, onnxVersion, mode) =>

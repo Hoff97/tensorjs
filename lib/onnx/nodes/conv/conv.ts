@@ -1,9 +1,9 @@
-import {Variable} from '../../autograd';
-import {Mode} from '../../model/module';
-import Tensor, {Activation, Precision} from '../../types';
-import {toCPU, toGPU, toWASM} from '../../util/convert';
-import {OnnxNode} from '../node';
-import {Attributes, Constants} from '../types';
+import {Variable} from '../../../autograd';
+import {Mode} from '../../../model/module';
+import Tensor, {Activation, Precision} from '../../../types';
+import {toCPU, toGPU, toWASM} from '../../../util/convert';
+import {OnnxNode} from '../../node';
+import {Attributes, Constants} from '../../types';
 
 export class ConvNode extends OnnxNode {
   private group: number;

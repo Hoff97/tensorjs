@@ -1,6 +1,6 @@
 import Tensor from '../../types';
 import {OnnxNode} from '../node';
-import {ConvNode} from '../nodes/conv';
+import {ConvNode} from '../nodes/conv/conv';
 import {ReluNode} from '../nodes/relu';
 import {Constants} from '../types';
 import {SequenceOptimization} from './optimization';
