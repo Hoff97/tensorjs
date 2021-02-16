@@ -19,7 +19,7 @@ export class MatMulNode extends OnnxNode {
     const A = inputs[0];
     const B = inputs[1];
 
-    if (this.onnxVersion < 13 && this.onnxVersion >= 9) {
+    if (this.onnxVersion < 13) {
       if (A.getShape().length !== B.getShape().length) {
         throw new Error('Automatic broadcasting in MatMul not supported yet');
       }

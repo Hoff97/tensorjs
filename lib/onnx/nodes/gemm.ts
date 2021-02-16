@@ -30,7 +30,7 @@ export class GemmNode extends OnnxNode {
   }
 
   async forward(inputs: Tensor[]): Promise<Tensor[]> {
-    if (this.onnxVersion >= 9 && this.onnxVersion < 11) {
+    if (this.onnxVersion >= 7 && this.onnxVersion < 11) {
       const a = inputs[0];
       const b = inputs[1];
       const c = inputs[2];

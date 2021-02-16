@@ -99,6 +99,15 @@ export abstract class OnnxNode extends Module {
     return undefined;
   }
 
+  getAttributeFloats(name: string) {
+    const attr = this.attributes[name];
+    if (attr !== undefined) {
+      const result = attr.floats;
+      return result;
+    }
+    return undefined;
+  }
+
   getAttributeTensor(name: string) {
     const attr = this.attributes[name];
     if (attr !== undefined) {

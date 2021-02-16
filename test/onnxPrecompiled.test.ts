@@ -1,7 +1,7 @@
 import {OnnxModel} from '../lib/onnx/model';
 import {toGPU} from '../lib/util/convert';
 
-import {enabledTests} from './data/enabledTests';
+import {enabledTests, opsetVersions} from './data/enabledTests';
 import {onnx} from 'onnx-proto';
 import {createTensor} from '../lib/onnx/util';
 import Tensor from '../lib/types';
@@ -10,8 +10,6 @@ import {GPUTensor} from '../lib/tensor/gpu/tensor';
 const run = false;
 
 const epsilon = 0.001;
-
-const opsetVersions = ['9'];
 
 // These are not suitable since either their input is
 // outside of the range of float16 or the errors add up too much
@@ -32,9 +30,16 @@ if (run) {
   for (const opset of opsetVersions) {
     describe(`Opset ${opset} precompiled`, () => {
       for (const test of enabledTests) {
-        if (!excludeHalfPrecision.has(test)) {
-          it(`Should work for operator ${test} with half precision`, async () => {
-            const resp = await fetch(`onnx/${opset}/${test}/model.onnx`);
+        const testName = typeof test === 'string' ? test : test.name;
+
+        const runForOpset =
+          typeof test === 'string' ||
+          test.opsets === undefined ||
+          test.opsets.find(os => opset === os) !== undefined;
+
+        if (!excludeHalfPrecision.has(testName) && runForOpset) {
+          it(`Should work for operator ${testName} with half precision`, async () => {
+            const resp = await fetch(`onnx/${opset}/${testName}/model.onnx`);
             const buffer = await resp.arrayBuffer();
 
             const model = new OnnxModel(buffer, {
@@ -46,7 +51,7 @@ if (run) {
             // eslint-disable-next-line no-constant-condition
             while (true) {
               const resp = await fetch(
-                `onnx/${opset}/${test}/test_data_set_0/input_${i}.pb`
+                `onnx/${opset}/${testName}/test_data_set_0/input_${i}.pb`
               );
               if (resp.status !== 200) {
                 break;
@@ -60,7 +65,7 @@ if (run) {
             }
 
             const respOut = await fetch(
-              `onnx/${opset}/${test}/test_data_set_0/output_0.pb`
+              `onnx/${opset}/${testName}/test_data_set_0/output_0.pb`
             );
             const bufferOut = await respOut.arrayBuffer();
             const arr = new Uint8Array(bufferOut);
