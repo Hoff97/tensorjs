@@ -34,6 +34,9 @@ import {UpsampleNode} from './nodes/upsample';
 import {NodeConstructor} from './types';
 import {GlobalAveragePoolNode} from './nodes/conv/globalAveragePool';
 import {AbsNode} from './nodes/unary/abs';
+import {LogNode} from './nodes/unary/log';
+import {SqrtNode} from './nodes/unary/sqrt';
+import {SignNode} from './nodes/unary/sign';
 
 export const nodeResolve: {[opType: string]: NodeConstructor} = {
   Conv: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
@@ -79,6 +82,12 @@ export const nodeResolve: {[opType: string]: NodeConstructor} = {
     new MatMulNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   Exp: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
     new ExpNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Log: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new LogNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Sqrt: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new SqrtNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Sign: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new SignNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   ReduceSum: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
     new ReduceSumNode(
       attributes,
