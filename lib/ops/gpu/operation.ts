@@ -19,6 +19,13 @@ export interface Input {
   type?: InputType;
 }
 
+/**
+ * A GPU operation takes some input of the InputType and
+ * calculates a single GPUTensor
+ *
+ * This is done with WebGL, which takes some input information of type Info,
+ * which is passed to the shader in the form of uniforms.
+ */
 export abstract class Operation<
   GPUTensor extends GPUTensorI,
   Info extends DictBase,
@@ -30,6 +37,10 @@ export abstract class Operation<
 
   protected gpuTensorConstructor: GPUTensorConstructor<GPUTensor>;
 
+  /**
+   * Since WebGL only supports arrays of constant size, we have to represent all arrays
+   * with a fixed length. This is this attribute, which is the maximum rank a tensor can have.
+   */
   protected maxRank: number;
 
   protected drawCommand?: DrawCommand;
@@ -87,10 +98,16 @@ export abstract class Operation<
     }
   }
 
+  /**
+   * Gets the variable modifier for the WebGL variable with the given name
+   */
   getVarModifier(name: string) {
     return this.statics.has(name) ? '' : 'uniform';
   }
 
+  /**
+   * Pads an array to the specified length, or the maxRank by default
+   */
   pad(arr: number[], len = this.maxRank) {
     while (arr.length < len) {
       arr.push(-1);
@@ -106,6 +123,10 @@ export abstract class Operation<
     return result;
   }
 
+  /**
+   * Gets the variable declarations for the WebGL shader. Overwrite this if you
+   * need extra uniform inputs
+   */
   getVariables() {
     return '';
   }
@@ -420,6 +441,18 @@ export abstract class Operation<
     `;
   }
 
+  /**
+   * The default main function of the fragment shader.
+   * Unless in special cases, you will use this and your fragment shader will look something like this:
+   *
+   * ```
+   * float process(int index[maxRank]) {
+   *   // Calculate the value of the output at the given index
+   * }
+   *
+   * ${this.getDefaultMain()}
+   * ```
+   */
   getDefaultMain() {
     return `
     void main() {
@@ -493,6 +526,11 @@ export abstract class Operation<
     return result;
   }
 
+  /**
+   * Compiles the fragment shader with the given compilation info and precision
+   *
+   * If you need to add extra compilation info, overwrite this method
+   */
   compile(info: Info, precision: Precision) {
     this.registerStatics(info);
 
@@ -578,19 +616,41 @@ export abstract class Operation<
     return this.gpuTensorConstructor(result, resultShape, this.precision);
   }
 
+  /**
+   * Returns the fragment shader of this operation,
+   * should have a method `void main()`. See getDefaultMain
+   */
   abstract getFragmentShader(info: Info): string;
 
+  /**
+   * Get the names of the tensors in the order they are passed to compute
+   */
   abstract getTextureNames(): string[];
 
   getUniformAttrs(): Input[] {
     return [];
   }
 
+  /**
+   * Performs the computation of the operation.
+   *
+   * Typically you will compute the output shape and then call `compute`
+   */
   abstract calc(input: InputType): GPUTensor;
 
+  /**
+   * Computes the shape of the output tensor given the inputs
+   */
   abstract getOutputShape(input: InputType): readonly number[];
 
+  /**
+   * Get all compilation info, that can be inferred from the given input
+   */
   abstract getCompilationInfo(input: InputType, precision: Precision): Info;
 
+  /**
+   * Returns a string that is unique for each compilation
+   * configuration implied by the given input
+   */
   abstract getInputInfoString(input: InputType): string;
 }
