@@ -3,6 +3,7 @@ export const opsetVersions = ['7', '8', '9', '10', '11', '12'];
 export interface TestSpec {
   name: string;
   opsets?: string[];
+  backends?: string[];
 }
 
 export type Test = string | TestSpec;
@@ -315,7 +316,11 @@ export const enabledTests: Test[] = [
   //  "test_shrink_soft",
   //  "test_sigmoid",
   //  "test_sigmoid_example",
-  {name: 'test_sign', opsets: ['9', '10', '11', '12']},
+  {
+    name: 'test_sign',
+    opsets: ['9', '10', '11', '12'],
+    backends: ['CPU', 'WASM'],
+  },
   //  "test_simple_rnn_defaults",
   //  "test_simple_rnn_with_initial_bias",
   //  "test_sin",

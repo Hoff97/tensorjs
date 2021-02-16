@@ -1218,7 +1218,15 @@ impl Tensor {
     }
 
     pub fn sign(&self) -> Tensor {
-        self.unary_op(|x: f32| if x < 0. { -1. } else { 1. })
+        self.unary_op(|x: f32| {
+            if x < 0. {
+                -1.
+            } else if x == 0.0 {
+                0.
+            } else {
+                1.
+            }
+        })
     }
 
     pub fn negate(&self) -> Tensor {

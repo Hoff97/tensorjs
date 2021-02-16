@@ -66,7 +66,7 @@ export function ceil(a: CPUTensor) {
 }
 
 export function sign(a: CPUTensor) {
-  return positionWiseUnaryOp(a, o1 => (o1 < 0 ? -1 : 1));
+  return positionWiseUnaryOp(a, o1 => (o1 < 0 ? -1 : o1 === 0 ? 0 : 1));
 }
 
 export function negate(a: CPUTensor) {
