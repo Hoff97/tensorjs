@@ -319,7 +319,6 @@ export const enabledTests: Test[] = [
   {
     name: 'test_sign',
     opsets: ['9', '10', '11', '12'],
-    backends: ['CPU', 'WASM'],
   },
   //  "test_simple_rnn_defaults",
   //  "test_simple_rnn_with_initial_bias",
