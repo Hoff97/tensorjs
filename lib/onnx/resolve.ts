@@ -41,6 +41,8 @@ import {TanNode} from './nodes/unary/tan';
 import {CosNode} from './nodes/unary/cos';
 import {SinNode} from './nodes/unary/sin';
 import {SigmoidNode} from './nodes/unary/sigmoid';
+import {ReduceMinNode} from './nodes/reduce/reduceMin';
+import {ReduceProdNode} from './nodes/reduce/reduceProd';
 
 export const nodeResolve: {[opType: string]: NodeConstructor} = {
   Conv: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
@@ -101,8 +103,26 @@ export const nodeResolve: {[opType: string]: NodeConstructor} = {
       onnxVersion,
       mode
     ),
+  ReduceProd: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new ReduceProdNode(
+      attributes,
+      inputs,
+      outputs,
+      constants,
+      onnxVersion,
+      mode
+    ),
   ReduceMax: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
     new ReduceMaxNode(
+      attributes,
+      inputs,
+      outputs,
+      constants,
+      onnxVersion,
+      mode
+    ),
+  ReduceMin: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new ReduceMinNode(
       attributes,
       inputs,
       outputs,
