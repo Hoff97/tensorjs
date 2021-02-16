@@ -115,6 +115,8 @@ const buffer = await res.arrayBuffer();
 const model = new tjs.onnx.model.OnnxModel(buffer);
 ```
 
+To see all supported operators, check the [supported operator list](https://github.com/Hoff97/tensorjs/blob/master/Operators.md).
+
 You will very likely want to run this model on the GPU. To do this:
 ```typescript
 await model.toGPU();
