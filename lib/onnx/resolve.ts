@@ -40,6 +40,7 @@ import {SignNode} from './nodes/unary/sign';
 import {TanNode} from './nodes/unary/tan';
 import {CosNode} from './nodes/unary/cos';
 import {SinNode} from './nodes/unary/sin';
+import {SigmoidNode} from './nodes/unary/sigmoid';
 
 export const nodeResolve: {[opType: string]: NodeConstructor} = {
   Conv: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
@@ -192,6 +193,8 @@ export const nodeResolve: {[opType: string]: NodeConstructor} = {
     new CeilNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   Abs: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
     new AbsNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Sigmoid: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new SigmoidNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   Sin: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
     new SinNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   Cos: (attributes, inputs, outputs, constants, onnxVersion, mode) =>

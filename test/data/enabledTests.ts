@@ -314,8 +314,8 @@ export const enabledTests: Test[] = [
   'test_shape_example',
   //  "test_shrink_hard",
   //  "test_shrink_soft",
-  //  "test_sigmoid",
-  //  "test_sigmoid_example",
+  'test_sigmoid',
+  'test_sigmoid_example',
   {
     name: 'test_sign',
     opsets: ['9', '10', '11', '12'],
