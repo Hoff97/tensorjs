@@ -37,9 +37,9 @@ import {AbsNode} from './nodes/unary/abs';
 import {LogNode} from './nodes/unary/log';
 import {SqrtNode} from './nodes/unary/sqrt';
 import {SignNode} from './nodes/unary/sign';
-import {TanNode} from './nodes/unary/tan';
-import {CosNode} from './nodes/unary/cos';
-import {SinNode} from './nodes/unary/sin';
+import {ATanHNode, ATanNode, TanHNode, TanNode} from './nodes/unary/tan';
+import {ACosHNode, ACosNode, CosHNode, CosNode} from './nodes/unary/cos';
+import {ASinHNode, ASinNode, SinHNode, SinNode} from './nodes/unary/sin';
 import {SigmoidNode} from './nodes/unary/sigmoid';
 import {ReduceMinNode} from './nodes/reduce/reduceMin';
 import {ReduceProdNode} from './nodes/reduce/reduceProd';
@@ -47,6 +47,7 @@ import {ReduceLogSumNode} from './nodes/reduce/reduceLogSum';
 import {ReduceLogSumExpNode} from './nodes/reduce/reduceLogSumExp';
 import {ReduceL2Node} from './nodes/reduce/reduceL2';
 import {ReduceL1Node} from './nodes/reduce/reduceL1';
+import {PowNode} from './nodes/binary/pow';
 
 export const nodeResolve: {[opType: string]: NodeConstructor} = {
   Conv: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
@@ -71,6 +72,8 @@ export const nodeResolve: {[opType: string]: NodeConstructor} = {
     new ClipNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   Add: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
     new AddNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Pow: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new PowNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   ReduceMean: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
     new ReduceMeanNode(
       attributes,
@@ -254,6 +257,24 @@ export const nodeResolve: {[opType: string]: NodeConstructor} = {
     new CosNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   Tan: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
     new TanNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Asin: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new ASinNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Acos: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new ACosNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Atan: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new ATanNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Sinh: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new SinHNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Cosh: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new CosHNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Tanh: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new TanHNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Asinh: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new ASinHNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Acosh: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new ACosHNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Atanh: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new ATanHNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   Slice: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
     new SliceNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   Upsample: (attributes, inputs, outputs, constants, onnxVersion, mode) =>

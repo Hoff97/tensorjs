@@ -32,6 +32,7 @@
     "test:rust": "cargo test --tests",
     "docs": "typedoc",
     "testData": "ts-node --project tsconfig.dev.json tools/test.ts",
+    "onnxTable": "ts-node --project tsconfig.dev.json tools/onnxTable.ts",
     "lint": "gts lint",
     "clean": "gts clean",
     "fix": "gts fix"

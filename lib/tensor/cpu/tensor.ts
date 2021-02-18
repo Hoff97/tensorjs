@@ -1,12 +1,19 @@
 import {averagePool} from '../../ops/cpu/averagePool';
 import {
   abs,
+  acos,
+  acosh,
   add,
   addMultiplyScalar,
+  asin,
+  asinh,
+  atan,
+  atanh,
   ceil,
   clip,
   clipBackward,
   cos,
+  cosh,
   divide,
   exp,
   floor,
@@ -17,9 +24,11 @@ import {
   sigmoid,
   sign,
   sin,
+  sinh,
   sqrt,
   subtract,
   tan,
+  tanh,
 } from '../../ops/cpu/basic';
 import {concat} from '../../ops/cpu/concat';
 import {conv} from '../../ops/cpu/conv';
@@ -191,6 +200,42 @@ export class CPUTensor extends Tensor {
 
   tan(): Tensor {
     return tan(this);
+  }
+
+  asin(): Tensor {
+    return asin(this);
+  }
+
+  acos(): Tensor {
+    return acos(this);
+  }
+
+  atan(): Tensor {
+    return atan(this);
+  }
+
+  sinh(): Tensor {
+    return sinh(this);
+  }
+
+  cosh(): Tensor {
+    return cosh(this);
+  }
+
+  tanh(): Tensor {
+    return tanh(this);
+  }
+
+  asinh(): Tensor {
+    return asinh(this);
+  }
+
+  acosh(): Tensor {
+    return acosh(this);
+  }
+
+  atanh(): Tensor {
+    return atanh(this);
   }
 
   floor(): Tensor {

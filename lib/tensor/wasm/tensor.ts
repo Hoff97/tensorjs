@@ -95,6 +95,42 @@ export class WASMTensor extends Tensor {
     return new WASMTensor(this.wasmTensor.tan());
   }
 
+  asin(): Tensor {
+    return new WASMTensor(this.wasmTensor.asin());
+  }
+
+  acos(): Tensor {
+    return new WASMTensor(this.wasmTensor.acos());
+  }
+
+  atan(): Tensor {
+    return new WASMTensor(this.wasmTensor.atan());
+  }
+
+  sinh(): Tensor {
+    return new WASMTensor(this.wasmTensor.sinh());
+  }
+
+  cosh(): Tensor {
+    return new WASMTensor(this.wasmTensor.cosh());
+  }
+
+  tanh(): Tensor {
+    return new WASMTensor(this.wasmTensor.tanh());
+  }
+
+  asinh(): Tensor {
+    return new WASMTensor(this.wasmTensor.asinh());
+  }
+
+  acosh(): Tensor {
+    return new WASMTensor(this.wasmTensor.acosh());
+  }
+
+  atanh(): Tensor {
+    return new WASMTensor(this.wasmTensor.atanh());
+  }
+
   sigmoid(): Tensor {
     return new WASMTensor(this.wasmTensor.sigmoid());
   }

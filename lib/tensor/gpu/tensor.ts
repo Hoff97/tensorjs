@@ -48,9 +48,21 @@ import {ConvTransposeOperation} from '../../ops/gpu/conv/convTranspose';
 import {SigmoidOperation} from '../../ops/gpu/unary/sigmoid';
 import {AddMultiplyScalarOperation} from '../../ops/gpu/unary/addMultiplyScalar';
 import {SetValuesOperation} from '../../ops/gpu/util/setValues';
-import {SinOperation} from '../../ops/gpu/unary/sin';
-import {CosOperation} from '../../ops/gpu/unary/cos';
-import {TanOperation} from '../../ops/gpu/unary/tan';
+import {
+  ASinOperation,
+  SinHOperation,
+  SinOperation,
+} from '../../ops/gpu/unary/sin';
+import {
+  ACosOperation,
+  CosHOperation,
+  CosOperation,
+} from '../../ops/gpu/unary/cos';
+import {
+  ATanOperation,
+  TanHOperation,
+  TanOperation,
+} from '../../ops/gpu/unary/tan';
 import {ReduceLogSumOperation} from '../../ops/gpu/pool/reduceLogSum';
 import {ReduceLogSumExpOperation} from '../../ops/gpu/pool/reduceLogSumExp';
 
@@ -164,6 +176,42 @@ export class GPUTensor extends Tensor implements GPUTensorI {
 
   tan(): Tensor {
     return defaultTanD.calc({input: this}, this.precision) as GPUTensor;
+  }
+
+  asin(): Tensor {
+    return defaultASinD.calc({input: this}, this.precision) as GPUTensor;
+  }
+
+  acos(): Tensor {
+    return defaultACosD.calc({input: this}, this.precision) as GPUTensor;
+  }
+
+  atan(): Tensor {
+    return defaultATanD.calc({input: this}, this.precision) as GPUTensor;
+  }
+
+  sinh(): Tensor {
+    return defaultSinHD.calc({input: this}, this.precision) as GPUTensor;
+  }
+
+  cosh(): Tensor {
+    return defaultCosHD.calc({input: this}, this.precision) as GPUTensor;
+  }
+
+  tanh(): Tensor {
+    return defaultTanHD.calc({input: this}, this.precision) as GPUTensor;
+  }
+
+  asinh(): Tensor {
+    throw new Error('Method not implemented');
+  }
+
+  acosh(): Tensor {
+    throw new Error('Method not implemented');
+  }
+
+  atanh(): Tensor {
+    throw new Error('Method not implemented');
   }
 
   sigmoid(): Tensor {
@@ -603,6 +651,12 @@ const defaultAbsD = new Dispatcher(() => new AbsOperation(gpuConstructor));
 const defaultSinD = new Dispatcher(() => new SinOperation(gpuConstructor));
 const defaultCosD = new Dispatcher(() => new CosOperation(gpuConstructor));
 const defaultTanD = new Dispatcher(() => new TanOperation(gpuConstructor));
+const defaultASinD = new Dispatcher(() => new ASinOperation(gpuConstructor));
+const defaultACosD = new Dispatcher(() => new ACosOperation(gpuConstructor));
+const defaultATanD = new Dispatcher(() => new ATanOperation(gpuConstructor));
+const defaultSinHD = new Dispatcher(() => new SinHOperation(gpuConstructor));
+const defaultCosHD = new Dispatcher(() => new CosHOperation(gpuConstructor));
+const defaultTanHD = new Dispatcher(() => new TanHOperation(gpuConstructor));
 const defaultSigmoidD = new Dispatcher(
   () => new SigmoidOperation(gpuConstructor)
 );

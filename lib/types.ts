@@ -496,6 +496,51 @@ export default abstract class Tensor {
   abstract tan(): Tensor;
 
   /**
+   * Takes the arcus sinus of each value of the tensor
+   */
+  abstract asin(): Tensor;
+
+  /**
+   * Takes the arcus cosine of each value of the tensor
+   */
+  abstract acos(): Tensor;
+
+  /**
+   * Takes the arcus tangens of each value of the tensor
+   */
+  abstract atan(): Tensor;
+
+  /**
+   * Takes the hyperbolic sinus of each value of the tensor
+   */
+  abstract sinh(): Tensor;
+
+  /**
+   * Takes the hyperbolic cosine of each value of the tensor
+   */
+  abstract cosh(): Tensor;
+
+  /**
+   * Takes the hyperbolic tangens of each value of the tensor
+   */
+  abstract tanh(): Tensor;
+
+  /**
+   * Takes the inverse hyperbolic sinus of each value of the tensor
+   */
+  abstract asinh(): Tensor;
+
+  /**
+   * Takes the inverse hyperbolic cosine of each value of the tensor
+   */
+  abstract acosh(): Tensor;
+
+  /**
+   * Takes the inverse hyperbolic tangens of each value of the tensor
+   */
+  abstract atanh(): Tensor;
+
+  /**
    * Negates all entries of the tensor
    */
   abstract negate(): Tensor;

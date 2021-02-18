@@ -16,3 +16,33 @@ export class TanOperation<
     return `tan(${input})`;
   }
 }
+
+export class ATanOperation<
+  GPUTensor extends GPUTensorI
+> extends UnaryOperation<GPUTensor> {
+  constructor(
+    tensorConstructor: GPUTensorConstructor<GPUTensor>,
+    allocator?: GPUMemoryAllocator
+  ) {
+    super(tensorConstructor, allocator);
+  }
+
+  operation(input: string): string {
+    return `atan(${input})`;
+  }
+}
+
+export class TanHOperation<
+  GPUTensor extends GPUTensorI
+> extends UnaryOperation<GPUTensor> {
+  constructor(
+    tensorConstructor: GPUTensorConstructor<GPUTensor>,
+    allocator?: GPUMemoryAllocator
+  ) {
+    super(tensorConstructor, allocator);
+  }
+
+  operation(input: string): string {
+    return `(exp(2.0*${input}) - 1.0)/(exp(2.0*${input}) + 1.0)`;
+  }
+}

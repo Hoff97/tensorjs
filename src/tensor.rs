@@ -1249,6 +1249,42 @@ impl Tensor {
         self.unary_op(|x: f32| x.tan())
     }
 
+    pub fn asin(&self) -> Tensor {
+        self.unary_op(|x: f32| x.asin())
+    }
+
+    pub fn acos(&self) -> Tensor {
+        self.unary_op(|x: f32| x.acos())
+    }
+
+    pub fn atan(&self) -> Tensor {
+        self.unary_op(|x: f32| x.atan())
+    }
+
+    pub fn sinh(&self) -> Tensor {
+        self.unary_op(|x: f32| x.sinh())
+    }
+
+    pub fn cosh(&self) -> Tensor {
+        self.unary_op(|x: f32| x.cosh())
+    }
+
+    pub fn tanh(&self) -> Tensor {
+        self.unary_op(|x: f32| x.tanh())
+    }
+
+    pub fn asinh(&self) -> Tensor {
+        self.unary_op(|x: f32| x.asinh())
+    }
+
+    pub fn acosh(&self) -> Tensor {
+        self.unary_op(|x: f32| x.acosh())
+    }
+
+    pub fn atanh(&self) -> Tensor {
+        self.unary_op(|x: f32| x.atanh())
+    }
+
     pub fn sigmoid(&self) -> Tensor {
         self.unary_op(|x: f32| 1.0 / (1.0 + (-x).exp()))
     }

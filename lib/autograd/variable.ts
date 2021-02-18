@@ -36,9 +36,9 @@ import {Backend} from '../util/convert';
 import {WASMTensor} from '../tensor/wasm/tensor';
 import {GPUTensor} from '../tensor/gpu/tensor';
 import REGL from 'regl';
-import {SinBack} from './ops/unary/sinBack';
-import {CosBack} from './ops/unary/cosBack';
-import {TanBack} from './ops/unary/tanBack';
+import {ASinBack, ASinHBack, SinBack, SinHBack} from './ops/unary/sinBack';
+import {ACosBack, ACosHBack, CosBack, CosHBack} from './ops/unary/cosBack';
+import {ATanBack, ATanHBack, TanBack, TanHBack} from './ops/unary/tanBack';
 import {LogSumBack} from './ops/reduce/logSumBack';
 import {LogSumExpBack} from './ops/reduce/logSumExpBack';
 
@@ -257,6 +257,70 @@ export class Variable extends Tensor implements VariableI {
   tan(): Tensor {
     return new Variable(this.value.tan(), {
       backEdge: this.noGrad ? undefined : new TanBack(this),
+      noGrad: this.noGrad,
+    });
+  }
+
+  asin(): Tensor {
+    return new Variable(this.value.asin(), {
+      backEdge: this.noGrad ? undefined : new ASinBack(this),
+      noGrad: this.noGrad,
+    });
+  }
+
+  acos(): Tensor {
+    return new Variable(this.value.acos(), {
+      backEdge: this.noGrad ? undefined : new ACosBack(this),
+      noGrad: this.noGrad,
+    });
+  }
+
+  atan(): Tensor {
+    return new Variable(this.value.atan(), {
+      backEdge: this.noGrad ? undefined : new ATanBack(this),
+      noGrad: this.noGrad,
+    });
+  }
+
+  sinh(): Tensor {
+    return new Variable(this.value.sinh(), {
+      backEdge: this.noGrad ? undefined : new SinHBack(this),
+      noGrad: this.noGrad,
+    });
+  }
+
+  cosh(): Tensor {
+    return new Variable(this.value.cosh(), {
+      backEdge: this.noGrad ? undefined : new CosHBack(this),
+      noGrad: this.noGrad,
+    });
+  }
+
+  tanh(): Tensor {
+    const tanh = this.value.tanh();
+    return new Variable(tanh, {
+      backEdge: this.noGrad ? undefined : new TanHBack(this, tanh),
+      noGrad: this.noGrad,
+    });
+  }
+
+  asinh(): Tensor {
+    return new Variable(this.value.asinh(), {
+      backEdge: this.noGrad ? undefined : new ASinHBack(this),
+      noGrad: this.noGrad,
+    });
+  }
+
+  acosh(): Tensor {
+    return new Variable(this.value.acosh(), {
+      backEdge: this.noGrad ? undefined : new ACosHBack(this),
+      noGrad: this.noGrad,
+    });
+  }
+
+  atanh(): Tensor {
+    return new Variable(this.value.atanh(), {
+      backEdge: this.noGrad ? undefined : new ATanHBack(this),
       noGrad: this.noGrad,
     });
   }
