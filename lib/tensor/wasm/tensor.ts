@@ -143,6 +143,10 @@ export class WASMTensor extends Tensor {
     return new WASMTensor(this.wasmTensor.negate());
   }
 
+  powerScalar(power: number, factor: number): Tensor {
+    return new WASMTensor(this.wasmTensor.power_scalar(power, factor));
+  }
+
   addMultiplyScalar(factor: number, add: number): Tensor {
     return new WASMTensor(this.wasmTensor.add_multiply_scalar(factor, add));
   }

@@ -454,6 +454,52 @@ for (const backend of backends) {
       expect(await v.grad?.compare(numericalGrad, epsilon)).toBeTrue();
     });
 
+    it('should work with add multiply scalar', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 2], [-2, -1, 0.5, 1]);
+      const ones = backend.constructor([2, 2], [1, 1, 1, 1]);
+
+      const v = new Variable(a);
+
+      const res = v.addMultiplyScalar(2.0, 5.0) as Variable;
+      res.backward(ones);
+
+      const numericalGrad = await backend.toBackend(
+        numericalGradient(
+          (await toCPU(a)) as CPUTensor,
+          (a: CPUTensor) => a.addMultiplyScalar(2.0, 5.0) as CPUTensor
+        )
+      );
+
+      expect(await v.grad?.compare(numericalGrad, epsilon)).toBeTrue();
+    });
+
+    it('should work with power scalar', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 2], [-2, -1, 0.5, 1]);
+      const ones = backend.constructor([2, 2], [1, 1, 1, 1]);
+
+      const v = new Variable(a);
+
+      const res = v.powerScalar(2.0, 3.0) as Variable;
+      res.backward(ones);
+
+      const numericalGrad = await backend.toBackend(
+        numericalGradient(
+          (await toCPU(a)) as CPUTensor,
+          (a: CPUTensor) => a.powerScalar(2.0, 3.0) as CPUTensor
+        )
+      );
+
+      expect(await v.grad?.compare(numericalGrad, 0.1)).toBeTrue();
+    });
+
     it('should work with matmul', async () => {
       if (backend.wait !== undefined) {
         await backend.wait;

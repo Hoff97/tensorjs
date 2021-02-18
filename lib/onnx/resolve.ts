@@ -51,6 +51,9 @@ import {PowNode} from './nodes/binary/pow';
 import {IdentityNode} from './nodes/unary/identity';
 import {HardSigmoidNode} from './nodes/unary/hardSigmoid';
 import {NegNode} from './nodes/unary/neg';
+import {ReciprocalNode} from './nodes/unary/reciprocal';
+import {SqueezeNode} from './nodes/squeeze';
+import {SizeNode} from './nodes/size';
 
 export const nodeResolve: {[opType: string]: NodeConstructor} = {
   Conv: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
@@ -220,6 +223,8 @@ export const nodeResolve: {[opType: string]: NodeConstructor} = {
     ),
   Expand: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
     new ExpandNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Squeeze: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new SqueezeNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   InstanceNormalization: (
     attributes,
     inputs,
@@ -242,6 +247,8 @@ export const nodeResolve: {[opType: string]: NodeConstructor} = {
     new ReluNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   Shape: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
     new ShapeNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Size: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new SizeNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   Gather: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
     new GatherNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   Cast: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
@@ -254,6 +261,15 @@ export const nodeResolve: {[opType: string]: NodeConstructor} = {
     new AbsNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   Neg: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
     new NegNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Reciprocal: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new ReciprocalNode(
+      attributes,
+      inputs,
+      outputs,
+      constants,
+      onnxVersion,
+      mode
+    ),
   Identity: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
     new IdentityNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   Sigmoid: (attributes, inputs, outputs, constants, onnxVersion, mode) =>

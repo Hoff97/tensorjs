@@ -66,6 +66,7 @@ import {
 import {ReduceLogSumOperation} from '../../ops/gpu/pool/reduceLogSum';
 import {ReduceLogSumExpOperation} from '../../ops/gpu/pool/reduceLogSumExp';
 import {HardSigmoidOperation} from '../../ops/gpu/unary/hardSigmoid';
+import {PowerScalarOperation} from '../../ops/gpu/unary/powerScalar';
 
 export class GPUTensor extends Tensor implements GPUTensorI {
   public memory: MemoryEntry;
@@ -241,6 +242,13 @@ export class GPUTensor extends Tensor implements GPUTensorI {
   addMultiplyScalar(factor: number, add: number): Tensor {
     return defaultAddMultiplyScalarD.calc(
       {input: this, factor, add},
+      this.precision
+    ) as GPUTensor;
+  }
+
+  powerScalar(power: number, factor: number): Tensor {
+    return defaultPowerScalarD.calc(
+      {input: this, factor, power},
       this.precision
     ) as GPUTensor;
   }
@@ -684,6 +692,9 @@ const defaultNegateD = new Dispatcher(
 );
 const defaultAddMultiplyScalarD = new Dispatcher(
   () => new AddMultiplyScalarOperation(gpuConstructor)
+);
+const defaultPowerScalarD = new Dispatcher(
+  () => new PowerScalarOperation(gpuConstructor)
 );
 const defaultSignD = new Dispatcher(() => new SignOperation(gpuConstructor));
 

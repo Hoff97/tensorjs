@@ -41,6 +41,7 @@ import {ACosBack, ACosHBack, CosBack, CosHBack} from './ops/unary/cosBack';
 import {ATanBack, ATanHBack, TanBack, TanHBack} from './ops/unary/tanBack';
 import {LogSumBack} from './ops/reduce/logSumBack';
 import {LogSumExpBack} from './ops/reduce/logSumExpBack';
+import {PowerScalarBack} from './ops/unary/powerScalarBack';
 
 export interface VariableOptions {
   /**
@@ -354,6 +355,15 @@ export class Variable extends Tensor implements VariableI {
       backEdge: this.noGrad
         ? undefined
         : new AddMultiplyScalarBack(this, factor),
+      noGrad: this.noGrad,
+    });
+  }
+
+  powerScalar(power: number, factor: number): Tensor {
+    return new Variable(this.value.powerScalar(power, factor), {
+      backEdge: this.noGrad
+        ? undefined
+        : new PowerScalarBack(this, power, factor),
       noGrad: this.noGrad,
     });
   }

@@ -1309,6 +1309,10 @@ impl Tensor {
         self.unary_op(|x: f32| -x)
     }
 
+    pub fn power_scalar(&self, power: f32, factor: f32) -> Tensor {
+        self.unary_op(|x: f32| x.powf(power) * factor)
+    }
+
     pub fn add_multiply_scalar(&self, factor: f32, add: f32) -> Tensor {
         self.unary_op(|x: f32| x * factor + add)
     }

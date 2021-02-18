@@ -546,6 +546,11 @@ export default abstract class Tensor {
   abstract negate(): Tensor;
 
   /**
+   * Takes element wise power and multiplies with the given factor
+   */
+  abstract powerScalar(power: number, factor: number): Tensor;
+
+  /**
    * Computes the element wise sigmoid of all values
    */
   abstract sigmoid(): Tensor;
@@ -1011,6 +1016,17 @@ export default abstract class Tensor {
   abstract repeat(repeats: number[]): Tensor;
 
   abstract expand(shape: readonly number[]): Tensor;
+
+  squeeze(): Tensor {
+    const sh = this.getShape();
+    const newShape = [];
+    for (const a of sh) {
+      if (a !== 1) {
+        newShape.push(a);
+      }
+    }
+    return this.reshape(newShape);
+  }
 
   /**
    * Copy the tensor.

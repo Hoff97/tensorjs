@@ -121,6 +121,10 @@ export function negate(a: CPUTensor) {
   return positionWiseUnaryOp(a, o1 => -o1);
 }
 
+export function powerScalar(a: CPUTensor, power: number, factor: number) {
+  return positionWiseUnaryOp(a, o1 => Math.pow(o1, power) * factor);
+}
+
 export function addMultiplyScalar(a: CPUTensor, factor: number, add: number) {
   return positionWiseUnaryOp(a, o1 => o1 * factor + add);
 }

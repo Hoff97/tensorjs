@@ -22,6 +22,7 @@ import {
   multiply,
   negate,
   power,
+  powerScalar,
   sigmoid,
   sign,
   sin,
@@ -249,6 +250,10 @@ export class CPUTensor extends Tensor {
 
   negate(): Tensor {
     return negate(this);
+  }
+
+  powerScalar(power: number, factor: number): Tensor {
+    return powerScalar(this, power, factor);
   }
 
   multiplyScalar(value: number): Tensor {

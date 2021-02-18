@@ -1,0 +1,29 @@
+import {Mode} from '../../../model/module';
+import Tensor from '../../../types';
+import {Attributes, Constants} from '../../types';
+import {UnaryNode} from './unaryNode';
+
+export class ReciprocalNode extends UnaryNode {
+  constructor(
+    attributes: Attributes,
+    inputs: string[],
+    outputs: string[],
+    constants: Constants,
+    onnxVersion: number,
+    mode: Mode
+  ) {
+    super(
+      attributes,
+      inputs,
+      outputs,
+      constants,
+      onnxVersion,
+      'Reciprocal',
+      mode
+    );
+  }
+
+  compute(x: Tensor): Tensor {
+    return x.powerScalar(-1, 1);
+  }
+}
