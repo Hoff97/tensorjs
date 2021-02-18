@@ -24,6 +24,15 @@ const excludeHalfPrecision = new Set([
   'test_shape_example',
   'test_shape',
   'test_constantofshape_float_ones',
+  'test_tan',
+  'test_reduce_prod_default_axes_keepdims_random',
+  'test_size_example',
+  'test_size',
+  'test_pow',
+  'test_reduce_prod_default_axes_keepdims_example',
+  'test_reduce_prod_keepdims_random',
+  'test_reduce_prod_do_not_keepdims_random',
+  'test_reduce_prod_keepdims_random',
 ]);
 
 if (run) {
@@ -37,7 +46,12 @@ if (run) {
           test.opsets === undefined ||
           test.opsets.find(os => opset === os) !== undefined;
 
-        if (!excludeHalfPrecision.has(testName) && runForOpset) {
+        const runForGPU =
+          typeof test === 'string' ||
+          test.backends === undefined ||
+          test.backends.find(b => b === 'GPU') !== undefined;
+
+        if (!excludeHalfPrecision.has(testName) && runForOpset && runForGPU) {
           it(`Should work for operator ${testName} with half precision`, async () => {
             const resp = await fetch(`onnx/${opset}/${testName}/model.onnx`);
             const buffer = await resp.arrayBuffer();

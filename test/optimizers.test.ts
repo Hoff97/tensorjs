@@ -38,12 +38,6 @@ if (run) {
         },
         32
       ) as GPUTensor;
-
-      console.log(await moment1New.getValues());
-      console.log(await correctMoment1.getValues());
-      console.log(await moment2New.getValues());
-      console.log(await correctMoment2.getValues());
-      console.log(await newMoments.getValues());
     });
 
     it('update step should work', async () => {
@@ -79,9 +73,6 @@ if (run) {
         },
         32
       ) as GPUTensor;
-
-      console.log(await newValue.getValues());
-      console.log(await newVal.getValues());
     });
   });
 }
