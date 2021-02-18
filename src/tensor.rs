@@ -426,6 +426,30 @@ impl Tensor {
         );
     }
 
+    pub fn _reduce_log_sum(&self, axes: &Vec<usize>, keep_dims: bool) -> Tensor {
+        return self._pool(
+            axes,
+            keep_dims,
+            |x: f32, y: f32| x + y,
+            true,
+            |x: f32| x.ln(),
+            false,
+            |x: f32| x,
+        );
+    }
+
+    pub fn _reduce_log_sum_exp(&self, axes: &Vec<usize>, keep_dims: bool) -> Tensor {
+        return self._pool(
+            axes,
+            keep_dims,
+            |x: f32, y: f32| x.exp() + y,
+            true,
+            |x: f32| x.ln(),
+            true,
+            |x: f32| x.exp(),
+        );
+    }
+
     pub fn _conv(
         &self,
         kernel: &Tensor,
@@ -1411,6 +1435,22 @@ impl Tensor {
             ax[i as usize] = axes.get_index(i) as usize;
         }
         return self._reduce_mean_square(&ax, keep_dims);
+    }
+
+    pub fn reduce_log_sum(&self, axes: Uint32Array, keep_dims: bool) -> Tensor {
+        let mut ax: Vec<usize> = vec![0; axes.length() as usize];
+        for i in 0..axes.length() {
+            ax[i as usize] = axes.get_index(i) as usize;
+        }
+        return self._reduce_log_sum(&ax, keep_dims);
+    }
+
+    pub fn reduce_log_sum_exp(&self, axes: Uint32Array, keep_dims: bool) -> Tensor {
+        let mut ax: Vec<usize> = vec![0; axes.length() as usize];
+        for i in 0..axes.length() {
+            ax[i as usize] = axes.get_index(i) as usize;
+        }
+        return self._reduce_log_sum_exp(&ax, keep_dims);
     }
 
     pub fn conv(

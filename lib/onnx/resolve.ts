@@ -43,6 +43,8 @@ import {SinNode} from './nodes/unary/sin';
 import {SigmoidNode} from './nodes/unary/sigmoid';
 import {ReduceMinNode} from './nodes/reduce/reduceMin';
 import {ReduceProdNode} from './nodes/reduce/reduceProd';
+import {ReduceLogSumNode} from './nodes/reduce/reduceLogSum';
+import {ReduceLogSumExpNode} from './nodes/reduce/reduceLogSumExp';
 
 export const nodeResolve: {[opType: string]: NodeConstructor} = {
   Conv: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
@@ -139,6 +141,31 @@ export const nodeResolve: {[opType: string]: NodeConstructor} = {
     mode
   ) =>
     new ReduceSumSquareNode(
+      attributes,
+      inputs,
+      outputs,
+      constants,
+      onnxVersion,
+      mode
+    ),
+  ReduceLogSum: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new ReduceLogSumNode(
+      attributes,
+      inputs,
+      outputs,
+      constants,
+      onnxVersion,
+      mode
+    ),
+  ReduceLogSumExp: (
+    attributes,
+    inputs,
+    outputs,
+    constants,
+    onnxVersion,
+    mode
+  ) =>
+    new ReduceLogSumExpNode(
       attributes,
       inputs,
       outputs,

@@ -39,6 +39,8 @@ import REGL from 'regl';
 import {SinBack} from './ops/unary/sinBack';
 import {CosBack} from './ops/unary/cosBack';
 import {TanBack} from './ops/unary/tanBack';
+import {LogSumBack} from './ops/reduce/logSumBack';
+import {LogSumExpBack} from './ops/reduce/logSumExpBack';
 
 export interface VariableOptions {
   /**
@@ -580,6 +582,22 @@ export class Variable extends Tensor implements VariableI {
       backEdge: this.noGrad
         ? undefined
         : new MeanSquareBack(this, axes, keepDims),
+      noGrad: this.noGrad,
+    });
+  }
+
+  protected reduceLogSum_impl(axes: number[], keepDims: boolean): Tensor {
+    return new Variable(this.value.reduceLogSum(axes, keepDims), {
+      backEdge: this.noGrad ? undefined : new LogSumBack(this, axes, keepDims),
+      noGrad: this.noGrad,
+    });
+  }
+
+  protected reduceLogSumExp_impl(axes: number[], keepDims: boolean): Tensor {
+    return new Variable(this.value.reduceLogSumExp(axes, keepDims), {
+      backEdge: this.noGrad
+        ? undefined
+        : new LogSumExpBack(this, axes, keepDims),
       noGrad: this.noGrad,
     });
   }

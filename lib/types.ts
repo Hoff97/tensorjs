@@ -229,6 +229,38 @@ export default abstract class Tensor {
   }
 
   /**
+   * Takes the log of the sum over the specified axis
+   * This is equal to `a.sum(axes, keepDims).log()` (where sumSize is the number
+   * of entries in the summation axes) but faster.
+   *
+   * @param axes One or multiple axes to take the mean over. If not specified this will take the mean over all axes
+   * @param keepDims Wether the mean axes will be kept with size 1
+   *
+   */
+  reduceLogSum(axes?: number | number[], keepDims?: boolean): Tensor {
+    const ax = this.getAxes(axes);
+    keepDims = keepDims || false;
+
+    return this.reduceLogSum_impl(ax.sort(), keepDims);
+  }
+
+  /**
+   * Takes the log of the sum over the exp of the specified axis
+   * This is equal to `a.sum(axes, keepDims).log()` (where sumSize is the number
+   * of entries in the summation axes) but faster.
+   *
+   * @param axes One or multiple axes to take the mean over. If not specified this will take the mean over all axes
+   * @param keepDims Wether the mean axes will be kept with size 1
+   *
+   */
+  reduceLogSumExp(axes?: number | number[], keepDims?: boolean): Tensor {
+    const ax = this.getAxes(axes);
+    keepDims = keepDims || false;
+
+    return this.reduceLogSumExp_impl(ax, keepDims);
+  }
+
+  /**
    * Takes the mean over the specified axis/axes with the entries of the tensor squared.
    * This is equal to `a.multiply(a).sum(axes, keepDims).divide(sumSize)` (where sumSize is the number
    * of entries in the summation axes) but faster.
@@ -1075,6 +1107,16 @@ export default abstract class Tensor {
   protected abstract reduceMean_impl(axes: number[], keepDims: boolean): Tensor;
 
   protected abstract reduceMeanSquare_impl(
+    axes: number[],
+    keepDims: boolean
+  ): Tensor;
+
+  protected abstract reduceLogSum_impl(
+    axes: number[],
+    keepDims: boolean
+  ): Tensor;
+
+  protected abstract reduceLogSumExp_impl(
     axes: number[],
     keepDims: boolean
   ): Tensor;

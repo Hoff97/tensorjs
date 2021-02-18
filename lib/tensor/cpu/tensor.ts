@@ -33,6 +33,8 @@ import {min} from '../../ops/cpu/min';
 import {normalize} from '../../ops/cpu/normalize';
 import {pad} from '../../ops/cpu/pad';
 import {product} from '../../ops/cpu/product';
+import {reduceLogSum} from '../../ops/cpu/reduceLogSum';
+import {reduceLogSumExp} from '../../ops/cpu/reduceLogSumExp';
 import {reduceMean} from '../../ops/cpu/reduceMean';
 import {reduceMeanSquare} from '../../ops/cpu/reduceMeanSquare';
 import {repeat} from '../../ops/cpu/repeat';
@@ -345,6 +347,14 @@ export class CPUTensor extends Tensor {
 
   reduceMeanSquare_impl(axes: number[], keepDims: boolean): Tensor {
     return reduceMeanSquare(this, axes, keepDims);
+  }
+
+  reduceLogSum_impl(axes: number[], keepDims: boolean): Tensor {
+    return reduceLogSum(this, axes, keepDims);
+  }
+
+  reduceLogSumExp_impl(axes: number[], keepDims: boolean): Tensor {
+    return reduceLogSumExp(this, axes, keepDims);
   }
 
   conv_impl(

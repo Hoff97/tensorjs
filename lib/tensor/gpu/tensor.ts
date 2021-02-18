@@ -51,6 +51,8 @@ import {SetValuesOperation} from '../../ops/gpu/util/setValues';
 import {SinOperation} from '../../ops/gpu/unary/sin';
 import {CosOperation} from '../../ops/gpu/unary/cos';
 import {TanOperation} from '../../ops/gpu/unary/tan';
+import {ReduceLogSumOperation} from '../../ops/gpu/pool/reduceLogSum';
+import {ReduceLogSumExpOperation} from '../../ops/gpu/pool/reduceLogSumExp';
 
 export class GPUTensor extends Tensor implements GPUTensorI {
   public memory: MemoryEntry;
@@ -336,6 +338,20 @@ export class GPUTensor extends Tensor implements GPUTensorI {
 
   reduceMeanSquare_impl(axes: number[], keepDims: boolean): Tensor {
     return defaultMeanSquareD.calc(
+      {X: this, axes, keepDims},
+      this.precision
+    ) as GPUTensor;
+  }
+
+  protected reduceLogSum_impl(axes: number[], keepDims: boolean): Tensor {
+    return defaultLogSumD.calc(
+      {X: this, axes, keepDims},
+      this.precision
+    ) as GPUTensor;
+  }
+
+  protected reduceLogSumExp_impl(axes: number[], keepDims: boolean): Tensor {
+    return defaultLogSumExpD.calc(
       {X: this, axes, keepDims},
       this.precision
     ) as GPUTensor;
@@ -651,6 +667,12 @@ const defaultProductD = new Dispatcher(
 );
 const defaultMaxD = new Dispatcher(() => new MaxOperation(gpuConstructor));
 const defaultMinD = new Dispatcher(() => new MinOperation(gpuConstructor));
+const defaultLogSumD = new Dispatcher(
+  () => new ReduceLogSumOperation(gpuConstructor)
+);
+const defaultLogSumExpD = new Dispatcher(
+  () => new ReduceLogSumExpOperation(gpuConstructor)
+);
 
 //Util
 const defaultConcatD = new Dispatcher(

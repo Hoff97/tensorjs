@@ -265,6 +265,18 @@ export class WASMTensor extends Tensor {
     );
   }
 
+  protected reduceLogSum_impl(axes: number[], keepDims: boolean): Tensor {
+    return new WASMTensor(
+      this.wasmTensor.reduce_log_sum(new Uint32Array(axes), keepDims)
+    );
+  }
+
+  protected reduceLogSumExp_impl(axes: number[], keepDims: boolean): Tensor {
+    return new WASMTensor(
+      this.wasmTensor.reduce_log_sum_exp(new Uint32Array(axes), keepDims)
+    );
+  }
+
   getActivationFlag(activation: Activation) {
     if (activation === 'id') {
       return 0;
