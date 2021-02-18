@@ -1,15 +1,24 @@
-pub mod utils;
 pub mod shape;
 pub mod tensor;
+pub mod utils;
+
+pub mod ops {
+    pub mod aggregate;
+    pub mod binary;
+    pub mod conv;
+    pub mod matmul;
+    pub mod unary;
+    pub mod util;
+}
 
 pub mod tests {
     pub mod shape;
     pub mod tensor {
         pub mod aggregate;
         pub mod basic;
+        pub mod conv;
         pub mod pool;
         pub mod tensor;
-        pub mod conv;
     }
 }
 
