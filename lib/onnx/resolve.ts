@@ -50,6 +50,7 @@ import {ReduceL1Node} from './nodes/reduce/reduceL1';
 import {PowNode} from './nodes/binary/pow';
 import {IdentityNode} from './nodes/unary/identity';
 import {HardSigmoidNode} from './nodes/unary/hardSigmoid';
+import {NegNode} from './nodes/unary/neg';
 
 export const nodeResolve: {[opType: string]: NodeConstructor} = {
   Conv: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
@@ -251,6 +252,8 @@ export const nodeResolve: {[opType: string]: NodeConstructor} = {
     new CeilNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   Abs: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
     new AbsNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Neg: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new NegNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   Identity: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
     new IdentityNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   Sigmoid: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
