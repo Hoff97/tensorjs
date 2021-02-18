@@ -1,5 +1,5 @@
 import {Mode} from '../../../model/module';
-import types from '../../../types';
+import Tensor from '../../../types';
 import {Attributes, Constants} from '../../types';
 import {ReduceNode} from './reduceNode';
 
@@ -23,7 +23,7 @@ export class ReduceL2Node extends ReduceNode {
     );
   }
 
-  calc(input: types): types {
+  calc(input: Tensor): Tensor {
     const sumSquare = input.sumSquare(this.axes, this.keepDims);
     const result = sumSquare.sqrt();
     sumSquare.delete();

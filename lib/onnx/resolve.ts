@@ -54,6 +54,10 @@ import {NegNode} from './nodes/unary/neg';
 import {ReciprocalNode} from './nodes/unary/reciprocal';
 import {SqueezeNode} from './nodes/squeeze';
 import {SizeNode} from './nodes/size';
+import {LeakyReluNode} from './nodes/leakyRelu';
+import {EluNode} from './nodes/elu';
+import {PReluNode} from './nodes/prelu';
+import {SeluNode} from './nodes/selu';
 
 export const nodeResolve: {[opType: string]: NodeConstructor} = {
   Conv: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
@@ -245,6 +249,21 @@ export const nodeResolve: {[opType: string]: NodeConstructor} = {
     new PadNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   Relu: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
     new ReluNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  LeakyRelu: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new LeakyReluNode(
+      attributes,
+      inputs,
+      outputs,
+      constants,
+      onnxVersion,
+      mode
+    ),
+  Elu: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new EluNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  PRelu: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new PReluNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Selu: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new SeluNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   Shape: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
     new ShapeNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   Size: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
