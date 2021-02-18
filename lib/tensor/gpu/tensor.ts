@@ -48,6 +48,25 @@ import {ConvTransposeOperation} from '../../ops/gpu/conv/convTranspose';
 import {SigmoidOperation} from '../../ops/gpu/unary/sigmoid';
 import {AddMultiplyScalarOperation} from '../../ops/gpu/unary/addMultiplyScalar';
 import {SetValuesOperation} from '../../ops/gpu/util/setValues';
+import {
+  ASinOperation,
+  SinHOperation,
+  SinOperation,
+} from '../../ops/gpu/unary/sin';
+import {
+  ACosOperation,
+  CosHOperation,
+  CosOperation,
+} from '../../ops/gpu/unary/cos';
+import {
+  ATanOperation,
+  TanHOperation,
+  TanOperation,
+} from '../../ops/gpu/unary/tan';
+import {ReduceLogSumOperation} from '../../ops/gpu/pool/reduceLogSum';
+import {ReduceLogSumExpOperation} from '../../ops/gpu/pool/reduceLogSumExp';
+import {HardSigmoidOperation} from '../../ops/gpu/unary/hardSigmoid';
+import {PowerScalarOperation} from '../../ops/gpu/unary/powerScalar';
 
 export class GPUTensor extends Tensor implements GPUTensorI {
   public memory: MemoryEntry;
@@ -149,8 +168,63 @@ export class GPUTensor extends Tensor implements GPUTensorI {
     return defaultAbsD.calc({input: this}, this.precision) as GPUTensor;
   }
 
+  sin(): Tensor {
+    return defaultSinD.calc({input: this}, this.precision) as GPUTensor;
+  }
+
+  cos(): Tensor {
+    return defaultCosD.calc({input: this}, this.precision) as GPUTensor;
+  }
+
+  tan(): Tensor {
+    return defaultTanD.calc({input: this}, this.precision) as GPUTensor;
+  }
+
+  asin(): Tensor {
+    return defaultASinD.calc({input: this}, this.precision) as GPUTensor;
+  }
+
+  acos(): Tensor {
+    return defaultACosD.calc({input: this}, this.precision) as GPUTensor;
+  }
+
+  atan(): Tensor {
+    return defaultATanD.calc({input: this}, this.precision) as GPUTensor;
+  }
+
+  sinh(): Tensor {
+    return defaultSinHD.calc({input: this}, this.precision) as GPUTensor;
+  }
+
+  cosh(): Tensor {
+    return defaultCosHD.calc({input: this}, this.precision) as GPUTensor;
+  }
+
+  tanh(): Tensor {
+    return defaultTanHD.calc({input: this}, this.precision) as GPUTensor;
+  }
+
+  asinh(): Tensor {
+    throw new Error('Method not implemented');
+  }
+
+  acosh(): Tensor {
+    throw new Error('Method not implemented');
+  }
+
+  atanh(): Tensor {
+    throw new Error('Method not implemented');
+  }
+
   sigmoid(): Tensor {
     return defaultSigmoidD.calc({input: this}, this.precision) as GPUTensor;
+  }
+
+  hardSigmoid(alpha: number, beta: number): Tensor {
+    return defaultHardSigmoidD.calc(
+      {input: this, alpha, beta},
+      this.precision
+    ) as GPUTensor;
   }
 
   floor(): Tensor {
@@ -168,6 +242,13 @@ export class GPUTensor extends Tensor implements GPUTensorI {
   addMultiplyScalar(factor: number, add: number): Tensor {
     return defaultAddMultiplyScalarD.calc(
       {input: this, factor, add},
+      this.precision
+    ) as GPUTensor;
+  }
+
+  powerScalar(power: number, factor: number): Tensor {
+    return defaultPowerScalarD.calc(
+      {input: this, factor, power},
       this.precision
     ) as GPUTensor;
   }
@@ -321,6 +402,20 @@ export class GPUTensor extends Tensor implements GPUTensorI {
 
   reduceMeanSquare_impl(axes: number[], keepDims: boolean): Tensor {
     return defaultMeanSquareD.calc(
+      {X: this, axes, keepDims},
+      this.precision
+    ) as GPUTensor;
+  }
+
+  protected reduceLogSum_impl(axes: number[], keepDims: boolean): Tensor {
+    return defaultLogSumD.calc(
+      {X: this, axes, keepDims},
+      this.precision
+    ) as GPUTensor;
+  }
+
+  protected reduceLogSumExp_impl(axes: number[], keepDims: boolean): Tensor {
+    return defaultLogSumExpD.calc(
       {X: this, axes, keepDims},
       this.precision
     ) as GPUTensor;
@@ -569,8 +664,20 @@ const defaultGemmCD = new Dispatcher(() => new GemmCOperation(gpuConstructor));
 //Unary operations
 const defaultExpD = new Dispatcher(() => new ExpOperation(gpuConstructor));
 const defaultAbsD = new Dispatcher(() => new AbsOperation(gpuConstructor));
+const defaultSinD = new Dispatcher(() => new SinOperation(gpuConstructor));
+const defaultCosD = new Dispatcher(() => new CosOperation(gpuConstructor));
+const defaultTanD = new Dispatcher(() => new TanOperation(gpuConstructor));
+const defaultASinD = new Dispatcher(() => new ASinOperation(gpuConstructor));
+const defaultACosD = new Dispatcher(() => new ACosOperation(gpuConstructor));
+const defaultATanD = new Dispatcher(() => new ATanOperation(gpuConstructor));
+const defaultSinHD = new Dispatcher(() => new SinHOperation(gpuConstructor));
+const defaultCosHD = new Dispatcher(() => new CosHOperation(gpuConstructor));
+const defaultTanHD = new Dispatcher(() => new TanHOperation(gpuConstructor));
 const defaultSigmoidD = new Dispatcher(
   () => new SigmoidOperation(gpuConstructor)
+);
+const defaultHardSigmoidD = new Dispatcher(
+  () => new HardSigmoidOperation(gpuConstructor)
 );
 const defaultCeilD = new Dispatcher(() => new CeilOperation(gpuConstructor));
 const defaultFloorD = new Dispatcher(() => new FloorOperation(gpuConstructor));
@@ -585,6 +692,9 @@ const defaultNegateD = new Dispatcher(
 );
 const defaultAddMultiplyScalarD = new Dispatcher(
   () => new AddMultiplyScalarOperation(gpuConstructor)
+);
+const defaultPowerScalarD = new Dispatcher(
+  () => new PowerScalarOperation(gpuConstructor)
 );
 const defaultSignD = new Dispatcher(() => new SignOperation(gpuConstructor));
 
@@ -633,6 +743,12 @@ const defaultProductD = new Dispatcher(
 );
 const defaultMaxD = new Dispatcher(() => new MaxOperation(gpuConstructor));
 const defaultMinD = new Dispatcher(() => new MinOperation(gpuConstructor));
+const defaultLogSumD = new Dispatcher(
+  () => new ReduceLogSumOperation(gpuConstructor)
+);
+const defaultLogSumExpD = new Dispatcher(
+  () => new ReduceLogSumExpOperation(gpuConstructor)
+);
 
 //Util
 const defaultConcatD = new Dispatcher(

@@ -155,6 +155,282 @@ for (const backend of backends) {
       expect(await v.grad?.compare(numericalGrad, epsilon)).toBeTrue();
     });
 
+    it('should work with sin', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 2], [-2, -1, 0.5, 1]);
+      const ones = backend.constructor([2, 2], [1, 1, 1, 1]);
+
+      const v = new Variable(a);
+
+      const res = v.sin() as Variable;
+      res.backward(ones);
+
+      const numericalGrad = await backend.toBackend(
+        numericalGradient(
+          (await toCPU(a)) as CPUTensor,
+          (a: CPUTensor) => a.sin() as CPUTensor
+        )
+      );
+
+      expect(await v.grad?.compare(numericalGrad, epsilon)).toBeTrue();
+    });
+
+    it('should work with cos', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 2], [-2, -1, 0.5, 1]);
+      const ones = backend.constructor([2, 2], [1, 1, 1, 1]);
+
+      const v = new Variable(a);
+
+      const res = v.cos() as Variable;
+      res.backward(ones);
+
+      const numericalGrad = await backend.toBackend(
+        numericalGradient(
+          (await toCPU(a)) as CPUTensor,
+          (a: CPUTensor) => a.cos() as CPUTensor
+        )
+      );
+
+      expect(await v.grad?.compare(numericalGrad, epsilon)).toBeTrue();
+    });
+
+    it('should work with tan', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 2], [-0.7, -0.3, 0.5, 0.7]);
+      const ones = backend.constructor([2, 2], [1, 1, 1, 1]);
+
+      const v = new Variable(a);
+
+      const res = v.tan() as Variable;
+      res.backward(ones);
+
+      const numericalGrad = await backend.toBackend(
+        numericalGradient(
+          (await toCPU(a)) as CPUTensor,
+          (a: CPUTensor) => a.tan() as CPUTensor
+        )
+      );
+
+      expect(await v.grad?.compare(numericalGrad, epsilon)).toBeTrue();
+    });
+
+    it('should work with asin', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 2], [-0.5, -0.1, 0.2, 0.7]);
+      const ones = backend.constructor([2, 2], [1, 1, 1, 1]);
+
+      const v = new Variable(a);
+
+      const res = v.asin() as Variable;
+      res.backward(ones);
+
+      const numericalGrad = await backend.toBackend(
+        numericalGradient(
+          (await toCPU(a)) as CPUTensor,
+          (a: CPUTensor) => a.asin() as CPUTensor
+        )
+      );
+
+      expect(await v.grad?.compare(numericalGrad, epsilon)).toBeTrue();
+    });
+
+    it('should work with acos', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 2], [-0.5, -0.1, 0.2, 0.7]);
+      const ones = backend.constructor([2, 2], [1, 1, 1, 1]);
+
+      const v = new Variable(a);
+
+      const res = v.acos() as Variable;
+      res.backward(ones);
+
+      const numericalGrad = await backend.toBackend(
+        numericalGradient(
+          (await toCPU(a)) as CPUTensor,
+          (a: CPUTensor) => a.acos() as CPUTensor
+        )
+      );
+
+      expect(await v.grad?.compare(numericalGrad, epsilon)).toBeTrue();
+    });
+
+    it('should work with atan', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 2], [-0.7, -0.3, 0.5, 0.7]);
+      const ones = backend.constructor([2, 2], [1, 1, 1, 1]);
+
+      const v = new Variable(a);
+
+      const res = v.atan() as Variable;
+      res.backward(ones);
+
+      const numericalGrad = await backend.toBackend(
+        numericalGradient(
+          (await toCPU(a)) as CPUTensor,
+          (a: CPUTensor) => a.atan() as CPUTensor
+        )
+      );
+
+      expect(await v.grad?.compare(numericalGrad, epsilon)).toBeTrue();
+    });
+
+    it('should work with sinh', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 2], [-0.5, -0.1, 0.2, 0.7]);
+      const ones = backend.constructor([2, 2], [1, 1, 1, 1]);
+
+      const v = new Variable(a);
+
+      const res = v.sinh() as Variable;
+      res.backward(ones);
+
+      const numericalGrad = await backend.toBackend(
+        numericalGradient(
+          (await toCPU(a)) as CPUTensor,
+          (a: CPUTensor) => a.sinh() as CPUTensor
+        )
+      );
+
+      expect(await v.grad?.compare(numericalGrad, epsilon)).toBeTrue();
+    });
+
+    it('should work with cosh', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 2], [-0.5, -0.1, 0.2, 0.7]);
+      const ones = backend.constructor([2, 2], [1, 1, 1, 1]);
+
+      const v = new Variable(a);
+
+      const res = v.cosh() as Variable;
+      res.backward(ones);
+
+      const numericalGrad = await backend.toBackend(
+        numericalGradient(
+          (await toCPU(a)) as CPUTensor,
+          (a: CPUTensor) => a.cosh() as CPUTensor
+        )
+      );
+
+      expect(await v.grad?.compare(numericalGrad, epsilon)).toBeTrue();
+    });
+
+    it('should work with tanh', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 2], [-0.7, -0.3, 0.5, 0.7]);
+      const ones = backend.constructor([2, 2], [1, 1, 1, 1]);
+
+      const v = new Variable(a);
+
+      const res = v.tanh() as Variable;
+      res.backward(ones);
+
+      const numericalGrad = await backend.toBackend(
+        numericalGradient(
+          (await toCPU(a)) as CPUTensor,
+          (a: CPUTensor) => a.tanh() as CPUTensor
+        )
+      );
+
+      expect(await v.grad?.compare(numericalGrad, epsilon)).toBeTrue();
+    });
+
+    it('should work with asinh', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 2], [-0.5, -0.1, 0.2, 0.7]);
+      const ones = backend.constructor([2, 2], [1, 1, 1, 1]);
+
+      const v = new Variable(a);
+
+      const res = v.asinh() as Variable;
+      res.backward(ones);
+
+      const numericalGrad = await backend.toBackend(
+        numericalGradient(
+          (await toCPU(a)) as CPUTensor,
+          (a: CPUTensor) => a.asinh() as CPUTensor
+        )
+      );
+
+      expect(await v.grad?.compare(numericalGrad, epsilon)).toBeTrue();
+    });
+
+    it('should work with acosh', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 2], [2.0, 2.2, 3.1, 4.5]);
+      const ones = backend.constructor([2, 2], [1, 1, 1, 1]);
+
+      const v = new Variable(a);
+
+      const res = v.acosh() as Variable;
+      res.backward(ones);
+
+      const numericalGrad = await backend.toBackend(
+        numericalGradient(
+          (await toCPU(a)) as CPUTensor,
+          (a: CPUTensor) => a.acosh() as CPUTensor
+        )
+      );
+
+      expect(await v.grad?.compare(numericalGrad, epsilon)).toBeTrue();
+    });
+
+    it('should work with atanh', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 2], [-0.7, -0.3, 0.5, 0.7]);
+      const ones = backend.constructor([2, 2], [1, 1, 1, 1]);
+
+      const v = new Variable(a);
+
+      const res = v.atanh() as Variable;
+      res.backward(ones);
+
+      const numericalGrad = await backend.toBackend(
+        numericalGradient(
+          (await toCPU(a)) as CPUTensor,
+          (a: CPUTensor) => a.atanh() as CPUTensor
+        )
+      );
+
+      expect(await v.grad?.compare(numericalGrad, epsilon)).toBeTrue();
+    });
+
     it('should work with negate', async () => {
       if (backend.wait !== undefined) {
         await backend.wait;
@@ -176,6 +452,52 @@ for (const backend of backends) {
       );
 
       expect(await v.grad?.compare(numericalGrad, epsilon)).toBeTrue();
+    });
+
+    it('should work with add multiply scalar', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 2], [-2, -1, 0.5, 1]);
+      const ones = backend.constructor([2, 2], [1, 1, 1, 1]);
+
+      const v = new Variable(a);
+
+      const res = v.addMultiplyScalar(2.0, 5.0) as Variable;
+      res.backward(ones);
+
+      const numericalGrad = await backend.toBackend(
+        numericalGradient(
+          (await toCPU(a)) as CPUTensor,
+          (a: CPUTensor) => a.addMultiplyScalar(2.0, 5.0) as CPUTensor
+        )
+      );
+
+      expect(await v.grad?.compare(numericalGrad, epsilon)).toBeTrue();
+    });
+
+    it('should work with power scalar', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 2], [-2, -1, 0.5, 1]);
+      const ones = backend.constructor([2, 2], [1, 1, 1, 1]);
+
+      const v = new Variable(a);
+
+      const res = v.powerScalar(2.0, 3.0) as Variable;
+      res.backward(ones);
+
+      const numericalGrad = await backend.toBackend(
+        numericalGradient(
+          (await toCPU(a)) as CPUTensor,
+          (a: CPUTensor) => a.powerScalar(2.0, 3.0) as CPUTensor
+        )
+      );
+
+      expect(await v.grad?.compare(numericalGrad, 0.1)).toBeTrue();
     });
 
     it('should work with matmul', async () => {
@@ -1467,6 +1789,141 @@ for (const backend of backends) {
         numericalGradient(
           aCPU,
           (a: CPUTensor) => a.reduceMeanSquare() as CPUTensor
+        )
+      );
+
+      expect(await vA.grad?.compare(numericalGradA, 0.05)).toBeTrue();
+    });
+
+    it('should work with log sum axis 1', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 3], [1, 2, 3, 4, 5, 6]);
+      const ones = backend.constructor([2], new Array(2).fill(1));
+      const vA = new Variable(a);
+      const aCPU = (await toCPU(a)) as CPUTensor;
+
+      const res = vA.reduceLogSum(1) as Variable;
+      res.backward(ones);
+
+      const numericalGradA = await backend.toBackend(
+        numericalGradient(
+          aCPU,
+          (a: CPUTensor) => a.reduceLogSum(1) as CPUTensor
+        )
+      );
+
+      expect(await vA.grad?.compare(numericalGradA, 0.05)).toBeTrue();
+    });
+
+    it('should work with log sum axis 0', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 3], [1, 2, 3, 4, 5, 6]);
+      const ones = backend.constructor([3], new Array(3).fill(1));
+      const vA = new Variable(a);
+      const aCPU = (await toCPU(a)) as CPUTensor;
+
+      const res = vA.reduceLogSum(0) as Variable;
+      res.backward(ones);
+
+      const numericalGradA = await backend.toBackend(
+        numericalGradient(
+          aCPU,
+          (a: CPUTensor) => a.reduceLogSum(0) as CPUTensor
+        )
+      );
+
+      expect(await vA.grad?.compare(numericalGradA, 0.05)).toBeTrue();
+    });
+
+    it('should work with log sum across all axes', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 3], [1, 2, 3, 4, 5, 6]);
+      const ones = backend.constructor([1], new Array(1).fill(1));
+      const vA = new Variable(a);
+      const aCPU = (await toCPU(a)) as CPUTensor;
+
+      const res = vA.reduceLogSum() as Variable;
+      res.backward(ones);
+
+      const numericalGradA = await backend.toBackend(
+        numericalGradient(aCPU, (a: CPUTensor) => a.reduceLogSum() as CPUTensor)
+      );
+
+      expect(await vA.grad?.compare(numericalGradA, 0.05)).toBeTrue();
+    });
+
+    it('should work with log sum exp axis 1', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 3], [1, 2, 3, 4, 5, 6]);
+      const ones = backend.constructor([2], new Array(2).fill(1));
+      const vA = new Variable(a);
+      const aCPU = (await toCPU(a)) as CPUTensor;
+
+      const res = vA.reduceLogSumExp(1) as Variable;
+      res.backward(ones);
+
+      const numericalGradA = await backend.toBackend(
+        numericalGradient(
+          aCPU,
+          (a: CPUTensor) => a.reduceLogSumExp(1) as CPUTensor
+        )
+      );
+
+      expect(await vA.grad?.compare(numericalGradA, 0.05)).toBeTrue();
+    });
+
+    it('should work with log sum exp axis 0', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 3], [1, 2, 3, 4, 5, 6]);
+      const ones = backend.constructor([3], new Array(3).fill(1));
+      const vA = new Variable(a);
+      const aCPU = (await toCPU(a)) as CPUTensor;
+
+      const res = vA.reduceLogSumExp(0) as Variable;
+      res.backward(ones);
+
+      const numericalGradA = await backend.toBackend(
+        numericalGradient(
+          aCPU,
+          (a: CPUTensor) => a.reduceLogSumExp(0) as CPUTensor
+        )
+      );
+
+      expect(await vA.grad?.compare(numericalGradA, 0.05)).toBeTrue();
+    });
+
+    it('should work with log sum exp across all axes', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 3], [1, 2, 3, 4, 5, 6]);
+      const ones = backend.constructor([1], new Array(1).fill(1));
+      const vA = new Variable(a);
+      const aCPU = (await toCPU(a)) as CPUTensor;
+
+      const res = vA.reduceLogSumExp() as Variable;
+      res.backward(ones);
+
+      const numericalGradA = await backend.toBackend(
+        numericalGradient(
+          aCPU,
+          (a: CPUTensor) => a.reduceLogSumExp() as CPUTensor
         )
       );
 

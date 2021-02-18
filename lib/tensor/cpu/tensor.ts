@@ -1,22 +1,36 @@
 import {averagePool} from '../../ops/cpu/averagePool';
 import {
   abs,
+  acos,
+  acosh,
   add,
   addMultiplyScalar,
+  asin,
+  asinh,
+  atan,
+  atanh,
   ceil,
   clip,
   clipBackward,
+  cos,
+  cosh,
   divide,
   exp,
   floor,
+  hardSigmoid,
   log,
   multiply,
   negate,
   power,
+  powerScalar,
   sigmoid,
   sign,
+  sin,
+  sinh,
   sqrt,
   subtract,
+  tan,
+  tanh,
 } from '../../ops/cpu/basic';
 import {concat} from '../../ops/cpu/concat';
 import {conv} from '../../ops/cpu/conv';
@@ -30,6 +44,8 @@ import {min} from '../../ops/cpu/min';
 import {normalize} from '../../ops/cpu/normalize';
 import {pad} from '../../ops/cpu/pad';
 import {product} from '../../ops/cpu/product';
+import {reduceLogSum} from '../../ops/cpu/reduceLogSum';
+import {reduceLogSumExp} from '../../ops/cpu/reduceLogSumExp';
 import {reduceMean} from '../../ops/cpu/reduceMean';
 import {reduceMeanSquare} from '../../ops/cpu/reduceMeanSquare';
 import {repeat} from '../../ops/cpu/repeat';
@@ -176,6 +192,54 @@ export class CPUTensor extends Tensor {
     return abs(this);
   }
 
+  sin(): Tensor {
+    return sin(this);
+  }
+
+  cos(): Tensor {
+    return cos(this);
+  }
+
+  tan(): Tensor {
+    return tan(this);
+  }
+
+  asin(): Tensor {
+    return asin(this);
+  }
+
+  acos(): Tensor {
+    return acos(this);
+  }
+
+  atan(): Tensor {
+    return atan(this);
+  }
+
+  sinh(): Tensor {
+    return sinh(this);
+  }
+
+  cosh(): Tensor {
+    return cosh(this);
+  }
+
+  tanh(): Tensor {
+    return tanh(this);
+  }
+
+  asinh(): Tensor {
+    return asinh(this);
+  }
+
+  acosh(): Tensor {
+    return acosh(this);
+  }
+
+  atanh(): Tensor {
+    return atanh(this);
+  }
+
   floor(): Tensor {
     return floor(this);
   }
@@ -186,6 +250,10 @@ export class CPUTensor extends Tensor {
 
   negate(): Tensor {
     return negate(this);
+  }
+
+  powerScalar(power: number, factor: number): Tensor {
+    return powerScalar(this, power, factor);
   }
 
   multiplyScalar(value: number): Tensor {
@@ -217,6 +285,10 @@ export class CPUTensor extends Tensor {
 
   sigmoid(): Tensor {
     return sigmoid(this);
+  }
+
+  hardSigmoid(alpha: number, beta: number): Tensor {
+    return hardSigmoid(this, alpha, beta);
   }
 
   add_impl(
@@ -330,6 +402,14 @@ export class CPUTensor extends Tensor {
 
   reduceMeanSquare_impl(axes: number[], keepDims: boolean): Tensor {
     return reduceMeanSquare(this, axes, keepDims);
+  }
+
+  reduceLogSum_impl(axes: number[], keepDims: boolean): Tensor {
+    return reduceLogSum(this, axes, keepDims);
+  }
+
+  reduceLogSumExp_impl(axes: number[], keepDims: boolean): Tensor {
+    return reduceLogSumExp(this, axes, keepDims);
   }
 
   conv_impl(

@@ -1,8 +1,8 @@
-import {Mode} from '../../model/module';
-import {glContext} from '../../tensor/gpu/gl';
-import Tensor from '../../types';
-import {OnnxNode} from '../node';
-import {Attributes, Constants} from '../types';
+import {Mode} from '../../../model/module';
+import {glContext} from '../../../tensor/gpu/gl';
+import Tensor from '../../../types';
+import {OnnxNode} from '../../node';
+import {Attributes, Constants} from '../../types';
 
 export class InstanceNormalizationNode extends OnnxNode {
   private epsilon: number;

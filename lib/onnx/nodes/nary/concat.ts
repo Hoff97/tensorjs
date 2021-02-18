@@ -1,7 +1,7 @@
-import {Mode} from '../../model/module';
-import Tensor from '../../types';
-import {OnnxNode} from '../node';
-import {Attributes, Constants} from '../types';
+import {Mode} from '../../../model/module';
+import Tensor from '../../../types';
+import {OnnxNode} from '../../node';
+import {Attributes, Constants} from '../../types';
 
 export class ConcatNode extends OnnxNode {
   private axis?: number;

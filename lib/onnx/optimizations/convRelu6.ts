@@ -1,7 +1,7 @@
 import Tensor from '../../types';
 import {OnnxNode} from '../node';
 import {ClipNode} from '../nodes/clip';
-import {ConvNode} from '../nodes/conv';
+import {ConvNode} from '../nodes/conv/conv';
 import {Constants} from '../types';
 import {SequenceOptimization} from './optimization';
 

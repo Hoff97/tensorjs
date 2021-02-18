@@ -57,6 +57,54 @@ export function abs(a: CPUTensor) {
   return positionWiseUnaryOp(a, o1 => Math.abs(o1));
 }
 
+export function sin(a: CPUTensor) {
+  return positionWiseUnaryOp(a, o1 => Math.sin(o1));
+}
+
+export function cos(a: CPUTensor) {
+  return positionWiseUnaryOp(a, o1 => Math.cos(o1));
+}
+
+export function tan(a: CPUTensor) {
+  return positionWiseUnaryOp(a, o1 => Math.tan(o1));
+}
+
+export function asin(a: CPUTensor) {
+  return positionWiseUnaryOp(a, o1 => Math.asin(o1));
+}
+
+export function acos(a: CPUTensor) {
+  return positionWiseUnaryOp(a, o1 => Math.acos(o1));
+}
+
+export function atan(a: CPUTensor) {
+  return positionWiseUnaryOp(a, o1 => Math.atan(o1));
+}
+
+export function sinh(a: CPUTensor) {
+  return positionWiseUnaryOp(a, o1 => Math.sinh(o1));
+}
+
+export function cosh(a: CPUTensor) {
+  return positionWiseUnaryOp(a, o1 => Math.cosh(o1));
+}
+
+export function tanh(a: CPUTensor) {
+  return positionWiseUnaryOp(a, o1 => Math.tanh(o1));
+}
+
+export function asinh(a: CPUTensor) {
+  return positionWiseUnaryOp(a, o1 => Math.asinh(o1));
+}
+
+export function acosh(a: CPUTensor) {
+  return positionWiseUnaryOp(a, o1 => Math.acosh(o1));
+}
+
+export function atanh(a: CPUTensor) {
+  return positionWiseUnaryOp(a, o1 => Math.atanh(o1));
+}
+
 export function floor(a: CPUTensor) {
   return positionWiseUnaryOp(a, o1 => Math.floor(o1));
 }
@@ -66,11 +114,15 @@ export function ceil(a: CPUTensor) {
 }
 
 export function sign(a: CPUTensor) {
-  return positionWiseUnaryOp(a, o1 => (o1 < 0 ? -1 : 1));
+  return positionWiseUnaryOp(a, o1 => (o1 < 0 ? -1 : o1 === 0 ? 0 : 1));
 }
 
 export function negate(a: CPUTensor) {
   return positionWiseUnaryOp(a, o1 => -o1);
+}
+
+export function powerScalar(a: CPUTensor, power: number, factor: number) {
+  return positionWiseUnaryOp(a, o1 => Math.pow(o1, power) * factor);
 }
 
 export function addMultiplyScalar(a: CPUTensor, factor: number, add: number) {
@@ -79,6 +131,12 @@ export function addMultiplyScalar(a: CPUTensor, factor: number, add: number) {
 
 export function sigmoid(a: CPUTensor) {
   return positionWiseUnaryOp(a, o1 => 1 / (1 + Math.exp(-o1)));
+}
+
+export function hardSigmoid(a: CPUTensor, alpha: number, beta: number) {
+  return positionWiseUnaryOp(a, o1 =>
+    Math.max(0, Math.min(1, alpha * o1 + beta))
+  );
 }
 
 export function clip(a: CPUTensor, min?: number, max?: number) {

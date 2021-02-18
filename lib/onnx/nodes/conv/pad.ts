@@ -1,7 +1,7 @@
-import {Mode} from '../../model/module';
-import Tensor, {PadMode} from '../../types';
-import {OnnxNode} from '../node';
-import {Attributes, Constants} from '../types';
+import {Mode} from '../../../model/module';
+import Tensor, {PadMode} from '../../../types';
+import {OnnxNode} from '../../node';
+import {Attributes, Constants} from '../../types';
 
 export class PadNode extends OnnxNode {
   private padMode: PadMode;

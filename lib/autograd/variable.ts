@@ -36,6 +36,12 @@ import {Backend} from '../util/convert';
 import {WASMTensor} from '../tensor/wasm/tensor';
 import {GPUTensor} from '../tensor/gpu/tensor';
 import REGL from 'regl';
+import {ASinBack, ASinHBack, SinBack, SinHBack} from './ops/unary/sinBack';
+import {ACosBack, ACosHBack, CosBack, CosHBack} from './ops/unary/cosBack';
+import {ATanBack, ATanHBack, TanBack, TanHBack} from './ops/unary/tanBack';
+import {LogSumBack} from './ops/reduce/logSumBack';
+import {LogSumExpBack} from './ops/reduce/logSumExpBack';
+import {PowerScalarBack} from './ops/unary/powerScalarBack';
 
 export interface VariableOptions {
   /**
@@ -235,6 +241,91 @@ export class Variable extends Tensor implements VariableI {
     });
   }
 
+  sin(): Tensor {
+    return new Variable(this.value.sin(), {
+      backEdge: this.noGrad ? undefined : new SinBack(this),
+      noGrad: this.noGrad,
+    });
+  }
+
+  cos(): Tensor {
+    return new Variable(this.value.cos(), {
+      backEdge: this.noGrad ? undefined : new CosBack(this),
+      noGrad: this.noGrad,
+    });
+  }
+
+  tan(): Tensor {
+    return new Variable(this.value.tan(), {
+      backEdge: this.noGrad ? undefined : new TanBack(this),
+      noGrad: this.noGrad,
+    });
+  }
+
+  asin(): Tensor {
+    return new Variable(this.value.asin(), {
+      backEdge: this.noGrad ? undefined : new ASinBack(this),
+      noGrad: this.noGrad,
+    });
+  }
+
+  acos(): Tensor {
+    return new Variable(this.value.acos(), {
+      backEdge: this.noGrad ? undefined : new ACosBack(this),
+      noGrad: this.noGrad,
+    });
+  }
+
+  atan(): Tensor {
+    return new Variable(this.value.atan(), {
+      backEdge: this.noGrad ? undefined : new ATanBack(this),
+      noGrad: this.noGrad,
+    });
+  }
+
+  sinh(): Tensor {
+    return new Variable(this.value.sinh(), {
+      backEdge: this.noGrad ? undefined : new SinHBack(this),
+      noGrad: this.noGrad,
+    });
+  }
+
+  cosh(): Tensor {
+    return new Variable(this.value.cosh(), {
+      backEdge: this.noGrad ? undefined : new CosHBack(this),
+      noGrad: this.noGrad,
+    });
+  }
+
+  tanh(): Tensor {
+    const tanh = this.value.tanh();
+    return new Variable(tanh, {
+      backEdge: this.noGrad ? undefined : new TanHBack(this, tanh),
+      noGrad: this.noGrad,
+    });
+  }
+
+  asinh(): Tensor {
+    return new Variable(this.value.asinh(), {
+      backEdge: this.noGrad ? undefined : new ASinHBack(this),
+      noGrad: this.noGrad,
+    });
+  }
+
+  acosh(): Tensor {
+    return new Variable(this.value.acosh(), {
+      backEdge: this.noGrad ? undefined : new ACosHBack(this),
+      noGrad: this.noGrad,
+    });
+  }
+
+  atanh(): Tensor {
+    return new Variable(this.value.atanh(), {
+      backEdge: this.noGrad ? undefined : new ATanHBack(this),
+      noGrad: this.noGrad,
+    });
+  }
+
   sigmoid(): Tensor {
     const sigmoid = this.value.sigmoid();
     return new Variable(sigmoid, {
@@ -243,9 +334,13 @@ export class Variable extends Tensor implements VariableI {
     });
   }
 
+  hardSigmoid(alpha: number, beta: number): Tensor {
+    throw new Error('Method not implemented.');
+  }
+
   sign(): Tensor {
     // No back edge since the gradient will be zero anyway
-    return new Variable(this.value.sqrt());
+    return new Variable(this.value.sign());
   }
 
   negate(): Tensor {
@@ -260,6 +355,15 @@ export class Variable extends Tensor implements VariableI {
       backEdge: this.noGrad
         ? undefined
         : new AddMultiplyScalarBack(this, factor),
+      noGrad: this.noGrad,
+    });
+  }
+
+  powerScalar(power: number, factor: number): Tensor {
+    return new Variable(this.value.powerScalar(power, factor), {
+      backEdge: this.noGrad
+        ? undefined
+        : new PowerScalarBack(this, power, factor),
       noGrad: this.noGrad,
     });
   }
@@ -556,6 +660,22 @@ export class Variable extends Tensor implements VariableI {
       backEdge: this.noGrad
         ? undefined
         : new MeanSquareBack(this, axes, keepDims),
+      noGrad: this.noGrad,
+    });
+  }
+
+  protected reduceLogSum_impl(axes: number[], keepDims: boolean): Tensor {
+    return new Variable(this.value.reduceLogSum(axes, keepDims), {
+      backEdge: this.noGrad ? undefined : new LogSumBack(this, axes, keepDims),
+      noGrad: this.noGrad,
+    });
+  }
+
+  protected reduceLogSumExp_impl(axes: number[], keepDims: boolean): Tensor {
+    return new Variable(this.value.reduceLogSumExp(axes, keepDims), {
+      backEdge: this.noGrad
+        ? undefined
+        : new LogSumExpBack(this, axes, keepDims),
       noGrad: this.noGrad,
     });
   }

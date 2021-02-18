@@ -426,6 +426,30 @@ impl Tensor {
         );
     }
 
+    pub fn _reduce_log_sum(&self, axes: &Vec<usize>, keep_dims: bool) -> Tensor {
+        return self._pool(
+            axes,
+            keep_dims,
+            |x: f32, y: f32| x + y,
+            true,
+            |x: f32| x.ln(),
+            false,
+            |x: f32| x,
+        );
+    }
+
+    pub fn _reduce_log_sum_exp(&self, axes: &Vec<usize>, keep_dims: bool) -> Tensor {
+        return self._pool(
+            axes,
+            keep_dims,
+            |x: f32, y: f32| x.exp() + y,
+            true,
+            |x: f32| x.ln(),
+            true,
+            |x: f32| x.exp(),
+        );
+    }
+
     pub fn _conv(
         &self,
         kernel: &Tensor,
@@ -1213,16 +1237,80 @@ impl Tensor {
         self.unary_op(|x: f32| x.abs())
     }
 
+    pub fn sin(&self) -> Tensor {
+        self.unary_op(|x: f32| x.sin())
+    }
+
+    pub fn cos(&self) -> Tensor {
+        self.unary_op(|x: f32| x.cos())
+    }
+
+    pub fn tan(&self) -> Tensor {
+        self.unary_op(|x: f32| x.tan())
+    }
+
+    pub fn asin(&self) -> Tensor {
+        self.unary_op(|x: f32| x.asin())
+    }
+
+    pub fn acos(&self) -> Tensor {
+        self.unary_op(|x: f32| x.acos())
+    }
+
+    pub fn atan(&self) -> Tensor {
+        self.unary_op(|x: f32| x.atan())
+    }
+
+    pub fn sinh(&self) -> Tensor {
+        self.unary_op(|x: f32| x.sinh())
+    }
+
+    pub fn cosh(&self) -> Tensor {
+        self.unary_op(|x: f32| x.cosh())
+    }
+
+    pub fn tanh(&self) -> Tensor {
+        self.unary_op(|x: f32| x.tanh())
+    }
+
+    pub fn asinh(&self) -> Tensor {
+        self.unary_op(|x: f32| x.asinh())
+    }
+
+    pub fn acosh(&self) -> Tensor {
+        self.unary_op(|x: f32| x.acosh())
+    }
+
+    pub fn atanh(&self) -> Tensor {
+        self.unary_op(|x: f32| x.atanh())
+    }
+
     pub fn sigmoid(&self) -> Tensor {
         self.unary_op(|x: f32| 1.0 / (1.0 + (-x).exp()))
     }
 
+    pub fn hard_sigmoid(&self, alpha: f32, beta: f32) -> Tensor {
+        self.unary_op(|x: f32| (alpha * x + beta).min(1.0).max(0.0))
+    }
+
     pub fn sign(&self) -> Tensor {
-        self.unary_op(|x: f32| if x < 0. { -1. } else { 1. })
+        self.unary_op(|x: f32| {
+            if x < 0. {
+                -1.
+            } else if x == 0.0 {
+                0.
+            } else {
+                1.
+            }
+        })
     }
 
     pub fn negate(&self) -> Tensor {
         self.unary_op(|x: f32| -x)
+    }
+
+    pub fn power_scalar(&self, power: f32, factor: f32) -> Tensor {
+        self.unary_op(|x: f32| x.powf(power) * factor)
     }
 
     pub fn add_multiply_scalar(&self, factor: f32, add: f32) -> Tensor {
@@ -1391,6 +1479,22 @@ impl Tensor {
             ax[i as usize] = axes.get_index(i) as usize;
         }
         return self._reduce_mean_square(&ax, keep_dims);
+    }
+
+    pub fn reduce_log_sum(&self, axes: Uint32Array, keep_dims: bool) -> Tensor {
+        let mut ax: Vec<usize> = vec![0; axes.length() as usize];
+        for i in 0..axes.length() {
+            ax[i as usize] = axes.get_index(i) as usize;
+        }
+        return self._reduce_log_sum(&ax, keep_dims);
+    }
+
+    pub fn reduce_log_sum_exp(&self, axes: Uint32Array, keep_dims: bool) -> Tensor {
+        let mut ax: Vec<usize> = vec![0; axes.length() as usize];
+        for i in 0..axes.length() {
+            ax[i as usize] = axes.get_index(i) as usize;
+        }
+        return self._reduce_log_sum_exp(&ax, keep_dims);
     }
 
     pub fn conv(

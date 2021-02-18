@@ -229,6 +229,38 @@ export default abstract class Tensor {
   }
 
   /**
+   * Takes the log of the sum over the specified axis
+   * This is equal to `a.sum(axes, keepDims).log()` (where sumSize is the number
+   * of entries in the summation axes) but faster.
+   *
+   * @param axes One or multiple axes to take the mean over. If not specified this will take the mean over all axes
+   * @param keepDims Wether the mean axes will be kept with size 1
+   *
+   */
+  reduceLogSum(axes?: number | number[], keepDims?: boolean): Tensor {
+    const ax = this.getAxes(axes);
+    keepDims = keepDims || false;
+
+    return this.reduceLogSum_impl(ax.sort(), keepDims);
+  }
+
+  /**
+   * Takes the log of the sum over the exp of the specified axis
+   * This is equal to `a.sum(axes, keepDims).log()` (where sumSize is the number
+   * of entries in the summation axes) but faster.
+   *
+   * @param axes One or multiple axes to take the mean over. If not specified this will take the mean over all axes
+   * @param keepDims Wether the mean axes will be kept with size 1
+   *
+   */
+  reduceLogSumExp(axes?: number | number[], keepDims?: boolean): Tensor {
+    const ax = this.getAxes(axes);
+    keepDims = keepDims || false;
+
+    return this.reduceLogSumExp_impl(ax, keepDims);
+  }
+
+  /**
    * Takes the mean over the specified axis/axes with the entries of the tensor squared.
    * This is equal to `a.multiply(a).sum(axes, keepDims).divide(sumSize)` (where sumSize is the number
    * of entries in the summation axes) but faster.
@@ -449,14 +481,85 @@ export default abstract class Tensor {
   abstract abs(): Tensor;
 
   /**
+   * Takes the sinus of each value of the tensor
+   */
+  abstract sin(): Tensor;
+
+  /**
+   * Takes the cosine of each value of the tensor
+   */
+  abstract cos(): Tensor;
+
+  /**
+   * Takes the tangens of each value of the tensor
+   */
+  abstract tan(): Tensor;
+
+  /**
+   * Takes the arcus sinus of each value of the tensor
+   */
+  abstract asin(): Tensor;
+
+  /**
+   * Takes the arcus cosine of each value of the tensor
+   */
+  abstract acos(): Tensor;
+
+  /**
+   * Takes the arcus tangens of each value of the tensor
+   */
+  abstract atan(): Tensor;
+
+  /**
+   * Takes the hyperbolic sinus of each value of the tensor
+   */
+  abstract sinh(): Tensor;
+
+  /**
+   * Takes the hyperbolic cosine of each value of the tensor
+   */
+  abstract cosh(): Tensor;
+
+  /**
+   * Takes the hyperbolic tangens of each value of the tensor
+   */
+  abstract tanh(): Tensor;
+
+  /**
+   * Takes the inverse hyperbolic sinus of each value of the tensor
+   */
+  abstract asinh(): Tensor;
+
+  /**
+   * Takes the inverse hyperbolic cosine of each value of the tensor
+   */
+  abstract acosh(): Tensor;
+
+  /**
+   * Takes the inverse hyperbolic tangens of each value of the tensor
+   */
+  abstract atanh(): Tensor;
+
+  /**
    * Negates all entries of the tensor
    */
   abstract negate(): Tensor;
 
   /**
+   * Takes element wise power and multiplies with the given factor
+   */
+  abstract powerScalar(power: number, factor: number): Tensor;
+
+  /**
    * Computes the element wise sigmoid of all values
    */
   abstract sigmoid(): Tensor;
+
+  /**
+   * Computes the element wise hard sigmoid of all values given
+   * by `y = max(0, min(1, alpha * x + beta))`
+   */
+  abstract hardSigmoid(alpha: number, beta: number): Tensor;
 
   /**
    * Computes the value-wise sign which is:
@@ -914,6 +1017,32 @@ export default abstract class Tensor {
 
   abstract expand(shape: readonly number[]): Tensor;
 
+  squeeze(): Tensor {
+    const sh = this.getShape();
+    const newShape = [];
+    for (const a of sh) {
+      if (a !== 1) {
+        newShape.push(a);
+      }
+    }
+    return this.reshape(newShape);
+  }
+
+  flatten(axis?: number): Tensor {
+    if (axis === undefined) {
+      axis = 1;
+    }
+    const sh = this.getShape();
+    if (axis < 0) {
+      axis += sh.length;
+    }
+    const newShape = [
+      getSize(sh.slice(0, axis), 1),
+      getSize(sh.slice(axis), 1),
+    ];
+    return this.reshape(newShape);
+  }
+
   /**
    * Copy the tensor.
    * If the tensor is a GPU tensor, you can specify a precision (16/32)
@@ -1060,6 +1189,16 @@ export default abstract class Tensor {
   protected abstract reduceMean_impl(axes: number[], keepDims: boolean): Tensor;
 
   protected abstract reduceMeanSquare_impl(
+    axes: number[],
+    keepDims: boolean
+  ): Tensor;
+
+  protected abstract reduceLogSum_impl(
+    axes: number[],
+    keepDims: boolean
+  ): Tensor;
+
+  protected abstract reduceLogSumExp_impl(
     axes: number[],
     keepDims: boolean
   ): Tensor;

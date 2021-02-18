@@ -31,7 +31,10 @@ function loadOnnxUnitTests() {
           `cp -r tmp/onnx/onnx/backend/test/data/node/${enabledTest} ${copyDir}/${enabledTest}`
         );
       } else {
-        if (enabledTest.opsets.find(os => os === opset) !== undefined) {
+        if (
+          enabledTest.opsets === undefined ||
+          enabledTest.opsets.find(os => os === opset) !== undefined
+        ) {
           execSync(
             `cp -r tmp/onnx/onnx/backend/test/data/node/${enabledTest.name} ${copyDir}/${enabledTest.name}`
           );

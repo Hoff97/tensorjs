@@ -83,12 +83,68 @@ export class WASMTensor extends Tensor {
     return new WASMTensor(this.wasmTensor.abs());
   }
 
+  sin(): Tensor {
+    return new WASMTensor(this.wasmTensor.sin());
+  }
+
+  cos(): Tensor {
+    return new WASMTensor(this.wasmTensor.cos());
+  }
+
+  tan(): Tensor {
+    return new WASMTensor(this.wasmTensor.tan());
+  }
+
+  asin(): Tensor {
+    return new WASMTensor(this.wasmTensor.asin());
+  }
+
+  acos(): Tensor {
+    return new WASMTensor(this.wasmTensor.acos());
+  }
+
+  atan(): Tensor {
+    return new WASMTensor(this.wasmTensor.atan());
+  }
+
+  sinh(): Tensor {
+    return new WASMTensor(this.wasmTensor.sinh());
+  }
+
+  cosh(): Tensor {
+    return new WASMTensor(this.wasmTensor.cosh());
+  }
+
+  tanh(): Tensor {
+    return new WASMTensor(this.wasmTensor.tanh());
+  }
+
+  asinh(): Tensor {
+    return new WASMTensor(this.wasmTensor.asinh());
+  }
+
+  acosh(): Tensor {
+    return new WASMTensor(this.wasmTensor.acosh());
+  }
+
+  atanh(): Tensor {
+    return new WASMTensor(this.wasmTensor.atanh());
+  }
+
   sigmoid(): Tensor {
     return new WASMTensor(this.wasmTensor.sigmoid());
   }
 
+  hardSigmoid(alpha: number, beta: number): Tensor {
+    return new WASMTensor(this.wasmTensor.hard_sigmoid(alpha, beta));
+  }
+
   negate(): Tensor {
     return new WASMTensor(this.wasmTensor.negate());
+  }
+
+  powerScalar(power: number, factor: number): Tensor {
+    return new WASMTensor(this.wasmTensor.power_scalar(power, factor));
   }
 
   addMultiplyScalar(factor: number, add: number): Tensor {
@@ -250,6 +306,18 @@ export class WASMTensor extends Tensor {
   reduceMeanSquare_impl(axes: number[], keepDims: boolean): Tensor {
     return new WASMTensor(
       this.wasmTensor.reduce_mean_square(new Uint32Array(axes), keepDims)
+    );
+  }
+
+  protected reduceLogSum_impl(axes: number[], keepDims: boolean): Tensor {
+    return new WASMTensor(
+      this.wasmTensor.reduce_log_sum(new Uint32Array(axes), keepDims)
+    );
+  }
+
+  protected reduceLogSumExp_impl(axes: number[], keepDims: boolean): Tensor {
+    return new WASMTensor(
+      this.wasmTensor.reduce_log_sum_exp(new Uint32Array(axes), keepDims)
     );
   }
 

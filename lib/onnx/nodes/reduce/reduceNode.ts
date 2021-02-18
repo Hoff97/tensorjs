@@ -1,6 +1,5 @@
 import {Tensor} from '../../../library';
 import {Mode} from '../../../model/module';
-import types from '../../../types';
 import {OnnxNode} from '../../node';
 import {Attributes, Constants} from '../../types';
 
@@ -45,7 +44,7 @@ export abstract class ReduceNode extends OnnxNode {
     }
   }
 
-  async forward(inputs: types[]): Promise<types[]> {
+  async forward(inputs: Tensor[]): Promise<Tensor[]> {
     if (this.onnxVersion < 11) {
       return [this.calc(inputs[0])];
     }
