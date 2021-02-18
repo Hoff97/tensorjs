@@ -45,6 +45,8 @@ import {ReduceMinNode} from './nodes/reduce/reduceMin';
 import {ReduceProdNode} from './nodes/reduce/reduceProd';
 import {ReduceLogSumNode} from './nodes/reduce/reduceLogSum';
 import {ReduceLogSumExpNode} from './nodes/reduce/reduceLogSumExp';
+import {ReduceL2Node} from './nodes/reduce/reduceL2';
+import {ReduceL1Node} from './nodes/reduce/reduceL1';
 
 export const nodeResolve: {[opType: string]: NodeConstructor} = {
   Conv: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
@@ -148,6 +150,10 @@ export const nodeResolve: {[opType: string]: NodeConstructor} = {
       onnxVersion,
       mode
     ),
+  ReduceL2: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new ReduceL2Node(attributes, inputs, outputs, constants, onnxVersion, mode),
+  ReduceL1: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new ReduceL1Node(attributes, inputs, outputs, constants, onnxVersion, mode),
   ReduceLogSum: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
     new ReduceLogSumNode(
       attributes,
