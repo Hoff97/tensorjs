@@ -1028,6 +1028,21 @@ export default abstract class Tensor {
     return this.reshape(newShape);
   }
 
+  flatten(axis?: number): Tensor {
+    if (axis === undefined) {
+      axis = 1;
+    }
+    const sh = this.getShape();
+    if (axis < 0) {
+      axis += sh.length;
+    }
+    const newShape = [
+      getSize(sh.slice(0, axis), 1),
+      getSize(sh.slice(axis), 1),
+    ];
+    return this.reshape(newShape);
+  }
+
   /**
    * Copy the tensor.
    * If the tensor is a GPU tensor, you can specify a precision (16/32)

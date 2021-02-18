@@ -1,6 +1,6 @@
-export function getSize(shape: ReadonlyArray<number>) {
+export function getSize(shape: ReadonlyArray<number>, zeroSize = 0) {
   if (shape.length === 0) {
-    return 0;
+    return zeroSize;
   }
 
   let size = 1;

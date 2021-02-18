@@ -3,7 +3,7 @@ import {BatchNormalizationNode} from './nodes/batchNormalization';
 import {CastNode} from './nodes/cast';
 import {CeilNode} from './nodes/unary/ceil';
 import {ClipNode} from './nodes/clip';
-import {ConcatNode} from './nodes/concat';
+import {ConcatNode} from './nodes/nary/concat';
 import {ConstantNode} from './nodes/constant';
 import {ConstantOfShapeNode} from './nodes/constantOfShape';
 import {ConvNode} from './nodes/conv/conv';
@@ -58,6 +58,11 @@ import {LeakyReluNode} from './nodes/leakyRelu';
 import {EluNode} from './nodes/elu';
 import {PReluNode} from './nodes/prelu';
 import {SeluNode} from './nodes/selu';
+import {FlattenNode} from './nodes/flatten';
+import {SoftplusNode} from './nodes/softplus';
+import {SoftsignNode} from './nodes/softsign';
+import {SumNode} from './nodes/nary/sum';
+import {MeanNode} from './nodes/nary/mean';
 
 export const nodeResolve: {[opType: string]: NodeConstructor} = {
   Conv: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
@@ -99,6 +104,8 @@ export const nodeResolve: {[opType: string]: NodeConstructor} = {
     new ConstantNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   Reshape: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
     new ReshapeNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Flatten: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new FlattenNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   Tile: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
     new TileNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   MatMul: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
@@ -209,6 +216,10 @@ export const nodeResolve: {[opType: string]: NodeConstructor} = {
     ),
   Concat: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
     new ConcatNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Sum: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new SumNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Mean: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new MeanNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   ConstantOfShape: (
     attributes,
     inputs,
@@ -341,6 +352,10 @@ export const nodeResolve: {[opType: string]: NodeConstructor} = {
     ),
   Softmax: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
     new SoftmaxNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Softplus: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new SoftplusNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Softsign: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new SoftsignNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   GlobalAveragePool: (
     attributes,
     inputs,
