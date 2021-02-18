@@ -349,7 +349,7 @@ for (const backend of backends) {
 
       const v = new Variable(a);
 
-      const res = v.atan() as Variable;
+      const res = v.tanh() as Variable;
       res.backward(ones);
 
       const numericalGrad = await backend.toBackend(
