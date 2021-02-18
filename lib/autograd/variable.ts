@@ -333,9 +333,13 @@ export class Variable extends Tensor implements VariableI {
     });
   }
 
+  hardSigmoid(alpha: number, beta: number): Tensor {
+    throw new Error('Method not implemented.');
+  }
+
   sign(): Tensor {
     // No back edge since the gradient will be zero anyway
-    return new Variable(this.value.sqrt());
+    return new Variable(this.value.sign());
   }
 
   negate(): Tensor {

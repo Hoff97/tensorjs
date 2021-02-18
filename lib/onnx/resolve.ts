@@ -48,6 +48,8 @@ import {ReduceLogSumExpNode} from './nodes/reduce/reduceLogSumExp';
 import {ReduceL2Node} from './nodes/reduce/reduceL2';
 import {ReduceL1Node} from './nodes/reduce/reduceL1';
 import {PowNode} from './nodes/binary/pow';
+import {IdentityNode} from './nodes/unary/identity';
+import {HardSigmoidNode} from './nodes/unary/hardSigmoid';
 
 export const nodeResolve: {[opType: string]: NodeConstructor} = {
   Conv: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
@@ -249,8 +251,19 @@ export const nodeResolve: {[opType: string]: NodeConstructor} = {
     new CeilNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   Abs: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
     new AbsNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Identity: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new IdentityNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   Sigmoid: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
     new SigmoidNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  HardSigmoid: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new HardSigmoidNode(
+      attributes,
+      inputs,
+      outputs,
+      constants,
+      onnxVersion,
+      mode
+    ),
   Sin: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
     new SinNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   Cos: (attributes, inputs, outputs, constants, onnxVersion, mode) =>

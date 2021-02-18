@@ -135,6 +135,10 @@ export class WASMTensor extends Tensor {
     return new WASMTensor(this.wasmTensor.sigmoid());
   }
 
+  hardSigmoid(alpha: number, beta: number): Tensor {
+    return new WASMTensor(this.wasmTensor.hard_sigmoid(alpha, beta));
+  }
+
   negate(): Tensor {
     return new WASMTensor(this.wasmTensor.negate());
   }

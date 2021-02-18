@@ -1289,6 +1289,10 @@ impl Tensor {
         self.unary_op(|x: f32| 1.0 / (1.0 + (-x).exp()))
     }
 
+    pub fn hard_sigmoid(&self, alpha: f32, beta: f32) -> Tensor {
+        self.unary_op(|x: f32| (alpha * x + beta).min(1.0).max(0.0))
+    }
+
     pub fn sign(&self) -> Tensor {
         self.unary_op(|x: f32| {
             if x < 0. {

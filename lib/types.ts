@@ -551,6 +551,12 @@ export default abstract class Tensor {
   abstract sigmoid(): Tensor;
 
   /**
+   * Computes the element wise hard sigmoid of all values given
+   * by `y = max(0, min(1, alpha * x + beta))`
+   */
+  abstract hardSigmoid(alpha: number, beta: number): Tensor;
+
+  /**
    * Computes the value-wise sign which is:
    *  - (-1) if x < 0
    *  - 1 otherwise

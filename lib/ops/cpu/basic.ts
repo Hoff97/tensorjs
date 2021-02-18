@@ -129,6 +129,12 @@ export function sigmoid(a: CPUTensor) {
   return positionWiseUnaryOp(a, o1 => 1 / (1 + Math.exp(-o1)));
 }
 
+export function hardSigmoid(a: CPUTensor, alpha: number, beta: number) {
+  return positionWiseUnaryOp(a, o1 =>
+    Math.max(0, Math.min(1, alpha * o1 + beta))
+  );
+}
+
 export function clip(a: CPUTensor, min?: number, max?: number) {
   let f = (o1: number) => o1;
   if (min !== undefined && max !== undefined) {

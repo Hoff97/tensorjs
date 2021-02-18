@@ -65,6 +65,7 @@ import {
 } from '../../ops/gpu/unary/tan';
 import {ReduceLogSumOperation} from '../../ops/gpu/pool/reduceLogSum';
 import {ReduceLogSumExpOperation} from '../../ops/gpu/pool/reduceLogSumExp';
+import {HardSigmoidOperation} from '../../ops/gpu/unary/hardSigmoid';
 
 export class GPUTensor extends Tensor implements GPUTensorI {
   public memory: MemoryEntry;
@@ -216,6 +217,13 @@ export class GPUTensor extends Tensor implements GPUTensorI {
 
   sigmoid(): Tensor {
     return defaultSigmoidD.calc({input: this}, this.precision) as GPUTensor;
+  }
+
+  hardSigmoid(alpha: number, beta: number): Tensor {
+    return defaultHardSigmoidD.calc(
+      {input: this, alpha, beta},
+      this.precision
+    ) as GPUTensor;
   }
 
   floor(): Tensor {
@@ -659,6 +667,9 @@ const defaultCosHD = new Dispatcher(() => new CosHOperation(gpuConstructor));
 const defaultTanHD = new Dispatcher(() => new TanHOperation(gpuConstructor));
 const defaultSigmoidD = new Dispatcher(
   () => new SigmoidOperation(gpuConstructor)
+);
+const defaultHardSigmoidD = new Dispatcher(
+  () => new HardSigmoidOperation(gpuConstructor)
 );
 const defaultCeilD = new Dispatcher(() => new CeilOperation(gpuConstructor));
 const defaultFloorD = new Dispatcher(() => new FloorOperation(gpuConstructor));

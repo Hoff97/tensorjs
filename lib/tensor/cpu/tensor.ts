@@ -17,6 +17,7 @@ import {
   divide,
   exp,
   floor,
+  hardSigmoid,
   log,
   multiply,
   negate,
@@ -279,6 +280,10 @@ export class CPUTensor extends Tensor {
 
   sigmoid(): Tensor {
     return sigmoid(this);
+  }
+
+  hardSigmoid(alpha: number, beta: number): Tensor {
+    return hardSigmoid(this, alpha, beta);
   }
 
   add_impl(
