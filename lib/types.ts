@@ -5,6 +5,16 @@ export type PadMode = 'constant' | 'reflect' | 'edge';
 
 export type TensorValues = Float32Array | Int32Array;
 
+export type DType =
+  | 'F32'
+  | 'F16'
+  | 'I32'
+  | 'I16'
+  | 'Byte'
+  | 'UI32'
+  | 'UI16'
+  | 'UI8';
+
 export default abstract class Tensor {
   /**
    * Gets the values of the tensor as a Float32 or Int32 Array
@@ -79,6 +89,7 @@ export default abstract class Tensor {
     if (epsilon !== undefined) {
       for (let i = 0; i < arrA.length; i += 1) {
         if (Math.abs(arrA[i] - arrB[i]) > epsilon) {
+          console.log(Math.abs(arrA[i] - arrB[i]), arrA[i], arrB[i], i);
           return false;
         }
       }
@@ -1109,14 +1120,20 @@ export default abstract class Tensor {
   abstract setValues(values: Tensor, starts: number[]): Tensor;
 
   /**
-   * Rounds each tensor value to the nearest upper integer
+   * Rounds each tensor value to the nearest lower integer
    */
   abstract floor(): Tensor;
 
   /**
-   * Rounds each tensor value to the nearest lower integer
+   * Rounds each tensor value to the nearest upper integer
    */
   abstract ceil(): Tensor;
+
+  /**
+   * Rounds each tensor value to the nearest integer.
+   * When the value is 0.5 it rounds up.
+   */
+  abstract round(): Tensor;
 
   /**
    * Scales the tensor up/down according to the specified scales.

@@ -523,6 +523,10 @@ export class WASMTensor extends Tensor {
     return new WASMTensor(this.wasmTensor.ceil());
   }
 
+  round(): Tensor {
+    return new WASMTensor(this.wasmTensor.round());
+  }
+
   slice_impl(
     starts: number[],
     ends: number[],

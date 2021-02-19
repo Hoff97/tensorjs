@@ -441,6 +441,10 @@ export class Variable extends Tensor implements VariableI {
     return new Variable(this.value.ceil());
   }
 
+  round(): Tensor {
+    return new Variable(this.value.round());
+  }
+
   upsample(scales: number[]): Tensor {
     throw new Error('Method not implemented.');
   }

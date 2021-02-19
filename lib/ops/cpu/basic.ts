@@ -113,6 +113,10 @@ export function ceil(a: CPUTensor) {
   return positionWiseUnaryOp(a, o1 => Math.ceil(o1));
 }
 
+export function round(a: CPUTensor) {
+  return positionWiseUnaryOp(a, o1 => Math.round(o1));
+}
+
 export function sign(a: CPUTensor) {
   return positionWiseUnaryOp(a, o1 => (o1 < 0 ? -1 : o1 === 0 ? 0 : 1));
 }

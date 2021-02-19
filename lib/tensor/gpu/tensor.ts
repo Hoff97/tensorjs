@@ -67,6 +67,7 @@ import {ReduceLogSumOperation} from '../../ops/gpu/pool/reduceLogSum';
 import {ReduceLogSumExpOperation} from '../../ops/gpu/pool/reduceLogSumExp';
 import {HardSigmoidOperation} from '../../ops/gpu/unary/hardSigmoid';
 import {PowerScalarOperation} from '../../ops/gpu/unary/powerScalar';
+import {RoundOperation} from '../../ops/gpu/unary/round';
 
 export class GPUTensor extends Tensor implements GPUTensorI {
   public memory: MemoryEntry;
@@ -233,6 +234,10 @@ export class GPUTensor extends Tensor implements GPUTensorI {
 
   ceil(): Tensor {
     return defaultCeilD.calc({input: this}, this.precision) as GPUTensor;
+  }
+
+  round(): Tensor {
+    return defaultRoundD.calc({input: this}, this.precision) as GPUTensor;
   }
 
   negate(): Tensor {
@@ -689,6 +694,7 @@ const defaultHardSigmoidD = new Dispatcher(
 );
 const defaultCeilD = new Dispatcher(() => new CeilOperation(gpuConstructor));
 const defaultFloorD = new Dispatcher(() => new FloorOperation(gpuConstructor));
+const defaultRoundD = new Dispatcher(() => new RoundOperation(gpuConstructor));
 const defaultClipD = new Dispatcher(() => new ClipOperation(gpuConstructor));
 const defaultClipBackwardD = new Dispatcher(
   () => new ClipBackwardOperation(gpuConstructor)

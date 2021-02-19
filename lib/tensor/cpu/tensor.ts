@@ -23,6 +23,7 @@ import {
   negate,
   power,
   powerScalar,
+  round,
   sigmoid,
   sign,
   sin,
@@ -246,6 +247,10 @@ export class CPUTensor extends Tensor {
 
   ceil(): Tensor {
     return ceil(this);
+  }
+
+  round(): Tensor {
+    return round(this);
   }
 
   negate(): Tensor {

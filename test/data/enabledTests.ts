@@ -732,7 +732,7 @@ export const enabledTests: Test[] = [
   //'test_reversesequence_batch',
   //'test_reversesequence_time',
   //'test_roialign',
-  //'test_round',
+  {name: 'test_round', opsets: ['11', '12']},
   //'test_scatter_elements_with_axis',
   //'test_scatter_elements_with_negative_indices',
   //'test_scatter_elements_without_axis',

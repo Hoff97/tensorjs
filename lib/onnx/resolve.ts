@@ -64,6 +64,7 @@ import {SoftsignNode} from './nodes/softsign';
 import {SumNode} from './nodes/nary/sum';
 import {MeanNode} from './nodes/nary/mean';
 import {CeluNode} from './nodes/celu';
+import {RoundNode} from './nodes/unary/round';
 
 export const nodeResolve: {[opType: string]: NodeConstructor} = {
   Conv: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
@@ -290,6 +291,8 @@ export const nodeResolve: {[opType: string]: NodeConstructor} = {
     new FloorNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   Ceil: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
     new CeilNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Round: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new RoundNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   Abs: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
     new AbsNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   Neg: (attributes, inputs, outputs, constants, onnxVersion, mode) =>

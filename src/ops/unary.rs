@@ -141,4 +141,8 @@ impl Tensor {
     pub fn ceil(&self) -> Tensor {
         self.unary_op(|x: f32| x.ceil())
     }
+
+    pub fn round(&self) -> Tensor {
+        self.unary_op(|x: f32| x.round())
+    }
 }
