@@ -19,24 +19,26 @@ export class ConstantNode extends OnnxNode {
   ) {
     super(attributes, inputs, outputs, constants, onnxVersion, mode);
 
-    if (onnxVersion < 11) {
-      const tensor = this.getAttributeTensor('value');
-      if (tensor !== undefined && tensor !== null) {
-        this.tensor = createTensor(tensor);
+    const tensor = this.getAttributeTensor('value');
+    if (tensor !== undefined && tensor !== null) {
+      this.tensor = createTensor(tensor);
 
-        if (mode === 'train') {
-          this.tensor = new Variable(this.tensor);
-        }
+      if (mode === 'train') {
+        this.tensor = new Variable(this.tensor);
       }
+    } else {
+      throw new Error(
+        'Constant needs tensor value, but attribute "value" was not defined'
+      );
     }
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async forward(inputs: Tensor[]): Promise<Tensor[]> {
-    if (this.onnxVersion < 11 && this.tensor !== undefined) {
+    if (this.tensor !== undefined) {
       return [this.tensor];
     }
-    throw new Error('Constant with onnx version >= 11 not yet implemented');
+    throw new Error('Constant without tensor value doesnt work');
   }
 
   async toCPU() {
