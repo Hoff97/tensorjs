@@ -89,7 +89,6 @@ export default abstract class Tensor {
     if (epsilon !== undefined) {
       for (let i = 0; i < arrA.length; i += 1) {
         if (Math.abs(arrA[i] - arrB[i]) > epsilon) {
-          console.log(Math.abs(arrA[i] - arrB[i]), arrA[i], arrB[i], i);
           return false;
         }
       }

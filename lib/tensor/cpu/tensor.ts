@@ -65,6 +65,15 @@ import {
 } from '../../util/shape';
 
 export class CPUTensor extends Tensor {
+  static range(start: number, limit: number, delta: number) {
+    const size = Math.max(Math.ceil((limit - start) / delta), 0);
+    const values = new Float32Array(size);
+    for (let i = 0; i < size; i++) {
+      values[i] = start + i * delta;
+    }
+    return new CPUTensor([size], values);
+  }
+
   public values: TensorValues;
 
   public shape: ReadonlyArray<number>;

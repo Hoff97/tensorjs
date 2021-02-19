@@ -65,6 +65,7 @@ import {SumNode} from './nodes/nary/sum';
 import {MeanNode} from './nodes/nary/mean';
 import {CeluNode} from './nodes/celu';
 import {RoundNode} from './nodes/unary/round';
+import {RangeNode} from './nodes/range';
 
 export const nodeResolve: {[opType: string]: NodeConstructor} = {
   Conv: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
@@ -106,6 +107,8 @@ export const nodeResolve: {[opType: string]: NodeConstructor} = {
     new ConstantNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   Reshape: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
     new ReshapeNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Range: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new RangeNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   Flatten: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
     new FlattenNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   Tile: (attributes, inputs, outputs, constants, onnxVersion, mode) =>

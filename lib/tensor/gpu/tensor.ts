@@ -70,6 +70,20 @@ import {PowerScalarOperation} from '../../ops/gpu/unary/powerScalar';
 import {RoundOperation} from '../../ops/gpu/unary/round';
 
 export class GPUTensor extends Tensor implements GPUTensorI {
+  static range(
+    start: number,
+    limit: number,
+    delta: number,
+    precision?: Precision
+  ) {
+    const size = Math.max(Math.ceil((limit - start) / delta), 0);
+    const values = new Float32Array(size);
+    for (let i = 0; i < size; i++) {
+      values[i] = start + i * delta;
+    }
+    return new GPUTensor(values, [size], precision || 32);
+  }
+
   public memory: MemoryEntry;
 
   public size: number;

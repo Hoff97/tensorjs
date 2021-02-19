@@ -14,6 +14,15 @@ export const wasmLoaded: Promise<void> = new Promise(resolve => {
 });
 
 export class WASMTensor extends Tensor {
+  static range(start: number, limit: number, delta: number) {
+    const size = Math.max(Math.ceil((limit - start) / delta), 0);
+    const values = new Float32Array(size);
+    for (let i = 0; i < size; i++) {
+      values[i] = start + i * delta;
+    }
+    return new WASMTensor(values, new Uint32Array([size]));
+  }
+
   public wasmTensor: WT;
 
   constructor(values: Float32Array | WT, shape?: Uint32Array) {
