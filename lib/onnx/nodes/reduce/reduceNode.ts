@@ -45,7 +45,7 @@ export abstract class ReduceNode extends OnnxNode {
   }
 
   async forward(inputs: Tensor[]): Promise<Tensor[]> {
-    if (this.onnxVersion < 11) {
+    if (this.onnxVersion < 13) {
       return [this.calc(inputs[0])];
     }
     throw new Error(

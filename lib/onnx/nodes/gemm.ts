@@ -30,16 +30,11 @@ export class GemmNode extends OnnxNode {
   }
 
   async forward(inputs: Tensor[]): Promise<Tensor[]> {
-    if (this.onnxVersion >= 7 && this.onnxVersion < 11) {
-      const a = inputs[0];
-      const b = inputs[1];
-      const c = inputs[2];
+    const a = inputs[0];
+    const b = inputs[1];
+    const c = inputs[2];
 
-      return [a.gemm(b, this.transA, this.transB, this.alpha, c, this.beta)];
-    }
-    throw new Error(
-      `Gemm is not implemented for onnx version ${this.onnxVersion}`
-    );
+    return [a.gemm(b, this.transA, this.transB, this.alpha, c, this.beta)];
   }
 
   getType() {

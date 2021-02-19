@@ -5,12 +5,13 @@ export class ConcatBack implements BackwardOp {
   constructor(public a: VariableI, public b: VariableI, public axis: number) {}
 
   backward(grad: Tensor): void {
+    let axis = this.axis;
+    if (axis < 0) {
+      axis += this.a.getShape().length;
+    }
+
     if (!this.a.noGrad) {
-      const gradA = grad.slice(
-        [0],
-        [this.a.getShape()[this.axis]],
-        [this.axis]
-      );
+      const gradA = grad.slice([0], [this.a.getShape()[axis]], [axis]);
       const needed = this.a.backward(gradA);
       if (!needed) {
         gradA.delete();
@@ -19,9 +20,9 @@ export class ConcatBack implements BackwardOp {
 
     if (!this.b.noGrad) {
       const gradB = grad.slice(
-        [this.a.getShape()[this.axis]],
-        [grad.getShape()[this.axis]],
-        [this.axis]
+        [this.a.getShape()[axis]],
+        [grad.getShape()[axis]],
+        [axis]
       );
       const needed = this.b.backward(gradB);
       if (!needed) {

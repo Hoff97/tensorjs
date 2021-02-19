@@ -480,6 +480,9 @@ export class CPUTensor extends Tensor {
     if (!(tensor instanceof CPUTensor)) {
       throw new Error('Can only concat CPU tensor to CPU tensor');
     }
+    if (axis < 0) {
+      axis += this.shape.length;
+    }
     return concat(this, tensor, axis);
   }
 

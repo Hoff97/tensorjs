@@ -544,6 +544,9 @@ export class GPUTensor extends Tensor implements GPUTensorI {
     if (!(tensor instanceof GPUTensor)) {
       throw new Error('Can only concat GPU tensor to GPU tensor');
     }
+    if (axis < 0) {
+      axis += this.shape.length;
+    }
     return defaultConcatD.calc(
       {A: this, B: tensor, axis},
       this.precision

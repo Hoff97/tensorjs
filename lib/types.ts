@@ -106,6 +106,11 @@ export default abstract class Tensor {
       ax = [axes];
     } else {
       ax = axes;
+      for (let i = 0; i < ax.length; i++) {
+        if (ax[i] < 0) {
+          ax[i] += this.getShape().length;
+        }
+      }
     }
     return ax;
   }

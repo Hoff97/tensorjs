@@ -426,6 +426,9 @@ export class WASMTensor extends Tensor {
     if (!(tensor instanceof WASMTensor)) {
       throw new Error('Can only concat WASM tensor to WASM tensor');
     }
+    if (axis < 0) {
+      axis += this.getShape().length;
+    }
     return new WASMTensor(this.wasmTensor.concat(tensor.wasmTensor, axis));
   }
 
