@@ -607,9 +607,14 @@ export class GPUTensor extends Tensor implements GPUTensorI {
     ) as GPUTensor;
   }
 
-  slice_impl(starts: number[], ends: number[], axes: number[]): Tensor {
+  slice_impl(
+    starts: number[],
+    ends: number[],
+    axes: number[],
+    steps: number[]
+  ): Tensor {
     return defaultSliceD.calc(
-      {X: this, starts, ends, axes},
+      {X: this, starts, ends, axes, steps},
       this.precision
     ) as GPUTensor;
   }

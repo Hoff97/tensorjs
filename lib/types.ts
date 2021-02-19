@@ -922,7 +922,12 @@ export default abstract class Tensor {
    * @param ends End of the slice for each axis - Exclusive (the end index will not be included in the slice)
    * @param axes Axes to slice. Defaults to all axes
    */
-  slice(starts: number[], ends: number[], axes?: number[]): Tensor {
+  slice(
+    starts: number[],
+    ends: number[],
+    axes?: number[],
+    steps?: number[]
+  ): Tensor {
     const shape = this.getShape();
     const rank = shape.length;
     if (axes === undefined) {
@@ -930,6 +935,11 @@ export default abstract class Tensor {
       for (let i = 0; i < rank; i++) {
         axes.push(i);
       }
+    } else {
+      axes = axes.map(x => (x < 0 ? x + rank : x));
+    }
+    if (steps === undefined) {
+      steps = new Array(rank).fill(1);
     }
     starts = [...starts];
     ends = [...ends];
@@ -938,7 +948,11 @@ export default abstract class Tensor {
       if (starts[i] < 0) {
         starts[i] += sh;
       } else if (starts[i] >= sh) {
-        starts[i] = sh;
+        if (steps[i] > 0) {
+          starts[i] = sh;
+        } else {
+          starts[i] = sh - 1;
+        }
       }
       if (ends[i] < 0) {
         ends[i] += sh;
@@ -946,7 +960,7 @@ export default abstract class Tensor {
         ends[i] = sh;
       }
     }
-    return this.slice_impl(starts, ends, axes);
+    return this.slice_impl(starts, ends, axes, steps);
   }
 
   /**
@@ -1244,7 +1258,8 @@ export default abstract class Tensor {
   protected abstract slice_impl(
     starts: number[],
     ends: number[],
-    axes: number[]
+    axes: number[],
+    steps: number[]
   ): Tensor;
 }
 

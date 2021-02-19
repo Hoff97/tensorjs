@@ -3,6 +3,8 @@ import Long from 'long';
 import {onnx} from 'onnx-proto';
 import {Precision, Tensor} from '../library';
 import {Mode, Module} from '../model/module';
+import {CPUTensor} from '../tensor/cpu/tensor';
+import {toCPU} from '../util/convert';
 import {Attributes, Constants} from './types';
 
 export abstract class OnnxNode extends Module {
@@ -115,6 +117,21 @@ export abstract class OnnxNode extends Module {
       return result;
     }
     return undefined;
+  }
+
+  async toValues(tensor: Tensor): Promise<number[]> {
+    if (!(tensor instanceof CPUTensor)) {
+      console.warn('Tensor for values not on CPU, need to transfer!');
+      tensor = await toCPU(tensor);
+    }
+
+    const sc = tensor as CPUTensor;
+
+    const values = new Array(sc.size);
+    for (let i = 0; i < sc.size; i++) {
+      values[i] = sc.get(i);
+    }
+    return values;
   }
 
   async toCPU() {}

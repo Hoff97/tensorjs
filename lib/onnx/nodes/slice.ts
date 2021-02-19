@@ -5,8 +5,8 @@ import {Attributes, Constants} from '../types';
 
 export class SliceNode extends OnnxNode {
   private axes?: number[];
-  private starts: number[];
-  private ends: number[];
+  private starts?: number[];
+  private ends?: number[];
 
   constructor(
     attributes: Attributes,
@@ -19,20 +19,35 @@ export class SliceNode extends OnnxNode {
     super(attributes, inputs, outputs, constants, onnxVersion, mode);
 
     this.axes = this.getAttributeInts('axes');
-    //@ts-ignore
     this.starts = this.getAttributeInts('starts');
-    //@ts-ignore
     this.ends = this.getAttributeInts('ends');
   }
 
   async forward(inputs: Tensor[]): Promise<Tensor[]> {
     if (this.onnxVersion < 10) {
+      if (this.starts === undefined || this.ends === undefined) {
+        throw new Error(
+          'Slice with onnx version < 10 needs starts and ends defined as attributes'
+        );
+      }
       const x = inputs[0];
       return [x.slice(this.starts, this.ends, this.axes)];
+    } else {
+      const x = inputs[0];
+      const starts = inputs[1];
+      const ends = inputs[2];
+      const axes = inputs[3];
+      const steps = inputs[4];
+
+      const startValues = await this.toValues(starts);
+      const endValues = await this.toValues(ends);
+      const axesValues =
+        axes !== undefined ? await this.toValues(axes) : undefined;
+      const stepValues =
+        steps !== undefined ? await this.toValues(steps) : undefined;
+
+      return [x.slice(startValues, endValues, axesValues, stepValues)];
     }
-    throw new Error(
-      `Slice not implemented for onnx version ${this.onnxVersion}`
-    );
   }
 
   getType() {

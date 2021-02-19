@@ -507,8 +507,13 @@ export class CPUTensor extends Tensor {
     return gather(this, axis, indices);
   }
 
-  slice_impl(starts: number[], ends: number[], axes: number[]): Tensor {
-    return slice(this, starts, ends, axes);
+  slice_impl(
+    starts: number[],
+    ends: number[],
+    axes: number[],
+    steps: number[]
+  ): Tensor {
+    return slice(this, starts, ends, axes, steps);
   }
 
   upsample(scales: number[]): Tensor {

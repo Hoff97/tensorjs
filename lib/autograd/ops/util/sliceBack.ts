@@ -6,8 +6,13 @@ export class SliceBack implements BackwardOp {
     public a: VariableI,
     public starts: number[],
     public ends: number[],
-    public axes: number[]
-  ) {}
+    public axes: number[],
+    public steps: number[]
+  ) {
+    if (steps.find(x => x !== 1) !== undefined) {
+      throw new Error('Slice backward pass only supports step size of 1');
+    }
+  }
 
   backward(grad: Tensor): void {
     if (!this.a.noGrad) {

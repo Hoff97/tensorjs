@@ -17,6 +17,7 @@ export interface SliceInfo {
   starts?: readonly number[];
   ends?: readonly number[];
   axes?: readonly number[];
+  steps?: readonly number[];
 
   offsets?: number[];
 }
@@ -26,6 +27,7 @@ export interface SliceInput {
   starts: number[];
   ends: number[];
   axes: number[];
+  steps: number[];
 }
 
 export class SliceOperation<GPUTensor extends GPUTensorI> extends Operation<
@@ -51,7 +53,7 @@ export class SliceOperation<GPUTensor extends GPUTensorI> extends Operation<
           break;
         }
 
-        inIx[i] = index[i] + offsets[i];
+        inIx[i] = index[i]*steps[i] + offsets[i];
       }
 
       return _X(inIx);
@@ -68,11 +70,15 @@ export class SliceOperation<GPUTensor extends GPUTensorI> extends Operation<
   getVariables() {
     return `
     ${this.getVarModifier('offsets')} int offsets[${this.maxRank}];
+    ${this.getVarModifier('steps')} int steps[${this.maxRank}];
     `;
   }
 
   getUniformAttrs(): Input[] {
-    return [{name: 'offsets', length: this.maxRank}];
+    return [
+      {name: 'offsets', length: this.maxRank},
+      {name: 'steps', length: this.maxRank},
+    ];
   }
 
   calc(input: SliceInput): GPUTensor {
@@ -84,11 +90,15 @@ export class SliceOperation<GPUTensor extends GPUTensorI> extends Operation<
 
     const resultShape = [...input.X.shape];
     const offsets: number[] = new Array(rank).fill(0);
+    const steps: number[] = new Array(rank).fill(1);
     let axIx = 0;
     for (let i = 0; i < rank && axIx < input.axes.length; i++) {
       if (i === input.axes[axIx]) {
-        resultShape[i] = input.ends[axIx] - input.starts[axIx];
+        resultShape[i] = Math.ceil(
+          (input.ends[axIx] - input.starts[axIx]) / input.steps[axIx]
+        );
         offsets[i] = input.starts[axIx];
+        steps[i] = input.steps[axIx];
         axIx++;
       }
     }
@@ -98,6 +108,7 @@ export class SliceOperation<GPUTensor extends GPUTensorI> extends Operation<
       {X: input.X},
       {
         offsets: this.pad(offsets),
+        steps: this.pad(steps),
       }
     );
   }
@@ -109,7 +120,9 @@ export class SliceOperation<GPUTensor extends GPUTensorI> extends Operation<
     let axIx = 0;
     for (let i = 0; i < rank && axIx < input.axes.length; i++) {
       if (i === input.axes[axIx]) {
-        resultShape[i] = input.ends[axIx] - input.starts[axIx];
+        resultShape[i] = Math.ceil(
+          (input.ends[axIx] - input.starts[axIx]) / input.steps[axIx]
+        );
         axIx++;
       }
     }
@@ -124,20 +137,24 @@ export class SliceOperation<GPUTensor extends GPUTensorI> extends Operation<
       if (
         info.axes !== undefined &&
         info.starts !== undefined &&
-        info.starts !== undefined
+        info.ends !== undefined &&
+        info.steps !== undefined
       ) {
         const rank = info.shapeX.length;
 
         const offsets: number[] = new Array(rank).fill(0);
+        const steps: number[] = new Array(rank).fill(1);
         let axIx = 0;
         for (let i = 0; i < rank && axIx < info.axes.length; i++) {
           if (i === info.axes[axIx]) {
             offsets[i] = info.starts[axIx];
+            steps[i] = info.steps[axIx];
             axIx++;
           }
         }
 
         info.offsets = offsets;
+        info.steps = steps;
 
         delete info['starts'];
         delete info['ends'];
@@ -159,11 +176,15 @@ export class SliceOperation<GPUTensor extends GPUTensorI> extends Operation<
 
     const resultShape = [...input.X.shape];
     const offsets: number[] = new Array(rank).fill(0);
+    const steps: number[] = new Array(rank).fill(1);
     let axIx = 0;
     for (let i = 0; i < rank && axIx < input.axes.length; i++) {
       if (i === input.axes[axIx]) {
-        resultShape[i] = input.ends[axIx] - input.starts[axIx];
+        resultShape[i] = Math.ceil(
+          (input.ends[axIx] - input.starts[axIx]) / input.steps[axIx]
+        );
         offsets[i] = input.starts[axIx];
+        steps[i] = input.steps[axIx];
         axIx++;
       }
     }
@@ -178,10 +199,11 @@ export class SliceOperation<GPUTensor extends GPUTensorI> extends Operation<
       heightOutput: outputSize.height,
 
       offsets,
+      steps,
     };
   }
 
   getInputInfoString(input: SliceInput): string {
-    return `${input.X.shape}-${input.axes}-${input.starts}-${input.ends}`;
+    return `${input.X.shape}-${input.axes}-${input.starts}-${input.ends}-${input.steps}`;
   }
 }

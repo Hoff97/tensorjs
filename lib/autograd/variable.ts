@@ -767,12 +767,13 @@ export class Variable extends Tensor implements VariableI {
   protected slice_impl(
     starts: number[],
     ends: number[],
-    axes: number[]
+    axes: number[],
+    steps: number[]
   ): Tensor {
-    return new Variable(this.value.slice(starts, ends, axes), {
+    return new Variable(this.value.slice(starts, ends, axes, steps), {
       backEdge: this.noGrad
         ? undefined
-        : new SliceBack(this, starts, ends, axes),
+        : new SliceBack(this, starts, ends, axes, steps),
       noGrad: this.noGrad,
     });
   }

@@ -5,7 +5,8 @@ export function slice(
   x: CPUTensor,
   starts: number[],
   ends: number[],
-  axis: number[]
+  axis: number[],
+  steps: number[]
 ) {
   const rank = x.shape.length;
 
@@ -13,7 +14,7 @@ export function slice(
   let axIx = 0;
   for (let i = 0; i < rank && axIx < axis.length; i++) {
     if (i === axis[axIx]) {
-      resultShape[i] = ends[axIx] - starts[axIx];
+      resultShape[i] = Math.ceil((ends[axIx] - starts[axIx]) / steps[axIx]);
       axIx++;
     }
   }
@@ -24,9 +25,9 @@ export function slice(
   let inIx: number[];
 
   for (let i = 0; i < result.size; i++) {
-    inIx = [...outIx];
+    inIx = new Array(rank);
     for (let j = 0; j < axis.length; j++) {
-      inIx[axis[j]] += starts[j];
+      inIx[axis[j]] = outIx[axis[j]] * steps[j] + starts[j];
     }
 
     result.set(i, x.get(inIx));

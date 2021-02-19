@@ -102,13 +102,24 @@ impl Tensor {
         Tensor::new(output_shape, output_strides, output_size, values)
     }
 
-    pub fn _slice(&self, starts: &Vec<usize>, ends: &Vec<usize>, axis: &Vec<usize>) -> Tensor {
+    pub fn _slice(
+        &self,
+        starts: &Vec<usize>,
+        ends: &Vec<usize>,
+        axis: &Vec<usize>,
+        steps: &Vec<isize>,
+    ) -> Tensor {
         let rank = self.rank();
         let mut result_shape = vec![0; rank];
         let mut ax_ix = 0;
         for i in 0..rank {
             if ax_ix < axis.len() && i == axis[ax_ix] {
-                result_shape[i] = ends[ax_ix] - starts[ax_ix];
+                let diff = ends[ax_ix] as isize - starts[ax_ix] as isize;
+                result_shape[i] = (diff / steps[ax_ix]) as usize;
+                let mod_steps = diff.abs() % steps[ax_ix].abs();
+                if mod_steps > 0 {
+                    result_shape[i] += 1;
+                }
                 ax_ix += 1;
             } else {
                 result_shape[i] = self.get_dim_size(i);
@@ -127,7 +138,8 @@ impl Tensor {
             ax_ix = 0;
             for j in 0..rank {
                 if ax_ix < axis.len() && j == axis[ax_ix] {
-                    in_ix[j] = out_ix[j] + starts[ax_ix];
+                    in_ix[j] =
+                        (out_ix[j] as isize * steps[ax_ix] + (starts[ax_ix] as isize)) as usize;
                     ax_ix += 1;
                 } else {
                     in_ix[j] = out_ix[j];
@@ -330,16 +342,24 @@ impl Tensor {
         Tensor::new(result_shape, result_strides, result_size, values)
     }
 
-    pub fn slice(&self, starts: Uint32Array, ends: Uint32Array, axis: Uint32Array) -> Tensor {
+    pub fn slice(
+        &self,
+        starts: Uint32Array,
+        ends: Uint32Array,
+        axis: Uint32Array,
+        steps: Int32Array,
+    ) -> Tensor {
         let mut _starts: Vec<usize> = vec![0; starts.length() as usize];
         let mut _ends: Vec<usize> = vec![0; ends.length() as usize];
         let mut _axis: Vec<usize> = vec![0; axis.length() as usize];
+        let mut _steps: Vec<isize> = vec![0; axis.length() as usize];
         for i in 0..starts.length() {
             _starts[i as usize] = starts.get_index(i) as usize;
             _ends[i as usize] = ends.get_index(i) as usize;
             _axis[i as usize] = axis.get_index(i) as usize;
+            _steps[i as usize] = steps.get_index(i) as isize;
         }
 
-        return self._slice(&_starts, &_ends, &_axis);
+        return self._slice(&_starts, &_ends, &_axis, &_steps);
     }
 }
