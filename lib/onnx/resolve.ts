@@ -63,6 +63,7 @@ import {SoftplusNode} from './nodes/softplus';
 import {SoftsignNode} from './nodes/softsign';
 import {SumNode} from './nodes/nary/sum';
 import {MeanNode} from './nodes/nary/mean';
+import {CeluNode} from './nodes/celu';
 
 export const nodeResolve: {[opType: string]: NodeConstructor} = {
   Conv: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
@@ -275,6 +276,8 @@ export const nodeResolve: {[opType: string]: NodeConstructor} = {
     new PReluNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   Selu: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
     new SeluNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Celu: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new CeluNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   Shape: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
     new ShapeNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   Size: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
