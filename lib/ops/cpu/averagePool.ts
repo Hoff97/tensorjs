@@ -1,9 +1,10 @@
 import {CPUTensor} from '../../tensor/cpu/tensor';
+import {DType} from '../../types';
 import {getSize, incrementIndex} from '../../util/shape';
 import {outputDimsSize} from '../util/conv';
 
-export function averagePool(
-  x: CPUTensor,
+export function averagePool<DTpe extends DType>(
+  x: CPUTensor<DTpe>,
   kernelShape: number[],
   pads: number[],
   strides: number[],
@@ -29,7 +30,7 @@ export function averagePool(
   let outputShape = [N, C];
   outputShape = outputShape.concat(R);
 
-  const Y = new CPUTensor(outputShape);
+  const Y = new CPUTensor(outputShape, undefined, x.dtype);
 
   // Iterate over all batches
   for (let n = 0; n < N; n++) {

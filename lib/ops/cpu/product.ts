@@ -1,12 +1,13 @@
 import {CPUTensor} from '../../tensor/cpu/tensor';
+import {DType} from '../../types';
 
 import {pool} from './pool';
 
-export function product(
-  a: CPUTensor,
+export function product<DTpe extends DType>(
+  a: CPUTensor<DTpe>,
   axes: number[],
   keepDims: boolean
-): CPUTensor {
+): CPUTensor<DTpe> {
   return pool(
     a,
     axes,

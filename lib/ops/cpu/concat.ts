@@ -1,10 +1,15 @@
 import {CPUTensor} from '../../tensor/cpu/tensor';
+import {DType} from '../../types';
 
-export function concat(x: CPUTensor, y: CPUTensor, axis: number) {
+export function concat<DTpe extends DType>(
+  x: CPUTensor<DTpe>,
+  y: CPUTensor<DTpe>,
+  axis: number
+) {
   const outputShape = [...x.shape];
   outputShape[axis] += y.shape[axis];
 
-  const result = new CPUTensor(outputShape);
+  const result = new CPUTensor(outputShape, undefined, x.dtype);
 
   let indexX = 0;
   let indexY = 0;

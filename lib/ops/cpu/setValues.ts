@@ -1,12 +1,13 @@
 import {CPUTensor} from '../../tensor/cpu/tensor';
+import {DType} from '../../types';
 import {incrementIndex} from '../../util/shape';
 
-export function setValues(
-  a: CPUTensor,
-  b: CPUTensor,
+export function setValues<DTpe extends DType>(
+  a: CPUTensor<DTpe>,
+  b: CPUTensor<DTpe>,
   starts: readonly number[]
 ) {
-  const result = new CPUTensor(a.shape);
+  const result = new CPUTensor(a.shape, undefined, a.dtype);
 
   const index = new Array(a.shape.length).fill(0);
 

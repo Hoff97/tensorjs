@@ -1,7 +1,11 @@
 import {CPUTensor} from '../../tensor/cpu/tensor';
+import {DType} from '../../types';
 import {incrementIndex} from '../../util/shape';
 
-export function transpose(x: CPUTensor, permutation: number[]) {
+export function transpose<DTpe extends DType>(
+  x: CPUTensor<DTpe>,
+  permutation: number[]
+) {
   const rank = x.shape.length;
 
   const outputShape = new Array(rank);
@@ -11,7 +15,7 @@ export function transpose(x: CPUTensor, permutation: number[]) {
     reversePerm[permutation[i]] = i;
   }
 
-  const result = new CPUTensor(outputShape);
+  const result = new CPUTensor(outputShape, undefined, x.dtype);
 
   const resultStrides = result.strides;
   const mappedStrides = new Array(rank);

@@ -1,7 +1,12 @@
 import {CPUTensor} from '../../tensor/cpu/tensor';
+import {DType} from '../../types';
 import {incrementIndex} from '../../util/shape';
 
-export function gather(x: CPUTensor, axis: number, indices: CPUTensor) {
+export function gather<DTpe extends DType>(
+  x: CPUTensor<DTpe>,
+  axis: number,
+  indices: CPUTensor<'int32'>
+) {
   const r = x.shape.length;
   const q = indices.shape.length;
 
@@ -17,7 +22,7 @@ export function gather(x: CPUTensor, axis: number, indices: CPUTensor) {
     resultShape[i + q - 1] = x.shape[i];
   }
 
-  const result = new CPUTensor(resultShape, undefined, x.type);
+  const result = new CPUTensor(resultShape, undefined, x.dtype);
 
   const outIx = new Array(resultRank).fill(0);
   let gatherIx: number[];

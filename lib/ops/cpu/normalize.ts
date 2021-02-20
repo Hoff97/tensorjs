@@ -1,19 +1,20 @@
 import {CPUTensor} from '../../tensor/cpu/tensor';
+import {DType} from '../../types';
 import {incrementIndex} from '../../util/shape';
 
-export function normalize(
-  x: CPUTensor,
-  mean: CPUTensor,
-  variance: CPUTensor,
+export function normalize<DTpe extends DType>(
+  x: CPUTensor<DTpe>,
+  mean: CPUTensor<DTpe>,
+  variance: CPUTensor<DTpe>,
   epsilon: number,
-  scale: CPUTensor,
-  bias: CPUTensor
+  scale: CPUTensor<DTpe>,
+  bias: CPUTensor<DTpe>
 ) {
   const rank = x.shape.length;
 
   const resultShape = [...x.shape];
 
-  const result = new CPUTensor(resultShape, undefined, x.type);
+  const result = new CPUTensor(resultShape, undefined, x.dtype);
 
   const outIx = new Array(rank).fill(0);
   for (let i = 0; i < result.size; i++) {

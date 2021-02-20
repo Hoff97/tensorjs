@@ -1,7 +1,11 @@
 import {CPUTensor} from '../../tensor/cpu/tensor';
+import {DType} from '../../types';
 import {incrementIndex} from '../../util/shape';
 
-export function repeat(x: CPUTensor, repeats: number[]) {
+export function repeat<DTpe extends DType>(
+  x: CPUTensor<DTpe>,
+  repeats: number[]
+) {
   const rank = x.shape.length;
 
   const outputShape = new Array(rank);
@@ -9,7 +13,7 @@ export function repeat(x: CPUTensor, repeats: number[]) {
     outputShape[i] = x.shape[i] * repeats[i];
   }
 
-  const result = new CPUTensor(outputShape);
+  const result = new CPUTensor(outputShape, undefined, x.dtype);
 
   const index = new Array(rank).fill(0);
   for (let i = 0; i < result.size; i++) {

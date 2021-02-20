@@ -1,12 +1,13 @@
 import {CPUTensor} from '../../tensor/cpu/tensor';
+import {DType} from '../../types';
 
 import {pool} from './pool';
 
-export function reduceLogSumExp(
-  a: CPUTensor,
+export function reduceLogSumExp<DTpe extends DType>(
+  a: CPUTensor<DTpe>,
   axes: number[],
   keepDims: boolean
-): CPUTensor {
+): CPUTensor<DTpe> {
   return pool(
     a,
     axes,

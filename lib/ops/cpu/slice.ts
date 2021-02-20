@@ -1,8 +1,9 @@
 import {CPUTensor} from '../../tensor/cpu/tensor';
+import {DType} from '../../types';
 import {incrementIndex} from '../../util/shape';
 
-export function slice(
-  x: CPUTensor,
+export function slice<DTpe extends DType>(
+  x: CPUTensor<DTpe>,
   starts: number[],
   ends: number[],
   axis: number[],
@@ -19,7 +20,7 @@ export function slice(
     }
   }
 
-  const result = new CPUTensor(resultShape, undefined, x.type);
+  const result = new CPUTensor(resultShape, undefined, x.dtype);
 
   const outIx = new Array(rank).fill(0);
   let inIx: number[];

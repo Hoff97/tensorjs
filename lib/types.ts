@@ -3,19 +3,48 @@ import {compareShapes, getSize} from './util/shape';
 
 export type PadMode = 'constant' | 'reflect' | 'edge';
 
-export type TensorValues = Float32Array | Int32Array;
+export type TensorValues = {
+  float32: Float32Array;
+  float16: Float32Array;
+  int32: Int32Array;
+  int16: Int16Array;
+  int8: Int8Array;
+  uint32: Uint32Array;
+  uint16: Uint16Array;
+  uint8: Uint8Array;
+};
+
+export const tensorValuesConstructor = {
+  float32: Float32Array,
+  float16: Float32Array,
+  int32: Int32Array,
+  int16: Int16Array,
+  int8: Int8Array,
+  uint32: Uint32Array,
+  uint16: Uint16Array,
+  uint8: Uint8Array,
+};
 
 export type DType =
-  | 'F32'
-  | 'F16'
-  | 'I32'
-  | 'I16'
-  | 'Byte'
-  | 'UI32'
-  | 'UI16'
-  | 'UI8';
+  | 'float32'
+  | 'float16'
+  | 'int32'
+  | 'int16'
+  | 'int8'
+  | 'uint32'
+  | 'uint16'
+  | 'uint8';
 
-export default abstract class Tensor {
+export type Activation = 'id' | 'relu' | 'relu6';
+
+export type Precision = 16 | 32;
+
+export default abstract class Tensor<DTpe extends DType> {
+  public dtype: DTpe;
+
+  constructor(dtype: DTpe) {
+    this.dtype = dtype;
+  }
   /**
    * Gets the values of the tensor as a Float32 or Int32 Array
    *
@@ -27,7 +56,7 @@ export default abstract class Tensor {
    * });
    * ```
    */
-  abstract getValues(): Promise<TensorValues>;
+  abstract getValues(): Promise<TensorValues[DTpe]>;
 
   /**
    * Get the shape of the tensor
@@ -37,12 +66,14 @@ export default abstract class Tensor {
   /**
    * Constructs a tensor with the same shape and the given value everywhere
    */
-  abstract constantLike(value: number): Tensor;
+  abstract constantLike(value: number): Tensor<DTpe>;
 
   /**
    * Constructs a tensor with shape [1] and the given value everywhere
    */
-  abstract singleConstant(value: number): Tensor;
+  abstract singleConstant(value: number): Tensor<DTpe>;
+
+  abstract cast<DTpe2 extends DType>(dtype: DTpe2): Tensor<DTpe2>;
 
   /**
    * Deletes the tensor. Has the following effects depending on the backend
@@ -78,7 +109,7 @@ export default abstract class Tensor {
    * });
    * ```
    */
-  async compare(tensor: Tensor, epsilon?: number): Promise<boolean> {
+  async compare(tensor: Tensor<DTpe>, epsilon?: number): Promise<boolean> {
     if (!compareShapes(this.getShape(), tensor.getShape())) {
       return false;
     }
@@ -141,7 +172,7 @@ export default abstract class Tensor {
    * a.sum(0, true); //Will be [[5,7,9]]
    * ```
    */
-  sum(axes?: number | number[], keepDims?: boolean): Tensor {
+  sum(axes?: number | number[], keepDims?: boolean): Tensor<DTpe> {
     const ax = this.getAxes(axes);
     keepDims = keepDims || false;
     return this.sum_impl(ax, keepDims);
@@ -155,7 +186,7 @@ export default abstract class Tensor {
    * @param keepDims Wether the summation axes will be kept with size 1
    *
    */
-  sumSquare(axes?: number | number[], keepDims?: boolean): Tensor {
+  sumSquare(axes?: number | number[], keepDims?: boolean): Tensor<DTpe> {
     const ax = this.getAxes(axes);
     keepDims = keepDims || false;
     return this.sumSquare_impl(ax, keepDims);
@@ -177,7 +208,7 @@ export default abstract class Tensor {
    * a.product(0, true); //Will be [[4,10,18]]
    * ```
    */
-  product(axes?: number | number[], keepDims?: boolean): Tensor {
+  product(axes?: number | number[], keepDims?: boolean): Tensor<DTpe> {
     const ax = this.getAxes(axes);
     keepDims = keepDims || false;
     return this.product_impl(ax, keepDims);
@@ -199,7 +230,7 @@ export default abstract class Tensor {
    * a.max(0, true); //Will be [[4,5,6]]
    * ```
    */
-  max(axes?: number | number[], keepDims?: boolean): Tensor {
+  max(axes?: number | number[], keepDims?: boolean): Tensor<DTpe> {
     const ax = this.getAxes(axes);
     keepDims = keepDims || false;
     return this.max_impl(ax, keepDims);
@@ -221,7 +252,7 @@ export default abstract class Tensor {
    * a.min(0, true); //Will be [[1,2,3]]
    * ```
    */
-  min(axes?: number | number[], keepDims?: boolean): Tensor {
+  min(axes?: number | number[], keepDims?: boolean): Tensor<DTpe> {
     const ax = this.getAxes(axes);
     keepDims = keepDims || false;
     return this.min_impl(ax, keepDims);
@@ -236,7 +267,7 @@ export default abstract class Tensor {
    * @param keepDims Wether the mean axes will be kept with size 1
    *
    */
-  reduceMean(axes?: number | number[], keepDims?: boolean): Tensor {
+  reduceMean(axes?: number | number[], keepDims?: boolean): Tensor<DTpe> {
     const ax = this.getAxes(axes);
     keepDims = keepDims || false;
 
@@ -252,7 +283,7 @@ export default abstract class Tensor {
    * @param keepDims Wether the mean axes will be kept with size 1
    *
    */
-  reduceLogSum(axes?: number | number[], keepDims?: boolean): Tensor {
+  reduceLogSum(axes?: number | number[], keepDims?: boolean): Tensor<DTpe> {
     const ax = this.getAxes(axes);
     keepDims = keepDims || false;
 
@@ -268,7 +299,7 @@ export default abstract class Tensor {
    * @param keepDims Wether the mean axes will be kept with size 1
    *
    */
-  reduceLogSumExp(axes?: number | number[], keepDims?: boolean): Tensor {
+  reduceLogSumExp(axes?: number | number[], keepDims?: boolean): Tensor<DTpe> {
     const ax = this.getAxes(axes);
     keepDims = keepDims || false;
 
@@ -284,7 +315,7 @@ export default abstract class Tensor {
    * @param keepDims Wether the mean axes will be kept with size 1
    *
    */
-  reduceMeanSquare(axes?: number | number[], keepDims?: boolean): Tensor {
+  reduceMeanSquare(axes?: number | number[], keepDims?: boolean): Tensor<DTpe> {
     const ax = this.getAxes(axes);
     keepDims = keepDims || false;
 
@@ -307,14 +338,14 @@ export default abstract class Tensor {
    * @param activation Optional activation to apply. Defaults to the identity (so no activation)
    */
   conv(
-    kernel: Tensor,
-    bias?: Tensor,
+    kernel: Tensor<DTpe>,
+    bias?: Tensor<DTpe>,
     dilations?: number[],
     group?: number,
     pads?: number[],
     strides?: number[],
     activation?: Activation
-  ): Tensor {
+  ): Tensor<DTpe> {
     const sh = this.getShape();
     const dataRank = sh.length - 2;
 
@@ -350,12 +381,12 @@ export default abstract class Tensor {
    * @param strides Convolution stride for each spatial dimension. Defaults to 1 for all axes
    */
   convTranspose(
-    kernel: Tensor,
+    kernel: Tensor<DTpe>,
     dilations?: number[],
     group?: number,
     pads?: number[],
     strides?: number[]
-  ): Tensor {
+  ): Tensor<DTpe> {
     const sh = this.getShape();
     const dataRank = sh.length - 2;
 
@@ -400,7 +431,7 @@ export default abstract class Tensor {
    * @param mode Padding mode. One of 'constant', 'edge', 'reflect'. Defaults to 'constant'
    * @param value Value for constant padding. Defaults to 0.0
    */
-  pad(pads: number[], mode?: PadMode, value?: number): Tensor {
+  pad(pads: number[], mode?: PadMode, value?: number): Tensor<DTpe> {
     if (mode === undefined) {
       mode = 'constant';
     }
@@ -424,7 +455,7 @@ export default abstract class Tensor {
     pads?: number[],
     strides?: number[],
     includePad?: boolean
-  ): Tensor {
+  ): Tensor<DTpe> {
     const sh = this.getShape();
     const dataRank = sh.length - 2;
 
@@ -443,7 +474,7 @@ export default abstract class Tensor {
    * @param shape New shape of the tensor
    * @param copy Wether the tensor values should be copied. Only has an effect on GPU tensors
    */
-  reshape(shape: readonly number[], copy?: boolean): Tensor {
+  reshape(shape: readonly number[], copy?: boolean): Tensor<DTpe> {
     let shSize = 1;
     let negIndex = -1;
     for (let i = 0; i < shape.length; i++) {
@@ -473,115 +504,115 @@ export default abstract class Tensor {
   protected abstract reshape_impl(
     shape: readonly number[],
     copy: boolean
-  ): Tensor;
+  ): Tensor<DTpe>;
 
   /**
    * Takes the exponential of each value of the tensor
    */
-  abstract exp(): Tensor;
+  abstract exp(): Tensor<DTpe>;
 
   /**
    * Takes the natural logarithm of each value of the tensor
    */
-  abstract log(): Tensor;
+  abstract log(): Tensor<DTpe>;
 
   /**
    * Takes the square root of each value of the tensor
    */
-  abstract sqrt(): Tensor;
+  abstract sqrt(): Tensor<DTpe>;
 
   /**
    * Takes the absolute of each value of the tensor
    */
-  abstract abs(): Tensor;
+  abstract abs(): Tensor<DTpe>;
 
   /**
    * Takes the sinus of each value of the tensor
    */
-  abstract sin(): Tensor;
+  abstract sin(): Tensor<DTpe>;
 
   /**
    * Takes the cosine of each value of the tensor
    */
-  abstract cos(): Tensor;
+  abstract cos(): Tensor<DTpe>;
 
   /**
    * Takes the tangens of each value of the tensor
    */
-  abstract tan(): Tensor;
+  abstract tan(): Tensor<DTpe>;
 
   /**
    * Takes the arcus sinus of each value of the tensor
    */
-  abstract asin(): Tensor;
+  abstract asin(): Tensor<DTpe>;
 
   /**
    * Takes the arcus cosine of each value of the tensor
    */
-  abstract acos(): Tensor;
+  abstract acos(): Tensor<DTpe>;
 
   /**
    * Takes the arcus tangens of each value of the tensor
    */
-  abstract atan(): Tensor;
+  abstract atan(): Tensor<DTpe>;
 
   /**
    * Takes the hyperbolic sinus of each value of the tensor
    */
-  abstract sinh(): Tensor;
+  abstract sinh(): Tensor<DTpe>;
 
   /**
    * Takes the hyperbolic cosine of each value of the tensor
    */
-  abstract cosh(): Tensor;
+  abstract cosh(): Tensor<DTpe>;
 
   /**
    * Takes the hyperbolic tangens of each value of the tensor
    */
-  abstract tanh(): Tensor;
+  abstract tanh(): Tensor<DTpe>;
 
   /**
    * Takes the inverse hyperbolic sinus of each value of the tensor
    */
-  abstract asinh(): Tensor;
+  abstract asinh(): Tensor<DTpe>;
 
   /**
    * Takes the inverse hyperbolic cosine of each value of the tensor
    */
-  abstract acosh(): Tensor;
+  abstract acosh(): Tensor<DTpe>;
 
   /**
    * Takes the inverse hyperbolic tangens of each value of the tensor
    */
-  abstract atanh(): Tensor;
+  abstract atanh(): Tensor<DTpe>;
 
   /**
    * Negates all entries of the tensor
    */
-  abstract negate(): Tensor;
+  abstract negate(): Tensor<DTpe>;
 
   /**
    * Takes element wise power and multiplies with the given factor
    */
-  abstract powerScalar(power: number, factor: number): Tensor;
+  abstract powerScalar(power: number, factor: number): Tensor<DTpe>;
 
   /**
    * Computes the element wise sigmoid of all values
    */
-  abstract sigmoid(): Tensor;
+  abstract sigmoid(): Tensor<DTpe>;
 
   /**
    * Computes the element wise hard sigmoid of all values given
    * by `y = max(0, min(1, alpha * x + beta))`
    */
-  abstract hardSigmoid(alpha: number, beta: number): Tensor;
+  abstract hardSigmoid(alpha: number, beta: number): Tensor<DTpe>;
 
   /**
    * Computes the value-wise sign which is:
    *  - (-1) if x < 0
    *  - 1 otherwise
    */
-  abstract sign(): Tensor;
+  abstract sign(): Tensor<DTpe>;
 
   alignShapes(
     shape1: readonly number[],
@@ -615,14 +646,14 @@ export default abstract class Tensor {
    *
    * @param tensor Tensor of which the shapes should be aligned
    */
-  alignTensor(tensor: Tensor) {
+  alignTensor(tensor: Tensor<DTpe>) {
     let thisShape = this.getShape();
     let thatShape = tensor.getShape();
     if (compareShapes(thisShape, thatShape)) {
       return [this, tensor, thisShape];
     }
     // eslint-disable-next-line @typescript-eslint/no-this-alias
-    let th: Tensor = this;
+    let th: Tensor<DTpe> = this;
     if (thisShape.length < thatShape.length) {
       thisShape = [...thisShape];
       const prepend = thatShape.length - thisShape.length;
@@ -662,7 +693,7 @@ export default abstract class Tensor {
    * //  [5,6]]
    * ```
    */
-  add(tensor: Tensor, alpha?: number, beta?: number) {
+  add(tensor: Tensor<DTpe>, alpha?: number, beta?: number) {
     if (alpha === undefined) {
       alpha = 1;
     }
@@ -671,8 +702,8 @@ export default abstract class Tensor {
     }
     const [th, tens, resultShape] = this.alignTensor(tensor);
     return this.add_impl(
-      th as Tensor,
-      tens as Tensor,
+      th as Tensor<DTpe>,
+      tens as Tensor<DTpe>,
       resultShape as number[],
       alpha,
       beta
@@ -699,7 +730,7 @@ export default abstract class Tensor {
    * //  [5,6]]
    * ```
    */
-  subtract(tensor: Tensor, alpha?: number, beta?: number) {
+  subtract(tensor: Tensor<DTpe>, alpha?: number, beta?: number) {
     if (alpha === undefined) {
       alpha = 1;
     }
@@ -709,8 +740,8 @@ export default abstract class Tensor {
 
     const [th, tens, resultShape] = this.alignTensor(tensor);
     return this.subtract_impl(
-      th as Tensor,
-      tens as Tensor,
+      th as Tensor<DTpe>,
+      tens as Tensor<DTpe>,
       resultShape as number[],
       alpha,
       beta
@@ -737,14 +768,14 @@ export default abstract class Tensor {
    *     [6,8]]
    * ```
    */
-  multiply(tensor: Tensor, alpha?: number) {
+  multiply(tensor: Tensor<DTpe>, alpha?: number) {
     if (alpha === undefined) {
       alpha = 1;
     }
     const [th, tens, resultShape] = this.alignTensor(tensor);
     return this.multiply_impl(
-      th as Tensor,
-      tens as Tensor,
+      th as Tensor<DTpe>,
+      tens as Tensor<DTpe>,
       resultShape as number[],
       alpha
     );
@@ -758,7 +789,7 @@ export default abstract class Tensor {
     return this.addMultiplyScalar(1, value);
   }
 
-  abstract addMultiplyScalar(factor: number, add: number): Tensor;
+  abstract addMultiplyScalar(factor: number, add: number): Tensor<DTpe>;
 
   /**
    * Divides two tensors. Supports broadcasting
@@ -780,15 +811,15 @@ export default abstract class Tensor {
    * //  [3.5,4]]
    * ```
    */
-  divide(tensor: Tensor, alpha?: number) {
+  divide(tensor: Tensor<DTpe>, alpha?: number) {
     if (alpha === undefined) {
       alpha = 1;
     }
 
     const [th, tens, resultShape] = this.alignTensor(tensor);
     return this.divide_impl(
-      th as Tensor,
-      tens as Tensor,
+      th as Tensor<DTpe>,
+      tens as Tensor<DTpe>,
       resultShape as number[],
       alpha
     );
@@ -814,11 +845,11 @@ export default abstract class Tensor {
    * //  [49,64]]
    * ```
    */
-  power(tensor: Tensor) {
+  power(tensor: Tensor<DTpe>) {
     const [th, tens, resultShape] = this.alignTensor(tensor);
     return this.power_impl(
-      th as Tensor,
-      tens as Tensor,
+      th as Tensor<DTpe>,
+      tens as Tensor<DTpe>,
       resultShape as number[]
     );
   }
@@ -837,7 +868,7 @@ export default abstract class Tensor {
    * ```
    * @param permutation Permutation for the axes. Default is the reverse axis order
    */
-  transpose(permutation?: number[]): Tensor {
+  transpose(permutation?: number[]): Tensor<DTpe> {
     if (permutation === undefined) {
       const shape = this.getShape();
       const rank = shape.length;
@@ -884,13 +915,13 @@ export default abstract class Tensor {
    * @param beta Beta parameter, only used if c is specified. Defaults to 1.0
    */
   gemm(
-    b: Tensor,
+    b: Tensor<DTpe>,
     aTranspose?: boolean,
     bTranspose?: boolean,
     alpha?: number,
-    c?: Tensor,
+    c?: Tensor<DTpe>,
     beta?: number
-  ): Tensor {
+  ): Tensor<DTpe> {
     aTranspose = aTranspose || false;
     bTranspose = bTranspose || false;
     alpha = alpha !== undefined ? alpha : 1;
@@ -937,7 +968,7 @@ export default abstract class Tensor {
     ends: number[],
     axes?: number[],
     steps?: number[]
-  ): Tensor {
+  ): Tensor<DTpe> {
     const shape = this.getShape();
     const rank = shape.length;
     if (axes === undefined) {
@@ -980,7 +1011,7 @@ export default abstract class Tensor {
    *
    * @result Tensor with shape [M,O]
    */
-  abstract matMul(tensor: Tensor): Tensor;
+  abstract matMul(tensor: Tensor<DTpe>): Tensor<DTpe>;
 
   /**
    * Concatenate the two tensors along the given axis
@@ -1003,14 +1034,14 @@ export default abstract class Tensor {
    * //  [3,4,7,8],
    * ```
    */
-  abstract concat(tensor: Tensor, axis: number): Tensor;
+  abstract concat(tensor: Tensor<DTpe>, axis: number): Tensor<DTpe>;
 
   /**
    * Clips the tensor values between the minimum and maximum
    * @param min Minimum value. Defaults to the minimum possible value
    * @param max Maximum value. Defaults to the maximum possible value
    */
-  abstract clip(min?: number, max?: number): Tensor;
+  abstract clip(min?: number, max?: number): Tensor<DTpe>;
 
   /**
    * Backward pass for clip
@@ -1018,7 +1049,11 @@ export default abstract class Tensor {
    * @param min Minimum value. Defaults to the minimum possible value
    * @param max Maximum value. Defaults to the maximum possible value
    */
-  abstract clipBackward(grad: Tensor, min?: number, max?: number): Tensor;
+  abstract clipBackward(
+    grad: Tensor<DTpe>,
+    min?: number,
+    max?: number
+  ): Tensor<DTpe>;
 
   /**
    * Repeat the tensor along each dimension
@@ -1042,11 +1077,11 @@ export default abstract class Tensor {
    *
    * @param repeats Number of repetitions along each dimension
    */
-  abstract repeat(repeats: number[]): Tensor;
+  abstract repeat(repeats: number[]): Tensor<DTpe>;
 
-  abstract expand(shape: readonly number[]): Tensor;
+  abstract expand(shape: readonly number[]): Tensor<DTpe>;
 
-  squeeze(): Tensor {
+  squeeze(): Tensor<DTpe> {
     const sh = this.getShape();
     const newShape = [];
     for (const a of sh) {
@@ -1057,7 +1092,7 @@ export default abstract class Tensor {
     return this.reshape(newShape);
   }
 
-  flatten(axis?: number): Tensor {
+  flatten(axis?: number): Tensor<DTpe> {
     if (axis === undefined) {
       axis = 1;
     }
@@ -1076,7 +1111,7 @@ export default abstract class Tensor {
    * Copy the tensor.
    * If the tensor is a GPU tensor, you can specify a precision (16/32)
    */
-  abstract copy(): Tensor;
+  abstract copy(): Tensor<DTpe>;
 
   /**
    * Gather values along the given axis, according to the indices
@@ -1097,7 +1132,7 @@ export default abstract class Tensor {
    * //  [3,3]]
    * ```
    */
-  abstract gather(axis: number, indices: CPUTensor): Tensor;
+  abstract gather(axis: number, indices: CPUTensor<'int32'>): Tensor<DTpe>;
 
   /**
    * Sets the values in the current tensor to the given values.
@@ -1116,23 +1151,23 @@ export default abstract class Tensor {
    * //  [5,6]]
    * ```
    */
-  abstract setValues(values: Tensor, starts: number[]): Tensor;
+  abstract setValues(values: Tensor<DTpe>, starts: number[]): Tensor<DTpe>;
 
   /**
    * Rounds each tensor value to the nearest lower integer
    */
-  abstract floor(): Tensor;
+  abstract floor(): Tensor<DTpe>;
 
   /**
    * Rounds each tensor value to the nearest upper integer
    */
-  abstract ceil(): Tensor;
+  abstract ceil(): Tensor<DTpe>;
 
   /**
    * Rounds each tensor value to the nearest integer.
    * When the value is 0.5 it rounds up.
    */
-  abstract round(): Tensor;
+  abstract round(): Tensor<DTpe>;
 
   /**
    * Scales the tensor up/down according to the specified scales.
@@ -1150,7 +1185,7 @@ export default abstract class Tensor {
    * //  [3,3,4,4]]
    * ```
    */
-  abstract upsample(scales: number[]): Tensor;
+  abstract upsample(scales: number[]): Tensor<DTpe>;
 
   /**
    * Normalizes the tensor according to the following formula:
@@ -1160,125 +1195,130 @@ export default abstract class Tensor {
    * ```
    */
   abstract normalize(
-    mean: Tensor,
-    variance: Tensor,
+    mean: Tensor<DTpe>,
+    variance: Tensor<DTpe>,
     epsilon: number,
-    scale: Tensor,
-    bias: Tensor
-  ): Tensor;
+    scale: Tensor<DTpe>,
+    bias: Tensor<DTpe>
+  ): Tensor<DTpe>;
 
   abstract add_impl(
-    th: Tensor,
-    tensor: Tensor,
+    th: Tensor<DTpe>,
+    tensor: Tensor<DTpe>,
     resultShape: readonly number[],
     alpha: number,
     beta: number
-  ): Tensor;
+  ): Tensor<DTpe>;
 
   abstract subtract_impl(
-    th: Tensor,
-    tensor: Tensor,
+    th: Tensor<DTpe>,
+    tensor: Tensor<DTpe>,
     resultShape: readonly number[],
     alpha: number,
     beta: number
-  ): Tensor;
+  ): Tensor<DTpe>;
 
   abstract multiply_impl(
-    th: Tensor,
-    tensor: Tensor,
+    th: Tensor<DTpe>,
+    tensor: Tensor<DTpe>,
     resultShape: readonly number[],
     alpha: number
-  ): Tensor;
+  ): Tensor<DTpe>;
 
   abstract divide_impl(
-    th: Tensor,
-    tensor: Tensor,
+    th: Tensor<DTpe>,
+    tensor: Tensor<DTpe>,
     resultShape: readonly number[],
     alpha: number
-  ): Tensor;
+  ): Tensor<DTpe>;
 
   abstract power_impl(
-    th: Tensor,
-    tensor: Tensor,
+    th: Tensor<DTpe>,
+    tensor: Tensor<DTpe>,
     resultShape: readonly number[]
-  ): Tensor;
+  ): Tensor<DTpe>;
 
   abstract gemm_impl(
-    b: Tensor,
+    b: Tensor<DTpe>,
     aTranspose: boolean,
     bTranspose: boolean,
     alpha: number,
     beta: number,
-    C?: Tensor
-  ): Tensor;
+    C?: Tensor<DTpe>
+  ): Tensor<DTpe>;
 
-  protected abstract sum_impl(axes: number[], keepDims: boolean): Tensor;
-  protected abstract sumSquare_impl(axes: number[], keepDims: boolean): Tensor;
+  protected abstract sum_impl(axes: number[], keepDims: boolean): Tensor<DTpe>;
+  protected abstract sumSquare_impl(
+    axes: number[],
+    keepDims: boolean
+  ): Tensor<DTpe>;
 
-  protected abstract product_impl(axes: number[], keepDims: boolean): Tensor;
+  protected abstract product_impl(
+    axes: number[],
+    keepDims: boolean
+  ): Tensor<DTpe>;
 
-  protected abstract max_impl(axes: number[], keepDims: boolean): Tensor;
+  protected abstract max_impl(axes: number[], keepDims: boolean): Tensor<DTpe>;
 
-  protected abstract min_impl(axes: number[], keepDims: boolean): Tensor;
+  protected abstract min_impl(axes: number[], keepDims: boolean): Tensor<DTpe>;
 
-  protected abstract reduceMean_impl(axes: number[], keepDims: boolean): Tensor;
+  protected abstract reduceMean_impl(
+    axes: number[],
+    keepDims: boolean
+  ): Tensor<DTpe>;
 
   protected abstract reduceMeanSquare_impl(
     axes: number[],
     keepDims: boolean
-  ): Tensor;
+  ): Tensor<DTpe>;
 
   protected abstract reduceLogSum_impl(
     axes: number[],
     keepDims: boolean
-  ): Tensor;
+  ): Tensor<DTpe>;
 
   protected abstract reduceLogSumExp_impl(
     axes: number[],
     keepDims: boolean
-  ): Tensor;
+  ): Tensor<DTpe>;
 
   protected abstract conv_impl(
-    kernel: Tensor,
+    kernel: Tensor<DTpe>,
     dilations: number[],
     group: number,
     pads: number[],
     strides: number[],
     activation: Activation,
-    bias?: Tensor
-  ): Tensor;
+    bias?: Tensor<DTpe>
+  ): Tensor<DTpe>;
 
   protected abstract convTranspose_impl(
-    kernel: Tensor,
+    kernel: Tensor<DTpe>,
     dilations: number[],
     group: number,
     pads: number[],
     strides: number[]
-  ): Tensor;
+  ): Tensor<DTpe>;
 
   protected abstract pad_impl(
     pads: number[],
     mode: PadMode,
     value: number
-  ): Tensor;
+  ): Tensor<DTpe>;
 
   protected abstract averagePool_impl(
     kernelShape: number[],
     pads: number[],
     strides: number[],
     includePad: boolean
-  ): Tensor;
+  ): Tensor<DTpe>;
 
-  protected abstract transpose_impl(permutation: number[]): Tensor;
+  protected abstract transpose_impl(permutation: number[]): Tensor<DTpe>;
 
   protected abstract slice_impl(
     starts: number[],
     ends: number[],
     axes: number[],
     steps: number[]
-  ): Tensor;
+  ): Tensor<DTpe>;
 }
-
-export type Activation = 'id' | 'relu' | 'relu6';
-
-export type Precision = 16 | 32;
