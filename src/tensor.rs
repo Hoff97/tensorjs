@@ -10,7 +10,7 @@ use std::cmp::Ordering;
 use std::ops::Add;
 use std::ops::Sub;
 
-#[derive(Debug, Clone, std::marker::Copy)]
+#[derive(Debug, Clone)]
 pub struct Tensor<DType> {
     shape: Vec<usize>,
     strides: Vec<usize>,
@@ -18,10 +18,7 @@ pub struct Tensor<DType> {
     values: Vec<DType>,
 }
 
-impl<DType> Tensor<DType>
-where
-    DType: Clone,
-{
+impl<DType> Tensor<DType> {
     pub fn new(
         shape: Vec<usize>,
         strides: Vec<usize>,
@@ -59,12 +56,12 @@ where
     pub fn get_values(&self) -> &Vec<DType> {
         return &self.values;
     }
+}
 
-    pub fn get(&self, index: &Vec<usize>) -> DType {
-        let pos = index_to_pos(index, self.get_strides());
-        return self.values[pos];
-    }
-
+impl<DType> Tensor<DType>
+where
+    DType: Copy,
+{
     pub fn get_ix(&self, index: usize) -> DType {
         return self.values[index];
     }
@@ -89,11 +86,16 @@ where
 
         Tensor::new(shape.to_vec(), strides, size, values)
     }
+
+    pub fn get(&self, index: &Vec<usize>) -> DType {
+        let pos = index_to_pos(index, self.get_strides());
+        return self.values[pos];
+    }
 }
 
 impl<DType> Tensor<DType>
 where
-    DType: Clone,
+    DType: Copy,
     DType: Num,
     DType: Signed,
     DType: PartialOrd,
@@ -113,25 +115,33 @@ where
     }
 }
 
-impl<DType> Add for Tensor<DType> {
+impl<DType> Add for Tensor<DType>
+where
+    DType: Copy,
+    DType: Num,
+{
     type Output = Self;
 
     fn add(self, other: Self) -> Self {
-        return self.binary_op(&other, |x: f32, y: f32| x + y);
+        return self.binary_op(&other, |x: DType, y: DType| x + y);
     }
 }
 
-impl<DType> Sub for Tensor<DType> {
+impl<DType> Sub for Tensor<DType>
+where
+    DType: Copy,
+    DType: Num,
+{
     type Output = Self;
 
     fn sub(self, other: Self) -> Self {
-        return self.binary_op(&other, |x: f32, y: f32| x - y);
+        return self.binary_op(&other, |x: DType, y: DType| x - y);
     }
 }
 
 impl<DType> PartialEq for Tensor<DType>
 where
-    DType: Clone,
+    DType: Copy,
     DType: PartialEq,
 {
     fn eq(&self, other: &Self) -> bool {
@@ -151,7 +161,7 @@ where
 
 impl<DType> PartialOrd for Tensor<DType>
 where
-    DType: Clone,
+    DType: Copy,
     DType: PartialOrd,
     DType: Num,
     DType: FromPrimitive,

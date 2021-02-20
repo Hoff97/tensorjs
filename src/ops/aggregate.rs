@@ -8,9 +8,9 @@ use num_traits::Num;
 
 impl<DType> Tensor<DType>
 where
-    DType: Clone,
+    DType: Copy,
     DType: Num,
-    DType: Ord,
+    DType: PartialOrd,
     DType: FromPrimitive,
 {
     #[inline]
@@ -250,7 +250,7 @@ where
         return self._pool(
             axes,
             keep_dims,
-            |x: DType, y: DType| x.max(y),
+            |x: DType, y: DType| if x > y { x } else { y },
             false,
             |x: DType| x,
             false,
@@ -262,7 +262,7 @@ where
         return self._pool(
             axes,
             keep_dims,
-            |x: DType, y: DType| x.min(y),
+            |x: DType, y: DType| if x < y { x } else { y },
             false,
             |x: DType| x,
             false,
@@ -286,7 +286,7 @@ where
                 false,
                 |x: DType| x,
             ),
-            None => panic!("Cant convert from usize to given dtype"),
+            None => panic!("Tensor size too large to compute mean for given dtype"),
         }
     }
 
@@ -315,7 +315,7 @@ impl<DType> Tensor<DType>
 where
     DType: Clone,
     DType: Num,
-    DType: Ord,
+    DType: PartialOrd,
     DType: FromPrimitive,
     DType: Float,
 {
@@ -346,9 +346,9 @@ where
 
 impl<DType> Tensor<DType>
 where
-    DType: Clone,
+    DType: Copy,
     DType: Num,
-    DType: Ord,
+    DType: PartialOrd,
     DType: FromPrimitive,
 {
     pub fn sum(&self, axes: Uint32Array, keep_dims: bool) -> Tensor<DType> {
@@ -412,7 +412,7 @@ impl<DType> Tensor<DType>
 where
     DType: Clone,
     DType: Num,
-    DType: Ord,
+    DType: PartialOrd,
     DType: FromPrimitive,
     DType: Float,
 {

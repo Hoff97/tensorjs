@@ -1,19 +1,22 @@
 use crate::shape::*;
 use crate::tensor::*;
-use wasm_bindgen::prelude::*;
+use num_traits::zero;
+use num_traits::Num;
 
-use std::cmp;
-
-impl Tensor {
+impl<DType> Tensor<DType>
+where
+    DType: Copy,
+    DType: Num,
+{
     pub fn _gemm(
         &self,
-        b: &Tensor,
+        b: &Tensor<DType>,
         a_transpose: bool,
         b_transpose: bool,
-        alpha: f32,
-        c: Option<&Tensor>,
-        beta: f32,
-    ) -> Tensor {
+        alpha: DType,
+        c: Option<&Tensor<DType>>,
+        beta: DType,
+    ) -> Tensor<DType> {
         let rank = self.rank();
 
         let M = if a_transpose {
@@ -76,7 +79,7 @@ impl Tensor {
         let result_size = get_size(&result_shape);
         let result_strides = compute_strides(&result_shape);
 
-        let mut values = vec![0.0; result_size];
+        let mut values = vec![zero(); result_size];
 
         for i in 0..batch_size {
             let a_base = i * a_batch_mult;
@@ -86,11 +89,12 @@ impl Tensor {
 
             for m in 0..M {
                 for o in 0..O {
-                    let mut result = 0.0;
+                    let mut result = zero();
 
                     for n in 0..N {
-                        result += self.get_ix(a_base + m * a_m_mult + n * a_n_mult)
-                            * b.get_ix(b_base + n * b_n_mult + o * b_o_mult);
+                        result = result
+                            + self.get_ix(a_base + m * a_m_mult + n * a_n_mult)
+                                * b.get_ix(b_base + n * b_n_mult + o * b_o_mult);
                     }
 
                     result = alpha * result;
@@ -98,7 +102,7 @@ impl Tensor {
                         None => {}
                         Some(c_) => {
                             let ix = c_base + m * c_m_mult + o * c_o_mult;
-                            result += beta * c_.get_ix(ix);
+                            result = result + beta * c_.get_ix(ix);
                         }
                     }
                     values[y_base + m * O + o] = result;
@@ -110,19 +114,22 @@ impl Tensor {
     }
 }
 
-#[wasm_bindgen]
-impl Tensor {
-    pub fn matmul(&self, other: &Tensor) -> Tensor {
+impl<DType> Tensor<DType>
+where
+    DType: Copy,
+    DType: Num,
+{
+    pub fn matmul(&self, other: &Tensor<DType>) -> Tensor<DType> {
         let m = self.get_dim_size(0);
         let n = self.get_dim_size(1);
         let o = other.get_dim_size(1);
 
-        let mut values = vec![0.; m * o];
+        let mut values = vec![zero(); m * o];
         for i in 0..m {
             for k in 0..o {
-                let mut res = 0.;
+                let mut res = zero();
                 for j in 0..n {
-                    res += self.get_ix(i * n + j) * other.get_ix(j * o + k);
+                    res = res + self.get_ix(i * n + j) * other.get_ix(j * o + k);
                 }
                 values[i * o + k] = res;
             }
@@ -131,19 +138,25 @@ impl Tensor {
         Tensor::new(vec![m, o], vec![o, 1], m * o, values)
     }
 
-    pub fn gemm(&self, other: &Tensor, a_transpose: bool, b_transpose: bool, alpha: f32) -> Tensor {
-        return self._gemm(other, a_transpose, b_transpose, alpha, None, 1.0);
+    pub fn gemm(
+        &self,
+        other: &Tensor<DType>,
+        a_transpose: bool,
+        b_transpose: bool,
+        alpha: DType,
+    ) -> Tensor<DType> {
+        return self._gemm(other, a_transpose, b_transpose, alpha, None, zero());
     }
 
     pub fn gemm_with_c(
         &self,
-        other: &Tensor,
+        other: &Tensor<DType>,
         a_transpose: bool,
         b_transpose: bool,
-        alpha: f32,
-        c: &Tensor,
-        beta: f32,
-    ) -> Tensor {
+        alpha: DType,
+        c: &Tensor<DType>,
+        beta: DType,
+    ) -> Tensor<DType> {
         return self._gemm(other, a_transpose, b_transpose, alpha, Some(c), beta);
     }
 }

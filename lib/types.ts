@@ -4,6 +4,7 @@ import {compareShapes, getSize} from './util/shape';
 export type PadMode = 'constant' | 'reflect' | 'edge';
 
 export type TensorValues = {
+  float64: Float64Array;
   float32: Float32Array;
   float16: Float32Array;
   int32: Int32Array;
@@ -15,6 +16,7 @@ export type TensorValues = {
 };
 
 export const tensorValuesConstructor = {
+  float64: Float64Array,
   float32: Float32Array,
   float16: Float32Array,
   int32: Int32Array,
@@ -26,6 +28,7 @@ export const tensorValuesConstructor = {
 };
 
 export type DType =
+  | 'float64'
   | 'float32'
   | 'float16'
   | 'int32'
