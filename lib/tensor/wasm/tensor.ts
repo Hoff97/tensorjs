@@ -1,5 +1,5 @@
 import {Activation} from '../../library';
-import Tensor, {PadMode} from '../../types';
+import Tensor, {DType, PadMode, TensorValues} from '../../types';
 import {compareShapes} from '../../util/shape';
 
 import {Tensor as WT} from '../../wasm/rust_wasm_tensor';
@@ -13,7 +13,7 @@ export const wasmLoaded: Promise<void> = new Promise(resolve => {
   });
 });
 
-export class WASMTensor extends Tensor {
+export class WASMTensor<DTpe extends DType> extends Tensor<DTpe> {
   static range(start: number, limit: number, delta: number) {
     const size = Math.max(Math.ceil((limit - start) / delta), 0);
     const values = new Float32Array(size);
@@ -25,8 +25,12 @@ export class WASMTensor extends Tensor {
 
   public wasmTensor: WT;
 
-  constructor(values: Float32Array | WT, shape?: Uint32Array) {
-    super();
+  constructor(
+    values: TensorValues[DTpe] | WT,
+    shape?: Uint32Array,
+    dtype?: DTpe
+  ) {
+    super(dtype || ('float32' as any));
 
     if (values instanceof Float32Array) {
       if (shape === undefined) {
@@ -38,6 +42,10 @@ export class WASMTensor extends Tensor {
     } else {
       this.wasmTensor = values;
     }
+  }
+
+  cast<DTpe2 extends DType>(dtype: DTpe2): Tensor<DTpe2> {
+    throw new Error('Method not implemented.');
   }
 
   getValues() {

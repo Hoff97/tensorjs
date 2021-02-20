@@ -50,7 +50,7 @@ fn test_tensor_cmp_eq() {
 
 #[test]
 fn test_tensor_cmp_ordering_rank_0() {
-    let a = Tensor::new_from_shape(&vec![], &vec![]);
+    let a: Tensor<f32> = Tensor::new_from_shape(&vec![], &vec![]);
     let b = Tensor::new_from_shape(&vec![], &vec![]);
 
     assert_eq!(a.partial_cmp(&b), Some(Ordering::Equal));

@@ -2,6 +2,10 @@ pub mod shape;
 pub mod tensor;
 pub mod utils;
 
+pub mod dtype {
+    pub mod f32;
+}
+
 pub mod ops {
     pub mod aggregate;
     pub mod binary;
