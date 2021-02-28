@@ -1,8 +1,11 @@
 import {DrawCommand, Framebuffer2D} from 'regl';
 import {defaultAllocator, gl} from '../../tensor/gpu/gl';
-import {GPUTensorConstructor, GPUTensorI} from '../../tensor/gpu/interface';
+import {
+  DTypeGpu,
+  GPUTensorConstructor,
+  GPUTensorI,
+} from '../../tensor/gpu/interface';
 import {GPUMemoryAllocator} from '../../tensor/gpu/memory';
-import {Precision} from '../../types';
 import {computeStrides, getSize} from '../../util/shape';
 
 export const defaultMaxRank = 10;
@@ -45,8 +48,6 @@ export abstract class Operation<
 
   protected drawCommand?: DrawCommand;
 
-  protected precision?: Precision;
-
   private copyCounter = 0;
 
   protected fullyStatic = false;
@@ -54,6 +55,7 @@ export abstract class Operation<
 
   constructor(
     tensorConstructor: GPUTensorConstructor<GPUTensor>,
+    protected dtype: DTypeGpu,
     allocator?: GPUMemoryAllocator,
     maxRank?: number
   ) {
@@ -245,7 +247,6 @@ export abstract class Operation<
     }
 
     vec2 posToCoordinate(int pos, int textureWidth, int textureHeight) {
-      // 4 positions map to the same coordinate
       pos = pos/4;
 
       int y = pos/textureWidth;
@@ -265,6 +266,8 @@ export abstract class Operation<
       return pos;
     }
 
+    // TODO: Change return type based on dtype of operation
+    // TODO: Change values per texel here
     float getValueAtPos(int pos, int textureWidth, int textureHeight, sampler2D tex) {
       vec2 coord = posToCoordinate(pos, textureWidth, textureHeight);
       int res = pos - (pos/4)*4;
@@ -280,6 +283,7 @@ export abstract class Operation<
       }
     }
 
+    // TODO: Change return type based on dtype of operation
     float getValueAt(int index[${this.maxRank}], int strides[${this.maxRank}], int textureWidth, int textureHeight, sampler2D tex) {
       int pos = indexToPos(index, strides);
       return getValueAtPos(pos, textureWidth, textureHeight, tex);
@@ -292,15 +296,15 @@ export abstract class Operation<
     return textures
       .map(x => {
         return `
-      float _${x}(int indices[${this.maxRank}]) {
-        return getValueAt(indices, strides${x}, width${x}, height${x}, ${x});
-      }
+        float _${x}(int indices[${this.maxRank}]) {
+          return getValueAt(indices, strides${x}, width${x}, height${x}, ${x});
+        }
       `;
       })
       .join('\n');
   }
 
-  getCompleteFragmentShader(info: Info, precision: Precision): string {
+  getCompleteFragmentShader(info: Info): string {
     const fragShader = this.getFragmentShader(info);
 
     const variableDecls = this.getVariableDeclarations();
@@ -310,7 +314,8 @@ export abstract class Operation<
     const textureFunctions = this.getTextureFunctions();
 
     const result = `
-    precision ${this.precisionString(precision)} float;
+    // TODO: Change between int/float here
+    precision ${this.precisionString()} float;
 
     ${variableDecls}
 
@@ -460,6 +465,7 @@ export abstract class Operation<
 
       int pos = coordinateToPos(uv, widthOutput, heightOutput);
 
+      // TODO: change number of values per pixel here
       vec4 result = vec4(0,0,0,0);
 
       if (pos < sizeOutput) {
@@ -493,19 +499,21 @@ export abstract class Operation<
     }`;
   }
 
-  precisionString(precision: Precision) {
-    return precision === 32 ? 'highp' : 'mediump';
+  precisionString() {
+    // TODO: Change based on current dtype
+    return this.dtype === 'float16' ? 'mediump' : 'highp';
   }
 
-  getDrawCommand(info: Info, precision: Precision): DrawCommand {
-    const fragShader = this.getCompleteFragmentShader(info, precision);
+  getDrawCommand(info: Info): DrawCommand {
+    const fragShader = this.getCompleteFragmentShader(info);
 
     const uniforms = this.getUniforms(info);
 
     const result = gl({
       frag: fragShader,
       vert: `
-        precision ${this.precisionString(precision)} float;
+        // TODO: Change between float/int
+        precision ${this.precisionString()} float;
         attribute vec2 position;
         varying vec2 uv;
         void main() {
@@ -531,12 +539,10 @@ export abstract class Operation<
    *
    * If you need to add extra compilation info, overwrite this method
    */
-  compile(info: Info, precision: Precision) {
+  compile(info: Info) {
     this.registerStatics(info);
 
-    this.precision = precision;
-
-    this.drawCommand = this.getDrawCommand(info, precision);
+    this.drawCommand = this.getDrawCommand(info);
   }
 
   compute(
@@ -546,7 +552,7 @@ export abstract class Operation<
     inputs?: any
   ) {
     if (this.drawCommand === undefined) {
-      this.compile({} as Info, 32);
+      this.compile({} as Info);
     }
 
     const resultSize = getSize(resultShape);
@@ -646,7 +652,7 @@ export abstract class Operation<
   /**
    * Get all compilation info, that can be inferred from the given input
    */
-  abstract getCompilationInfo(input: InputType, precision: Precision): Info;
+  abstract getCompilationInfo(input: InputType): Info;
 
   /**
    * Returns a string that is unique for each compilation

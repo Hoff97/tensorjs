@@ -36,8 +36,8 @@ export function pad<DTpe extends DType>(
   return Y;
 }
 
-function getPadValue(
-  x: CPUTensor,
+function getPadValue<DTpe extends DType>(
+  x: CPUTensor<DTpe>,
   index: number[],
   mode: PadMode,
   value: number,

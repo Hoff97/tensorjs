@@ -1,7 +1,10 @@
 import {defaultAllocator} from '../../../tensor/gpu/gl';
-import {GPUTensorConstructor, GPUTensorI} from '../../../tensor/gpu/interface';
+import {
+  DTypeGpu,
+  GPUTensorConstructor,
+  GPUTensorI,
+} from '../../../tensor/gpu/interface';
 import {GPUMemoryAllocator} from '../../../tensor/gpu/memory';
-import {Precision} from '../../../types';
 import {getSize} from '../../../util/shape';
 import {Operation} from '../operation';
 
@@ -26,9 +29,10 @@ export class ExpandOperation<GPUTensor extends GPUTensorI> extends Operation<
 > {
   constructor(
     tensorConstructor: GPUTensorConstructor<GPUTensor>,
+    dtype: DTypeGpu,
     allocator?: GPUMemoryAllocator
   ) {
-    super(tensorConstructor, allocator);
+    super(tensorConstructor, dtype, allocator);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -54,19 +58,19 @@ export class ExpandOperation<GPUTensor extends GPUTensorI> extends Operation<
     return input.outputShape;
   }
 
-  compile(info: ExpandInfo, precision: Precision) {
+  compile(info: ExpandInfo) {
     if (info.shapeX !== undefined) {
       this.maxRank = info.shapeX.length;
     }
 
-    super.compile(info, precision);
+    super.compile(info);
   }
 
-  getCompilationInfo(input: ExpandInput, precision: Precision): ExpandInfo {
+  getCompilationInfo(input: ExpandInput): ExpandInfo {
     const outputShape = this.getOutputShape(input);
     const outputSize = defaultAllocator.getAllocationDimensions(
       getSize(outputShape),
-      precision
+      this.dtype
     );
 
     return {

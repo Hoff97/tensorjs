@@ -5,7 +5,7 @@ import {incrementIndex} from '../../util/shape';
 export function gather<DTpe extends DType>(
   x: CPUTensor<DTpe>,
   axis: number,
-  indices: CPUTensor<'int32'>
+  indices: CPUTensor<'uint32'>
 ) {
   const r = x.shape.length;
   const q = indices.shape.length;

@@ -1,7 +1,11 @@
 import {defaultAllocator} from '../../../tensor/gpu/gl';
-import {GPUTensorConstructor, GPUTensorI} from '../../../tensor/gpu/interface';
+import {
+  DTypeGpu,
+  GPUTensorConstructor,
+  GPUTensorI,
+} from '../../../tensor/gpu/interface';
 import {GPUMemoryAllocator} from '../../../tensor/gpu/memory';
-import {PadMode, Precision} from '../../../types';
+import {PadMode} from '../../../types';
 import {getSize} from '../../../util/shape';
 import {Input, Operation} from '../operation';
 
@@ -32,9 +36,10 @@ export class PadOperation<GPUTensor extends GPUTensorI> extends Operation<
 > {
   constructor(
     tensorConstructor: GPUTensorConstructor<GPUTensor>,
+    dtype: DTypeGpu,
     allocator?: GPUMemoryAllocator
   ) {
-    super(tensorConstructor, allocator);
+    super(tensorConstructor, dtype, allocator);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -150,7 +155,7 @@ export class PadOperation<GPUTensor extends GPUTensorI> extends Operation<
     return resultShape;
   }
 
-  compile(info: PadInfo, precision: Precision) {
+  compile(info: PadInfo) {
     if (info.shapeX !== undefined) {
       this.maxRank = info.shapeX.length;
     }
@@ -159,14 +164,14 @@ export class PadOperation<GPUTensor extends GPUTensorI> extends Operation<
       info.mode = this.getModeFlag(info.mode);
     }
 
-    super.compile(info, precision);
+    super.compile(info);
   }
 
-  getCompilationInfo(input: PadInput, precision: Precision): PadInfo {
+  getCompilationInfo(input: PadInput): PadInfo {
     const outputShape = this.getOutputShape(input);
     const outputSize = defaultAllocator.getAllocationDimensions(
       getSize(outputShape),
-      precision
+      this.dtype
     );
 
     return {

@@ -1,7 +1,7 @@
 import REGL, {Framebuffer2D, Regl} from 'regl';
-import {Precision} from '../../types';
 import {OrderedDict} from '../../util/datastructs/types';
 import {primeFactors} from '../../util/math';
+import {DTypeGpu} from './interface';
 
 export interface MemoryEntry {
   width: number;
@@ -9,7 +9,7 @@ export interface MemoryEntry {
   size: number;
 
   frameBuffer: Framebuffer2D;
-  precision: Precision;
+  dtype: DTypeGpu;
 
   id: number;
 }
@@ -19,8 +19,21 @@ export interface Size {
   height: number;
 }
 
+export const colorType = {
+  float32: 'float',
+  float16: 'half float',
+  int32: 'float',
+  int16: 'float',
+  int8: 'float',
+  uint32: 'float',
+  uint16: 'float',
+  uint8: 'float',
+};
+
+const valsPerTexel = 4;
+
 export class GPUMemoryAllocator {
-  private trees: {[precision: number]: OrderedDict<number, MemoryEntry>};
+  private trees: {[dtype: string]: OrderedDict<number, MemoryEntry>};
 
   private entryId: number;
 
@@ -32,13 +45,10 @@ export class GPUMemoryAllocator {
 
   constructor(
     regl: Regl,
-    orderedDictConstructor: () => OrderedDict<number, MemoryEntry>,
+    private orderedDictConstructor: () => OrderedDict<number, MemoryEntry>,
     maxSizeFactor?: number
   ) {
-    this.trees = {
-      16: orderedDictConstructor(),
-      32: orderedDictConstructor(),
-    };
+    this.trees = {};
 
     this.regl = regl;
     this.entryId = 0;
@@ -46,19 +56,43 @@ export class GPUMemoryAllocator {
     this.maxSizeFactor = maxSizeFactor || 2;
   }
 
-  allocate(size: number, precision: Precision): MemoryEntry {
+  getColorType(dtype: DTypeGpu) {
+    //@ts-ignore
+    return colorType[dtype as string] as string;
+  }
+
+  dtypeGroup(dtype: DTypeGpu) {
+    if (dtype === 'float16') {
+      return 'float16';
+    } else {
+      // We represent all other data types as float32 textures
+      // This is of course technically not correct, but WebGL only
+      // allows writing/reading float values from textures anyway
+      // and the overhead of converting between the correct dtype and float32
+      // in every shader is considered too big.
+      return 'float32';
+    }
+  }
+
+  allocate(size: number, dtype: DTypeGpu): MemoryEntry {
+    const group = this.dtypeGroup(dtype);
+
     let upperBound = size * this.maxSizeFactor;
-    const texSize = Math.ceil(size / 4) * 4;
+    const texSize = Math.ceil(size / valsPerTexel) * valsPerTexel;
     if (texSize < upperBound) {
       upperBound = texSize;
     }
 
-    const results = this.trees[precision].betweenBoundsFirst({
-      gte: texSize,
-      lte: upperBound,
-    });
+    const results =
+      this.trees[group] !== undefined
+        ? this.trees[group].betweenBoundsFirst({
+            gte: texSize,
+            lte: upperBound,
+          })
+        : [];
+
     if (results.length === 0) {
-      const textureSize = Math.ceil(size / 4);
+      const textureSize = Math.ceil(size / valsPerTexel);
       const {width, height} = this.getTextureDims(textureSize);
 
       const framebuffer = this.regl.framebuffer({
@@ -66,16 +100,16 @@ export class GPUMemoryAllocator {
         height: height,
         depthStencil: false,
         colorFormat: 'rgba',
-        colorType: precision === 32 ? 'float' : 'half float',
+        colorType: colorType[dtype] as any,
       });
 
       const memoryEntry: MemoryEntry = {
         width: width,
         height: height,
-        size: width * height * 4,
+        size: width * height * valsPerTexel,
         frameBuffer: framebuffer,
         id: this.entryId++,
-        precision: precision,
+        dtype: dtype,
       };
 
       this.totalAllocations++;
@@ -83,25 +117,33 @@ export class GPUMemoryAllocator {
       return memoryEntry;
     } else {
       const first = results[0];
-      this.trees[precision].deleteFirst(first.key);
+      this.trees[group].deleteFirst(first.key);
+
+      first.value.dtype = dtype;
 
       return first.value;
     }
   }
 
-  getAllocationDimensions(size: number, precision: Precision): Size {
+  getAllocationDimensions(size: number, dtype: DTypeGpu): Size {
+    const group = this.dtypeGroup(dtype);
+
     let upperBound = size * this.maxSizeFactor;
-    const texSize = Math.ceil(size / 4) * 4;
+    const texSize = Math.ceil(size / valsPerTexel) * valsPerTexel;
     if (texSize < upperBound) {
       upperBound = texSize;
     }
 
-    const results = this.trees[precision].betweenBoundsFirst({
-      gte: size,
-      lte: upperBound,
-    });
+    const results =
+      this.trees[group] !== undefined
+        ? this.trees[group].betweenBoundsFirst({
+            gte: size,
+            lte: upperBound,
+          })
+        : [];
+
     if (results.length === 0) {
-      const textureSize = Math.ceil(size / 4);
+      const textureSize = Math.ceil(size / valsPerTexel);
       return this.getTextureDims(textureSize);
     } else {
       const first = results[0];
@@ -114,15 +156,20 @@ export class GPUMemoryAllocator {
   }
 
   deallocate(entry: MemoryEntry) {
-    this.trees[entry.precision].insert(entry.size, entry);
+    const group = this.dtypeGroup(entry.dtype);
+
+    if (this.trees[group] === undefined) {
+      this.trees[group] = this.orderedDictConstructor();
+    }
+    this.trees[group].insert(entry.size, entry);
   }
 
-  allocateTexture(values: Float32Array, precision: Precision): MemoryEntry {
-    const textureSize = Math.ceil(values.length / 4);
+  allocateTexture(values: number[], dtype: DTypeGpu): MemoryEntry {
+    const textureSize = Math.ceil(values.length / valsPerTexel);
     const {width, height} = this.getTextureDims(textureSize);
-    const arraySize = width * height * 4;
+    const arraySize = width * height * valsPerTexel;
 
-    const vals = new Float32Array(arraySize);
+    const vals = new Array(arraySize);
     for (let i = 0; i < values.length; i++) {
       vals[i] = values[i];
     }
@@ -134,8 +181,9 @@ export class GPUMemoryAllocator {
       width: width,
       height: height,
       format: 'rgba',
-      type: precision === 32 ? 'float' : 'half float',
-      data: precision === 32 ? vals : Array.from(vals),
+      type: colorType[dtype] as any,
+      // TODO: Convert data!
+      data: vals,
     });
 
     const framebuffer = this.regl.framebuffer({
@@ -153,22 +201,22 @@ export class GPUMemoryAllocator {
       size: arraySize,
       frameBuffer: framebuffer,
       id: this.entryId++,
-      precision: precision,
+      dtype: dtype,
     };
   }
 
   allocateOfDimensions(
     width: number,
     height: number,
-    precision: Precision
+    dtype: DTypeGpu
   ): MemoryEntry {
-    const arraySize = width * height * 4;
+    const arraySize = width * height * valsPerTexel;
 
     const texture = this.regl.texture({
       width: width,
       height: height,
       format: 'rgba',
-      type: precision === 32 ? 'float' : 'half float',
+      type: colorType[dtype] as any,
     });
 
     const framebuffer = this.regl.framebuffer({
@@ -186,14 +234,11 @@ export class GPUMemoryAllocator {
       size: arraySize,
       frameBuffer: framebuffer,
       id: this.entryId++,
-      precision: precision,
+      dtype: dtype,
     };
   }
 
-  allocateFramebuffer(
-    texture: REGL.Texture2D,
-    precision: Precision
-  ): MemoryEntry {
+  allocateFramebuffer(texture: REGL.Texture2D, dtype: DTypeGpu): MemoryEntry {
     const framebuffer = this.regl.framebuffer({
       color: texture,
       width: texture.width,
@@ -206,10 +251,10 @@ export class GPUMemoryAllocator {
     return {
       width: texture.width,
       height: texture.height,
-      size: texture.width * texture.height * 4,
+      size: texture.width * texture.height * valsPerTexel,
       frameBuffer: framebuffer,
       id: this.entryId++,
-      precision: precision,
+      dtype: dtype,
     };
   }
 
@@ -228,6 +273,10 @@ export class GPUMemoryAllocator {
   }
 
   public getNumEntries() {
-    return this.trees[16].numEntries + this.trees[32].numEntries;
+    let num = 0;
+    for (const dtype in this.trees) {
+      num += this.trees[dtype].numEntries;
+    }
+    return num;
   }
 }

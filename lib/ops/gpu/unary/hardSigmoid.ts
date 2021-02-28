@@ -1,6 +1,9 @@
-import {GPUTensorConstructor, GPUTensorI} from '../../../tensor/gpu/interface';
+import {
+  DTypeGpu,
+  GPUTensorConstructor,
+  GPUTensorI,
+} from '../../../tensor/gpu/interface';
 import {GPUMemoryAllocator} from '../../../tensor/gpu/memory';
-import {Precision} from '../../../types';
 import {Input} from '../operation';
 import {UnaryOperation, UnaryOpInfo, UnaryOpInput} from './unaryOperation';
 
@@ -19,9 +22,10 @@ export class HardSigmoidOperation<
 > extends UnaryOperation<GPUTensor, HardSigmoidInfo, HardSigmoidInput> {
   constructor(
     tensorConstructor: GPUTensorConstructor<GPUTensor>,
+    dtype: DTypeGpu,
     allocator?: GPUMemoryAllocator
   ) {
-    super(tensorConstructor, allocator);
+    super(tensorConstructor, dtype, allocator);
   }
 
   operation(input: string): string {
@@ -36,11 +40,8 @@ export class HardSigmoidOperation<
     );
   }
 
-  getCompilationInfo(
-    input: HardSigmoidInput,
-    precision: Precision
-  ): HardSigmoidInfo {
-    const info = super.getCompilationInfo(input, precision);
+  getCompilationInfo(input: HardSigmoidInput): HardSigmoidInfo {
+    const info = super.getCompilationInfo(input);
 
     return {
       ...info,

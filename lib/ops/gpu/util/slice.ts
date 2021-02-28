@@ -1,7 +1,10 @@
 import {defaultAllocator} from '../../../tensor/gpu/gl';
-import {GPUTensorConstructor, GPUTensorI} from '../../../tensor/gpu/interface';
+import {
+  DTypeGpu,
+  GPUTensorConstructor,
+  GPUTensorI,
+} from '../../../tensor/gpu/interface';
 import {GPUMemoryAllocator} from '../../../tensor/gpu/memory';
-import {Precision} from '../../../types';
 import {getSize} from '../../../util/shape';
 import {Input, Operation} from '../operation';
 
@@ -37,9 +40,10 @@ export class SliceOperation<GPUTensor extends GPUTensorI> extends Operation<
 > {
   constructor(
     tensorConstructor: GPUTensorConstructor<GPUTensor>,
+    dtype: DTypeGpu,
     allocator?: GPUMemoryAllocator
   ) {
-    super(tensorConstructor, allocator);
+    super(tensorConstructor, dtype, allocator);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -130,7 +134,7 @@ export class SliceOperation<GPUTensor extends GPUTensorI> extends Operation<
     return resultShape;
   }
 
-  compile(info: SliceInfo, precision: Precision) {
+  compile(info: SliceInfo) {
     if (info.shapeX !== undefined) {
       this.maxRank = info.shapeX.length;
 
@@ -162,14 +166,14 @@ export class SliceOperation<GPUTensor extends GPUTensorI> extends Operation<
       }
     }
 
-    super.compile(info, precision);
+    super.compile(info);
   }
 
-  getCompilationInfo(input: SliceInput, precision: Precision): SliceInfo {
+  getCompilationInfo(input: SliceInput): SliceInfo {
     const outputShape = this.getOutputShape(input);
     const outputSize = defaultAllocator.getAllocationDimensions(
       getSize(outputShape),
-      precision
+      this.dtype
     );
 
     const rank = input.X.shape.length;

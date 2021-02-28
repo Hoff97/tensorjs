@@ -1,8 +1,11 @@
 import {CPUTensor} from '../../../tensor/cpu/tensor';
 import {defaultAllocator} from '../../../tensor/gpu/gl';
-import {GPUTensorConstructor, GPUTensorI} from '../../../tensor/gpu/interface';
+import {
+  DTypeGpu,
+  GPUTensorConstructor,
+  GPUTensorI,
+} from '../../../tensor/gpu/interface';
 import {GPUMemoryAllocator} from '../../../tensor/gpu/memory';
-import {Precision} from '../../../types';
 import {computeStrides, getSize} from '../../../util/shape';
 import {Input, Operation} from '../operation';
 
@@ -15,7 +18,7 @@ export interface GatherInfo {
   widthOutput?: number;
   heightOutput?: number;
 
-  indices?: CPUTensor;
+  indices?: CPUTensor<'uint32'>;
 
   axis?: number;
   indexValues?: number[];
@@ -25,7 +28,7 @@ export interface GatherInfo {
 
 export interface GatherInput {
   X: GPUTensorI;
-  indices: CPUTensor;
+  indices: CPUTensor<'uint32'>;
   axis: number;
 }
 
@@ -38,9 +41,10 @@ export class GatherOperation<GPUTensor extends GPUTensorI> extends Operation<
 
   constructor(
     tensorConstructor: GPUTensorConstructor<GPUTensor>,
+    dtype: DTypeGpu,
     allocator?: GPUMemoryAllocator
   ) {
-    super(tensorConstructor, allocator);
+    super(tensorConstructor, dtype, allocator);
   }
 
   getVariables() {
@@ -181,7 +185,7 @@ export class GatherOperation<GPUTensor extends GPUTensorI> extends Operation<
     return resultShape;
   }
 
-  compile(info: GatherInfo, precision: Precision) {
+  compile(info: GatherInfo) {
     if (info.shapeX !== undefined) {
       this.maxRank = info.shapeX.length;
 
@@ -225,14 +229,14 @@ export class GatherOperation<GPUTensor extends GPUTensorI> extends Operation<
       }
     }
 
-    super.compile(info, precision);
+    super.compile(info);
   }
 
-  getCompilationInfo(input: GatherInput, precision: Precision): GatherInfo {
+  getCompilationInfo(input: GatherInput): GatherInfo {
     const outputShape = this.getOutputShape(input);
     const outputSize = defaultAllocator.getAllocationDimensions(
       getSize(outputShape),
-      precision
+      this.dtype
     );
 
     const r = input.X.shape.length;

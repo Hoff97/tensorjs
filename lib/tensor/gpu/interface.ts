@@ -1,5 +1,14 @@
-import {Precision} from '../../types';
 import {MemoryEntry} from './memory';
+
+export type DTypeGpu =
+  | 'float32'
+  | 'float16'
+  | 'int32'
+  | 'int16'
+  | 'int8'
+  | 'uint32'
+  | 'uint16'
+  | 'uint8';
 
 export interface GPUTensorI {
   memory: MemoryEntry;
@@ -10,5 +19,5 @@ export interface GPUTensorI {
 export type GPUTensorConstructor<GPUTensor extends GPUTensorI> = (
   memory: MemoryEntry,
   shape: readonly number[],
-  precision: Precision
+  dtype: DTypeGpu
 ) => GPUTensor;

@@ -1,9 +1,12 @@
 import {getSize} from '../../../util/shape';
 
-import {GPUTensorConstructor, GPUTensorI} from '../../../tensor/gpu/interface';
+import {
+  DTypeGpu,
+  GPUTensorConstructor,
+  GPUTensorI,
+} from '../../../tensor/gpu/interface';
 import {GPUMemoryAllocator} from '../../../tensor/gpu/memory';
 import {Input, Operation} from '../operation';
-import {Precision} from '../../../types';
 import {defaultAllocator} from '../../../tensor/gpu/gl';
 
 export interface GemmInfo {
@@ -47,9 +50,10 @@ export class GemmOperation<
 
   constructor(
     tensorConstructor: GPUTensorConstructor<GPUTensor>,
+    dtype: DTypeGpu,
     allocator?: GPUMemoryAllocator
   ) {
-    super(tensorConstructor, allocator);
+    super(tensorConstructor, dtype, allocator);
   }
 
   getMainBody() {
@@ -212,7 +216,7 @@ export class GemmOperation<
     return resultShape;
   }
 
-  compile(info: GemmInf, precision: Precision) {
+  compile(info: GemmInf) {
     if (info.shapeA !== undefined) {
       const rank = info.shapeA.length;
       info.rank = rank;
@@ -241,14 +245,14 @@ export class GemmOperation<
       info.bTranspose = info.bTranspose ? 1 : 0;
     }
 
-    super.compile(info, precision);
+    super.compile(info);
   }
 
-  getCompilationInfo(input: GemmIn, precision: Precision): GemmInf {
+  getCompilationInfo(input: GemmIn): GemmInf {
     const outputShape = this.getOutputShape(input);
     const outputSize = defaultAllocator.getAllocationDimensions(
       getSize(outputShape),
-      precision
+      this.dtype
     );
 
     const rank = input.a.shape.length;
@@ -373,8 +377,8 @@ export class GemmCOperation<GPUTensor extends GPUTensorI> extends GemmOperation<
     );
   }
 
-  getCompilationInfo(input: GemmCInput, precision: Precision): GemmCInfo {
-    const inf = super.getCompilationInfo(input, precision);
+  getCompilationInfo(input: GemmCInput): GemmCInfo {
+    const inf = super.getCompilationInfo(input);
 
     const info: GemmCInfo = {
       ...inf,

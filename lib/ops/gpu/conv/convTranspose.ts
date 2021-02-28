@@ -1,7 +1,10 @@
 import {defaultAllocator} from '../../../tensor/gpu/gl';
-import {GPUTensorConstructor, GPUTensorI} from '../../../tensor/gpu/interface';
+import {
+  DTypeGpu,
+  GPUTensorConstructor,
+  GPUTensorI,
+} from '../../../tensor/gpu/interface';
 import {GPUMemoryAllocator} from '../../../tensor/gpu/memory';
-import {Precision} from '../../../types';
 import {getSize} from '../../../util/shape';
 import {outputDimsSize} from '../../util/convTranspose';
 import {Input, Operation} from '../operation';
@@ -42,9 +45,10 @@ export class ConvTransposeOperation<
 
   constructor(
     tensorConstructor: GPUTensorConstructor<GPUTensor>,
+    dtype: DTypeGpu,
     allocator?: GPUMemoryAllocator
   ) {
-    super(tensorConstructor, allocator);
+    super(tensorConstructor, dtype, allocator);
   }
 
   updateInputIx() {
@@ -227,7 +231,7 @@ export class ConvTransposeOperation<
     return outputShape;
   }
 
-  compile(info: ConvTransposeInfo, precision: Precision) {
+  compile(info: ConvTransposeInfo) {
     if (info.shapeW !== undefined) {
       info.CG = info.shapeW[1];
       info.kernelSize = getSize(info.shapeW.slice(2));
@@ -241,17 +245,14 @@ export class ConvTransposeOperation<
       this.maxRank = info.shapeX.length;
     }
 
-    super.compile(info, precision);
+    super.compile(info);
   }
 
-  getCompilationInfo(
-    input: ConvTransposeInput,
-    precision: Precision
-  ): ConvTransposeInfo {
+  getCompilationInfo(input: ConvTransposeInput): ConvTransposeInfo {
     const outputShape = this.getOutputShape(input);
     const outputSize = defaultAllocator.getAllocationDimensions(
       getSize(outputShape),
-      precision
+      this.dtype
     );
 
     const kernelSize = getSize(input.W.shape.slice(2));

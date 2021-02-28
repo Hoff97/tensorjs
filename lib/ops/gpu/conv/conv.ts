@@ -1,10 +1,14 @@
 import {getSize} from '../../../util/shape';
 import {outputDimsSize} from '../../util/conv';
 
-import {GPUTensorConstructor, GPUTensorI} from '../../../tensor/gpu/interface';
+import {
+  DTypeGpu,
+  GPUTensorConstructor,
+  GPUTensorI,
+} from '../../../tensor/gpu/interface';
 import {GPUMemoryAllocator} from '../../../tensor/gpu/memory';
 import {Input, Operation} from '../operation';
-import {Activation, Precision} from '../../../types';
+import {Activation} from '../../../types';
 import {defaultAllocator} from '../../../tensor/gpu/gl';
 
 export interface ConvInfo {
@@ -47,9 +51,10 @@ export class ConvOperation<
 
   constructor(
     tensorConstructor: GPUTensorConstructor<GPUTensor>,
+    dtype: DTypeGpu,
     allocator?: GPUMemoryAllocator
   ) {
-    super(tensorConstructor, allocator);
+    super(tensorConstructor, dtype, allocator);
   }
 
   updateInputIx() {
@@ -239,7 +244,7 @@ export class ConvOperation<
     return outputShape;
   }
 
-  compile(info: ConvInf, precision: Precision) {
+  compile(info: ConvInf) {
     if (info.shapeW !== undefined) {
       info.CG = info.shapeW[1];
       info.kernelSize = getSize(info.shapeW.slice(2));
@@ -256,14 +261,14 @@ export class ConvOperation<
       info.activation = this.getActivationFlag(info.activation);
     }
 
-    super.compile(info, precision);
+    super.compile(info);
   }
 
-  getCompilationInfo(input: ConvIn, precision: Precision): ConvInf {
+  getCompilationInfo(input: ConvIn): ConvInf {
     const outputShape = this.getOutputShape(input);
     const outputSize = defaultAllocator.getAllocationDimensions(
       getSize(outputShape),
-      precision
+      this.dtype
     );
 
     const kernelSize = getSize(input.W.shape.slice(2));
@@ -318,9 +323,10 @@ export class ConvBiasOperation<
 
   constructor(
     tensorConstructor: GPUTensorConstructor<GPUTensor>,
+    dtype: DTypeGpu,
     allocator?: GPUMemoryAllocator
   ) {
-    super(tensorConstructor, allocator);
+    super(tensorConstructor, dtype, allocator);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -388,8 +394,8 @@ export class ConvBiasOperation<
     );
   }
 
-  getCompilationInfo(input: ConvBiasInput, precision: Precision): ConvBiasInfo {
-    const info = super.getCompilationInfo(input, precision);
+  getCompilationInfo(input: ConvBiasInput): ConvBiasInfo {
+    const info = super.getCompilationInfo(input);
 
     return {
       ...info,

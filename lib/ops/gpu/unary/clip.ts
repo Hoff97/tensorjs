@@ -1,7 +1,10 @@
 import {defaultAllocator} from '../../../tensor/gpu/gl';
-import {GPUTensorConstructor, GPUTensorI} from '../../../tensor/gpu/interface';
+import {
+  DTypeGpu,
+  GPUTensorConstructor,
+  GPUTensorI,
+} from '../../../tensor/gpu/interface';
 import {GPUMemoryAllocator} from '../../../tensor/gpu/memory';
-import {Precision} from '../../../types';
 import {Input, Operation} from '../operation';
 
 export interface ClipInfo {
@@ -31,9 +34,10 @@ export class ClipOperation<GPUTensor extends GPUTensorI> extends Operation<
 > {
   constructor(
     tensorConstructor: GPUTensorConstructor<GPUTensor>,
+    dtype: DTypeGpu,
     allocator?: GPUMemoryAllocator
   ) {
-    super(tensorConstructor, allocator);
+    super(tensorConstructor, dtype, allocator);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -101,18 +105,18 @@ export class ClipOperation<GPUTensor extends GPUTensorI> extends Operation<
     return input.input.shape;
   }
 
-  compile(info: ClipInfo, precision: Precision) {
+  compile(info: ClipInfo) {
     if (info.shapeX !== undefined) {
       this.maxRank = info.shapeX.length;
     }
 
-    super.compile(info, precision);
+    super.compile(info);
   }
 
-  getCompilationInfo(input: ClipInput, precision: Precision): ClipInfo {
+  getCompilationInfo(input: ClipInput): ClipInfo {
     const outputSize = defaultAllocator.getAllocationDimensions(
       input.input.size,
-      precision
+      this.dtype
     );
 
     return {

@@ -1,7 +1,10 @@
 import {defaultAllocator} from '../../../tensor/gpu/gl';
-import {GPUTensorConstructor, GPUTensorI} from '../../../tensor/gpu/interface';
+import {
+  DTypeGpu,
+  GPUTensorConstructor,
+  GPUTensorI,
+} from '../../../tensor/gpu/interface';
 import {GPUMemoryAllocator} from '../../../tensor/gpu/memory';
-import {Precision} from '../../../types';
 import {getSize} from '../../../util/shape';
 import {Operation} from '../operation';
 
@@ -31,9 +34,10 @@ export class MatMulOperation<GPUTensor extends GPUTensorI> extends Operation<
 
   constructor(
     tensorConstructor: GPUTensorConstructor<GPUTensor>,
+    dtype: DTypeGpu,
     allocator?: GPUMemoryAllocator
   ) {
-    super(tensorConstructor, allocator);
+    super(tensorConstructor, dtype, allocator);
 
     this.maxRank = 2;
   }
@@ -87,21 +91,21 @@ export class MatMulOperation<GPUTensor extends GPUTensorI> extends Operation<
     return [input.A.shape[0], input.B.shape[1]];
   }
 
-  compile(info: MatMulInfo, precision: Precision) {
+  compile(info: MatMulInfo) {
     if (info.shapeA !== undefined) {
       this.maxIterations = info.shapeA[1];
     } else if (info.shapeB !== undefined) {
       this.maxIterations = info.shapeB[0];
     }
 
-    super.compile(info, precision);
+    super.compile(info);
   }
 
-  getCompilationInfo(input: MatMulInput, precision: Precision): MatMulInfo {
+  getCompilationInfo(input: MatMulInput): MatMulInfo {
     const outputShape = this.getOutputShape(input);
     const outputSize = defaultAllocator.getAllocationDimensions(
       getSize(outputShape),
-      precision
+      this.dtype
     );
 
     return {
