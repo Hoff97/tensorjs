@@ -763,11 +763,11 @@ export class WASMTensor<DTpe extends DTypeWasm> extends Tensor<DTpe> {
     );
   }
 
-  gather(axis: number, indices: CPUTensor<'int32'>): Tensor<DTpe> {
+  gather(axis: number, indices: CPUTensor<'uint32'>): Tensor<DTpe> {
     return new WASMTensor(
       this.wasmTensor.gather(
         axis,
-        indices.values as Int32Array,
+        indices.values as Uint32Array,
         new Uint32Array(indices.shape)
       ) as WT[DTpe]
     );

@@ -355,7 +355,7 @@ impl TensorU8 {
     }
 
     // Mode: 0 == constant, 1 == reflect, 2 == edge
-    pub fn gather(&self, axis: i32, indices: Int32Array, indice_shape: Uint32Array) -> TensorU8 {
+    pub fn gather(&self, axis: i32, indices: Uint32Array, indice_shape: Uint32Array) -> TensorU8 {
         TensorU8 {
             tensor: self.tensor.gather(axis, indices, indice_shape),
         }

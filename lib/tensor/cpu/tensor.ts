@@ -531,7 +531,7 @@ export class CPUTensor<DTpe extends DType> extends Tensor<DTpe> {
     return expand(this.reshape(_shape, false) as CPUTensor<DTpe>, resultShape);
   }
 
-  gather(axis: number, indices: CPUTensor<'int32'>): Tensor<DTpe> {
+  gather(axis: number, indices: CPUTensor<'uint32'>): Tensor<DTpe> {
     return gather(this, axis, indices);
   }
 

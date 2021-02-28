@@ -302,7 +302,7 @@ where
     pub fn gather(
         &self,
         axis: i32,
-        indices: Int32Array,
+        indices: Uint32Array,
         indice_shape: Uint32Array,
     ) -> Tensor<DType> {
         let indice_strides = compute_strides_uint32(&indice_shape);
