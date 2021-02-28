@@ -1,13 +1,13 @@
 import {Variable} from '../../autograd';
 import {Mode} from '../../model/module';
-import Tensor, {Precision} from '../../types';
+import Tensor from '../../types';
 import {toCPU, toGPU, toWASM} from '../../util/convert';
 import {OnnxNode} from '../node';
 import {Attributes, Constants} from '../types';
 import {createTensor} from '../util';
 
 export class ConstantNode extends OnnxNode {
-  public tensor?: Tensor;
+  public tensor?: Tensor<any>;
 
   constructor(
     attributes: Attributes,
@@ -23,7 +23,7 @@ export class ConstantNode extends OnnxNode {
     if (tensor !== undefined && tensor !== null) {
       this.tensor = createTensor(tensor);
 
-      if (mode === 'train') {
+      if (mode === 'train' && this.tensor !== undefined) {
         this.tensor = new Variable(this.tensor);
       }
     } else {
@@ -34,7 +34,7 @@ export class ConstantNode extends OnnxNode {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async forward(inputs: Tensor[]): Promise<Tensor[]> {
+  async forward(inputs: Tensor<any>[]): Promise<Tensor<any>[]> {
     if (this.tensor !== undefined) {
       return [this.tensor];
     }
@@ -53,9 +53,9 @@ export class ConstantNode extends OnnxNode {
     }
   }
 
-  async toGPU(precision: Precision) {
+  async toGPU() {
     if (this.tensor !== undefined) {
-      this.tensor = await toGPU(this.tensor, precision);
+      this.tensor = await toGPU(this.tensor);
     }
   }
 

@@ -1,7 +1,7 @@
 import {Variable} from '../../autograd/variable';
 import {Mode} from '../../model/module';
 import {CPUTensor} from '../../tensor/cpu/tensor';
-import Tensor, {Precision} from '../../types';
+import Tensor, {DType} from '../../types';
 import {toCPU, toGPU, toWASM} from '../../util/convert';
 import {OnnxNode} from '../node';
 import {Attributes, Constants} from '../types';
@@ -10,7 +10,7 @@ export class BatchNormalizationNode extends OnnxNode {
   private epsilon: number;
   private momentum: number;
 
-  public epsTensor: Tensor;
+  public epsTensor: Tensor<any>;
 
   constructor(
     attributes: Attributes,
@@ -33,7 +33,9 @@ export class BatchNormalizationNode extends OnnxNode {
     //TODO: Handle lower onnxversions here
   }
 
-  async defaultForward(inputs: Tensor[]): Promise<Tensor[]> {
+  async forward<DTpe extends DType>(
+    inputs: Tensor<DTpe>[]
+  ): Promise<Tensor<DTpe>[]> {
     const x = inputs[0];
 
     let scale = inputs[1];
@@ -57,10 +59,6 @@ export class BatchNormalizationNode extends OnnxNode {
     return [result];
   }
 
-  async forward(inputs: Tensor[]): Promise<Tensor[]> {
-    return this.defaultForward(inputs);
-  }
-
   getType() {
     return 'BatchNormalization';
   }
@@ -73,8 +71,8 @@ export class BatchNormalizationNode extends OnnxNode {
     this.epsTensor = await toWASM(this.epsTensor);
   }
 
-  async toGPU(precision: Precision) {
-    this.epsTensor = await toGPU(this.epsTensor, precision);
+  async toGPU() {
+    this.epsTensor = await toGPU(this.epsTensor);
   }
 
   delete(): void {

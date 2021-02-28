@@ -1,5 +1,5 @@
 import {Mode} from '../../model/module';
-import Tensor from '../../types';
+import Tensor, {DType} from '../../types';
 import {OnnxNode} from '../node';
 import {Attributes, Constants} from '../types';
 
@@ -21,7 +21,9 @@ export class SeluNode extends OnnxNode {
     this.gamma = this.getAttributeFloat('gamma') || 1.05070102214813232421875;
   }
 
-  async forward(inputs: Tensor[]): Promise<Tensor[]> {
+  async forward<DTpe extends DType>(
+    inputs: Tensor<DTpe>[]
+  ): Promise<Tensor<DTpe>[]> {
     const tensor = inputs[0];
 
     const below = tensor.clip(undefined, 0);
@@ -45,6 +47,6 @@ export class SeluNode extends OnnxNode {
   delete(): void {}
 
   getType() {
-    return 'Elu';
+    return 'Selu';
   }
 }

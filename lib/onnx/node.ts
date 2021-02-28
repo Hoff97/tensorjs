@@ -1,9 +1,10 @@
 // eslint-disable-next-line node/no-extraneous-import
 import Long from 'long';
 import {onnx} from 'onnx-proto';
-import {Precision, Tensor} from '../library';
+import {Tensor} from '../library';
 import {Mode, Module} from '../model/module';
 import {CPUTensor} from '../tensor/cpu/tensor';
+import {DType} from '../types';
 import {toCPU} from '../util/convert';
 import {Attributes, Constants} from './types';
 
@@ -45,7 +46,7 @@ export abstract class OnnxNode extends Module {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  initialize(resolveConstant: (name: string) => Tensor | undefined) {}
+  initialize(resolveConstant: (name: string) => Tensor<any> | undefined) {}
 
   getAttribute(name: string) {
     return this.attributes[name];
@@ -119,13 +120,13 @@ export abstract class OnnxNode extends Module {
     return undefined;
   }
 
-  async toValues(tensor: Tensor): Promise<number[]> {
+  async toValues<DTpe extends DType>(tensor: Tensor<DTpe>): Promise<number[]> {
     if (!(tensor instanceof CPUTensor)) {
       console.warn('Tensor for values not on CPU, need to transfer!');
       tensor = await toCPU(tensor);
     }
 
-    const sc = tensor as CPUTensor;
+    const sc = tensor as CPUTensor<DTpe>;
 
     const values = new Array(sc.size);
     for (let i = 0; i < sc.size; i++) {
@@ -136,10 +137,9 @@ export abstract class OnnxNode extends Module {
 
   async toCPU() {}
   async toWASM() {}
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async toGPU(precision: Precision) {}
+  async toGPU() {}
 
-  abstract forward(inputs: Tensor[]): Promise<Tensor[]>;
+  abstract forward(inputs: Tensor<any>[]): Promise<Tensor<any>[]>;
 
   abstract getType(): string;
 

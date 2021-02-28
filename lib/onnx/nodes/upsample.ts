@@ -40,7 +40,7 @@ export class UpsampleNode extends OnnxNode {
     }
   }
 
-  async getScales(scale: Tensor): Promise<number[]> {
+  async getScales(scale: Tensor<any>): Promise<number[]> {
     if (this.onnxVersion < 9) {
       return this.scales as number[];
     }
@@ -50,7 +50,7 @@ export class UpsampleNode extends OnnxNode {
       scale = await toCPU(scale);
     }
 
-    const sc = scale as CPUTensor;
+    const sc = scale as CPUTensor<any>;
 
     const scales = new Array(sc.size);
     for (let i = 0; i < sc.size; i++) {
@@ -59,7 +59,7 @@ export class UpsampleNode extends OnnxNode {
     return scales;
   }
 
-  async forward(inputs: Tensor[]): Promise<Tensor[]> {
+  async forward(inputs: Tensor<any>[]): Promise<Tensor<any>[]> {
     const x = inputs[0];
     const scale = inputs[1];
 

@@ -25,7 +25,7 @@ export class ClipNode extends OnnxNode {
     }
   }
 
-  async forward(inputs: Tensor[]): Promise<Tensor[]> {
+  async forward(inputs: Tensor<any>[]): Promise<Tensor<any>[]> {
     const x = inputs[0];
 
     if (this.onnxVersion < 11) {

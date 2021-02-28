@@ -1,5 +1,4 @@
 import {Mode} from '../../model/module';
-import {cast} from '../../ops/cpu/cast';
 import {CPUTensor} from '../../tensor/cpu/tensor';
 import Tensor from '../../types';
 import {OnnxNode} from '../node';
@@ -22,13 +21,11 @@ export class CastNode extends OnnxNode {
     this.to = this.getAttributeString('to');
   }
 
-  async forward(inputs: Tensor[]): Promise<Tensor[]> {
+  async forward(inputs: Tensor<any>[]): Promise<Tensor<any>[]> {
     const x = inputs[0];
 
-    if (x instanceof CPUTensor) {
-      return [cast(x, this.to)];
-    }
-    throw new Error('Can only cast CPU tensors right now');
+    // TODO: Convert to to correct dtype
+    return [x.cast(this.to as any)];
   }
 
   getType() {

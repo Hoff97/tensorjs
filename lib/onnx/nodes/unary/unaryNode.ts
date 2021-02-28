@@ -1,5 +1,5 @@
 import {Mode} from '../../../model/module';
-import Tensor from '../../../types';
+import Tensor, {DType} from '../../../types';
 import {OnnxNode} from '../../node';
 import {Attributes, Constants} from '../../types';
 
@@ -19,9 +19,11 @@ export abstract class UnaryNode extends OnnxNode {
     this.name = name;
   }
 
-  abstract compute(x: Tensor): Tensor;
+  abstract compute<DTpe extends DType>(x: Tensor<DTpe>): Tensor<DTpe>;
 
-  async forward(inputs: Tensor[]): Promise<Tensor[]> {
+  async forward<DTpe extends DType>(
+    inputs: Tensor<DTpe>[]
+  ): Promise<Tensor<DTpe>[]> {
     const x = inputs[0];
 
     return [this.compute(x)];
