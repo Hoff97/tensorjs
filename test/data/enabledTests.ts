@@ -304,7 +304,7 @@ export const enabledTests: Test[] = [
   'test_reduce_prod_default_axes_keepdims_example',
   {
     name: 'test_reduce_prod_default_axes_keepdims_random',
-    backends: ['CPU', 'WASM'],
+    backends: ['CPU'],
   },
   'test_reduce_prod_do_not_keepdims_example',
   'test_reduce_prod_do_not_keepdims_random',

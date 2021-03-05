@@ -65,14 +65,27 @@ impl<DType> Tensor<DType>
 where
     DType: Copy,
     DType: Num,
+    DType: PartialOrd,
     DType: Signed,
+    DType: FromPrimitive,
 {
     pub fn abs(&self) -> Tensor<DType> {
         self.unary_op(|x: DType| x.abs())
     }
 
     pub fn sign(&self) -> Tensor<DType> {
-        self.unary_op(|x: DType| x.signum())
+        match DType::from_i32(1) {
+            Some(one) => self.unary_op(|x: DType| {
+                if x < DType::zero() {
+                    -one
+                } else if x > DType::zero() {
+                    one
+                } else {
+                    DType::zero()
+                }
+            }),
+            None => panic!("Encountered DType that can not represent 1 in sign"),
+        }
     }
 
     pub fn negate(&self) -> Tensor<DType> {
