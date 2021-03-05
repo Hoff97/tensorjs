@@ -40,8 +40,6 @@ export type DType =
 
 export type Activation = 'id' | 'relu' | 'relu6';
 
-export type Precision = 16 | 32;
-
 export default abstract class Tensor<DTpe extends DType> {
   public dtype: DTpe;
 
@@ -1135,7 +1133,7 @@ export default abstract class Tensor<DTpe extends DType> {
    * //  [3,3]]
    * ```
    */
-  abstract gather(axis: number, indices: CPUTensor<'int32'>): Tensor<DTpe>;
+  abstract gather(axis: number, indices: CPUTensor<'uint32'>): Tensor<DTpe>;
 
   /**
    * Sets the values in the current tensor to the given values.
