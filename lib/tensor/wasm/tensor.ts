@@ -77,7 +77,9 @@ export type DTypeWasm =
   | 'uint16'
   | 'uint8';
 
-export class WASMTensor<DTpe extends DTypeWasm> extends Tensor<DTpe> {
+export class WASMTensor<
+  DTpe extends DTypeWasm = 'float32'
+> extends Tensor<DTpe> {
   static range(start: number, limit: number, delta: number) {
     const size = Math.max(Math.ceil((limit - start) / delta), 0);
     const values = new Array(size);

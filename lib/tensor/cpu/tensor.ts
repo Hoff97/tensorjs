@@ -70,7 +70,7 @@ import {
   indexToPos,
 } from '../../util/shape';
 
-export class CPUTensor<DTpe extends DType> extends Tensor<DTpe> {
+export class CPUTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
   static range(start: number, limit: number, delta: number) {
     const size = Math.max(Math.ceil((limit - start) / delta), 0);
     const values = new Float32Array(size);

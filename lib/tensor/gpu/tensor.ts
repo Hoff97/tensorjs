@@ -69,7 +69,7 @@ import {HardSigmoidOperation} from '../../ops/gpu/unary/hardSigmoid';
 import {PowerScalarOperation} from '../../ops/gpu/unary/powerScalar';
 import {RoundOperation} from '../../ops/gpu/unary/round';
 
-export class GPUTensor<DTpe extends DTypeGpu>
+export class GPUTensor<DTpe extends DTypeGpu = 'float32'>
   extends Tensor<DTpe>
   implements GPUTensorI {
   static range(start: number, limit: number, delta: number, dtype?: DTypeGpu) {

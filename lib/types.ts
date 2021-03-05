@@ -40,7 +40,7 @@ export type DType =
 
 export type Activation = 'id' | 'relu' | 'relu6';
 
-export default abstract class Tensor<DTpe extends DType> {
+export default abstract class Tensor<DTpe extends DType = 'float32'> {
   public dtype: DTpe;
 
   constructor(dtype: DTpe) {
