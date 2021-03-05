@@ -71,7 +71,7 @@ export interface VariableOptions<DTpe extends DType> {
  * Once backward on a scalar variable (eg. a variable with shape [1])
  * is called, the gradients for all variables will be computed
  */
-export class Variable<DTpe extends DType>
+export class Variable<DTpe extends DType = 'float32'>
   extends Tensor<DTpe>
   implements VariableI<DTpe> {
   public grad?: Tensor<DTpe>;
