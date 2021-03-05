@@ -557,7 +557,7 @@ export abstract class Operation<
 
     const resultSize = getSize(resultShape);
     //@ts-ignore
-    const result = this.allocator.allocate(resultSize, this.precision);
+    const result = this.allocator.allocate(resultSize, this.dtype);
 
     for (const i in inputTensors) {
       const t = inputTensors[i];

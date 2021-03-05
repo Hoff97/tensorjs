@@ -119,7 +119,10 @@ export class GPUTensor<DTpe extends DTypeGpu>
   }
 
   cast<DTpe2 extends DType>(dtype: DTpe2): Tensor<DTpe2> {
-    throw new Error('Method not implemented.');
+    if (dtype === 'float64') {
+      throw new Error('The WebGL backend does not support float64 tensors');
+    }
+    return defaultCopyD.calc({input: this}, dtype as any) as any;
   }
 
   getValues(): Promise<TensorValues[DTpe]> {

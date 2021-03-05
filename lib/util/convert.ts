@@ -53,7 +53,7 @@ export async function toWASM<DTpe extends DType>(
     return tensor;
   }
   return new WASMTensor(
-    values,
+    Array.from(values),
     new Uint32Array(tensor.getShape()),
     tensor.dtype as any
   ) as Tensor<DTpe>;

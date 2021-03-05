@@ -244,6 +244,7 @@ export class GPUMemoryAllocator {
       width: texture.width,
       height: texture.height,
       depthStencil: false,
+      colorType: colorType[dtype] as any,
     });
 
     this.totalAllocations++;

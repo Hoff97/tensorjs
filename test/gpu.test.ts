@@ -10,14 +10,16 @@ describe('GPU create tensor', () => {
     const arr = [1, 2, 3, 4];
     const tensor = new GPUTensor(arr, [2, 2], 'float32');
 
-    expect(await tensor.getValues()).toEqual(arr);
+    expect(await tensor.getValues()).toEqual(new Float32Array(arr));
   });
 
   it('should get the same values back when using half precision', async () => {
     const arr = [1, 2, 3, 4];
     const tensor = new GPUTensor(arr, [2, 2], 'float16');
 
-    expect(await tensor.copy().getValues()).toEqual(arr);
+    expect(await tensor.cast('float32').getValues()).toEqual(
+      new Float32Array(arr)
+    );
   });
 });
 
