@@ -127,7 +127,7 @@ export class CPUTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
   constantLike(value: number): Tensor<DTpe> {
     return new CPUTensor<DTpe>(
       this.shape,
-      new tensorValuesConstructor[this.dtype]().fill(
+      new tensorValuesConstructor[this.dtype](this.size).fill(
         value
       ) as TensorValues[DTpe],
       this.dtype

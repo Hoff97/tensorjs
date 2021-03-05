@@ -31,7 +31,7 @@ export async function toCPU<DTpe extends DType>(
     return tensor;
   }
   const values = await tensor.getValues();
-  return new CPUTensor(tensor.getShape(), values);
+  return new CPUTensor(tensor.getShape(), values, tensor.dtype);
 }
 
 export async function toWASM<DTpe extends DType>(
@@ -52,6 +52,7 @@ export async function toWASM<DTpe extends DType>(
   if (tensor instanceof CPUTensor && values instanceof Int32Array) {
     return tensor;
   }
+
   return new WASMTensor(
     Array.from(values),
     new Uint32Array(tensor.getShape()),

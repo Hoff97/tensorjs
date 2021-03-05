@@ -42,8 +42,8 @@ export const wasmLoaded: Promise<void> = new Promise(resolve => {
     WASMTU8 = x.TensorU8;
 
     tensorConstructor = {
-      float64: WASMTF32,
-      float32: WASMTF64,
+      float64: WASMTF64,
+      float32: WASMTF32,
       int32: WASMTI32,
       int16: WASMTI16,
       int8: WASMTI8,
@@ -119,7 +119,6 @@ export class WASMTensor<
   }
 
   getValues() {
-    // TODO: remove any
     return Promise.resolve(this.wasmTensor.get_vals()) as any;
   }
 
