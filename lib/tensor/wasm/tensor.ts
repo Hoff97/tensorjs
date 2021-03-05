@@ -27,6 +27,9 @@ let WASMTI8: typeof WTI8;
 let WASMTU32: typeof WTU32;
 let WASMTU16: typeof WTU16;
 let WASMTU8: typeof WTU8;
+
+export let tensorConstructor: {[name: string]: any};
+
 export const wasmLoaded: Promise<void> = new Promise(resolve => {
   import('../../wasm/rust_wasm_tensor').then(x => {
     WASMTF32 = x.TensorF32;
@@ -37,6 +40,18 @@ export const wasmLoaded: Promise<void> = new Promise(resolve => {
     WASMTU32 = x.TensorU32;
     WASMTU16 = x.TensorU16;
     WASMTU8 = x.TensorU8;
+
+    tensorConstructor = {
+      float64: WASMTF32,
+      float32: WASMTF64,
+      int32: WASMTI32,
+      int16: WASMTI16,
+      int8: WASMTI8,
+      uint32: WASMTU32,
+      uint16: WASMTU16,
+      uint8: WASMTU8,
+    };
+
     resolve();
   });
 });
@@ -50,17 +65,6 @@ export type WT = {
   uint32: WTU32;
   uint16: WTU16;
   uint8: WTU8;
-};
-
-export const tensorConstructor = {
-  float64: WTF64,
-  float32: WTF32,
-  int32: WTI32,
-  int16: WTI16,
-  int8: WTI8,
-  uint32: WTU32,
-  uint16: WTU16,
-  uint8: WTU8,
 };
 
 export type DTypeWasm =
@@ -148,8 +152,8 @@ export class WASMTensor<DTpe extends DTypeWasm> extends Tensor<DTpe> {
 
   exp(): Tensor<DTpe> {
     if (
-      !(this.wasmTensor instanceof WTF64) &&
-      !(this.wasmTensor instanceof WTF32)
+      !(this.wasmTensor instanceof WASMTF64) &&
+      !(this.wasmTensor instanceof WASMTF32)
     ) {
       throw new Error('Exp can only be called on float tensors');
     }
@@ -158,8 +162,8 @@ export class WASMTensor<DTpe extends DTypeWasm> extends Tensor<DTpe> {
 
   log(): Tensor<DTpe> {
     if (
-      !(this.wasmTensor instanceof WTF64) &&
-      !(this.wasmTensor instanceof WTF32)
+      !(this.wasmTensor instanceof WASMTF64) &&
+      !(this.wasmTensor instanceof WASMTF32)
     ) {
       throw new Error('Log can only be called on float tensors');
     }
@@ -168,8 +172,8 @@ export class WASMTensor<DTpe extends DTypeWasm> extends Tensor<DTpe> {
 
   sqrt(): Tensor<DTpe> {
     if (
-      !(this.wasmTensor instanceof WTF64) &&
-      !(this.wasmTensor instanceof WTF32)
+      !(this.wasmTensor instanceof WASMTF64) &&
+      !(this.wasmTensor instanceof WASMTF32)
     ) {
       throw new Error('Sqrt can only be called on float tensors');
     }
@@ -178,11 +182,11 @@ export class WASMTensor<DTpe extends DTypeWasm> extends Tensor<DTpe> {
 
   abs(): Tensor<DTpe> {
     if (
-      !(this.wasmTensor instanceof WTF64) &&
-      !(this.wasmTensor instanceof WTF32) &&
-      !(this.wasmTensor instanceof WTI32) &&
-      !(this.wasmTensor instanceof WTI16) &&
-      !(this.wasmTensor instanceof WTI8)
+      !(this.wasmTensor instanceof WASMTF64) &&
+      !(this.wasmTensor instanceof WASMTF32) &&
+      !(this.wasmTensor instanceof WASMTI32) &&
+      !(this.wasmTensor instanceof WASMTI16) &&
+      !(this.wasmTensor instanceof WASMTI8)
     ) {
       throw new Error('Abs can only be called on signed tensors');
     }
@@ -191,8 +195,8 @@ export class WASMTensor<DTpe extends DTypeWasm> extends Tensor<DTpe> {
 
   sin(): Tensor<DTpe> {
     if (
-      !(this.wasmTensor instanceof WTF64) &&
-      !(this.wasmTensor instanceof WTF32)
+      !(this.wasmTensor instanceof WASMTF64) &&
+      !(this.wasmTensor instanceof WASMTF32)
     ) {
       throw new Error('Sin can only be called on float tensors');
     }
@@ -201,8 +205,8 @@ export class WASMTensor<DTpe extends DTypeWasm> extends Tensor<DTpe> {
 
   cos(): Tensor<DTpe> {
     if (
-      !(this.wasmTensor instanceof WTF64) &&
-      !(this.wasmTensor instanceof WTF32)
+      !(this.wasmTensor instanceof WASMTF64) &&
+      !(this.wasmTensor instanceof WASMTF32)
     ) {
       throw new Error('Cos can only be called on float tensors');
     }
@@ -211,8 +215,8 @@ export class WASMTensor<DTpe extends DTypeWasm> extends Tensor<DTpe> {
 
   tan(): Tensor<DTpe> {
     if (
-      !(this.wasmTensor instanceof WTF64) &&
-      !(this.wasmTensor instanceof WTF32)
+      !(this.wasmTensor instanceof WASMTF64) &&
+      !(this.wasmTensor instanceof WASMTF32)
     ) {
       throw new Error('Tan can only be called on float tensors');
     }
@@ -221,8 +225,8 @@ export class WASMTensor<DTpe extends DTypeWasm> extends Tensor<DTpe> {
 
   asin(): Tensor<DTpe> {
     if (
-      !(this.wasmTensor instanceof WTF64) &&
-      !(this.wasmTensor instanceof WTF32)
+      !(this.wasmTensor instanceof WASMTF64) &&
+      !(this.wasmTensor instanceof WASMTF32)
     ) {
       throw new Error('Asin can only be called on float tensors');
     }
@@ -231,8 +235,8 @@ export class WASMTensor<DTpe extends DTypeWasm> extends Tensor<DTpe> {
 
   acos(): Tensor<DTpe> {
     if (
-      !(this.wasmTensor instanceof WTF64) &&
-      !(this.wasmTensor instanceof WTF32)
+      !(this.wasmTensor instanceof WASMTF64) &&
+      !(this.wasmTensor instanceof WASMTF32)
     ) {
       throw new Error('Acos can only be called on float tensors');
     }
@@ -241,8 +245,8 @@ export class WASMTensor<DTpe extends DTypeWasm> extends Tensor<DTpe> {
 
   atan(): Tensor<DTpe> {
     if (
-      !(this.wasmTensor instanceof WTF64) &&
-      !(this.wasmTensor instanceof WTF32)
+      !(this.wasmTensor instanceof WASMTF64) &&
+      !(this.wasmTensor instanceof WASMTF32)
     ) {
       throw new Error('Atan can only be called on float tensors');
     }
@@ -251,8 +255,8 @@ export class WASMTensor<DTpe extends DTypeWasm> extends Tensor<DTpe> {
 
   sinh(): Tensor<DTpe> {
     if (
-      !(this.wasmTensor instanceof WTF64) &&
-      !(this.wasmTensor instanceof WTF32)
+      !(this.wasmTensor instanceof WASMTF64) &&
+      !(this.wasmTensor instanceof WASMTF32)
     ) {
       throw new Error('Sinh can only be called on float tensors');
     }
@@ -261,8 +265,8 @@ export class WASMTensor<DTpe extends DTypeWasm> extends Tensor<DTpe> {
 
   cosh(): Tensor<DTpe> {
     if (
-      !(this.wasmTensor instanceof WTF64) &&
-      !(this.wasmTensor instanceof WTF32)
+      !(this.wasmTensor instanceof WASMTF64) &&
+      !(this.wasmTensor instanceof WASMTF32)
     ) {
       throw new Error('Cosh can only be called on float tensors');
     }
@@ -271,8 +275,8 @@ export class WASMTensor<DTpe extends DTypeWasm> extends Tensor<DTpe> {
 
   tanh(): Tensor<DTpe> {
     if (
-      !(this.wasmTensor instanceof WTF64) &&
-      !(this.wasmTensor instanceof WTF32)
+      !(this.wasmTensor instanceof WASMTF64) &&
+      !(this.wasmTensor instanceof WASMTF32)
     ) {
       throw new Error('Tanh can only be called on float tensors');
     }
@@ -281,8 +285,8 @@ export class WASMTensor<DTpe extends DTypeWasm> extends Tensor<DTpe> {
 
   asinh(): Tensor<DTpe> {
     if (
-      !(this.wasmTensor instanceof WTF64) &&
-      !(this.wasmTensor instanceof WTF32)
+      !(this.wasmTensor instanceof WASMTF64) &&
+      !(this.wasmTensor instanceof WASMTF32)
     ) {
       throw new Error('Asinh can only be called on float tensors');
     }
@@ -291,8 +295,8 @@ export class WASMTensor<DTpe extends DTypeWasm> extends Tensor<DTpe> {
 
   acosh(): Tensor<DTpe> {
     if (
-      !(this.wasmTensor instanceof WTF64) &&
-      !(this.wasmTensor instanceof WTF32)
+      !(this.wasmTensor instanceof WASMTF64) &&
+      !(this.wasmTensor instanceof WASMTF32)
     ) {
       throw new Error('Acosh can only be called on float tensors');
     }
@@ -301,8 +305,8 @@ export class WASMTensor<DTpe extends DTypeWasm> extends Tensor<DTpe> {
 
   atanh(): Tensor<DTpe> {
     if (
-      !(this.wasmTensor instanceof WTF64) &&
-      !(this.wasmTensor instanceof WTF32)
+      !(this.wasmTensor instanceof WASMTF64) &&
+      !(this.wasmTensor instanceof WASMTF32)
     ) {
       throw new Error('Atanh can only be called on float tensors');
     }
@@ -311,8 +315,8 @@ export class WASMTensor<DTpe extends DTypeWasm> extends Tensor<DTpe> {
 
   sigmoid(): Tensor<DTpe> {
     if (
-      !(this.wasmTensor instanceof WTF64) &&
-      !(this.wasmTensor instanceof WTF32)
+      !(this.wasmTensor instanceof WASMTF64) &&
+      !(this.wasmTensor instanceof WASMTF32)
     ) {
       throw new Error('Sigmoid can only be called on float tensors');
     }
@@ -321,8 +325,8 @@ export class WASMTensor<DTpe extends DTypeWasm> extends Tensor<DTpe> {
 
   hardSigmoid(alpha: number, beta: number): Tensor<DTpe> {
     if (
-      !(this.wasmTensor instanceof WTF64) &&
-      !(this.wasmTensor instanceof WTF32)
+      !(this.wasmTensor instanceof WASMTF64) &&
+      !(this.wasmTensor instanceof WASMTF32)
     ) {
       throw new Error('HardSigmoid can only be called on float tensors');
     }
@@ -333,11 +337,11 @@ export class WASMTensor<DTpe extends DTypeWasm> extends Tensor<DTpe> {
 
   negate(): Tensor<DTpe> {
     if (
-      !(this.wasmTensor instanceof WTF64) &&
-      !(this.wasmTensor instanceof WTF32) &&
-      !(this.wasmTensor instanceof WTI32) &&
-      !(this.wasmTensor instanceof WTI16) &&
-      !(this.wasmTensor instanceof WTI8)
+      !(this.wasmTensor instanceof WASMTF64) &&
+      !(this.wasmTensor instanceof WASMTF32) &&
+      !(this.wasmTensor instanceof WASMTI32) &&
+      !(this.wasmTensor instanceof WASMTI16) &&
+      !(this.wasmTensor instanceof WASMTI8)
     ) {
       throw new Error('Negate can only be called on signed tensors');
     }
@@ -358,11 +362,11 @@ export class WASMTensor<DTpe extends DTypeWasm> extends Tensor<DTpe> {
 
   sign(): Tensor<DTpe> {
     if (
-      !(this.wasmTensor instanceof WTF64) &&
-      !(this.wasmTensor instanceof WTF32) &&
-      !(this.wasmTensor instanceof WTI32) &&
-      !(this.wasmTensor instanceof WTI16) &&
-      !(this.wasmTensor instanceof WTI8)
+      !(this.wasmTensor instanceof WASMTF64) &&
+      !(this.wasmTensor instanceof WASMTF32) &&
+      !(this.wasmTensor instanceof WASMTI32) &&
+      !(this.wasmTensor instanceof WASMTI16) &&
+      !(this.wasmTensor instanceof WASMTI8)
     ) {
       throw new Error('Sign can only be called on signed tensors');
     }
@@ -544,8 +548,8 @@ export class WASMTensor<DTpe extends DTypeWasm> extends Tensor<DTpe> {
 
   protected reduceLogSum_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
     if (
-      !(this.wasmTensor instanceof WTF64) &&
-      !(this.wasmTensor instanceof WTF32)
+      !(this.wasmTensor instanceof WASMTF64) &&
+      !(this.wasmTensor instanceof WASMTF32)
     ) {
       throw new Error('ReduceLogSum can only be called on float tensors');
     }
@@ -562,8 +566,8 @@ export class WASMTensor<DTpe extends DTypeWasm> extends Tensor<DTpe> {
     keepDims: boolean
   ): Tensor<DTpe> {
     if (
-      !(this.wasmTensor instanceof WTF64) &&
-      !(this.wasmTensor instanceof WTF32)
+      !(this.wasmTensor instanceof WASMTF64) &&
+      !(this.wasmTensor instanceof WASMTF32)
     ) {
       throw new Error('ReduceLogSumExp can only be called on float tensors');
     }
@@ -775,8 +779,8 @@ export class WASMTensor<DTpe extends DTypeWasm> extends Tensor<DTpe> {
 
   floor(): Tensor<DTpe> {
     if (
-      !(this.wasmTensor instanceof WTF64) &&
-      !(this.wasmTensor instanceof WTF32)
+      !(this.wasmTensor instanceof WASMTF64) &&
+      !(this.wasmTensor instanceof WASMTF32)
     ) {
       throw new Error('Floor can only be called on float tensors');
     }
@@ -785,8 +789,8 @@ export class WASMTensor<DTpe extends DTypeWasm> extends Tensor<DTpe> {
 
   ceil(): Tensor<DTpe> {
     if (
-      !(this.wasmTensor instanceof WTF64) &&
-      !(this.wasmTensor instanceof WTF32)
+      !(this.wasmTensor instanceof WASMTF64) &&
+      !(this.wasmTensor instanceof WASMTF32)
     ) {
       throw new Error('Ceil can only be called on float tensors');
     }
@@ -795,8 +799,8 @@ export class WASMTensor<DTpe extends DTypeWasm> extends Tensor<DTpe> {
 
   round(): Tensor<DTpe> {
     if (
-      !(this.wasmTensor instanceof WTF64) &&
-      !(this.wasmTensor instanceof WTF32)
+      !(this.wasmTensor instanceof WASMTF64) &&
+      !(this.wasmTensor instanceof WASMTF32)
     ) {
       throw new Error('Round can only be called on float tensors');
     }
@@ -841,8 +845,8 @@ export class WASMTensor<DTpe extends DTypeWasm> extends Tensor<DTpe> {
       throw new Error('Can only normalize with WASM tensors');
     }
     if (
-      !(this.wasmTensor instanceof WTF64) &&
-      !(this.wasmTensor instanceof WTF32)
+      !(this.wasmTensor instanceof WASMTF64) &&
+      !(this.wasmTensor instanceof WASMTF32)
     ) {
       throw new Error('Normalize can only be called on float tensors');
     }

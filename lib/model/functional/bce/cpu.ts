@@ -1,7 +1,11 @@
 import {positionWiseBinaryOp} from '../../../ops/cpu/basic';
 import {CPUTensor} from '../../../tensor/cpu/tensor';
+import {DType} from '../../../types';
 
-export function bce(x: CPUTensor, y: CPUTensor) {
+export function bce<DTpe extends DType>(
+  x: CPUTensor<DTpe>,
+  y: CPUTensor<DTpe>
+) {
   return positionWiseBinaryOp(
     x,
     y,

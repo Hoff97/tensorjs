@@ -1,6 +1,10 @@
 import {BinaryOperation} from '../../../ops/gpu/binary/binaryOperation';
 import {Dispatcher} from '../../../ops/gpu/dispatcher';
-import {GPUTensorConstructor, GPUTensorI} from '../../../tensor/gpu/interface';
+import {
+  DTypeGpu,
+  GPUTensorConstructor,
+  GPUTensorI,
+} from '../../../tensor/gpu/interface';
 import {GPUMemoryAllocator} from '../../../tensor/gpu/memory';
 import {gpuConstructor} from '../../../tensor/gpu/tensor';
 
@@ -9,9 +13,10 @@ export class BCEOperation<
 > extends BinaryOperation<GPUTensor> {
   constructor(
     tensorConstructor: GPUTensorConstructor<GPUTensor>,
+    dtype: DTypeGpu,
     allocator?: GPUMemoryAllocator
   ) {
-    super(tensorConstructor, allocator);
+    super(tensorConstructor, dtype, allocator);
   }
 
   getOp(a: string, b: string): string {
@@ -20,5 +25,5 @@ export class BCEOperation<
 }
 
 export const defaultBCED = new Dispatcher(
-  () => new BCEOperation(gpuConstructor)
+  (dtype: DTypeGpu) => new BCEOperation(gpuConstructor, dtype)
 );

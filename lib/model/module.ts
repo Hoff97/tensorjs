@@ -1,5 +1,5 @@
 import {Variable} from '../autograd/variable';
-import Tensor, {Precision} from '../types';
+import Tensor from '../types';
 import {Backend, toCPU, toWASM, toGPU} from '../util/convert';
 
 export type Mode = 'train' | 'inference';
@@ -17,7 +17,7 @@ export abstract class Module {
 
   public mode: Mode = 'train';
 
-  abstract forward(inputs: Tensor[]): Promise<Tensor[]>;
+  abstract forward(inputs: Tensor<any>[]): Promise<Tensor<any>[]>;
 
   getSubModules(): Module[] {
     const modules: Module[] = [];
@@ -31,8 +31,8 @@ export abstract class Module {
     return modules;
   }
 
-  getParameters(): Variable[] {
-    let parameters: Variable[] = [];
+  getParameters(): Variable<any>[] {
+    let parameters: Variable<any>[] = [];
 
     for (const k of Object.keys(this)) {
       //@ts-ignore
@@ -57,7 +57,7 @@ export abstract class Module {
     } else if (backend === 'WASM') {
       return this.toWASM();
     } else {
-      return this.toGPU(32);
+      return this.toGPU();
     }
   }
 
@@ -95,17 +95,17 @@ export abstract class Module {
     this.backend = 'WASM';
   }
 
-  async toGPU(precision: Precision) {
+  async toGPU() {
     const submodules = this.getSubModules();
     for (const submodule of submodules) {
-      await submodule.toGPU(precision);
+      await submodule.toGPU();
     }
 
     for (const k of Object.keys(this)) {
       //@ts-ignore
       if (this[k] instanceof Tensor) {
         //@ts-ignore
-        this[k] = await toGPU(this[k], precision);
+        this[k] = await toGPU(this[k]);
       }
     }
 
