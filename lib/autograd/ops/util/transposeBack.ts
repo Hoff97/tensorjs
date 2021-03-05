@@ -1,10 +1,10 @@
-import {Tensor} from '../../../library';
+import Tensor, {DType} from '../../../types';
 import {BackwardOp, VariableI} from '../../types';
 
-export class TransposeBack implements BackwardOp {
-  constructor(public a: VariableI, public permutation: number[]) {}
+export class TransposeBack<DTpe extends DType> implements BackwardOp<DTpe> {
+  constructor(public a: VariableI<DTpe>, public permutation: number[]) {}
 
-  backward(grad: Tensor): void {
+  backward(grad: Tensor<DTpe>): void {
     const inversePerm = new Array(this.permutation.length);
     for (let i = 0; i < this.permutation.length; i++) {
       inversePerm[this.permutation[i]] = i;

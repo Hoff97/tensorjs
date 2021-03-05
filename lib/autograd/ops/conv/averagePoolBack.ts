@@ -1,16 +1,16 @@
-import {Tensor} from '../../../library';
+import {DType, Tensor} from '../../../library';
 import {BackwardOp, VariableI} from '../../types';
 
-export class AveragePoolBack implements BackwardOp {
+export class AveragePoolBack<DTpe extends DType> implements BackwardOp<DTpe> {
   constructor(
-    public x: VariableI,
+    public x: VariableI<DTpe>,
     kernelShape: number[],
     pads: number[],
     strides: number[],
     includePad: boolean
   ) {}
 
-  backward(grad: Tensor): void {
+  backward(grad: Tensor<DTpe>): void {
     throw new Error('Backward pass not implemented for average pool');
   }
 

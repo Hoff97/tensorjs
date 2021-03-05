@@ -1,9 +1,9 @@
-import {Tensor} from '../../../library';
+import Tensor, {DType} from '../../../types';
 import {BackwardOp, VariableI} from '../../types';
 
-export class SliceBack implements BackwardOp {
+export class SliceBack<DTpe extends DType> implements BackwardOp<DTpe> {
   constructor(
-    public a: VariableI,
+    public a: VariableI<DTpe>,
     public starts: number[],
     public ends: number[],
     public axes: number[],
@@ -14,7 +14,7 @@ export class SliceBack implements BackwardOp {
     }
   }
 
-  backward(grad: Tensor): void {
+  backward(grad: Tensor<DTpe>): void {
     if (!this.a.noGrad) {
       const shapeA = this.a.getShape();
       const rank = shapeA.length;

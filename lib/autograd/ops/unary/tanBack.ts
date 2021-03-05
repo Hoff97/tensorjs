@@ -1,10 +1,10 @@
-import {Tensor} from '../../../library';
+import {DType, Tensor} from '../../../library';
 import {BackwardOp, VariableI} from '../../types';
 
-export class TanBack implements BackwardOp {
-  constructor(public input: VariableI) {}
+export class TanBack<DTpe extends DType> implements BackwardOp<DTpe> {
+  constructor(public input: VariableI<DTpe>) {}
 
-  backward(grad: Tensor): void {
+  backward(grad: Tensor<DTpe>): void {
     const cos = this.input.value.cos();
     const cos2 = cos.multiply(cos);
     cos.delete();
@@ -23,10 +23,10 @@ export class TanBack implements BackwardOp {
   }
 }
 
-export class ATanBack implements BackwardOp {
-  constructor(public input: VariableI) {}
+export class ATanBack<DTpe extends DType> implements BackwardOp<DTpe> {
+  constructor(public input: VariableI<DTpe>) {}
 
-  backward(grad: Tensor): void {
+  backward(grad: Tensor<DTpe>): void {
     const squared = this.input.value.multiply(this.input.value);
     const onePlus = squared.addMultiplyScalar(1, 1);
     squared.delete();
@@ -45,10 +45,10 @@ export class ATanBack implements BackwardOp {
   }
 }
 
-export class TanHBack implements BackwardOp {
-  constructor(public input: VariableI, public tanH: Tensor) {}
+export class TanHBack<DTpe extends DType> implements BackwardOp<DTpe> {
+  constructor(public input: VariableI<DTpe>, public tanH: Tensor<DTpe>) {}
 
-  backward(grad: Tensor): void {
+  backward(grad: Tensor<DTpe>): void {
     const squared = this.tanH.multiply(this.tanH);
     const onePlus = squared.addMultiplyScalar(-1, 1);
     squared.delete();
@@ -67,10 +67,10 @@ export class TanHBack implements BackwardOp {
   }
 }
 
-export class ATanHBack implements BackwardOp {
-  constructor(public input: VariableI) {}
+export class ATanHBack<DTpe extends DType> implements BackwardOp<DTpe> {
+  constructor(public input: VariableI<DTpe>) {}
 
-  backward(grad: Tensor): void {
+  backward(grad: Tensor<DTpe>): void {
     const squared = this.input.value.multiply(this.input.value);
     const onePlus = squared.addMultiplyScalar(-1, 1);
     squared.delete();

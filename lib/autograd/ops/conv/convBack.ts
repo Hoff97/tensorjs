@@ -1,18 +1,18 @@
-import {Tensor} from '../../../library';
+import {DType, Tensor} from '../../../library';
 import {BackwardOp, VariableI} from '../../types';
 
-export class ConvBack implements BackwardOp {
+export class ConvBack<DTpe extends DType> implements BackwardOp<DTpe> {
   constructor(
-    public x: VariableI,
-    public w: VariableI,
+    public x: VariableI<DTpe>,
+    public w: VariableI<DTpe>,
     public strides: number[],
     public padding: number[],
     public dilations: number[],
     public group: number,
-    public b?: VariableI
+    public b?: VariableI<DTpe>
   ) {}
 
-  backward(grad: Tensor): void {
+  backward(grad: Tensor<DTpe>): void {
     if (!this.w.noGrad) {
       const gradW = this.x.value.conv(
         grad,

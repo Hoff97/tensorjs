@@ -1,20 +1,20 @@
-import {Tensor} from '../../../library';
+import {DType, Tensor} from '../../../library';
 import {BackwardOp, VariableI} from '../../types';
 
-export class GemmBack implements BackwardOp {
+export class GemmBack<DTpe extends DType> implements BackwardOp<DTpe> {
   constructor(
-    public a: VariableI,
-    public b: VariableI,
+    public a: VariableI<DTpe>,
+    public b: VariableI<DTpe>,
     public transA: boolean,
     public transB: boolean,
     public alpha: number,
     public beta: number,
-    public c?: VariableI
+    public c?: VariableI<DTpe>
   ) {}
 
-  backward(grad: Tensor): void {
+  backward(grad: Tensor<DTpe>): void {
     if (!this.b.noGrad) {
-      let gradB: Tensor;
+      let gradB: Tensor<DTpe>;
       if (this.transB) {
         gradB = grad.gemm(this.a.value, true, this.transA, this.alpha);
       } else {
@@ -27,7 +27,7 @@ export class GemmBack implements BackwardOp {
     }
 
     if (!this.a.noGrad) {
-      let gradA: Tensor;
+      let gradA: Tensor<DTpe>;
       if (this.transA) {
         gradA = this.b.value.gemm(grad, this.transB, true, this.alpha);
       } else {

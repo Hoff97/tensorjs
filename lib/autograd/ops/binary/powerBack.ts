@@ -1,15 +1,15 @@
-import {Tensor} from '../../../library';
+import {DType, Tensor} from '../../../library';
 import {BackwardOp, VariableI} from '../../types';
 
-export class PowerBack implements BackwardOp {
+export class PowerBack<DTpe extends DType> implements BackwardOp<DTpe> {
   constructor(
-    public a: VariableI,
-    public b: VariableI,
-    public powerResult: Tensor,
+    public a: VariableI<DTpe>,
+    public b: VariableI<DTpe>,
+    public powerResult: Tensor<DTpe>,
     public shape: readonly number[]
   ) {}
 
-  backward(grad: Tensor): void {
+  backward(grad: Tensor<DTpe>): void {
     const shapeA = this.a.getShape();
     const shapeB = this.b.getShape();
 
@@ -26,7 +26,7 @@ export class PowerBack implements BackwardOp {
     }
 
     if (!this.a.noGrad) {
-      let gradA: Tensor;
+      let gradA: Tensor<DTpe>;
       if (sumADims.length === 0) {
         const multiplied = this.powerResult.multiply(this.b.value);
         const divided = multiplied.divide(this.a.value);
@@ -51,7 +51,7 @@ export class PowerBack implements BackwardOp {
     }
 
     if (!this.b.noGrad) {
-      let gradB: Tensor;
+      let gradB: Tensor<DTpe>;
       if (sumBDims.length === 0) {
         const lnA = this.a.value.log();
         const mult = this.powerResult.multiply(lnA);

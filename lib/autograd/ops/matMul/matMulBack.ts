@@ -1,10 +1,10 @@
-import {Tensor} from '../../../library';
+import {DType, Tensor} from '../../../library';
 import {BackwardOp, VariableI} from '../../types';
 
-export class MatMulBack implements BackwardOp {
-  constructor(public a: VariableI, public b: VariableI) {}
+export class MatMulBack<DTpe extends DType> implements BackwardOp<DTpe> {
+  constructor(public a: VariableI<DTpe>, public b: VariableI<DTpe>) {}
 
-  backward(grad: Tensor): void {
+  backward(grad: Tensor<DTpe>): void {
     if (!this.b.noGrad) {
       const gradB = this.a.value.gemm(grad, true, false);
       const needed = this.b.backward(gradB);

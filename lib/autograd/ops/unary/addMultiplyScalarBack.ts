@@ -1,10 +1,11 @@
-import {Tensor} from '../../../library';
+import {DType, Tensor} from '../../../library';
 import {BackwardOp, VariableI} from '../../types';
 
-export class AddMultiplyScalarBack implements BackwardOp {
-  constructor(public input: VariableI, public scalar: number) {}
+export class AddMultiplyScalarBack<DTpe extends DType>
+  implements BackwardOp<DTpe> {
+  constructor(public input: VariableI<DTpe>, public scalar: number) {}
 
-  backward(grad: Tensor): void {
+  backward(grad: Tensor<DTpe>): void {
     const gradIn = grad.multiplyScalar(this.scalar);
     const needed = this.input.backward(gradIn);
     if (!needed) {

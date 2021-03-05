@@ -1,16 +1,16 @@
-import {Tensor} from '../../../library';
+import {DType, Tensor} from '../../../library';
 import {BackwardOp, VariableI} from '../../types';
 
-export class SubtractBack implements BackwardOp {
+export class SubtractBack<DTpe extends DType> implements BackwardOp<DTpe> {
   constructor(
-    public a: VariableI,
-    public b: VariableI,
+    public a: VariableI<DTpe>,
+    public b: VariableI<DTpe>,
     public shape: readonly number[],
     public alpha: number,
     public beta: number
   ) {}
 
-  backward(grad: Tensor): void {
+  backward(grad: Tensor<DTpe>): void {
     const shapeA = this.a.getShape();
     const shapeB = this.b.getShape();
 
@@ -27,7 +27,7 @@ export class SubtractBack implements BackwardOp {
     }
 
     if (!this.a.noGrad) {
-      let gradA: Tensor;
+      let gradA: Tensor<DTpe>;
       if (sumADims.length === 0) {
         if (this.alpha === 1) {
           gradA = grad.reshape(shapeA);
@@ -51,7 +51,7 @@ export class SubtractBack implements BackwardOp {
     }
 
     if (!this.b.noGrad) {
-      let gradB: Tensor;
+      let gradB: Tensor<DTpe>;
       if (sumBDims.length === 0) {
         gradB = grad.multiplyScalar(-this.beta).reshape(shapeB, false);
       } else {
