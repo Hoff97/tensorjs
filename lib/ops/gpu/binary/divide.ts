@@ -1,6 +1,9 @@
-import {GPUTensorConstructor, GPUTensorI} from '../../../tensor/gpu/interface';
+import {
+  DTypeGpu,
+  GPUTensorConstructor,
+  GPUTensorI,
+} from '../../../tensor/gpu/interface';
 import {GPUMemoryAllocator} from '../../../tensor/gpu/memory';
-import {Precision} from '../../../types';
 import {Input} from '../operation';
 import {BinaryOperation, BinaryOpInfo, BinaryOpInput} from './binaryOperation';
 
@@ -17,9 +20,10 @@ export class DivideOperation<
 > extends BinaryOperation<GPUTensor, DivideInfo, DivideInput> {
   constructor(
     tensorConstructor: GPUTensorConstructor<GPUTensor>,
+    dtype: DTypeGpu,
     allocator?: GPUMemoryAllocator
   ) {
-    super(tensorConstructor, allocator);
+    super(tensorConstructor, dtype, allocator);
   }
 
   getOp(a: string, b: string): string {
@@ -44,8 +48,8 @@ export class DivideOperation<
     return [{name: 'alpha', type: 'float'}];
   }
 
-  getCompilationInfo(input: DivideInput, precision: Precision): DivideInfo {
-    const info = super.getCompilationInfo(input, precision);
+  getCompilationInfo(input: DivideInput): DivideInfo {
+    const info = super.getCompilationInfo(input);
     return {
       ...info,
       alpha: input.alpha,

@@ -1,15 +1,15 @@
-import {PadMode, Tensor} from '../../../library';
+import {DType, PadMode, Tensor} from '../../../library';
 import {BackwardOp, VariableI} from '../../types';
 
-export class PadBack implements BackwardOp {
+export class PadBack<DTpe extends DType> implements BackwardOp<DTpe> {
   constructor(
-    public x: VariableI,
+    public x: VariableI<DTpe>,
     public pads: number[],
     public mode: PadMode,
     public value: number
   ) {}
 
-  backward(grad: Tensor): void {
+  backward(grad: Tensor<DTpe>): void {
     throw new Error('Backward pass not implemented for pad');
   }
 

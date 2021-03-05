@@ -1,10 +1,10 @@
-import {Tensor} from '../../../library';
+import {DType, Tensor} from '../../../library';
 import {BackwardOp, VariableI} from '../../types';
 
-export class SigmoidBack implements BackwardOp {
-  constructor(public input: VariableI, public sigmoid: Tensor) {}
+export class SigmoidBack<DTpe extends DType> implements BackwardOp<DTpe> {
+  constructor(public input: VariableI<DTpe>, public sigmoid: Tensor<DTpe>) {}
 
-  backward(grad: Tensor): void {
+  backward(grad: Tensor<DTpe>): void {
     const oneMinus = this.sigmoid.addMultiplyScalar(-1, 1);
     const mult = this.sigmoid.multiply(oneMinus);
     oneMinus.delete();

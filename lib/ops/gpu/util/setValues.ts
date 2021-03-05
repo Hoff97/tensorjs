@@ -1,7 +1,10 @@
 import {defaultAllocator} from '../../../tensor/gpu/gl';
-import {GPUTensorConstructor, GPUTensorI} from '../../../tensor/gpu/interface';
+import {
+  DTypeGpu,
+  GPUTensorConstructor,
+  GPUTensorI,
+} from '../../../tensor/gpu/interface';
 import {GPUMemoryAllocator} from '../../../tensor/gpu/memory';
-import {Precision} from '../../../types';
 import {getSize} from '../../../util/shape';
 import {Input, Operation} from '../operation';
 
@@ -34,9 +37,10 @@ export class SetValuesOperation<GPUTensor extends GPUTensorI> extends Operation<
 > {
   constructor(
     tensorConstructor: GPUTensorConstructor<GPUTensor>,
+    dtype: DTypeGpu,
     allocator?: GPUMemoryAllocator
   ) {
-    super(tensorConstructor, allocator);
+    super(tensorConstructor, dtype, allocator);
   }
 
   getVariables() {
@@ -104,22 +108,19 @@ export class SetValuesOperation<GPUTensor extends GPUTensorI> extends Operation<
     return input.A.shape;
   }
 
-  compile(info: SetValuesInfo, precision: Precision) {
+  compile(info: SetValuesInfo) {
     if (info.shapeA !== undefined) {
       this.maxRank = info.shapeA.length;
     }
 
-    super.compile(info, precision);
+    super.compile(info);
   }
 
-  getCompilationInfo(
-    input: SetValuesInput,
-    precision: Precision
-  ): SetValuesInfo {
+  getCompilationInfo(input: SetValuesInput): SetValuesInfo {
     const outputShape = this.getOutputShape(input);
     const outputSize = defaultAllocator.getAllocationDimensions(
       getSize(outputShape),
-      precision
+      this.dtype
     );
 
     return {

@@ -7,8 +7,7 @@ import testPool from './pool';
 
 const constructor = (shape: ReadonlyArray<number>, values: number[]) => {
   const sh = Uint32Array.from(shape);
-  const vals = Float32Array.from(values);
-  return new WASMTensor(vals, sh);
+  return new WASMTensor(values, sh, 'float32');
 };
 
 testBasic('WASM', constructor, wasmLoaded);

@@ -1,6 +1,5 @@
 import {GPUTensorI} from '../../../tensor/gpu/interface';
-import {Precision} from '../../../types';
-import {PoolInfo, PoolOperation} from './pool';
+import {PoolOperation} from './pool';
 
 export class SumSquareOperation<
   GPUTensor extends GPUTensorI
@@ -10,10 +9,5 @@ export class SumSquareOperation<
   }
   init(res: string) {
     return `${res}*${res}`;
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  compile(info: PoolInfo, precision: Precision) {
-    super.compile(info, 32);
   }
 }

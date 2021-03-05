@@ -6,7 +6,7 @@ import {TENSOR_FLOAT, TENSOR_INT64} from './definitions';
 import Long from 'long';
 import {getSize} from '../util/shape';
 
-export function createTensor(tensorProto: onnx.ITensorProto): CPUTensor {
+export function createTensor(tensorProto: onnx.ITensorProto): CPUTensor<any> {
   if (tensorProto.segment !== undefined && tensorProto.segment !== null) {
     throw new Error('Handling of tensor proto segment not yet implemented');
   }
@@ -52,7 +52,7 @@ export function createTensor(tensorProto: onnx.ITensorProto): CPUTensor {
         values[i / 8] = value;
       }
 
-      return new CPUTensor(shape, values, 'int');
+      return new CPUTensor(shape, values, 'int32');
     } else {
       throw new Error('Cant process int64 tensor without raw data');
     }

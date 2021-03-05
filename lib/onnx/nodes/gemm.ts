@@ -1,5 +1,5 @@
 import {Mode} from '../../model/module';
-import Tensor from '../../types';
+import Tensor, {DType} from '../../types';
 import {OnnxNode} from '../node';
 import {Attributes, Constants} from '../types';
 
@@ -29,7 +29,9 @@ export class GemmNode extends OnnxNode {
     this.transB = transB === 1;
   }
 
-  async forward(inputs: Tensor[]): Promise<Tensor[]> {
+  async forward<DTpe extends DType>(
+    inputs: Tensor<DTpe>[]
+  ): Promise<Tensor<DTpe>[]> {
     const a = inputs[0];
     const b = inputs[1];
     const c = inputs[2];

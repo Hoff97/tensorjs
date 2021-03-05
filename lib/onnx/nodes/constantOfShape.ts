@@ -9,7 +9,7 @@ import {createTensor} from '../util';
 // This does not support gradients right now, mainly because
 // the forward pass needs to directly access the constant value
 export class ConstantOfShapeNode extends OnnxNode {
-  private tensor?: CPUTensor;
+  private tensor?: CPUTensor<any>;
 
   constructor(
     attributes: Attributes,
@@ -29,7 +29,7 @@ export class ConstantOfShapeNode extends OnnxNode {
     }
   }
 
-  async forward(inputs: Tensor[]): Promise<Tensor[]> {
+  async forward(inputs: Tensor<any>[]): Promise<Tensor<any>[]> {
     const _shape = inputs[0];
 
     if (this.onnxVersion < 11 && this.tensor !== undefined) {
@@ -44,7 +44,7 @@ export class ConstantOfShapeNode extends OnnxNode {
       const size = getSize(shape);
       const values = new Float32Array(size).fill(this.tensor.get(0));
 
-      return [new CPUTensor(shape, values, this.tensor.type)];
+      return [new CPUTensor(shape, values, this.tensor.dtype)];
     }
     throw new Error(
       `ConstantOfShape not implemented for onnx version ${this.onnxVersion}`

@@ -1,5 +1,5 @@
 import {Mode} from '../../model/module';
-import Tensor from '../../types';
+import Tensor, {DType} from '../../types';
 import {OnnxNode} from '../node';
 import {Attributes, Constants} from '../types';
 
@@ -21,7 +21,9 @@ export class UnsqueezeNode extends OnnxNode {
     }
   }
 
-  async forward(inputs: Tensor[]): Promise<Tensor[]> {
+  async forward<DTpe extends DType>(
+    inputs: Tensor<DTpe>[]
+  ): Promise<Tensor<DTpe>[]> {
     const x = inputs[0];
 
     if (this.onnxVersion < 13 && this.axes !== undefined) {

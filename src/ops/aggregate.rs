@@ -1,9 +1,18 @@
 use crate::shape::*;
 use crate::tensor::*;
 use js_sys::Uint32Array;
-use wasm_bindgen::prelude::*;
+use num_traits::zero;
+use num_traits::Float;
+use num_traits::FromPrimitive;
+use num_traits::Num;
 
-impl Tensor {
+impl<DType> Tensor<DType>
+where
+    DType: Copy,
+    DType: Num,
+    DType: PartialOrd,
+    DType: FromPrimitive,
+{
     #[inline]
     pub fn pool_continuous<F, F2, F3>(
         &self,
@@ -14,11 +23,11 @@ impl Tensor {
         post: F2,
         init: bool,
         init_func: F3,
-    ) -> Tensor
+    ) -> Tensor<DType>
     where
-        F: Fn(f32, f32) -> f32,
-        F2: Fn(f32) -> f32,
-        F3: Fn(f32) -> f32,
+        F: Fn(DType, DType) -> DType,
+        F2: Fn(DType) -> DType,
+        F3: Fn(DType) -> DType,
     {
         let mut result_rank = self.rank() - axes.len() as usize;
 
@@ -46,7 +55,7 @@ impl Tensor {
             }
         }
         let result_strides = compute_strides(&result_shape);
-        let mut values = vec![0.0; result_size];
+        let mut values = vec![zero(); result_size];
 
         let self_strides = compute_strides_no_zero(self.get_sh());
 
@@ -108,11 +117,11 @@ impl Tensor {
         post: F2,
         init: bool,
         init_func: F3,
-    ) -> Tensor
+    ) -> Tensor<DType>
     where
-        F: Fn(f32, f32) -> f32,
-        F2: Fn(f32) -> f32,
-        F3: Fn(f32) -> f32,
+        F: Fn(DType, DType) -> DType,
+        F2: Fn(DType) -> DType,
+        F3: Fn(DType) -> DType,
     {
         let mut result_rank = self.rank() - axes.len() as usize;
 
@@ -170,7 +179,7 @@ impl Tensor {
             }
         }
         let result_strides = compute_strides(&result_shape);
-        let mut values = vec![0.0; result_size];
+        let mut values = vec![zero(); result_size];
         let mut initialized = vec![false; result_size];
 
         let mut input_index = vec![0; self.rank()];
@@ -201,130 +210,148 @@ impl Tensor {
         Tensor::new(result_shape, result_strides, result_size, values)
     }
 
-    pub fn _sum(&self, axes: &Vec<usize>, keep_dims: bool) -> Tensor {
+    pub fn _sum(&self, axes: &Vec<usize>, keep_dims: bool) -> Tensor<DType> {
         return self._pool(
             axes,
             keep_dims,
-            |x: f32, y: f32| x + y,
+            |x: DType, y: DType| x + y,
             false,
-            |x: f32| x,
+            |x: DType| x,
             false,
-            |x: f32| x,
+            |x: DType| x,
         );
     }
 
-    pub fn _sum_square(&self, axes: &Vec<usize>, keep_dims: bool) -> Tensor {
+    pub fn _sum_square(&self, axes: &Vec<usize>, keep_dims: bool) -> Tensor<DType> {
         return self._pool(
             axes,
             keep_dims,
-            |x: f32, y: f32| (x * x) + y,
+            |x: DType, y: DType| (x * x) + y,
             false,
-            |x: f32| x,
+            |x: DType| x,
             true,
-            |x: f32| x * x,
+            |x: DType| x * x,
         );
     }
 
-    pub fn _product(&self, axes: &Vec<usize>, keep_dims: bool) -> Tensor {
+    pub fn _product(&self, axes: &Vec<usize>, keep_dims: bool) -> Tensor<DType> {
         return self._pool(
             axes,
             keep_dims,
-            |x: f32, y: f32| x * y,
+            |x: DType, y: DType| x * y,
             false,
-            |x: f32| x,
+            |x: DType| x,
             false,
-            |x: f32| x,
+            |x: DType| x,
         );
     }
 
-    pub fn _max(&self, axes: &Vec<usize>, keep_dims: bool) -> Tensor {
+    pub fn _max(&self, axes: &Vec<usize>, keep_dims: bool) -> Tensor<DType> {
         return self._pool(
             axes,
             keep_dims,
-            |x: f32, y: f32| x.max(y),
+            |x: DType, y: DType| if x > y { x } else { y },
             false,
-            |x: f32| x,
+            |x: DType| x,
             false,
-            |x: f32| x,
+            |x: DType| x,
         );
     }
 
-    pub fn _min(&self, axes: &Vec<usize>, keep_dims: bool) -> Tensor {
+    pub fn _min(&self, axes: &Vec<usize>, keep_dims: bool) -> Tensor<DType> {
         return self._pool(
             axes,
             keep_dims,
-            |x: f32, y: f32| x.min(y),
+            |x: DType, y: DType| if x < y { x } else { y },
             false,
-            |x: f32| x,
+            |x: DType| x,
             false,
-            |x: f32| x,
+            |x: DType| x,
         );
     }
 
-    pub fn _reduce_mean(&self, axes: &Vec<usize>, keep_dims: bool) -> Tensor {
+    pub fn _reduce_mean(&self, axes: &Vec<usize>, keep_dims: bool) -> Tensor<DType> {
         let mut pool_size = 1;
         for i in 0..axes.len() {
             pool_size *= self.get_dim_size(axes[i]);
         }
-        let pool_size_f = pool_size as f32;
 
-        return self._pool(
-            axes,
-            keep_dims,
-            |x: f32, y: f32| x + y,
-            true,
-            |x: f32| x / pool_size_f,
-            false,
-            |x: f32| x,
-        );
+        match DType::from_usize(pool_size) {
+            Some(s) => self._pool(
+                axes,
+                keep_dims,
+                |x: DType, y: DType| x + y,
+                true,
+                |x: DType| x / s,
+                false,
+                |x: DType| x,
+            ),
+            None => panic!("Tensor size too large to compute mean for given dtype"),
+        }
     }
 
-    pub fn _reduce_mean_square(&self, axes: &Vec<usize>, keep_dims: bool) -> Tensor {
+    pub fn _reduce_mean_square(&self, axes: &Vec<usize>, keep_dims: bool) -> Tensor<DType> {
         let mut pool_size = 1;
         for i in 0..axes.len() {
             pool_size *= self.get_dim_size(axes[i]);
         }
-        let pool_size_f = pool_size as f32;
 
-        return self._pool(
-            axes,
-            keep_dims,
-            |x: f32, y: f32| (x * x) + y,
-            true,
-            |x: f32| x / pool_size_f,
-            true,
-            |x: f32| x * x,
-        );
+        match DType::from_usize(pool_size) {
+            Some(s) => self._pool(
+                axes,
+                keep_dims,
+                |x: DType, y: DType| (x * x) + y,
+                true,
+                |x: DType| x / s,
+                true,
+                |x: DType| x * x,
+            ),
+            None => panic!("Cant convert from usize to given dtype"),
+        }
     }
+}
 
-    pub fn _reduce_log_sum(&self, axes: &Vec<usize>, keep_dims: bool) -> Tensor {
+impl<DType> Tensor<DType>
+where
+    DType: Clone,
+    DType: Num,
+    DType: PartialOrd,
+    DType: FromPrimitive,
+    DType: Float,
+{
+    pub fn _reduce_log_sum(&self, axes: &Vec<usize>, keep_dims: bool) -> Tensor<DType> {
         return self._pool(
             axes,
             keep_dims,
-            |x: f32, y: f32| x + y,
+            |x: DType, y: DType| x + y,
             true,
-            |x: f32| x.ln(),
+            |x: DType| x.ln(),
             false,
-            |x: f32| x,
+            |x: DType| x,
         );
     }
 
-    pub fn _reduce_log_sum_exp(&self, axes: &Vec<usize>, keep_dims: bool) -> Tensor {
+    pub fn _reduce_log_sum_exp(&self, axes: &Vec<usize>, keep_dims: bool) -> Tensor<DType> {
         return self._pool(
             axes,
             keep_dims,
-            |x: f32, y: f32| x.exp() + y,
+            |x: DType, y: DType| x.exp() + y,
             true,
-            |x: f32| x.ln(),
+            |x: DType| x.ln(),
             true,
-            |x: f32| x.exp(),
+            |x: DType| x.exp(),
         );
     }
 }
 
-#[wasm_bindgen]
-impl Tensor {
-    pub fn sum(&self, axes: Uint32Array, keep_dims: bool) -> Tensor {
+impl<DType> Tensor<DType>
+where
+    DType: Copy,
+    DType: Num,
+    DType: PartialOrd,
+    DType: FromPrimitive,
+{
+    pub fn sum(&self, axes: Uint32Array, keep_dims: bool) -> Tensor<DType> {
         let mut ax: Vec<usize> = vec![0; axes.length() as usize];
         for i in 0..axes.length() {
             ax[i as usize] = axes.get_index(i) as usize;
@@ -332,7 +359,7 @@ impl Tensor {
         return self._sum(&ax, keep_dims);
     }
 
-    pub fn sum_square(&self, axes: Uint32Array, keep_dims: bool) -> Tensor {
+    pub fn sum_square(&self, axes: Uint32Array, keep_dims: bool) -> Tensor<DType> {
         let mut ax: Vec<usize> = vec![0; axes.length() as usize];
         for i in 0..axes.length() {
             ax[i as usize] = axes.get_index(i) as usize;
@@ -340,7 +367,7 @@ impl Tensor {
         return self._sum_square(&ax, keep_dims);
     }
 
-    pub fn product(&self, axes: Uint32Array, keep_dims: bool) -> Tensor {
+    pub fn product(&self, axes: Uint32Array, keep_dims: bool) -> Tensor<DType> {
         let mut ax: Vec<usize> = vec![0; axes.length() as usize];
         for i in 0..axes.length() {
             ax[i as usize] = axes.get_index(i) as usize;
@@ -348,7 +375,7 @@ impl Tensor {
         return self._product(&ax, keep_dims);
     }
 
-    pub fn max(&self, axes: Uint32Array, keep_dims: bool) -> Tensor {
+    pub fn max(&self, axes: Uint32Array, keep_dims: bool) -> Tensor<DType> {
         let mut ax: Vec<usize> = vec![0; axes.length() as usize];
         for i in 0..axes.length() {
             ax[i as usize] = axes.get_index(i) as usize;
@@ -356,7 +383,7 @@ impl Tensor {
         return self._max(&ax, keep_dims);
     }
 
-    pub fn min(&self, axes: Uint32Array, keep_dims: bool) -> Tensor {
+    pub fn min(&self, axes: Uint32Array, keep_dims: bool) -> Tensor<DType> {
         let mut ax: Vec<usize> = vec![0; axes.length() as usize];
         for i in 0..axes.length() {
             ax[i as usize] = axes.get_index(i) as usize;
@@ -364,7 +391,7 @@ impl Tensor {
         return self._min(&ax, keep_dims);
     }
 
-    pub fn reduce_mean(&self, axes: Uint32Array, keep_dims: bool) -> Tensor {
+    pub fn reduce_mean(&self, axes: Uint32Array, keep_dims: bool) -> Tensor<DType> {
         let mut ax: Vec<usize> = vec![0; axes.length() as usize];
         for i in 0..axes.length() {
             ax[i as usize] = axes.get_index(i) as usize;
@@ -372,15 +399,24 @@ impl Tensor {
         return self._reduce_mean(&ax, keep_dims);
     }
 
-    pub fn reduce_mean_square(&self, axes: Uint32Array, keep_dims: bool) -> Tensor {
+    pub fn reduce_mean_square(&self, axes: Uint32Array, keep_dims: bool) -> Tensor<DType> {
         let mut ax: Vec<usize> = vec![0; axes.length() as usize];
         for i in 0..axes.length() {
             ax[i as usize] = axes.get_index(i) as usize;
         }
         return self._reduce_mean_square(&ax, keep_dims);
     }
+}
 
-    pub fn reduce_log_sum(&self, axes: Uint32Array, keep_dims: bool) -> Tensor {
+impl<DType> Tensor<DType>
+where
+    DType: Clone,
+    DType: Num,
+    DType: PartialOrd,
+    DType: FromPrimitive,
+    DType: Float,
+{
+    pub fn reduce_log_sum(&self, axes: Uint32Array, keep_dims: bool) -> Tensor<DType> {
         let mut ax: Vec<usize> = vec![0; axes.length() as usize];
         for i in 0..axes.length() {
             ax[i as usize] = axes.get_index(i) as usize;
@@ -388,7 +424,7 @@ impl Tensor {
         return self._reduce_log_sum(&ax, keep_dims);
     }
 
-    pub fn reduce_log_sum_exp(&self, axes: Uint32Array, keep_dims: bool) -> Tensor {
+    pub fn reduce_log_sum_exp(&self, axes: Uint32Array, keep_dims: bool) -> Tensor<DType> {
         let mut ax: Vec<usize> = vec![0; axes.length() as usize];
         for i in 0..axes.length() {
             ax[i as usize] = axes.get_index(i) as usize;

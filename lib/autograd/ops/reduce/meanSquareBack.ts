@@ -1,14 +1,14 @@
-import {Tensor} from '../../../library';
+import {DType, Tensor} from '../../../library';
 import {BackwardOp, VariableI} from '../../types';
 
-export class MeanSquareBack implements BackwardOp {
+export class MeanSquareBack<DTpe extends DType> implements BackwardOp<DTpe> {
   constructor(
-    public input: VariableI,
+    public input: VariableI<DTpe>,
     public sumDims: number[],
     public keepDims: boolean
   ) {}
 
-  backward(grad: Tensor): void {
+  backward(grad: Tensor<DTpe>): void {
     const inShape = this.input.value.getShape();
     if (!this.keepDims) {
       const newShape = [];

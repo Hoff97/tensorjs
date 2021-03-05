@@ -1,16 +1,16 @@
-import {Tensor} from '../../../library';
+import {DType, Tensor} from '../../../library';
 import {BackwardOp, VariableI} from '../../types';
 
-export class DivideBack implements BackwardOp {
+export class DivideBack<DTpe extends DType> implements BackwardOp<DTpe> {
   constructor(
-    public a: VariableI,
-    public b: VariableI,
-    public divResult: Tensor,
+    public a: VariableI<DTpe>,
+    public b: VariableI<DTpe>,
+    public divResult: Tensor<DTpe>,
     public shape: readonly number[],
     public alpha: number
   ) {}
 
-  backward(grad: Tensor): void {
+  backward(grad: Tensor<DTpe>): void {
     const shapeA = this.a.getShape();
     const shapeB = this.b.getShape();
 
@@ -27,7 +27,7 @@ export class DivideBack implements BackwardOp {
     }
 
     if (!this.a.noGrad) {
-      let gradA: Tensor;
+      let gradA: Tensor<DTpe>;
       if (sumADims.length === 0) {
         gradA = grad.divide(this.b.value, this.alpha).reshape(shapeA, false);
       } else {
@@ -43,7 +43,7 @@ export class DivideBack implements BackwardOp {
     }
 
     if (!this.b.noGrad) {
-      let gradB: Tensor;
+      let gradB: Tensor<DTpe>;
       if (sumBDims.length === 0) {
         const multiplied = grad.multiply(this.divResult);
         const divided = multiplied.divide(this.b.value, -this.alpha);

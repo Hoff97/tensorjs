@@ -1,5 +1,5 @@
 import {Mode} from '../../model/module';
-import Tensor from '../../types';
+import Tensor, {DType} from '../../types';
 import {OnnxNode} from '../node';
 import {Attributes, Constants} from '../types';
 
@@ -20,7 +20,9 @@ export class SoftmaxNode extends OnnxNode {
     this.axis = this.getAttributeInt('axis');
   }
 
-  async defaultForward(inputs: Tensor[]): Promise<Tensor[]> {
+  async forward<DTpe extends DType>(
+    inputs: Tensor<DTpe>[]
+  ): Promise<Tensor<DTpe>[]> {
     const x = inputs[0];
 
     const shapeX = x.getShape();
@@ -50,10 +52,6 @@ export class SoftmaxNode extends OnnxNode {
     sum.delete();
 
     return [result.reshape(shapeX, false)];
-  }
-
-  async forward(inputs: Tensor[]): Promise<Tensor[]> {
-    return this.defaultForward(inputs);
   }
 
   getType() {

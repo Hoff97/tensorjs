@@ -4,19 +4,28 @@ use crate::utils::conv_output_size;
 use crate::utils::conv_transpose_output_size;
 use js_sys::Float32Array;
 use js_sys::Uint32Array;
-use wasm_bindgen::prelude::*;
+use num_traits::zero;
+use num_traits::Float;
+use num_traits::FromPrimitive;
+use num_traits::Num;
 
-impl Tensor {
+impl<DType> Tensor<DType>
+where
+    DType: Copy,
+    DType: Num,
+    DType: FromPrimitive,
+    DType: PartialOrd,
+{
     pub fn _conv(
         &self,
-        kernel: &Tensor,
-        bias: Option<&Tensor>,
+        kernel: &Tensor<DType>,
+        bias: Option<&Tensor<DType>>,
         _dilations: &Vec<usize>,
         group: usize,
         _pads: &Vec<usize>,
         _strides: &Vec<usize>,
         activation: u32,
-    ) -> Tensor {
+    ) -> Tensor<DType> {
         let N = self.get_dim_size(0);
         let C = self.get_dim_size(1);
         let D = self.get_sh();
@@ -40,7 +49,7 @@ impl Tensor {
 
         let output_strides = compute_strides(&output_shape);
         let o_size = get_size(&output_shape);
-        let mut values = vec![0.0; o_size];
+        let mut values = vec![zero(); o_size];
 
         // Iterate over all batches
         for n in 0..N {
@@ -97,7 +106,7 @@ impl Tensor {
                             if !skip {
                                 let w_i = kernel.get_ix(kernel_base + kernel_ix);
                                 let x_i = self.get(&input_ix);
-                                result += w_i * x_i;
+                                result = result + w_i * x_i;
                             }
 
                             increment_index(&mut kernel_indices, kernel.get_sh());
@@ -113,9 +122,18 @@ impl Tensor {
                     for o in 0..output_size {
                         let mut result = values[basis + o];
                         if activation == 1 {
-                            result = result.max(0.0)
+                            if result < zero() {
+                                result = zero()
+                            }
                         } else if activation == 2 {
-                            result = result.max(0.0).min(6.0);
+                            match DType::from_u32(6) {
+                                Some(six) => if result < zero() {
+                                    result = zero()
+                                } else if result > six {
+                                    result = six
+                                },
+                                None => panic!("Encountered dtype that can not represent 6 for relu6 activation")
+                            }
                         }
                         values[basis + o] = result;
                     }
@@ -128,12 +146,12 @@ impl Tensor {
 
     pub fn _conv_transpose(
         &self,
-        kernel: &Tensor,
+        kernel: &Tensor<DType>,
         _dilations: &Vec<usize>,
         group: usize,
         _pads: &Vec<usize>,
         _strides: &Vec<usize>,
-    ) -> Tensor {
+    ) -> Tensor<DType> {
         let N = self.get_dim_size(0);
         let C = self.get_dim_size(1);
         let D = self.get_sh();
@@ -157,7 +175,7 @@ impl Tensor {
 
         let output_strides = compute_strides(&output_shape);
         let o_size = get_size(&output_shape);
-        let mut values = vec![0.0; o_size];
+        let mut values = vec![zero(); o_size];
 
         // Iterate over all batches
         for n in 0..N {
@@ -215,7 +233,7 @@ impl Tensor {
                             if !skip {
                                 let w_i = kernel.get_ix(kernel_base + kernel_ix);
                                 let x_i = self.get(&input_ix);
-                                result += w_i * x_i;
+                                result = result + w_i * x_i;
                             }
 
                             increment_index(&mut kernel_indices, kernel.get_sh());
@@ -238,7 +256,7 @@ impl Tensor {
         pads: &Vec<usize>,
         strides: &Vec<usize>,
         include_pad: bool,
-    ) -> Tensor {
+    ) -> Tensor<DType> {
         let N = self.get_dim_size(0);
         let C = self.get_dim_size(1);
         let D = self.get_sh();
@@ -259,7 +277,7 @@ impl Tensor {
 
         let output_strides = compute_strides(&output_shape);
         let o_size = get_size(&output_shape);
-        let mut values = vec![0.0; o_size];
+        let mut values = vec![zero(); o_size];
 
         // Iterate over all batches
         for n in 0..N {
@@ -272,7 +290,7 @@ impl Tensor {
                 output_indices[1] = c;
 
                 for o_ix in 0..output_size {
-                    let mut result = 0.0;
+                    let mut result = zero();
                     let mut count = 0;
 
                     let mut kernel_indices = vec![0; data_rank];
@@ -298,7 +316,7 @@ impl Tensor {
 
                         if !skip {
                             let x_i = self.get(&input_ix);
-                            result += x_i;
+                            result = result + x_i;
                         }
 
                         if !skip || include_pad {
@@ -308,7 +326,10 @@ impl Tensor {
                         increment_index(&mut kernel_indices, kernel_shape);
                     }
 
-                    result = result / (count as f32);
+                    match DType::from_u32(count) {
+                        Some(co) => result = result / co,
+                        None => panic!("DType can not represent kernel size in average pool"),
+                    }
 
                     values[basis + o_ix] = result;
 
@@ -320,7 +341,7 @@ impl Tensor {
         Tensor::new(output_shape, output_strides, o_size, values)
     }
 
-    pub fn _pad(&self, pads: &Vec<usize>, mode: i32, value: f32) -> Tensor {
+    pub fn _pad(&self, pads: &Vec<usize>, mode: i32, value: DType) -> Tensor<DType> {
         let rank = self.rank();
 
         let mut output_shape = vec![0; rank];
@@ -330,7 +351,7 @@ impl Tensor {
         let output_strides = compute_strides(&output_shape);
         let output_size = get_size(&output_shape);
 
-        let mut values = vec![0.0; output_size];
+        let mut values = vec![zero(); output_size];
 
         let mut ix = vec![0; rank];
         let mut input_ix = vec![0; rank];
@@ -373,7 +394,7 @@ impl Tensor {
         Tensor::new(output_shape, output_strides, output_size, values)
     }
 
-    pub fn _upsample(&self, scales: &Vec<f32>) -> Tensor {
+    pub fn _upsample(&self, scales: &Vec<f32>) -> Tensor<DType> {
         let rank = self.rank();
         let mut result_shape = vec![0; rank];
         let mut ax_ix = 0;
@@ -384,7 +405,7 @@ impl Tensor {
         let result_strides = compute_strides(&result_shape);
         let result_size = get_size(&result_shape);
 
-        let mut values = vec![0.0; result_size];
+        let mut values = vec![zero(); result_size];
 
         let mut out_ix = vec![0; rank];
         let mut in_ix = vec![0; rank];
@@ -403,17 +424,22 @@ impl Tensor {
     }
 }
 
-#[wasm_bindgen]
-impl Tensor {
+impl<DType> Tensor<DType>
+where
+    DType: Copy,
+    DType: Num,
+    DType: FromPrimitive,
+    DType: PartialOrd,
+{
     pub fn conv(
         &self,
-        kernel: &Tensor,
+        kernel: &Tensor<DType>,
         dilations: Uint32Array,
         group: u32,
         pads: Uint32Array,
         strides: Uint32Array,
         activation: u32,
-    ) -> Tensor {
+    ) -> Tensor<DType> {
         let mut _dilations: Vec<usize> = vec![0; dilations.length() as usize];
         let mut _pads: Vec<usize> = vec![0; pads.length() as usize];
         let mut _strides: Vec<usize> = vec![0; strides.length() as usize];
@@ -438,14 +464,14 @@ impl Tensor {
 
     pub fn conv_with_bias(
         &self,
-        kernel: &Tensor,
-        bias: &Tensor,
+        kernel: &Tensor<DType>,
+        bias: &Tensor<DType>,
         dilations: Uint32Array,
         group: u32,
         pads: Uint32Array,
         strides: Uint32Array,
         activation: u32,
-    ) -> Tensor {
+    ) -> Tensor<DType> {
         let mut _dilations: Vec<usize> = vec![0; dilations.length() as usize];
         let mut _pads: Vec<usize> = vec![0; pads.length() as usize];
         let mut _strides: Vec<usize> = vec![0; strides.length() as usize];
@@ -470,12 +496,12 @@ impl Tensor {
 
     pub fn conv_transpose(
         &self,
-        kernel: &Tensor,
+        kernel: &Tensor<DType>,
         dilations: Uint32Array,
         group: u32,
         pads: Uint32Array,
         strides: Uint32Array,
-    ) -> Tensor {
+    ) -> Tensor<DType> {
         let mut _dilations: Vec<usize> = vec![0; dilations.length() as usize];
         let mut _pads: Vec<usize> = vec![0; pads.length() as usize];
         let mut _strides: Vec<usize> = vec![0; strides.length() as usize];
@@ -496,7 +522,7 @@ impl Tensor {
         pads: Uint32Array,
         strides: Uint32Array,
         include_pad: bool,
-    ) -> Tensor {
+    ) -> Tensor<DType> {
         let mut _kernel_shape: Vec<usize> = vec![0; kernel_shape.length() as usize];
         let mut _pads: Vec<usize> = vec![0; pads.length() as usize];
         let mut _strides: Vec<usize> = vec![0; strides.length() as usize];
@@ -512,7 +538,7 @@ impl Tensor {
     }
 
     // Mode: 0 == constant, 1 == reflect, 2 == edge
-    pub fn pad(&self, pads: Uint32Array, mode: i32, value: f32) -> Tensor {
+    pub fn pad(&self, pads: Uint32Array, mode: i32, value: DType) -> Tensor<DType> {
         let mut _pads: Vec<usize> = vec![0; pads.length() as usize];
         for i in 0..pads.length() {
             _pads[i as usize] = pads.get_index(i) as usize;
@@ -520,7 +546,7 @@ impl Tensor {
         return self._pad(&_pads, mode, value);
     }
 
-    pub fn upsample(&self, scales: Float32Array) -> Tensor {
+    pub fn upsample(&self, scales: Float32Array) -> Tensor<DType> {
         let mut _scales: Vec<f32> = vec![0.0; scales.length() as usize];
         for i in 0..scales.length() {
             _scales[i as usize] = scales.get_index(i) as f32;
@@ -528,22 +554,30 @@ impl Tensor {
 
         return self._upsample(&_scales);
     }
+}
 
+impl<DType> Tensor<DType>
+where
+    DType: Clone,
+    DType: Num,
+    DType: PartialOrd,
+    DType: Float,
+{
     pub fn normalize(
         &self,
-        mean: &Tensor,
-        variance: &Tensor,
-        epsilon: f32,
-        scale: &Tensor,
-        bias: &Tensor,
-    ) -> Tensor {
+        mean: &Tensor<DType>,
+        variance: &Tensor<DType>,
+        epsilon: DType,
+        scale: &Tensor<DType>,
+        bias: &Tensor<DType>,
+    ) -> Tensor<DType> {
         let mut result_shape = vec![0; self.rank()];
         for i in 0..self.rank() {
             result_shape[i] = self.get_dim_size(i);
         }
         let result_strides = compute_strides(&result_shape);
 
-        let mut values = vec![0.0; self.size];
+        let mut values = vec![zero(); self.size];
 
         let mut out_ix = vec![0; self.rank()];
         for i in 0..self.size {

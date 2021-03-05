@@ -1,10 +1,13 @@
 import {getSize} from '../../../util/shape';
 import {outputDimsSize} from '../../util/conv';
 
-import {GPUTensorConstructor, GPUTensorI} from '../../../tensor/gpu/interface';
+import {
+  DTypeGpu,
+  GPUTensorConstructor,
+  GPUTensorI,
+} from '../../../tensor/gpu/interface';
 import {GPUMemoryAllocator} from '../../../tensor/gpu/memory';
 import {Input, Operation} from '../operation';
-import {Precision} from '../../../types';
 import {defaultAllocator} from '../../../tensor/gpu/gl';
 
 export interface AveragePoolInfo {
@@ -41,9 +44,10 @@ export class AveragePoolOperation<
 
   constructor(
     tensorConstructor: GPUTensorConstructor<GPUTensor>,
+    dtype: DTypeGpu,
     allocator?: GPUMemoryAllocator
   ) {
-    super(tensorConstructor, allocator);
+    super(tensorConstructor, dtype, allocator);
   }
 
   updateInputIx() {
@@ -196,7 +200,7 @@ export class AveragePoolOperation<
     return outputShape;
   }
 
-  compile(info: AveragePoolInfo, precision: Precision) {
+  compile(info: AveragePoolInfo) {
     if (info.shapeX !== undefined) {
       info.dataRank = info.shapeX.length - 2;
 
@@ -208,17 +212,14 @@ export class AveragePoolOperation<
       info.includePad = 0;
     }
 
-    super.compile(info, precision);
+    super.compile(info);
   }
 
-  getCompilationInfo(
-    input: AveragePoolInput,
-    precision: Precision
-  ): AveragePoolInfo {
+  getCompilationInfo(input: AveragePoolInput): AveragePoolInfo {
     const outputShape = this.getOutputShape(input);
     const outputSize = defaultAllocator.getAllocationDimensions(
       getSize(outputShape),
-      precision
+      this.dtype
     );
 
     const kernelSize = getSize(input.kernelShape);

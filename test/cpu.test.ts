@@ -5,7 +5,7 @@ import testConv from './conv';
 import testPool from './pool';
 
 const constructor = (shape: ReadonlyArray<number>, values: number[]) =>
-  new CPUTensor(shape, values);
+  new CPUTensor(shape, values, 'float32');
 
 testBasic('CPU', constructor);
 testAggregate('CPU', constructor);

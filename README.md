@@ -48,14 +48,14 @@ You can create tensors of the respective backend like this:
   ```
 - GPU:
   ```typescript
-  const tensor = new tjs.tensor.gpu.GPUTensor(new Float32Array([1,2,3,4]), [2,2], 32);
+  const tensor = new tjs.tensor.gpu.GPUTensor(new Float32Array([1,2,3,4]), [2,2]);
   ```
   or directly from an image/video element:
   ```typescript
   const video: HTMLVideoElement = document.querySelector("#videoElement");
   const tensor = tjs.tensor.gpu.GPUTensor.fromData(video);
   ```
-  which will be a tensor with shape `[height,width,4]`.
+  which will be a tensor with shape `[height,width,4]` and data type `float32`.
   Creating a GPU tensor from a video element will usually be pretty fast.
   Creation from an image not necessarily, since here the image data
   first has to be transferred to the GPU.
@@ -89,6 +89,37 @@ which will give you the values as a array of the values.
 For CPU tensors you can also get the value at an index:
 ```typescript
 const value = tensor.get([1,2,3,4]);
+```
+
+### Data types
+
+Tensors are created with float values (using 32 bits) by default.
+You can specify another data type on creation:
+```typescript
+  const tensor = new tjs.tensor.cpu.CPUTensor([2,2], [1,2,3,4], 'float16');
+```
+or cast to another data type with:
+```typescript
+  const casted = tensor.cast('float16');
+```
+The available data types are `float64`, `float32`, `float16`, `int32`, `int16`, `int8`, `uint32`, `uint16`, `uint8`.
+Note that not all backends support all data types:
+- CPU: Supports all data types, but `float16` will be represented as `float32` internally
+- WASM: Supports all except `float16`
+- GPU: Supports all except `float64`. Note that except for `float16`, all other data types will be
+  represented by `float32` internally, since WebGL1 does not allow writing anything else than floats to
+  frame buffers. This means that for `int32` and `uint32`, not the whole range of the respective data type is available.
+
+The data type of a tensor can be accessed via `tensor.dtype`. Additionally, each tensor has a generic type argument,
+which will carry its data type:
+```typescript
+  const tensor: Tensor<'float16'> = new tjs.tensor.cpu.CPUTensor([2,2], [1,2,3,4], 'float16');
+```
+This allows type checking tensor operations, which means that only tensor operations with the same
+data type compile when using typescript.
+The generic type defaults to `float32`. If you want to represent the data type of a tensor with an unknown data type, write for example
+```typescript
+  const tensor: Tensor<any> = a.add(b);
 ```
 
 ### Converting between backends
@@ -144,19 +175,14 @@ model.toGPU();
 ```
 For the best performance you should also create your GPU tensors with half precision
 ```typescript
-const tensor = new tjs.tensor.gpu.GPUTensor(new Float32Array([1,2,3,4]), [2,2], 16);
-```
-or directly from an image/video element:
-```typescript
-const video: HTMLVideoElement = document.querySelector("#videoElement");
-const tensor = tjs.tensor.gpu.GPUTensor.fromData(video, 16);
+const tensor = new tjs.tensor.gpu.GPUTensor(new Float32Array([1,2,3,4]), [2,2], 'float16');
 ```
 
 The outputs of the model will be half-precision tensors as well.
 To read the values of a half precision gpu tensor, you have to convert
 it to full precision first, which can be done with:
 ```typescript
-const values = await tensor.copy(32).getValues();
+const values = await tensor.cast('float32').getValues();
 ```
 
 ### Other performance considerations

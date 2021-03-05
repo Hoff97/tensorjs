@@ -1,6 +1,10 @@
 import {CPUTensor} from '../../tensor/cpu/tensor';
+import {DType} from '../../types';
 
-export function matMul(a: CPUTensor, b: CPUTensor) {
+export function matMul<DTpe extends DType>(
+  a: CPUTensor<DTpe>,
+  b: CPUTensor<DTpe>
+) {
   if (a.shape.length !== 2 || b.shape.length !== 2) {
     throw new Error('Matmul expects both operands to have rank 2');
   }
@@ -15,7 +19,7 @@ export function matMul(a: CPUTensor, b: CPUTensor) {
   const n = a.shape[1];
   const o = b.shape[1];
 
-  const result = new CPUTensor([m, o]);
+  const result = new CPUTensor([m, o], undefined, a.dtype);
 
   for (let i = 0; i < m; i += 1) {
     for (let k = 0; k < o; k += 1) {

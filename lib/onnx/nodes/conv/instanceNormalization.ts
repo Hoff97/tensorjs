@@ -1,6 +1,6 @@
 import {Mode} from '../../../model/module';
 import {glContext} from '../../../tensor/gpu/gl';
-import Tensor from '../../../types';
+import Tensor, {DType} from '../../../types';
 import {OnnxNode} from '../../node';
 import {Attributes, Constants} from '../../types';
 
@@ -22,7 +22,9 @@ export class InstanceNormalizationNode extends OnnxNode {
     //TODO: Handle onnx versions < 6 here
   }
 
-  async defaultForward(inputs: Tensor[]): Promise<Tensor[]> {
+  async forward<DTpe extends DType>(
+    inputs: Tensor<DTpe>[]
+  ): Promise<Tensor<DTpe>[]> {
     const x = inputs[0];
     let scale = inputs[1];
     let B = inputs[2];
@@ -55,10 +57,6 @@ export class InstanceNormalizationNode extends OnnxNode {
     variance.delete();
 
     return [result];
-  }
-
-  async forward(inputs: Tensor[]): Promise<Tensor[]> {
-    return this.defaultForward(inputs);
   }
 
   getType() {

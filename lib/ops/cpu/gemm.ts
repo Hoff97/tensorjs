@@ -1,14 +1,15 @@
 import {CPUTensor} from '../../tensor/cpu/tensor';
+import {DType} from '../../types';
 import {getSize} from '../../util/shape';
 
-export function gemm(
-  a: CPUTensor,
-  b: CPUTensor,
+export function gemm<DTpe extends DType>(
+  a: CPUTensor<DTpe>,
+  b: CPUTensor<DTpe>,
   aTranspose: boolean,
   bTranspose: boolean,
   alpha: number,
   beta: number,
-  c?: CPUTensor
+  c?: CPUTensor<DTpe>
 ) {
   const rank = a.shape.length;
 
@@ -51,7 +52,7 @@ export function gemm(
   }
   const resultShape = [...batchShape, M, O];
 
-  const Y = new CPUTensor(resultShape);
+  const Y = new CPUTensor(resultShape, undefined, a.dtype);
 
   for (let i = 0; i < batchSize; i++) {
     const aBase = i * aBatchMult;

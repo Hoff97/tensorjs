@@ -1,5 +1,5 @@
 import {Mode} from '../../../model/module';
-import Tensor from '../../../types';
+import Tensor, {DType} from '../../../types';
 import {Attributes, Constants} from '../../types';
 import {BinaryNode} from './binaryNode';
 
@@ -15,7 +15,7 @@ export class SubNode extends BinaryNode {
     super(attributes, inputs, outputs, constants, onnxVersion, 'Sub', mode);
   }
 
-  compute(a: Tensor, b: Tensor): Tensor {
+  compute<DTpe extends DType>(a: Tensor<DTpe>, b: Tensor<DTpe>): Tensor<DTpe> {
     return a.subtract(b);
   }
 }

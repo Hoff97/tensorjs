@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {Tensor} from '../library';
 import {CPUTensor} from '../tensor/cpu/tensor';
-import {TensorValues, Activation, PadMode, Precision} from '../types';
+import {TensorValues, Activation, PadMode, DType} from '../types';
 import {AbsBack} from './ops/unary/absBack';
 import {ExpBack} from './ops/unary/expBack';
 import {LogBack} from './ops/unary/logBack';
@@ -43,18 +43,18 @@ import {LogSumBack} from './ops/reduce/logSumBack';
 import {LogSumExpBack} from './ops/reduce/logSumExpBack';
 import {PowerScalarBack} from './ops/unary/powerScalarBack';
 
-export interface VariableOptions {
+export interface VariableOptions<DTpe extends DType> {
   /**
    * The gradient can optionally be specified
    */
-  grad?: Tensor;
+  grad?: Tensor<DTpe>;
 
   /**
    * Backward edge of this variable
    *
    * You most likely do not want to use this
    */
-  backEdge?: BackwardOp;
+  backEdge?: BackwardOp<DTpe>;
 
   /**
    * When set to true, gradients will not be tracked for this
@@ -71,18 +71,20 @@ export interface VariableOptions {
  * Once backward on a scalar variable (eg. a variable with shape [1])
  * is called, the gradients for all variables will be computed
  */
-export class Variable extends Tensor implements VariableI {
-  public grad?: Tensor;
+export class Variable<DTpe extends DType = 'float32'>
+  extends Tensor<DTpe>
+  implements VariableI<DTpe> {
+  public grad?: Tensor<DTpe>;
 
-  public backEdge?: BackwardOp;
+  public backEdge?: BackwardOp<DTpe>;
 
   public noGrad: boolean;
 
   /**
    * Creates a variable whose value is the specified value
    */
-  constructor(public value: Tensor, options?: VariableOptions) {
-    super();
+  constructor(public value: Tensor<DTpe>, options?: VariableOptions<DTpe>) {
+    super(value.dtype);
 
     if (options === undefined) {
       options = {};
@@ -97,30 +99,28 @@ export class Variable extends Tensor implements VariableI {
     this.noGrad = options.noGrad || false;
   }
 
-  static create(
+  static create<DTpe extends DType>(
     shape: ReadonlyArray<number>,
-    values: number[] | Float32Array,
+    values: number[],
     backend: Backend,
-    options?: VariableOptions,
-    precision?: Precision
+    options?: VariableOptions<DTpe>,
+    dtype?: DTpe
   ) {
-    let value: Tensor;
+    if (dtype === undefined) {
+      dtype = 'float32' as any;
+    }
+
+    let value: Tensor<DTpe>;
     if (backend === 'CPU') {
       value = new CPUTensor(shape, values);
     } else if (backend === 'WASM') {
-      if (!(values instanceof Float32Array)) {
-        values = Float32Array.from(values);
-      }
-      value = new WASMTensor(values, new Uint32Array(shape));
-    } else {
-      if (!(values instanceof Float32Array)) {
-        values = Float32Array.from(values);
-      }
-      value = new GPUTensor(
+      value = new WASMTensor(
         values,
-        shape,
-        precision === undefined ? 32 : precision
-      );
+        new Uint32Array(shape),
+        dtype as any
+      ) as any;
+    } else {
+      value = new GPUTensor(values, shape, dtype as any) as any;
     }
 
     return new Variable(value, options);
@@ -131,21 +131,21 @@ export class Variable extends Tensor implements VariableI {
    */
   static fromData(
     data: REGL.TextureImageData,
-    options?: VariableOptions,
-    precision?: Precision
-  ) {
-    const tensor = GPUTensor.fromData(
-      data,
-      precision === undefined ? 32 : precision
-    );
+    options?: VariableOptions<'float32'>
+  ): Variable<'float32'> {
+    const tensor = GPUTensor.fromData(data);
 
     return new Variable(tensor, options);
+  }
+
+  cast<DTpe2 extends DType>(dtype: DTpe2): Tensor<DTpe2> {
+    throw new Error('Method not implemented.');
   }
 
   /**
    * Performs a backward pass and returns wether the grad is needed or can be deleted
    */
-  backward(grad?: Tensor): boolean {
+  backward(grad?: Tensor<DTpe>): boolean {
     if (grad === undefined) {
       const ownShape = this.value.getShape();
       if (ownShape.length === 1 && ownShape[0] === 1) {
@@ -178,15 +178,15 @@ export class Variable extends Tensor implements VariableI {
     return this.backEdge === undefined;
   }
 
-  constantLike(value: number): Tensor {
+  constantLike(value: number): Tensor<DTpe> {
     return new Variable(this.value.constantLike(value), {noGrad: true});
   }
 
-  singleConstant(value: number): Tensor {
+  singleConstant(value: number): Tensor<DTpe> {
     return new Variable(this.value.singleConstant(value), {noGrad: true});
   }
 
-  getValues(): Promise<TensorValues> {
+  getValues(): Promise<TensorValues[DTpe]> {
     return this.value.getValues();
   }
 
@@ -204,14 +204,17 @@ export class Variable extends Tensor implements VariableI {
     }
   }
 
-  protected reshape_impl(shape: readonly number[], copy: boolean): Tensor {
+  protected reshape_impl(
+    shape: readonly number[],
+    copy: boolean
+  ): Tensor<DTpe> {
     return new Variable(this.value.reshape(shape), {
       backEdge: this.noGrad ? undefined : new ReshapeBack(this),
       noGrad: this.noGrad,
     });
   }
 
-  exp(): Tensor {
+  exp(): Tensor<DTpe> {
     const exp = this.value.exp();
     return new Variable(exp, {
       backEdge: this.noGrad ? undefined : new ExpBack(this, exp),
@@ -219,14 +222,14 @@ export class Variable extends Tensor implements VariableI {
     });
   }
 
-  log(): Tensor {
+  log(): Tensor<DTpe> {
     return new Variable(this.value.log(), {
       backEdge: this.noGrad ? undefined : new LogBack(this),
       noGrad: this.noGrad,
     });
   }
 
-  sqrt(): Tensor {
+  sqrt(): Tensor<DTpe> {
     const sqrt = this.value.sqrt();
     return new Variable(sqrt, {
       backEdge: this.noGrad ? undefined : new SqrtBack(this, sqrt),
@@ -234,70 +237,70 @@ export class Variable extends Tensor implements VariableI {
     });
   }
 
-  abs(): Tensor {
+  abs(): Tensor<DTpe> {
     return new Variable(this.value.abs(), {
       backEdge: this.noGrad ? undefined : new AbsBack(this),
       noGrad: this.noGrad,
     });
   }
 
-  sin(): Tensor {
+  sin(): Tensor<DTpe> {
     return new Variable(this.value.sin(), {
       backEdge: this.noGrad ? undefined : new SinBack(this),
       noGrad: this.noGrad,
     });
   }
 
-  cos(): Tensor {
+  cos(): Tensor<DTpe> {
     return new Variable(this.value.cos(), {
       backEdge: this.noGrad ? undefined : new CosBack(this),
       noGrad: this.noGrad,
     });
   }
 
-  tan(): Tensor {
+  tan(): Tensor<DTpe> {
     return new Variable(this.value.tan(), {
       backEdge: this.noGrad ? undefined : new TanBack(this),
       noGrad: this.noGrad,
     });
   }
 
-  asin(): Tensor {
+  asin(): Tensor<DTpe> {
     return new Variable(this.value.asin(), {
       backEdge: this.noGrad ? undefined : new ASinBack(this),
       noGrad: this.noGrad,
     });
   }
 
-  acos(): Tensor {
+  acos(): Tensor<DTpe> {
     return new Variable(this.value.acos(), {
       backEdge: this.noGrad ? undefined : new ACosBack(this),
       noGrad: this.noGrad,
     });
   }
 
-  atan(): Tensor {
+  atan(): Tensor<DTpe> {
     return new Variable(this.value.atan(), {
       backEdge: this.noGrad ? undefined : new ATanBack(this),
       noGrad: this.noGrad,
     });
   }
 
-  sinh(): Tensor {
+  sinh(): Tensor<DTpe> {
     return new Variable(this.value.sinh(), {
       backEdge: this.noGrad ? undefined : new SinHBack(this),
       noGrad: this.noGrad,
     });
   }
 
-  cosh(): Tensor {
+  cosh(): Tensor<DTpe> {
     return new Variable(this.value.cosh(), {
       backEdge: this.noGrad ? undefined : new CosHBack(this),
       noGrad: this.noGrad,
     });
   }
 
-  tanh(): Tensor {
+  tanh(): Tensor<DTpe> {
     const tanh = this.value.tanh();
     return new Variable(tanh, {
       backEdge: this.noGrad ? undefined : new TanHBack(this, tanh),
@@ -305,28 +308,28 @@ export class Variable extends Tensor implements VariableI {
     });
   }
 
-  asinh(): Tensor {
+  asinh(): Tensor<DTpe> {
     return new Variable(this.value.asinh(), {
       backEdge: this.noGrad ? undefined : new ASinHBack(this),
       noGrad: this.noGrad,
     });
   }
 
-  acosh(): Tensor {
+  acosh(): Tensor<DTpe> {
     return new Variable(this.value.acosh(), {
       backEdge: this.noGrad ? undefined : new ACosHBack(this),
       noGrad: this.noGrad,
     });
   }
 
-  atanh(): Tensor {
+  atanh(): Tensor<DTpe> {
     return new Variable(this.value.atanh(), {
       backEdge: this.noGrad ? undefined : new ATanHBack(this),
       noGrad: this.noGrad,
     });
   }
 
-  sigmoid(): Tensor {
+  sigmoid(): Tensor<DTpe> {
     const sigmoid = this.value.sigmoid();
     return new Variable(sigmoid, {
       backEdge: this.noGrad ? undefined : new SigmoidBack(this, sigmoid),
@@ -334,23 +337,23 @@ export class Variable extends Tensor implements VariableI {
     });
   }
 
-  hardSigmoid(alpha: number, beta: number): Tensor {
+  hardSigmoid(alpha: number, beta: number): Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
 
-  sign(): Tensor {
+  sign(): Tensor<DTpe> {
     // No back edge since the gradient will be zero anyway
     return new Variable(this.value.sign());
   }
 
-  negate(): Tensor {
+  negate(): Tensor<DTpe> {
     return new Variable(this.value.negate(), {
       backEdge: this.noGrad ? undefined : new NegateBack(this),
       noGrad: this.noGrad,
     });
   }
 
-  addMultiplyScalar(factor: number, add: number): Tensor {
+  addMultiplyScalar(factor: number, add: number): Tensor<DTpe> {
     return new Variable(this.value.addMultiplyScalar(factor, add), {
       backEdge: this.noGrad
         ? undefined
@@ -359,7 +362,7 @@ export class Variable extends Tensor implements VariableI {
     });
   }
 
-  powerScalar(power: number, factor: number): Tensor {
+  powerScalar(power: number, factor: number): Tensor<DTpe> {
     return new Variable(this.value.powerScalar(power, factor), {
       backEdge: this.noGrad
         ? undefined
@@ -368,11 +371,11 @@ export class Variable extends Tensor implements VariableI {
     });
   }
 
-  setValues(values: Tensor, starts: number[]): Tensor {
+  setValues(values: Tensor<DTpe>, starts: number[]): Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
 
-  matMul(tensor: Tensor): Tensor {
+  matMul(tensor: Tensor<DTpe>): Tensor<DTpe> {
     if (!(tensor instanceof Variable)) {
       throw new Error('MatMul can only be done with another variable');
     }
@@ -385,7 +388,7 @@ export class Variable extends Tensor implements VariableI {
     });
   }
 
-  concat(tensor: Tensor, axis: number): Tensor {
+  concat(tensor: Tensor<DTpe>, axis: number): Tensor<DTpe> {
     if (!(tensor instanceof Variable)) {
       throw new Error('Concat can only be done with another variable');
     }
@@ -398,74 +401,74 @@ export class Variable extends Tensor implements VariableI {
     });
   }
 
-  clip(min?: number, max?: number): Tensor {
+  clip(min?: number, max?: number): Tensor<DTpe> {
     return new Variable(this.value.clip(min, max), {
       backEdge: this.noGrad ? undefined : new ClipBack(this, min, max),
       noGrad: this.noGrad,
     });
   }
 
-  clipBackward(grad: Tensor, min?: number, max?: number): Tensor {
+  clipBackward(grad: Tensor<DTpe>, min?: number, max?: number): Tensor<DTpe> {
     throw new Error('Clip backward not implemented for Variable');
   }
 
-  repeat(repeats: number[]): Tensor {
+  repeat(repeats: number[]): Tensor<DTpe> {
     return new Variable(this.value.repeat(repeats), {
       backEdge: this.noGrad ? undefined : new RepeatBack(this, repeats),
       noGrad: this.noGrad,
     });
   }
 
-  expand(shape: readonly number[]): Tensor {
+  expand(shape: readonly number[]): Tensor<DTpe> {
     return new Variable(this.value.expand(shape), {
       backEdge: this.noGrad ? undefined : new ExpandBack(this, shape),
       noGrad: this.noGrad,
     });
   }
 
-  copy(): Tensor {
+  copy(): Tensor<DTpe> {
     return new Variable(this.value.copy(), {
       grad: this.grad !== undefined ? this.grad.copy() : undefined,
     });
   }
 
-  gather(axis: number, indices: CPUTensor): Tensor {
+  gather(axis: number, indices: CPUTensor<'uint32'>): Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
 
-  floor(): Tensor {
+  floor(): Tensor<DTpe> {
     return new Variable(this.value.floor());
   }
 
-  ceil(): Tensor {
+  ceil(): Tensor<DTpe> {
     return new Variable(this.value.ceil());
   }
 
-  round(): Tensor {
+  round(): Tensor<DTpe> {
     return new Variable(this.value.round());
   }
 
-  upsample(scales: number[]): Tensor {
+  upsample(scales: number[]): Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
 
   normalize(
-    mean: Tensor,
-    variance: Tensor,
+    mean: Tensor<DTpe>,
+    variance: Tensor<DTpe>,
     epsilon: number,
-    scale: Tensor,
-    bias: Tensor
-  ): Tensor {
+    scale: Tensor<DTpe>,
+    bias: Tensor<DTpe>
+  ): Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
 
   add_impl(
-    th: Tensor,
-    tensor: Tensor,
+    th: Tensor<DTpe>,
+    tensor: Tensor<DTpe>,
     resultShape: readonly number[],
     alpha: number,
     beta: number
-  ): Tensor {
+  ): Tensor<DTpe> {
     if (!(tensor instanceof Variable) || !(th instanceof Variable)) {
       throw new Error('Can only add Variable tensor to Variable tensor');
     }
@@ -484,12 +487,12 @@ export class Variable extends Tensor implements VariableI {
   }
 
   subtract_impl(
-    th: Tensor,
-    tensor: Tensor,
+    th: Tensor<DTpe>,
+    tensor: Tensor<DTpe>,
     resultShape: readonly number[],
     alpha: number,
     beta: number
-  ): Tensor {
+  ): Tensor<DTpe> {
     if (!(tensor instanceof Variable) || !(th instanceof Variable)) {
       throw new Error('Can only add Variable tensor to Variable tensor');
     }
@@ -508,11 +511,11 @@ export class Variable extends Tensor implements VariableI {
   }
 
   multiply_impl(
-    th: Tensor,
-    tensor: Tensor,
+    th: Tensor<DTpe>,
+    tensor: Tensor<DTpe>,
     resultShape: readonly number[],
     alpha: number
-  ): Tensor {
+  ): Tensor<DTpe> {
     if (!(tensor instanceof Variable) || !(th instanceof Variable)) {
       throw new Error('Can only add Variable tensor to Variable tensor');
     }
@@ -531,11 +534,11 @@ export class Variable extends Tensor implements VariableI {
   }
 
   divide_impl(
-    th: Tensor,
-    tensor: Tensor,
+    th: Tensor<DTpe>,
+    tensor: Tensor<DTpe>,
     resultShape: readonly number[],
     alpha: number
-  ): Tensor {
+  ): Tensor<DTpe> {
     if (!(tensor instanceof Variable) || !(th instanceof Variable)) {
       throw new Error('Can only divide Variable tensor by Variable tensor');
     }
@@ -557,10 +560,10 @@ export class Variable extends Tensor implements VariableI {
   }
 
   power_impl(
-    th: Tensor,
-    tensor: Tensor,
+    th: Tensor<DTpe>,
+    tensor: Tensor<DTpe>,
     resultShape: readonly number[]
-  ): Tensor {
+  ): Tensor<DTpe> {
     if (!(tensor instanceof Variable) || !(th instanceof Variable)) {
       throw new Error(
         'Can only take Variable tensor to power of Variable tensor'
@@ -584,13 +587,13 @@ export class Variable extends Tensor implements VariableI {
   }
 
   gemm_impl(
-    b: Tensor,
+    b: Tensor<DTpe>,
     aTranspose: boolean,
     bTranspose: boolean,
     alpha: number,
     beta: number,
-    C?: Tensor
-  ): Tensor {
+    C?: Tensor<DTpe>
+  ): Tensor<DTpe> {
     if (
       !(b instanceof Variable) ||
       (C !== undefined && !(C instanceof Variable))
@@ -619,14 +622,14 @@ export class Variable extends Tensor implements VariableI {
     );
   }
 
-  protected sum_impl(axes: number[], keepDims: boolean): Tensor {
+  protected sum_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
     return new Variable(this.value.sum(axes, keepDims), {
       backEdge: this.noGrad ? undefined : new SumBack(this, axes, keepDims),
       noGrad: this.noGrad,
     });
   }
 
-  protected sumSquare_impl(axes: number[], keepDims: boolean): Tensor {
+  protected sumSquare_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
     return new Variable(this.value.sumSquare(axes, keepDims), {
       backEdge: this.noGrad
         ? undefined
@@ -635,7 +638,7 @@ export class Variable extends Tensor implements VariableI {
     });
   }
 
-  protected product_impl(axes: number[], keepDims: boolean): Tensor {
+  protected product_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
     const product = this.value.product(axes, keepDims);
     return new Variable(product, {
       backEdge: this.noGrad
@@ -645,21 +648,24 @@ export class Variable extends Tensor implements VariableI {
     });
   }
 
-  protected max_impl(axes: number[], keepDims: boolean): Tensor {
+  protected max_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
-  protected min_impl(axes: number[], keepDims: boolean): Tensor {
+  protected min_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
 
-  protected reduceMean_impl(axes: number[], keepDims: boolean): Tensor {
+  protected reduceMean_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
     return new Variable(this.value.reduceMean(axes, keepDims), {
       backEdge: this.noGrad ? undefined : new MeanBack(this, axes, keepDims),
       noGrad: this.noGrad,
     });
   }
 
-  protected reduceMeanSquare_impl(axes: number[], keepDims: boolean): Tensor {
+  protected reduceMeanSquare_impl(
+    axes: number[],
+    keepDims: boolean
+  ): Tensor<DTpe> {
     return new Variable(this.value.reduceMeanSquare(axes, keepDims), {
       backEdge: this.noGrad
         ? undefined
@@ -668,14 +674,17 @@ export class Variable extends Tensor implements VariableI {
     });
   }
 
-  protected reduceLogSum_impl(axes: number[], keepDims: boolean): Tensor {
+  protected reduceLogSum_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
     return new Variable(this.value.reduceLogSum(axes, keepDims), {
       backEdge: this.noGrad ? undefined : new LogSumBack(this, axes, keepDims),
       noGrad: this.noGrad,
     });
   }
 
-  protected reduceLogSumExp_impl(axes: number[], keepDims: boolean): Tensor {
+  protected reduceLogSumExp_impl(
+    axes: number[],
+    keepDims: boolean
+  ): Tensor<DTpe> {
     return new Variable(this.value.reduceLogSumExp(axes, keepDims), {
       backEdge: this.noGrad
         ? undefined
@@ -685,14 +694,14 @@ export class Variable extends Tensor implements VariableI {
   }
 
   protected conv_impl(
-    kernel: Tensor,
+    kernel: Tensor<DTpe>,
     dilations: number[],
     group: number,
     pads: number[],
     strides: number[],
     activation: Activation,
-    bias?: Tensor
-  ): Tensor {
+    bias?: Tensor<DTpe>
+  ): Tensor<DTpe> {
     if (
       !(kernel instanceof Variable) ||
       (bias !== undefined && !(bias instanceof Variable))
@@ -728,16 +737,20 @@ export class Variable extends Tensor implements VariableI {
   }
 
   protected convTranspose_impl(
-    kernel: Tensor,
+    kernel: Tensor<DTpe>,
     dilations: number[],
     group: number,
     pads: number[],
     strides: number[]
-  ): Tensor {
+  ): Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
 
-  protected pad_impl(pads: number[], mode: PadMode, value: number): Tensor {
+  protected pad_impl(
+    pads: number[],
+    mode: PadMode,
+    value: number
+  ): Tensor<DTpe> {
     return new Variable(this.value.pad(pads, mode, value), {
       backEdge: this.noGrad ? undefined : new PadBack(this, pads, mode, value),
       noGrad: this.noGrad,
@@ -749,7 +762,7 @@ export class Variable extends Tensor implements VariableI {
     pads: number[],
     strides: number[],
     includePad: boolean
-  ): Tensor {
+  ): Tensor<DTpe> {
     return new Variable(
       this.value.averagePool(kernelShape, pads, strides, includePad),
       {
@@ -761,7 +774,7 @@ export class Variable extends Tensor implements VariableI {
     );
   }
 
-  protected transpose_impl(permutation: number[]): Tensor {
+  protected transpose_impl(permutation: number[]): Tensor<DTpe> {
     return new Variable(this.value.transpose(permutation), {
       backEdge: this.noGrad ? undefined : new TransposeBack(this, permutation),
       noGrad: this.noGrad,
@@ -773,7 +786,7 @@ export class Variable extends Tensor implements VariableI {
     ends: number[],
     axes: number[],
     steps: number[]
-  ): Tensor {
+  ): Tensor<DTpe> {
     return new Variable(this.value.slice(starts, ends, axes, steps), {
       backEdge: this.noGrad
         ? undefined

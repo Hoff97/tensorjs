@@ -1,10 +1,10 @@
-import {Tensor} from '../../../library';
+import {DType, Tensor} from '../../../library';
 import {BackwardOp, VariableI} from '../../types';
 
-export class RepeatBack implements BackwardOp {
-  constructor(public a: VariableI, public repeats: number[]) {}
+export class RepeatBack<DTpe extends DType> implements BackwardOp<DTpe> {
+  constructor(public a: VariableI<DTpe>, public repeats: number[]) {}
 
-  backward(grad: Tensor): void {
+  backward(grad: Tensor<DTpe>): void {
     const shapeA = this.a.getShape();
 
     const gradNewShape = [];

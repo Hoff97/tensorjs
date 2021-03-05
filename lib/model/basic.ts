@@ -11,8 +11,8 @@ import {Module} from './module';
  * initialized to zeros
  */
 export class Linear extends Module {
-  weights: Tensor;
-  bias?: Tensor;
+  weights: Tensor<any>;
+  bias?: Tensor<any>;
 
   /**
    * Creates a linear layer
@@ -36,7 +36,7 @@ export class Linear extends Module {
     }
   }
 
-  async forward(inputs: Tensor[]): Promise<Tensor[]> {
+  async forward(inputs: Tensor<any>[]): Promise<Tensor<any>[]> {
     return [inputs[0].gemm(this.weights, false, false, 1, this.bias)];
   }
 }
@@ -45,7 +45,7 @@ export class Linear extends Module {
  * Rectified linear unit, calculates y = max(x,0)
  */
 export class Relu extends Module {
-  async forward(inputs: Tensor[]): Promise<Tensor[]> {
+  async forward(inputs: Tensor<any>[]): Promise<Tensor<any>[]> {
     return [inputs[0].clip(0)];
   }
 }
@@ -58,7 +58,7 @@ export class Sequential extends Module {
     super();
   }
 
-  async forward(inputs: Tensor[]): Promise<Tensor[]> {
+  async forward(inputs: Tensor<any>[]): Promise<Tensor<any>[]> {
     let x = inputs;
     for (let i = 0; i < this.modules.length; i++) {
       const oldX = x;
@@ -87,7 +87,7 @@ export class ModuleDict extends Module {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async forward(inputs: Tensor[]): Promise<Tensor[]> {
+  async forward(inputs: Tensor<any>[]): Promise<Tensor<any>[]> {
     throw new Error('Module dict does not support forward');
   }
 
@@ -117,7 +117,7 @@ export class ModuleList extends Module {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async forward(inputs: Tensor[]): Promise<Tensor[]> {
+  async forward(inputs: Tensor<any>[]): Promise<Tensor<any>[]> {
     throw new Error('Module list does not support forward');
   }
 

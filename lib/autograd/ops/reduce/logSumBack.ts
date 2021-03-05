@@ -1,14 +1,14 @@
-import {Tensor} from '../../../library';
+import {DType, Tensor} from '../../../library';
 import {BackwardOp, VariableI} from '../../types';
 
-export class LogSumBack implements BackwardOp {
+export class LogSumBack<DTpe extends DType> implements BackwardOp<DTpe> {
   constructor(
-    public input: VariableI,
+    public input: VariableI<DTpe>,
     public sumDims: number[],
     public keepDims: boolean
   ) {}
 
-  backward(grad: Tensor): void {
+  backward(grad: Tensor<DTpe>): void {
     const inShape = this.input.value.getShape();
 
     const sum = this.input.value.sum(this.sumDims, this.keepDims);

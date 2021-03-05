@@ -1,8 +1,11 @@
 import {getSize} from '../../../util/shape';
 
-import {GPUTensorConstructor, GPUTensorI} from '../../../tensor/gpu/interface';
+import {
+  DTypeGpu,
+  GPUTensorConstructor,
+  GPUTensorI,
+} from '../../../tensor/gpu/interface';
 import {GPUMemoryAllocator} from '../../../tensor/gpu/memory';
-import {Precision} from '../../../types';
 import {defaultAllocator} from '../../../tensor/gpu/gl';
 import {Input, Operation} from '../../../ops/gpu/operation';
 import {Dispatcher} from '../../../ops/gpu/dispatcher';
@@ -39,9 +42,10 @@ export class UpdateValueOperation<
 
   constructor(
     tensorConstructor: GPUTensorConstructor<GPUTensor>,
+    dtype: DTypeGpu,
     allocator?: GPUMemoryAllocator
   ) {
-    super(tensorConstructor, allocator);
+    super(tensorConstructor, dtype, allocator);
   }
 
   getVariables() {
@@ -120,22 +124,19 @@ export class UpdateValueOperation<
     return input.Value.shape;
   }
 
-  compile(info: UpdateValueInfo, precision: Precision) {
+  compile(info: UpdateValueInfo) {
     if (info.shapeMoments !== undefined) {
       this.maxRank = info.shapeMoments.length;
     }
 
-    super.compile(info, precision);
+    super.compile(info);
   }
 
-  getCompilationInfo(
-    input: UpdateValueInput,
-    precision: Precision
-  ): UpdateValueInfo {
+  getCompilationInfo(input: UpdateValueInput): UpdateValueInfo {
     const outputShape = this.getOutputShape(input);
     const outputSize = defaultAllocator.getAllocationDimensions(
       getSize(outputShape),
-      precision
+      this.dtype
     );
 
     return {
@@ -162,5 +163,5 @@ export class UpdateValueOperation<
 }
 
 export const defaultUpdateValueD = new Dispatcher(
-  () => new UpdateValueOperation(gpuConstructor)
+  (dtype: DTypeGpu) => new UpdateValueOperation(gpuConstructor, dtype)
 );

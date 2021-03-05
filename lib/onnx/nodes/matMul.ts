@@ -1,5 +1,5 @@
 import {Mode} from '../../model/module';
-import Tensor from '../../types';
+import Tensor, {DType} from '../../types';
 import {OnnxNode} from '../node';
 import {Attributes, Constants} from '../types';
 
@@ -15,7 +15,9 @@ export class MatMulNode extends OnnxNode {
     super(attributes, inputs, outputs, constants, onnxVersion, mode);
   }
 
-  async forward(inputs: Tensor[]): Promise<Tensor[]> {
+  async forward<DTpe extends DType>(
+    inputs: Tensor<DTpe>[]
+  ): Promise<Tensor<DTpe>[]> {
     const A = inputs[0];
     const B = inputs[1];
 

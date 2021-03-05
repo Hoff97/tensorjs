@@ -1,16 +1,22 @@
-use crate::shape::*;
 use crate::tensor::*;
-use wasm_bindgen::prelude::*;
+use num_traits::zero;
+use num_traits::Float;
+use num_traits::FromPrimitive;
+use num_traits::Num;
+use num_traits::PrimInt;
+use num_traits::Signed;
 
-use std::cmp;
-
-impl Tensor {
+impl<DType> Tensor<DType>
+where
+    DType: Copy,
+    DType: Num,
+{
     #[inline]
-    fn unary_op<F>(&self, op: F) -> Tensor
+    fn unary_op<F>(&self, op: F) -> Tensor<DType>
     where
-        F: Fn(f32) -> f32,
+        F: Fn(DType) -> DType,
     {
-        let mut values: Vec<f32> = vec![0.0; self.size];
+        let mut values: Vec<DType> = vec![zero(); self.size];
         for i in 0..self.size {
             values[i] = op(self.get_ix(i));
         }
@@ -24,125 +30,175 @@ impl Tensor {
     }
 }
 
-#[wasm_bindgen]
-impl Tensor {
-    pub fn exp(&self) -> Tensor {
-        self.unary_op(|x: f32| x.exp())
+impl<DType> Tensor<DType>
+where
+    DType: Copy,
+    DType: Num,
+    DType: PartialOrd,
+{
+    pub fn add_multiply_scalar(&self, factor: DType, add: DType) -> Tensor<DType> {
+        self.unary_op(|x: DType| x * factor + add)
     }
 
-    pub fn log(&self) -> Tensor {
-        self.unary_op(|x: f32| x.ln())
-    }
-
-    pub fn sqrt(&self) -> Tensor {
-        self.unary_op(|x: f32| x.sqrt())
-    }
-
-    pub fn abs(&self) -> Tensor {
-        self.unary_op(|x: f32| x.abs())
-    }
-
-    pub fn sin(&self) -> Tensor {
-        self.unary_op(|x: f32| x.sin())
-    }
-
-    pub fn cos(&self) -> Tensor {
-        self.unary_op(|x: f32| x.cos())
-    }
-
-    pub fn tan(&self) -> Tensor {
-        self.unary_op(|x: f32| x.tan())
-    }
-
-    pub fn asin(&self) -> Tensor {
-        self.unary_op(|x: f32| x.asin())
-    }
-
-    pub fn acos(&self) -> Tensor {
-        self.unary_op(|x: f32| x.acos())
-    }
-
-    pub fn atan(&self) -> Tensor {
-        self.unary_op(|x: f32| x.atan())
-    }
-
-    pub fn sinh(&self) -> Tensor {
-        self.unary_op(|x: f32| x.sinh())
-    }
-
-    pub fn cosh(&self) -> Tensor {
-        self.unary_op(|x: f32| x.cosh())
-    }
-
-    pub fn tanh(&self) -> Tensor {
-        self.unary_op(|x: f32| x.tanh())
-    }
-
-    pub fn asinh(&self) -> Tensor {
-        self.unary_op(|x: f32| x.asinh())
-    }
-
-    pub fn acosh(&self) -> Tensor {
-        self.unary_op(|x: f32| x.acosh())
-    }
-
-    pub fn atanh(&self) -> Tensor {
-        self.unary_op(|x: f32| x.atanh())
-    }
-
-    pub fn sigmoid(&self) -> Tensor {
-        self.unary_op(|x: f32| 1.0 / (1.0 + (-x).exp()))
-    }
-
-    pub fn hard_sigmoid(&self, alpha: f32, beta: f32) -> Tensor {
-        self.unary_op(|x: f32| (alpha * x + beta).min(1.0).max(0.0))
-    }
-
-    pub fn sign(&self) -> Tensor {
-        self.unary_op(|x: f32| {
-            if x < 0. {
-                -1.
-            } else if x == 0.0 {
-                0.
+    pub fn clip(&self, min: DType, max: DType) -> Tensor<DType> {
+        self.unary_op(|x: DType| {
+            if x > max {
+                max
+            } else if x < min {
+                min
             } else {
-                1.
+                x
             }
         })
     }
 
-    pub fn negate(&self) -> Tensor {
-        self.unary_op(|x: f32| -x)
+    pub fn clip_min(&self, min: DType) -> Tensor<DType> {
+        self.unary_op(|x: DType| if x < min { min } else { x })
     }
 
-    pub fn power_scalar(&self, power: f32, factor: f32) -> Tensor {
-        self.unary_op(|x: f32| x.powf(power) * factor)
+    pub fn clip_max(&self, max: DType) -> Tensor<DType> {
+        self.unary_op(|x: DType| if x > max { max } else { x })
+    }
+}
+
+impl<DType> Tensor<DType>
+where
+    DType: Copy,
+    DType: Num,
+    DType: PartialOrd,
+    DType: Signed,
+    DType: FromPrimitive,
+{
+    pub fn abs(&self) -> Tensor<DType> {
+        self.unary_op(|x: DType| x.abs())
     }
 
-    pub fn add_multiply_scalar(&self, factor: f32, add: f32) -> Tensor {
-        self.unary_op(|x: f32| x * factor + add)
+    pub fn sign(&self) -> Tensor<DType> {
+        match DType::from_i32(1) {
+            Some(one) => self.unary_op(|x: DType| {
+                if x < DType::zero() {
+                    -one
+                } else if x > DType::zero() {
+                    one
+                } else {
+                    DType::zero()
+                }
+            }),
+            None => panic!("Encountered DType that can not represent 1 in sign"),
+        }
     }
 
-    pub fn clip(&self, min: f32, max: f32) -> Tensor {
-        self.unary_op(|x: f32| x.min(max).max(min))
+    pub fn negate(&self) -> Tensor<DType> {
+        self.unary_op(|x: DType| x.neg())
+    }
+}
+
+impl<DType> Tensor<DType>
+where
+    DType: Copy,
+    DType: Num,
+    DType: Float,
+    DType: FromPrimitive,
+{
+    pub fn exp(&self) -> Tensor<DType> {
+        self.unary_op(|x: DType| x.exp())
     }
 
-    pub fn clip_min(&self, min: f32) -> Tensor {
-        self.unary_op(|x: f32| x.max(min))
+    pub fn log(&self) -> Tensor<DType> {
+        self.unary_op(|x: DType| x.ln())
     }
 
-    pub fn clip_max(&self, max: f32) -> Tensor {
-        self.unary_op(|x: f32| x.min(max))
+    pub fn sqrt(&self) -> Tensor<DType> {
+        self.unary_op(|x: DType| x.sqrt())
     }
 
-    pub fn floor(&self) -> Tensor {
-        self.unary_op(|x: f32| x.floor())
+    pub fn sin(&self) -> Tensor<DType> {
+        self.unary_op(|x: DType| x.sin())
     }
 
-    pub fn ceil(&self) -> Tensor {
-        self.unary_op(|x: f32| x.ceil())
+    pub fn cos(&self) -> Tensor<DType> {
+        self.unary_op(|x: DType| x.cos())
     }
 
-    pub fn round(&self) -> Tensor {
-        self.unary_op(|x: f32| x.round())
+    pub fn tan(&self) -> Tensor<DType> {
+        self.unary_op(|x: DType| x.tan())
+    }
+
+    pub fn asin(&self) -> Tensor<DType> {
+        self.unary_op(|x: DType| x.asin())
+    }
+
+    pub fn acos(&self) -> Tensor<DType> {
+        self.unary_op(|x: DType| x.acos())
+    }
+
+    pub fn atan(&self) -> Tensor<DType> {
+        self.unary_op(|x: DType| x.atan())
+    }
+
+    pub fn sinh(&self) -> Tensor<DType> {
+        self.unary_op(|x: DType| x.sinh())
+    }
+
+    pub fn cosh(&self) -> Tensor<DType> {
+        self.unary_op(|x: DType| x.cosh())
+    }
+
+    pub fn tanh(&self) -> Tensor<DType> {
+        self.unary_op(|x: DType| x.tanh())
+    }
+
+    pub fn asinh(&self) -> Tensor<DType> {
+        self.unary_op(|x: DType| x.asinh())
+    }
+
+    pub fn acosh(&self) -> Tensor<DType> {
+        self.unary_op(|x: DType| x.acosh())
+    }
+
+    pub fn atanh(&self) -> Tensor<DType> {
+        self.unary_op(|x: DType| x.atanh())
+    }
+
+    pub fn sigmoid(&self) -> Tensor<DType> {
+        match DType::from_f32(1.0) {
+            Some(one) => self.unary_op(|x: DType| one / (one + (-x).exp())),
+            None => panic!("Encountered DType that can not represent 1 in sigmoid"),
+        }
+    }
+
+    pub fn floor(&self) -> Tensor<DType> {
+        self.unary_op(|x: DType| x.floor())
+    }
+
+    pub fn ceil(&self) -> Tensor<DType> {
+        self.unary_op(|x: DType| x.ceil())
+    }
+
+    pub fn round(&self) -> Tensor<DType> {
+        self.unary_op(|x: DType| x.round())
+    }
+
+    pub fn power_scalar_float(&self, power: DType, factor: DType) -> Tensor<DType> {
+        self.unary_op(|x: DType| x.powf(power) * factor)
+    }
+
+    pub fn hard_sigmoid(&self, alpha: DType, beta: DType) -> Tensor<DType> {
+        match DType::from_f32(1.0) {
+            Some(one) => self.unary_op(|x: DType| (alpha * x + beta).min(one).max(zero())),
+            None => panic!("Encountered DType that can not represent 1 in hard_sigmoid"),
+        }
+    }
+}
+
+impl<DType> Tensor<DType>
+where
+    DType: Clone,
+    DType: Num,
+    DType: PartialOrd,
+    DType: PrimInt,
+{
+    pub fn power_scalar_int(&self, power: u32, factor: DType) -> Tensor<DType> {
+        self.unary_op(|x: DType| x.pow(power) * factor)
     }
 }

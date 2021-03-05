@@ -2,14 +2,13 @@ import {Mode} from '../../model/module';
 import {CPUTensor} from '../../tensor/cpu/tensor';
 import {GPUTensor} from '../../tensor/gpu/tensor';
 import {WASMTensor} from '../../tensor/wasm/tensor';
-import Tensor, {Precision} from '../../types';
+import Tensor from '../../types';
 import {Backend} from '../../util/convert';
 import {OnnxNode} from '../node';
 import {Attributes, Constants} from '../types';
 
 export class RangeNode extends OnnxNode {
   backend: Backend = 'CPU';
-  precision?: Precision;
 
   constructor(
     attributes: Attributes,
@@ -22,7 +21,7 @@ export class RangeNode extends OnnxNode {
     super(attributes, inputs, outputs, constants, onnxVersion, mode);
   }
 
-  async forward(inputs: Tensor[]): Promise<Tensor[]> {
+  async forward(inputs: Tensor<any>[]): Promise<Tensor<any>[]> {
     const start = inputs[0];
     const limit = inputs[1];
     const delta = inputs[2];
@@ -36,9 +35,7 @@ export class RangeNode extends OnnxNode {
     } else if (this.backend === 'WASM') {
       return [WASMTensor.range(startValue, limitValue, deltaValue)];
     } else {
-      return [
-        GPUTensor.range(startValue, limitValue, deltaValue, this.precision),
-      ];
+      return [GPUTensor.range(startValue, limitValue, deltaValue)];
     }
   }
 
@@ -54,8 +51,7 @@ export class RangeNode extends OnnxNode {
   async toWASM() {
     this.backend = 'WASM';
   }
-  async toGPU(precision: Precision) {
+  async toGPU() {
     this.backend = 'GPU';
-    this.precision = precision;
   }
 }

@@ -1,5 +1,6 @@
+import {DTypeGpu} from '../../../tensor/gpu/interface';
 import {GPUTensor} from '../../../tensor/gpu/tensor';
-import Tensor from '../../../types';
+import Tensor, {DType} from '../../../types';
 import {Module} from '../../module';
 import {Optimizer} from '../optimizer';
 import {defaultUpdateMomentsD} from './updateMoments';
@@ -13,10 +14,10 @@ import {defaultUpdateValueD} from './updateParams';
  * and will converge a lot quicker.
  */
 export class Adam extends Optimizer {
-  public moment1?: (Tensor | undefined)[];
-  public moment2?: (Tensor | undefined)[];
+  public moment1?: (Tensor<any> | undefined)[];
+  public moment2?: (Tensor<any> | undefined)[];
 
-  public moments?: GPUTensor[];
+  public moments?: GPUTensor<any>[];
 
   public t = 0;
 
@@ -34,9 +35,9 @@ export class Adam extends Optimizer {
       this.moments = new Array(params.length);
       for (let i = 0; i < params.length; i++) {
         this.moments[i] = new GPUTensor(
-          new Float32Array((params[i].value as GPUTensor).size * 4).fill(0),
+          new Array((params[i].value as GPUTensor<any>).size * 4).fill(0),
           [...params[i].getShape(), 4],
-          (params[i].value as GPUTensor).precision
+          params[i].value.dtype
         );
       }
     } else {
@@ -74,12 +75,12 @@ export class Adam extends Optimizer {
           const oldValue = parameter.value;
 
           const {newValue, moments} = this.gpuParamStep(
-            parameter.value as GPUTensor,
-            parameter.grad as GPUTensor,
+            parameter.value as GPUTensor<any>,
+            parameter.grad as GPUTensor<any>,
             this.moments[i]
           );
-          parameter.value = newValue as GPUTensor;
-          this.moments[i] = moments as GPUTensor;
+          parameter.value = newValue as GPUTensor<any>;
+          this.moments[i] = moments as GPUTensor<any>;
 
           oldValue.delete();
         }
@@ -87,10 +88,10 @@ export class Adam extends Optimizer {
     }
   }
 
-  updateMoments(
-    grad: Tensor,
-    moment1: Tensor | undefined,
-    moment2: Tensor | undefined
+  updateMoments<DTpe extends DType>(
+    grad: Tensor<DTpe>,
+    moment1: Tensor<DTpe> | undefined,
+    moment2: Tensor<DTpe> | undefined
   ) {
     let moment1New;
     if (moment1 === undefined) {
@@ -113,7 +114,10 @@ export class Adam extends Optimizer {
     return {moment1New, moment2New};
   }
 
-  getCorrectedMoments(moment1: Tensor, moment2: Tensor) {
+  getCorrectedMoments<DTpe extends DType>(
+    moment1: Tensor<DTpe>,
+    moment2: Tensor<DTpe>
+  ) {
     const correctMoment1 = moment1.addMultiplyScalar(
       1 / (1 - Math.pow(this.beta1, this.t)),
       0
@@ -127,11 +131,11 @@ export class Adam extends Optimizer {
     return {correctMoment1, correctMoment2};
   }
 
-  paramStep(
-    value: Tensor,
-    grad: Tensor,
-    moment1: Tensor | undefined,
-    moment2: Tensor | undefined
+  paramStep<DTpe extends DType>(
+    value: Tensor<DTpe>,
+    grad: Tensor<DTpe>,
+    moment1: Tensor<DTpe> | undefined,
+    moment2: Tensor<DTpe> | undefined
   ) {
     const {moment1New, moment2New} = this.updateMoments(grad, moment1, moment2);
 
@@ -157,7 +161,11 @@ export class Adam extends Optimizer {
     return {newValue, moment1, moment2};
   }
 
-  gpuParamStep(value: GPUTensor, grad: GPUTensor, moments: GPUTensor) {
+  gpuParamStep<DTpe extends DTypeGpu>(
+    value: GPUTensor<DTpe>,
+    grad: GPUTensor<DTpe>,
+    moments: GPUTensor<DTpe>
+  ) {
     const newMoments = defaultUpdateMomentsD.calc(
       {
         Grad: grad,
@@ -166,7 +174,7 @@ export class Adam extends Optimizer {
         beta2: this.beta2,
         t: this.t,
       },
-      value.precision
+      value.dtype
     );
     moments.delete();
 
@@ -177,7 +185,7 @@ export class Adam extends Optimizer {
         alpha: this.lr,
         epsilon: this.epsilon,
       },
-      value.precision
+      value.dtype
     );
 
     return {newValue, moments: newMoments};

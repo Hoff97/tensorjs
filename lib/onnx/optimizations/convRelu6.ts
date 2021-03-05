@@ -12,7 +12,7 @@ export class ConvRelu6 extends SequenceOptimization {
 
   apply(
     nodes: OnnxNode[],
-    resolveConstant: (name: string) => Tensor,
+    resolveConstant: (name: string) => Tensor<any>,
     constants: Constants,
     onnxVersion: number
   ): OnnxNode {

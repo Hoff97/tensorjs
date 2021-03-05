@@ -34,8 +34,8 @@ const imgs = [
 class App extends React.Component<{}, AppState> {
   private model?: tjs.onnx.model.OnnxModel = undefined;
 
-  private mean = new tjs.tensor.gpu.GPUTensor(new Float32Array([0.485, 0.456, 0.406]), [3,1,1], 16);
-  private std = new tjs.tensor.gpu.GPUTensor(new Float32Array([0.229, 0.224, 0.225]), [3,1,1], 16);
+  private mean = new tjs.tensor.gpu.GPUTensor([0.485, 0.456, 0.406], [3,1,1]);
+  private std = new tjs.tensor.gpu.GPUTensor([0.229, 0.224, 0.225], [3,1,1]);
 
   constructor(props: {}) {
     super(props);
@@ -55,7 +55,7 @@ class App extends React.Component<{}, AppState> {
     const el = document.getElementById("img") as HTMLImageElement;
 
     console.log('Reading pixels');
-    const tensor = tjs.tensor.gpu.GPUTensor.fromData(el, 16);
+    const tensor = tjs.tensor.gpu.GPUTensor.fromData(el);
 
     let [height, width] = tensor.shape.slice(0,2);
 
@@ -95,7 +95,7 @@ class App extends React.Component<{}, AppState> {
     const probs = tensor.softmax(1);
     tensor.delete();
 
-    const values = await (probs as tjs.tensor.gpu.GPUTensor).copy(32).getValues()
+    const values = await (probs as tjs.tensor.gpu.GPUTensor).getValues()
     let probMap = Array.from(values).map((v, i) => {
       return {
         prob: v,

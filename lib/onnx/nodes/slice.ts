@@ -23,7 +23,7 @@ export class SliceNode extends OnnxNode {
     this.ends = this.getAttributeInts('ends');
   }
 
-  async forward(inputs: Tensor[]): Promise<Tensor[]> {
+  async forward(inputs: Tensor<any>[]): Promise<Tensor<any>[]> {
     if (this.onnxVersion < 10) {
       if (this.starts === undefined || this.ends === undefined) {
         throw new Error(

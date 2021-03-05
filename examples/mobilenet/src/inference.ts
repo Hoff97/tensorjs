@@ -6,8 +6,7 @@ export async function loadModel(name: string) {
     const buffer = await res.arrayBuffer();
 
     const model = new tjs.onnx.model.OnnxModel(buffer, {
-        noConvertNodes: [69, 98],
-        precision: 16
+        noConvertNodes: [69, 98]
     });
     await model.toGPU();
 

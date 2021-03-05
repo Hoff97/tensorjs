@@ -1,7 +1,10 @@
 import {defaultAllocator} from '../../../tensor/gpu/gl';
-import {GPUTensorConstructor, GPUTensorI} from '../../../tensor/gpu/interface';
+import {
+  DTypeGpu,
+  GPUTensorConstructor,
+  GPUTensorI,
+} from '../../../tensor/gpu/interface';
 import {GPUMemoryAllocator} from '../../../tensor/gpu/memory';
-import {Precision} from '../../../types';
 import {getSize} from '../../../util/shape';
 import {Operation} from './../operation';
 
@@ -30,9 +33,10 @@ export abstract class BinaryOperation<
 > extends Operation<GPUTensor, BInfo, BInput> {
   constructor(
     tensorConstructor: GPUTensorConstructor<GPUTensor>,
+    dtype: DTypeGpu,
     allocator?: GPUMemoryAllocator
   ) {
-    super(tensorConstructor, allocator);
+    super(tensorConstructor, dtype, allocator);
   }
 
   abstract getOp(a: string, b: string): string;
@@ -60,7 +64,7 @@ export abstract class BinaryOperation<
     return this.compute(input.outputShape, {A: input.A, B: input.B});
   }
 
-  compile(info: BInfo, precision: Precision) {
+  compile(info: BInfo) {
     if (info.shapeA !== undefined) {
       this.maxRank = info.shapeA.length;
     }
@@ -68,13 +72,13 @@ export abstract class BinaryOperation<
       this.maxRank = info.shapeB.length;
     }
 
-    super.compile(info, precision);
+    super.compile(info);
   }
 
-  getCompilationInfo(input: BInput, precision: Precision): BInfo {
+  getCompilationInfo(input: BInput): BInfo {
     const outputSize = defaultAllocator.getAllocationDimensions(
       getSize(input.outputShape),
-      precision
+      this.dtype
     );
 
     return {

@@ -1,6 +1,9 @@
-import {GPUTensorConstructor, GPUTensorI} from '../../../tensor/gpu/interface';
+import {
+  DTypeGpu,
+  GPUTensorConstructor,
+  GPUTensorI,
+} from '../../../tensor/gpu/interface';
 import {GPUMemoryAllocator} from '../../../tensor/gpu/memory';
-import {Precision} from '../../../types';
 import {Input} from '../operation';
 import {UnaryOperation, UnaryOpInfo, UnaryOpInput} from './unaryOperation';
 
@@ -19,9 +22,10 @@ export class PowerScalarOperation<
 > extends UnaryOperation<GPUTensor, PowerScalarInfo, PowerScalarInput> {
   constructor(
     tensorConstructor: GPUTensorConstructor<GPUTensor>,
+    dtype: DTypeGpu,
     allocator?: GPUMemoryAllocator
   ) {
-    super(tensorConstructor, allocator);
+    super(tensorConstructor, dtype, allocator);
   }
 
   operation(input: string): string {
@@ -50,11 +54,8 @@ export class PowerScalarOperation<
     );
   }
 
-  getCompilationInfo(
-    input: PowerScalarInput,
-    precision: Precision
-  ): PowerScalarInfo {
-    const info = super.getCompilationInfo(input, precision);
+  getCompilationInfo(input: PowerScalarInput): PowerScalarInfo {
+    const info = super.getCompilationInfo(input);
 
     return {
       ...info,

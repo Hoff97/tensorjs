@@ -1,10 +1,14 @@
-import {Tensor} from '../../../library';
+import {DType, Tensor} from '../../../library';
 import {BackwardOp, VariableI} from '../../types';
 
-export class ConcatBack implements BackwardOp {
-  constructor(public a: VariableI, public b: VariableI, public axis: number) {}
+export class ConcatBack<DTpe extends DType> implements BackwardOp<DTpe> {
+  constructor(
+    public a: VariableI<DTpe>,
+    public b: VariableI<DTpe>,
+    public axis: number
+  ) {}
 
-  backward(grad: Tensor): void {
+  backward(grad: Tensor<DTpe>): void {
     let axis = this.axis;
     if (axis < 0) {
       axis += this.a.getShape().length;

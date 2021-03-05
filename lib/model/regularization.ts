@@ -2,7 +2,7 @@ import {Variable} from '../autograd';
 import {Module} from './module';
 
 export class L2Regularization {
-  public parameters: Variable[];
+  public parameters: Variable<any>[];
 
   constructor(public model: Module, public gamma: number) {
     this.parameters = model.getParameters();
@@ -20,7 +20,7 @@ export class L2Regularization {
 }
 
 export class L1Regularization {
-  public parameters: Variable[];
+  public parameters: Variable<any>[];
 
   constructor(public model: Module, public gamma: number) {
     this.parameters = model.getParameters();

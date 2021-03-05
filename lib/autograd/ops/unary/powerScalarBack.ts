@@ -1,14 +1,14 @@
-import {Tensor} from '../../../library';
+import {DType, Tensor} from '../../../library';
 import {BackwardOp, VariableI} from '../../types';
 
-export class PowerScalarBack implements BackwardOp {
+export class PowerScalarBack<DTpe extends DType> implements BackwardOp<DTpe> {
   constructor(
-    public input: VariableI,
+    public input: VariableI<DTpe>,
     public power: number,
     public factor: number
   ) {}
 
-  backward(grad: Tensor): void {
+  backward(grad: Tensor<DTpe>): void {
     const pow = this.input.value.powerScalar(
       this.power - 1,
       this.factor * this.power

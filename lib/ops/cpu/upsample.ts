@@ -1,7 +1,11 @@
 import {CPUTensor} from '../../tensor/cpu/tensor';
+import {DType} from '../../types';
 import {incrementIndex} from '../../util/shape';
 
-export function upsample(x: CPUTensor, scales: number[]) {
+export function upsample<DTpe extends DType>(
+  x: CPUTensor<DTpe>,
+  scales: number[]
+) {
   const rank = x.shape.length;
 
   const resultShape = [...x.shape];
@@ -9,7 +13,7 @@ export function upsample(x: CPUTensor, scales: number[]) {
     resultShape[i] = Math.floor(resultShape[i] * scales[i]);
   }
 
-  const result = new CPUTensor(resultShape, undefined, x.type);
+  const result = new CPUTensor(resultShape, undefined, x.dtype);
 
   const outIx = new Array(rank).fill(0);
   const inIx = new Array(rank);

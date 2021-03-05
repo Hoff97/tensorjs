@@ -1,19 +1,21 @@
-use crate::utils::conv_output_size;
 use js_sys::Int32Array;
+use num_traits::zero;
+use num_traits::Num;
 
-use wasm_bindgen::prelude::*;
-
-use js_sys::{Float32Array, Uint32Array};
+use js_sys::Uint32Array;
 
 use crate::shape::*;
 use crate::tensor::*;
-use crate::utils::*;
 
-impl Tensor {
-    pub fn _reshape(&self, shape: &Vec<usize>) -> Tensor {
+impl<DType> Tensor<DType>
+where
+    DType: Copy,
+    DType: Num,
+{
+    pub fn _reshape(&self, shape: &Vec<usize>) -> Tensor<DType> {
         let strides = compute_strides(shape);
 
-        let mut values = vec![0.0; self.size];
+        let mut values = vec![zero(); self.size];
         for i in 0..self.size {
             values[i] = self.get_ix(i);
         }
@@ -21,7 +23,7 @@ impl Tensor {
         Tensor::new(shape.to_vec(), strides, self.size, values)
     }
 
-    pub fn _transpose(&self, permutation: &Vec<usize>) -> Tensor {
+    pub fn _transpose(&self, permutation: &Vec<usize>) -> Tensor<DType> {
         let rank = self.rank();
 
         let mut output_shape = vec![0; rank];
@@ -37,7 +39,7 @@ impl Tensor {
             mapped_strides[i] = output_strides[reverse_perm[i]];
         }
 
-        let mut values = vec![0.0; self.size];
+        let mut values = vec![zero(); self.size];
 
         let mut index = vec![0; rank];
         for i in 0..self.size {
@@ -54,7 +56,7 @@ impl Tensor {
         Tensor::new(output_shape, output_strides, self.size, values)
     }
 
-    pub fn _repeat(&self, repeats: &Vec<usize>) -> Tensor {
+    pub fn _repeat(&self, repeats: &Vec<usize>) -> Tensor<DType> {
         let rank = self.rank();
 
         let mut output_shape = vec![0; rank];
@@ -65,7 +67,7 @@ impl Tensor {
         let output_strides = compute_strides(&output_shape);
         let output_size = get_size(&output_shape);
 
-        let mut values = vec![0.0; output_size];
+        let mut values = vec![zero(); output_size];
 
         let mut index = vec![0; rank];
         let mut in_ix = vec![0; rank];
@@ -82,7 +84,7 @@ impl Tensor {
         Tensor::new(output_shape, output_strides, output_size, values)
     }
 
-    pub fn _expand(&self, shape: &Vec<usize>) -> Tensor {
+    pub fn _expand(&self, shape: &Vec<usize>) -> Tensor<DType> {
         let mut output_shape = vec![0; shape.len()];
         for i in 0..shape.len() {
             output_shape[i] = shape[i]
@@ -90,7 +92,7 @@ impl Tensor {
         let output_strides = compute_strides(&output_shape);
         let output_size = get_size(&output_shape);
 
-        let mut values = vec![0.0; output_size];
+        let mut values = vec![zero(); output_size];
 
         let mut ix = vec![0; shape.len()];
         for i in 0..output_size {
@@ -108,7 +110,7 @@ impl Tensor {
         ends: &Vec<usize>,
         axis: &Vec<usize>,
         steps: &Vec<isize>,
-    ) -> Tensor {
+    ) -> Tensor<DType> {
         let rank = self.rank();
         let mut result_shape = vec![0; rank];
         let mut ax_ix = 0;
@@ -129,7 +131,7 @@ impl Tensor {
         let result_strides = compute_strides(&result_shape);
         let result_size = get_size(&result_shape);
 
-        let mut values = vec![0.0; result_size];
+        let mut values = vec![zero(); result_size];
 
         let mut out_ix = vec![0; rank];
         let mut in_ix = vec![0; rank];
@@ -154,7 +156,7 @@ impl Tensor {
         Tensor::new(result_shape, result_strides, result_size, values)
     }
 
-    pub fn _set_values(&self, value_tensor: &Tensor, starts: &Vec<usize>) -> Tensor {
+    pub fn _set_values(&self, value_tensor: &Tensor<DType>, starts: &Vec<usize>) -> Tensor<DType> {
         let rank = self.rank();
         let mut result_shape = vec![0; rank];
         for i in 0..rank {
@@ -164,7 +166,7 @@ impl Tensor {
         let result_strides = compute_strides(&result_shape);
         let result_size = get_size(&result_shape);
 
-        let mut values = vec![0.0; result_size];
+        let mut values = vec![zero(); result_size];
 
         let mut out_ix = vec![0; rank];
         let mut values_ix = vec![0; rank];
@@ -194,9 +196,12 @@ impl Tensor {
     }
 }
 
-#[wasm_bindgen]
-impl Tensor {
-    pub fn set_values(&self, values: &Tensor, starts: Uint32Array) -> Tensor {
+impl<DType> Tensor<DType>
+where
+    DType: Copy,
+    DType: Num,
+{
+    pub fn set_values(&self, values: &Tensor<DType>, starts: Uint32Array) -> Tensor<DType> {
         let mut _starts: Vec<usize> = vec![0; starts.length() as usize];
         for i in 0..starts.length() {
             _starts[i as usize] = starts.get_index(i) as usize;
@@ -204,7 +209,7 @@ impl Tensor {
         return self._set_values(values, &_starts);
     }
 
-    pub fn reshape(&self, shape: Uint32Array) -> Tensor {
+    pub fn reshape(&self, shape: Uint32Array) -> Tensor<DType> {
         let mut sh: Vec<usize> = vec![0; shape.length() as usize];
         for i in 0..shape.length() {
             sh[i as usize] = shape.get_index(i) as usize;
@@ -212,7 +217,7 @@ impl Tensor {
         return self._reshape(&sh);
     }
 
-    pub fn concat(&self, other: &Tensor, axes: u32) -> Tensor {
+    pub fn concat(&self, other: &Tensor<DType>, axes: u32) -> Tensor<DType> {
         let ax = axes as usize;
         let mut output_shape = vec![0; self.rank()];
         for i in 0..self.rank() {
@@ -223,7 +228,7 @@ impl Tensor {
         let output_strides = compute_strides(&output_shape);
         let output_size = get_size(&output_shape);
 
-        let mut values = vec![0.0; output_size];
+        let mut values = vec![zero(); output_size];
 
         let mut index_x = 0;
         let mut index_y = 0;
@@ -253,7 +258,7 @@ impl Tensor {
         Tensor::new(output_shape, output_strides, output_size, values)
     }
 
-    pub fn transpose(&self, permutation: Uint32Array) -> Tensor {
+    pub fn transpose(&self, permutation: Uint32Array) -> Tensor<DType> {
         let mut perm: Vec<usize> = vec![0; permutation.length() as usize];
         for i in 0..permutation.length() {
             perm[i as usize] = permutation.get_index(i) as usize;
@@ -261,7 +266,7 @@ impl Tensor {
         return self._transpose(&perm);
     }
 
-    pub fn repeat(&self, repeats: Uint32Array) -> Tensor {
+    pub fn repeat(&self, repeats: Uint32Array) -> Tensor<DType> {
         let mut _repeats: Vec<usize> = vec![0; repeats.length() as usize];
         for i in 0..repeats.length() {
             _repeats[i as usize] = repeats.get_index(i) as usize;
@@ -269,7 +274,7 @@ impl Tensor {
         return self._repeat(&_repeats);
     }
 
-    pub fn expand(&self, shape: Uint32Array) -> Tensor {
+    pub fn expand(&self, shape: Uint32Array) -> Tensor<DType> {
         let mut _shape: Vec<usize> = vec![0; shape.length() as usize];
         for i in 0..shape.length() {
             _shape[i as usize] = shape.get_index(i) as usize;
@@ -277,7 +282,7 @@ impl Tensor {
         return self._expand(&_shape);
     }
 
-    pub fn copy(&self) -> Tensor {
+    pub fn copy(&self) -> Tensor<DType> {
         let mut _shape: Vec<usize> = vec![0; self.rank() as usize];
         let mut _strides: Vec<usize> = vec![0; self.rank() as usize];
         for i in 0..self.rank() {
@@ -285,7 +290,7 @@ impl Tensor {
             _strides[i] = self.get_strides_at(i);
         }
 
-        let mut values = vec![0.0; self.size];
+        let mut values = vec![zero(); self.size];
         for i in 0..self.size {
             values[i] = self.get_ix(i);
         }
@@ -294,7 +299,12 @@ impl Tensor {
     }
 
     // Mode: 0 == constant, 1 == reflect, 2 == edge
-    pub fn gather(&self, axis: i32, indices: Int32Array, indice_shape: Uint32Array) -> Tensor {
+    pub fn gather(
+        &self,
+        axis: i32,
+        indices: Uint32Array,
+        indice_shape: Uint32Array,
+    ) -> Tensor<DType> {
         let indice_strides = compute_strides_uint32(&indice_shape);
 
         let r = self.rank();
@@ -315,7 +325,7 @@ impl Tensor {
         let result_strides = compute_strides(&result_shape);
         let result_size = get_size(&result_shape);
 
-        let mut values = vec![0.0; result_size];
+        let mut values = vec![zero(); result_size];
 
         let mut out_ix = vec![0; result_rank];
         let mut input_ix = vec![0; self.rank()];
@@ -348,7 +358,7 @@ impl Tensor {
         ends: Uint32Array,
         axis: Uint32Array,
         steps: Int32Array,
-    ) -> Tensor {
+    ) -> Tensor<DType> {
         let mut _starts: Vec<usize> = vec![0; starts.length() as usize];
         let mut _ends: Vec<usize> = vec![0; ends.length() as usize];
         let mut _axis: Vec<usize> = vec![0; axis.length() as usize];

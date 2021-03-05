@@ -1,10 +1,10 @@
-import {Tensor} from '../../../library';
+import {DType, Tensor} from '../../../library';
 import {BackwardOp, VariableI} from '../../types';
 
-export class LogBack implements BackwardOp {
-  constructor(public input: VariableI) {}
+export class LogBack<DTpe extends DType> implements BackwardOp<DTpe> {
+  constructor(public input: VariableI<DTpe>) {}
 
-  backward(grad: Tensor): void {
+  backward(grad: Tensor<DTpe>): void {
     const gradLog = grad.divide(this.input.value);
     const needed = this.input.backward(gradLog);
     if (!needed) {

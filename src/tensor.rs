@@ -2,24 +2,29 @@ use crate::shape::compare_shapes;
 use crate::shape::compute_strides;
 use crate::shape::get_size;
 use crate::shape::index_to_pos;
-use js_sys::Float32Array;
-use js_sys::Uint32Array;
+use num_traits::abs;
+use num_traits::FromPrimitive;
+use num_traits::Num;
+use num_traits::Signed;
 use std::cmp::Ordering;
 use std::ops::Add;
 use std::ops::Sub;
-use wasm_bindgen::prelude::*;
 
-#[wasm_bindgen]
 #[derive(Debug, Clone)]
-pub struct Tensor {
+pub struct Tensor<DType> {
     shape: Vec<usize>,
     strides: Vec<usize>,
     pub size: usize,
-    values: Vec<f32>,
+    values: Vec<DType>,
 }
 
-impl Tensor {
-    pub fn new(shape: Vec<usize>, strides: Vec<usize>, size: usize, values: Vec<f32>) -> Tensor {
+impl<DType> Tensor<DType> {
+    pub fn new(
+        shape: Vec<usize>,
+        strides: Vec<usize>,
+        size: usize,
+        values: Vec<DType>,
+    ) -> Tensor<DType> {
         Tensor {
             shape,
             strides,
@@ -48,32 +53,32 @@ impl Tensor {
         return self.strides[ix];
     }
 
-    pub fn get_values(&self) -> &Vec<f32> {
+    pub fn get_values(&self) -> &Vec<DType> {
         return &self.values;
     }
+}
 
-    pub fn get(&self, index: &Vec<usize>) -> f32 {
-        let pos = index_to_pos(index, self.get_strides());
-        return self.values[pos];
-    }
-
-    pub fn get_ix(&self, index: usize) -> f32 {
+impl<DType> Tensor<DType>
+where
+    DType: Copy,
+{
+    pub fn get_ix(&self, index: usize) -> DType {
         return self.values[index];
     }
 
-    pub fn set(&mut self, index: &Vec<usize>, value: f32) {
+    pub fn set(&mut self, index: &Vec<usize>, value: DType) {
         let pos = index_to_pos(index, &self.strides);
         self.values[pos] = value;
     }
 
-    pub fn new_from_shape(shape: &Vec<usize>, values: &Vec<f32>) -> Tensor {
+    pub fn new_from_shape(shape: &Vec<usize>, values: &Vec<DType>) -> Tensor<DType> {
         let strides = compute_strides(shape);
         let size = get_size(shape);
 
         Tensor::new(shape.to_vec(), strides, size, values.to_vec())
     }
 
-    pub fn constant(shape: &Vec<usize>, value: f32) -> Tensor {
+    pub fn constant(shape: &Vec<usize>, value: DType) -> Tensor<DType> {
         let strides = compute_strides(shape);
         let size = get_size(shape);
 
@@ -82,13 +87,26 @@ impl Tensor {
         Tensor::new(shape.to_vec(), strides, size, values)
     }
 
-    pub fn compare(&self, other: &Self, delta: f32) -> bool {
+    pub fn get(&self, index: &Vec<usize>) -> DType {
+        let pos = index_to_pos(index, self.get_strides());
+        return self.values[pos];
+    }
+}
+
+impl<DType> Tensor<DType>
+where
+    DType: Copy,
+    DType: Num,
+    DType: Signed,
+    DType: PartialOrd,
+{
+    pub fn compare(&self, other: &Self, delta: DType) -> bool {
         if !compare_shapes(self.get_sh(), other.get_sh()) {
             return false;
         }
 
         for i in 0..self.size {
-            if (self.get_ix(i) - other.get_ix(i)).abs() > delta {
+            if abs(self.get_ix(i) - other.get_ix(i)) > delta {
                 return false;
             }
         }
@@ -97,77 +115,35 @@ impl Tensor {
     }
 }
 
-#[wasm_bindgen]
-impl Tensor {
-    pub fn create(shape: Uint32Array, values: Float32Array) -> Tensor {
-        let mut _shape: Vec<usize> = vec![0; shape.length() as usize];
-        for i in 0.._shape.len() {
-            _shape[i] = shape.get_index(i as u32) as usize;
-        }
-
-        let strides = compute_strides(&_shape);
-        let size = get_size(&_shape);
-
-        let mut _values: Vec<f32> = vec![0.; values.length() as usize];
-        for i in 0.._values.len() {
-            _values[i] = values.get_index(i as u32);
-        }
-
-        Tensor::new(_shape, strides, size, _values)
-    }
-
-    pub fn create_constant(shape: Uint32Array, value: f32) -> Tensor {
-        let mut _shape: Vec<usize> = vec![0; shape.length() as usize];
-        for i in 0.._shape.len() {
-            _shape[i] = shape.get_index(i as u32) as usize;
-        }
-
-        let strides = compute_strides(&_shape);
-        let size = get_size(&_shape);
-
-        let values = vec![value; size];
-
-        Tensor::new(_shape, strides, size, values)
-    }
-
-    pub fn get_vals(&self) -> Float32Array {
-        let arr = Float32Array::new_with_length(self.size as u32);
-
-        for i in 0..self.size {
-            arr.set_index(i as u32, self.get_ix(i));
-        }
-
-        return arr;
-    }
-
-    pub fn get_shape(&self) -> Uint32Array {
-        let arr = Uint32Array::new_with_length(self.rank() as u32);
-
-        for i in 0..self.rank() {
-            arr.set_index(i as u32, self.get_dim_size(i) as u32);
-        }
-
-        return arr;
-    }
-}
-
-impl Add for Tensor {
+impl<DType> Add for Tensor<DType>
+where
+    DType: Copy,
+    DType: Num,
+{
     type Output = Self;
 
     fn add(self, other: Self) -> Self {
-        return self.binary_op(&other, |x: f32, y: f32| x + y);
+        return self.binary_op(&other, |x: DType, y: DType| x + y);
     }
 }
 
-impl Sub for Tensor {
+impl<DType> Sub for Tensor<DType>
+where
+    DType: Copy,
+    DType: Num,
+{
     type Output = Self;
 
     fn sub(self, other: Self) -> Self {
-        return self.binary_op(&other, |x: f32, y: f32| x - y);
+        return self.binary_op(&other, |x: DType, y: DType| x - y);
     }
 }
 
-impl PartialEq for Tensor {
+impl<DType> PartialEq for Tensor<DType>
+where
+    DType: Copy,
+    DType: PartialEq,
+{
     fn eq(&self, other: &Self) -> bool {
         if !compare_shapes(self.get_sh(), other.get_sh()) {
             return false;
@@ -183,7 +159,13 @@ impl PartialEq for Tensor {
     }
 }
 
-impl PartialOrd for Tensor {
+impl<DType> PartialOrd for Tensor<DType>
+where
+    DType: Copy,
+    DType: PartialOrd,
+    DType: Num,
+    DType: FromPrimitive,
+{
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         if !compare_shapes(self.get_sh(), other.get_sh()) {
             return None;
@@ -205,12 +187,12 @@ impl PartialOrd for Tensor {
 
         for i in 1..self.size {
             let diff = self.get_ix(i) - other.get_ix(i);
-            if diff < 0. {
+            if Some(diff) < DType::from_i32(0) {
                 if val != Some(Ordering::Less) {
                     val = None;
                     break;
                 }
-            } else if diff > 0. {
+            } else if Some(diff) > DType::from_i32(0) {
                 if val != Some(Ordering::Greater) {
                     val = None;
                     break;

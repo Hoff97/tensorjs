@@ -56,11 +56,10 @@ if (run) {
             const resp = await fetch(`onnx/${opset}/${testName}/model.onnx`);
             const buffer = await resp.arrayBuffer();
 
-            const model = new OnnxModel(buffer, {
-              precision: 16,
-            });
+            // TODO: Adjust model loading!
+            const model = new OnnxModel(buffer);
 
-            const inputs: Tensor[] = [];
+            const inputs: Tensor<'float32'>[] = [];
             let i = 0;
             // eslint-disable-next-line no-constant-condition
             while (true) {
@@ -86,21 +85,25 @@ if (run) {
             const tensorProto = onnx.TensorProto.decode(arr);
             const output = createTensor(tensorProto);
 
-            const inputsDevice: Tensor[] = [];
+            const inputsDevice: Tensor<'float32'>[] = [];
 
             await model.toGPU();
-            const out = await toGPU(output, 32);
+            const out = await toGPU(output);
             for (let i = 0; i < inputs.length; i++) {
-              inputsDevice.push(await toGPU(inputs[i], 16));
+              inputsDevice.push(await toGPU(inputs[i]));
             }
 
             const result1 = (await model.forward(inputsDevice))[0];
             expect(
-              await (result1 as GPUTensor).copy(32).compare(out, epsilon * 30)
+              await (result1 as GPUTensor<'float32'>)
+                .copy()
+                .compare(out, epsilon * 30)
             ).toBeTrue();
             const result2 = (await model.forward(inputsDevice))[0];
             expect(
-              await (result2 as GPUTensor).copy(32).compare(out, epsilon * 30)
+              await (result2 as GPUTensor<'float32'>)
+                .copy()
+                .compare(out, epsilon * 30)
             ).toBeTrue();
           });
         }

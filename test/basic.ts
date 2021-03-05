@@ -8,7 +8,7 @@ const epsilon = 0.00001;
 type TensorConstructor = (
   shape: ReadonlyArray<number>,
   values: number[]
-) => Tensor;
+) => Tensor<'float32'>;
 
 export default function testBasic(
   name: string,
