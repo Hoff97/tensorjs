@@ -3,6 +3,9 @@ import {compareShapes, getSize} from './util/shape';
 
 export type PadMode = 'constant' | 'reflect' | 'edge';
 
+/**
+ * Type that is returned when calling `tensor.getValues()`
+ */
 export type TensorValues = {
   float64: Float64Array;
   float32: Float32Array;
@@ -27,6 +30,9 @@ export const tensorValuesConstructor = {
   uint8: Uint8Array,
 };
 
+/**
+ * Tensor data types available in tensor-js
+ */
 export type DType =
   | 'float64'
   | 'float32'
@@ -41,6 +47,9 @@ export type DType =
 export type Activation = 'id' | 'relu' | 'relu6';
 
 export default abstract class Tensor<DTpe extends DType = 'float32'> {
+  /**
+   * Data type of the tensor
+   */
   public dtype: DTpe;
 
   constructor(dtype: DTpe) {
@@ -280,6 +289,8 @@ export default abstract class Tensor<DTpe extends DType = 'float32'> {
    * This is equal to `a.sum(axes, keepDims).log()` (where sumSize is the number
    * of entries in the summation axes) but faster.
    *
+   * Note that this can only be called on tensors with a float data type (float64, float32, float16)
+   *
    * @param axes One or multiple axes to take the mean over. If not specified this will take the mean over all axes
    * @param keepDims Wether the mean axes will be kept with size 1
    *
@@ -295,6 +306,8 @@ export default abstract class Tensor<DTpe extends DType = 'float32'> {
    * Takes the log of the sum over the exp of the specified axis
    * This is equal to `a.sum(axes, keepDims).log()` (where sumSize is the number
    * of entries in the summation axes) but faster.
+   *
+   * Note that this can only be called on tensors with a float data type (float64, float32, float16)
    *
    * @param axes One or multiple axes to take the mean over. If not specified this will take the mean over all axes
    * @param keepDims Wether the mean axes will be kept with size 1
@@ -509,86 +522,120 @@ export default abstract class Tensor<DTpe extends DType = 'float32'> {
 
   /**
    * Takes the exponential of each value of the tensor
+   *
+   * Note that this can only be called on tensors with a float data type (float64, float32, float16)
    */
   abstract exp(): Tensor<DTpe>;
 
   /**
    * Takes the natural logarithm of each value of the tensor
+   *
+   * Note that this can only be called on tensors with a float data type (float64, float32, float16)
    */
   abstract log(): Tensor<DTpe>;
 
   /**
    * Takes the square root of each value of the tensor
+   *
+   * Note that this can only be called on tensors with a float data type (float64, float32, float16)
    */
   abstract sqrt(): Tensor<DTpe>;
 
   /**
    * Takes the absolute of each value of the tensor
+   *
+   * Note that this can only be called on tensors with a signed data type (float*, int32, int16, int8)
    */
   abstract abs(): Tensor<DTpe>;
 
   /**
    * Takes the sinus of each value of the tensor
+   *
+   * Note that this can only be called on tensors with a float data type (float64, float32, float16)
    */
   abstract sin(): Tensor<DTpe>;
 
   /**
    * Takes the cosine of each value of the tensor
+   *
+   * Note that this can only be called on tensors with a float data type (float64, float32, float16)
    */
   abstract cos(): Tensor<DTpe>;
 
   /**
    * Takes the tangens of each value of the tensor
+   *
+   * Note that this can only be called on tensors with a float data type (float64, float32, float16)
    */
   abstract tan(): Tensor<DTpe>;
 
   /**
    * Takes the arcus sinus of each value of the tensor
+   *
+   * Note that this can only be called on tensors with a float data type (float64, float32, float16)
    */
   abstract asin(): Tensor<DTpe>;
 
   /**
    * Takes the arcus cosine of each value of the tensor
+   *
+   * Note that this can only be called on tensors with a float data type (float64, float32, float16)
    */
   abstract acos(): Tensor<DTpe>;
 
   /**
    * Takes the arcus tangens of each value of the tensor
+   *
+   * Note that this can only be called on tensors with a float data type (float64, float32, float16)
    */
   abstract atan(): Tensor<DTpe>;
 
   /**
    * Takes the hyperbolic sinus of each value of the tensor
+   *
+   * Note that this can only be called on tensors with a float data type (float64, float32, float16)
    */
   abstract sinh(): Tensor<DTpe>;
 
   /**
    * Takes the hyperbolic cosine of each value of the tensor
+   *
+   * Note that this can only be called on tensors with a float data type (float64, float32, float16)
    */
   abstract cosh(): Tensor<DTpe>;
 
   /**
    * Takes the hyperbolic tangens of each value of the tensor
+   *
+   * Note that this can only be called on tensors with a float data type (float64, float32, float16)
    */
   abstract tanh(): Tensor<DTpe>;
 
   /**
    * Takes the inverse hyperbolic sinus of each value of the tensor
+   *
+   * Note that this can only be called on tensors with a float data type (float64, float32, float16)
    */
   abstract asinh(): Tensor<DTpe>;
 
   /**
    * Takes the inverse hyperbolic cosine of each value of the tensor
+   *
+   * Note that this can only be called on tensors with a float data type (float64, float32, float16)
    */
   abstract acosh(): Tensor<DTpe>;
 
   /**
    * Takes the inverse hyperbolic tangens of each value of the tensor
+   *
+   * Note that this can only be called on tensors with a float data type (float64, float32, float16)
    */
   abstract atanh(): Tensor<DTpe>;
 
   /**
    * Negates all entries of the tensor
+   *
+   * Note that this can only be called on tensors with a signed data type (float*, int32, int16, int8)
    */
   abstract negate(): Tensor<DTpe>;
 
@@ -599,19 +646,26 @@ export default abstract class Tensor<DTpe extends DType = 'float32'> {
 
   /**
    * Computes the element wise sigmoid of all values
+   *
+   * Note that this can only be called on tensors with a float data type (float64, float32, float16)
    */
   abstract sigmoid(): Tensor<DTpe>;
 
   /**
    * Computes the element wise hard sigmoid of all values given
    * by `y = max(0, min(1, alpha * x + beta))`
+   *
+   * Note that this can only be called on tensors with a float data type (float64, float32, float16)
    */
   abstract hardSigmoid(alpha: number, beta: number): Tensor<DTpe>;
 
   /**
    * Computes the value-wise sign which is:
    *  - (-1) if x < 0
+   *  - 0 if x == 0
    *  - 1 otherwise
+   *
+   * Note that this can only be called on tensors with a signed data type (float*, int32, int16, int8)
    */
   abstract sign(): Tensor<DTpe>;
 
@@ -884,6 +938,8 @@ export default abstract class Tensor<DTpe extends DType = 'float32'> {
   /**
    * Takes the softmax along the given axis
    * https://en.wikipedia.org/wiki/Softmax_function
+   *
+   * Note that this can only be called on tensors with a float data type (float64, float32, float16)
    */
   softmax(axis: number) {
     const max = this.max(axis, true);
@@ -1156,17 +1212,23 @@ export default abstract class Tensor<DTpe extends DType = 'float32'> {
 
   /**
    * Rounds each tensor value to the nearest lower integer
+   *
+   * Note that this can only be called on tensors with a float data type (float64, float32, float16)
    */
   abstract floor(): Tensor<DTpe>;
 
   /**
    * Rounds each tensor value to the nearest upper integer
+   *
+   * Note that this can only be called on tensors with a float data type (float64, float32, float16)
    */
   abstract ceil(): Tensor<DTpe>;
 
   /**
    * Rounds each tensor value to the nearest integer.
    * When the value is 0.5 it rounds up.
+   *
+   * Note that this can only be called on tensors with a float data type (float64, float32, float16)
    */
   abstract round(): Tensor<DTpe>;
 
@@ -1194,6 +1256,8 @@ export default abstract class Tensor<DTpe extends DType = 'float32'> {
    * x' = (x-mean)/sqrt(variance + epsilon)
    * x'' = x'*scale + bias
    * ```
+   *
+   * Note that this can only be called on tensors with a float data type (float64, float32, float16)
    */
   abstract normalize(
     mean: Tensor<DTpe>,
