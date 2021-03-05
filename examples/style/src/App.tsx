@@ -38,7 +38,7 @@ const imgs = [
 class App extends React.Component<{}, AppState> {
   private model?: tjs.onnx.model.OnnxModel = undefined;
 
-  private scale = new tjs.tensor.gpu.GPUTensor(new Float32Array([255]), [1], 16);
+  private scale = new tjs.tensor.gpu.GPUTensor([255], [1]);
 
   constructor(props: {}) {
     super(props);
@@ -58,7 +58,7 @@ class App extends React.Component<{}, AppState> {
     const el = document.getElementById("img") as HTMLImageElement;
 
     console.log('Reading pixels');
-    const tensor = tjs.tensor.gpu.GPUTensor.fromData(el, 16);
+    const tensor = tjs.tensor.gpu.GPUTensor.fromData(el);
 
     let [height, width] = tensor.shape.slice(0,2);
 
@@ -104,19 +104,16 @@ class App extends React.Component<{}, AppState> {
     const sh = tensor.getShape();
 
     tensor = tensor.reshape(sh.slice(1), false);
-    const transposed = tensor.transpose([1,2,0]);
+    const transposed = tensor.transpose([1,2,0]) as tjs.tensor.gpu.GPUTensor;
     console.log(transposed.getShape());
     tensor.delete();
 
-    const t = (transposed as tjs.tensor.gpu.GPUTensor).copy(32) as tjs.tensor.gpu.GPUTensor;
-    transposed.delete();
-
-    t.getValues().then(x => {
+    transposed.getValues().then(x => {
       const canv = document.getElementById("canvas") as HTMLCanvasElement;
       const context = canv.getContext("2d");
 
       if (context) {
-        var id = context.createImageData(t.shape[0],t.shape[1]);
+        var id = context.createImageData(transposed.shape[0],transposed.shape[1]);
         var d  = id.data;
         console.log(d.length, x.length);
 
@@ -129,7 +126,7 @@ class App extends React.Component<{}, AppState> {
         context.putImageData(id, 0, 0);
       }
 
-      t.delete();
+      transposed.delete();
     });
   }
 

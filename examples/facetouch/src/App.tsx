@@ -86,8 +86,8 @@ class App extends React.Component<{}, AppState> {
   private mean?: tjs.Tensor;
   private varSqrt?: tjs.Tensor;
 
-  private meanMobilenet = new tjs.tensor.gpu.GPUTensor(new Float32Array([0.485, 0.456, 0.406]), [3,1,1], 32);
-  private stdMobilenet = new tjs.tensor.gpu.GPUTensor(new Float32Array([0.229, 0.224, 0.225]), [3,1,1], 32);
+  private meanMobilenet = new tjs.tensor.gpu.GPUTensor([0.485, 0.456, 0.406], [3,1,1]);
+  private stdMobilenet = new tjs.tensor.gpu.GPUTensor([0.229, 0.224, 0.225], [3,1,1]);
 
   private data?: tjs.tensor.gpu.GPUTensor;
 
@@ -121,9 +121,11 @@ class App extends React.Component<{}, AppState> {
   }
 
   componentDidMount() {
-    this.getVideo().then(x => {
-      this.checkStorage();
-    });
+    setTimeout(() => {
+      this.getVideo().then(x => {
+        this.checkStorage();
+      });
+    }, 1000);
   }
 
   async checkStorage() {
@@ -139,8 +141,8 @@ class App extends React.Component<{}, AppState> {
       this.classifier.weights = Variable.create([featureDim, 1], parsedClassifier[0], 'GPU');
       this.classifier.bias = Variable.create([1], parsedClassifier[1], 'GPU');
 
-      this.mean = new tjs.tensor.gpu.GPUTensor(new Float32Array(JSON.parse(mean)), [featureDim], 32);
-      this.varSqrt = new tjs.tensor.gpu.GPUTensor(new Float32Array(JSON.parse(varSqrt)), [featureDim], 32);
+      this.mean = new tjs.tensor.gpu.GPUTensor(JSON.parse(mean), [featureDim]);
+      this.varSqrt = new tjs.tensor.gpu.GPUTensor(JSON.parse(varSqrt), [featureDim]);
 
       await this.setModel(model);
       this.setState({
@@ -192,9 +194,9 @@ class App extends React.Component<{}, AppState> {
   }
 
   prepareVideo() {
-  const video: HTMLVideoElement = (document.querySelector("#videoElement") as any);
+    const video: HTMLVideoElement = (document.querySelector("#videoElement") as any);
 
-    this.videoTensor = tjs.tensor.gpu.GPUTensor.fromData(video, 32);
+    this.videoTensor = tjs.tensor.gpu.GPUTensor.fromData(video);
 
     let [height, width] = this.videoTensor.shape.slice(0,2);
 
@@ -216,7 +218,7 @@ class App extends React.Component<{}, AppState> {
 
   async prepareTraining() {
     const video: HTMLVideoElement = (document.querySelector("#videoElement") as any);
-    this.videoTensor = tjs.tensor.gpu.GPUTensor.fromData(video, 32);
+    this.videoTensor = tjs.tensor.gpu.GPUTensor.fromData(video);
     if (this.videoTensor !== undefined) {
       this.setState({
         ...this.state,
@@ -227,7 +229,7 @@ class App extends React.Component<{}, AppState> {
 
       const reshaped = this.prepareVideo() as tjs.Tensor;
 
-      this.data = new tjs.tensor.gpu.GPUTensor(new Float32Array(numSamples*featureDim).fill(0), [numSamples, featureDim], 32);
+      this.data = new tjs.tensor.gpu.GPUTensor(new Array(numSamples*featureDim).fill(0), [numSamples, featureDim]);
 
       console.log('Doing forward pass');
 
@@ -371,7 +373,7 @@ class App extends React.Component<{}, AppState> {
 
     const trainX = new Variable(trainData, {noGrad: true});
     const trainYs = [...new Array(this.state.numTrainSamples/2).fill(0),...new Array(this.state.numTrainSamples/2).fill(1)]
-    const trainY = Variable.create([this.state.numTrainSamples, 1], new Float32Array(trainYs), 'GPU', {noGrad: true});
+    const trainY = Variable.create([this.state.numTrainSamples, 1], trainYs, 'GPU', {noGrad: true});
 
     const valX = new Variable(valData, {noGrad: true});
     const valYs = [...new Array(this.state.numValidationSamples/2).fill(0),...new Array(this.state.numValidationSamples/2).fill(1)]
@@ -381,7 +383,7 @@ class App extends React.Component<{}, AppState> {
 
   async trainClassifier() {
     this.classifier = new Linear(featureDim, 1, true);
-    await this.classifier.toGPU(32);
+    await this.classifier.toGPU();
 
     const {trainX, trainYs, trainY, valX, valYs} = await this.prepareData();
 
@@ -405,14 +407,13 @@ class App extends React.Component<{}, AppState> {
       if (i % 50 === 0) {
         console.log(i, (await loss.getValues())[0]);
 
-        const predTrain = Array.from(await sigmoid.getValues());
+        const predTrain: number[] = Array.from(await sigmoid.getValues());
         let correctTrain = this.getCorrect(predTrain, trainYs);
         console.log(`${correctTrain} of ${predTrain.length} predicted correctly`);
 
-
         const predVal = (await this.classifier.forward([valX]))[0];
         const sigmoidVal = predVal.sigmoid();
-        const predValArr = Array.from(await sigmoidVal.getValues());
+        const predValArr: number[] = Array.from(await sigmoidVal.getValues());
         let correctVal = this.getCorrect(predValArr, valYs);
         console.log(`${correctVal} of ${predValArr.length} predicted correctly`);
         sigmoidVal.delete();
