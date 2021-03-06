@@ -75,12 +75,20 @@
 						<section class="tsd-index-section ">
 							<h3>Classes</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-class tsd-parent-kind-namespace"><a href="../classes/tensor.wasm.wasmtensor.html" class="tsd-kind-icon">WASMTensor</a></li>
+								<li class="tsd-kind-class tsd-parent-kind-namespace tsd-has-type-parameter"><a href="../classes/tensor.wasm.wasmtensor.html" class="tsd-kind-icon">WASMTensor</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Type aliases</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-type-alias tsd-parent-kind-namespace"><a href="tensor.wasm.html#dtypewasm" class="tsd-kind-icon">DType<wbr>Wasm</a></li>
+								<li class="tsd-kind-type-alias tsd-parent-kind-namespace"><a href="tensor.wasm.html#wt" class="tsd-kind-icon">WT</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Variables</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-variable tsd-parent-kind-namespace"><a href="tensor.wasm.html#tensorconstructor" class="tsd-kind-icon">tensor<wbr>Constructor</a></li>
 								<li class="tsd-kind-variable tsd-parent-kind-namespace"><a href="tensor.wasm.html#wasmloaded" class="tsd-kind-icon">wasm<wbr>Loaded</a></li>
 							</ul>
 						</section>
@@ -88,14 +96,84 @@
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Type aliases</h2>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-namespace">
+					<a name="dtypewasm" class="tsd-anchor"></a>
+					<h3>DType<wbr>Wasm</h3>
+					<div class="tsd-signature tsd-kind-icon">DType<wbr>Wasm<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;float64&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;float32&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;int32&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;int16&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;int8&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;uint32&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;uint16&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;uint8&quot;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/eff0d8d/lib/tensor/wasm/tensor.ts#L70">tensor/wasm/tensor.ts:70</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-namespace">
+					<a name="wt" class="tsd-anchor"></a>
+					<h3>WT</h3>
+					<div class="tsd-signature tsd-kind-icon">WT<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>float32<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">WTF32</span><span class="tsd-signature-symbol">; </span>float64<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">WTF64</span><span class="tsd-signature-symbol">; </span>int16<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">WTI16</span><span class="tsd-signature-symbol">; </span>int32<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">WTI32</span><span class="tsd-signature-symbol">; </span>int8<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">WTI8</span><span class="tsd-signature-symbol">; </span>uint16<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">WTU16</span><span class="tsd-signature-symbol">; </span>uint32<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">WTU32</span><span class="tsd-signature-symbol">; </span>uint8<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">WTU8</span><span class="tsd-signature-symbol"> }</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/eff0d8d/lib/tensor/wasm/tensor.ts#L59">tensor/wasm/tensor.ts:59</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter">
+								<h5>float32<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">WTF32</span></h5>
+							</li>
+							<li class="tsd-parameter">
+								<h5>float64<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">WTF64</span></h5>
+							</li>
+							<li class="tsd-parameter">
+								<h5>int16<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">WTI16</span></h5>
+							</li>
+							<li class="tsd-parameter">
+								<h5>int32<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">WTI32</span></h5>
+							</li>
+							<li class="tsd-parameter">
+								<h5>int8<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">WTI8</span></h5>
+							</li>
+							<li class="tsd-parameter">
+								<h5>uint16<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">WTU16</span></h5>
+							</li>
+							<li class="tsd-parameter">
+								<h5>uint32<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">WTU32</span></h5>
+							</li>
+							<li class="tsd-parameter">
+								<h5>uint8<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">WTU8</span></h5>
+							</li>
+						</ul>
+					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Variables</h2>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-namespace">
+					<a name="tensorconstructor" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagLet">Let</span> tensor<wbr>Constructor</h3>
+					<div class="tsd-signature tsd-kind-icon">tensor<wbr>Constructor<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{}</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/eff0d8d/lib/tensor/wasm/tensor.ts#L31">tensor/wasm/tensor.ts:31</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-index-signature">
+								<h5><span class="tsd-signature-symbol">[</span>name: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]: </span><span class="tsd-signature-type">any</span></h5>
+							</li>
+						</ul>
+					</div>
+				</section>
 				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-namespace">
 					<a name="wasmloaded" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> wasm<wbr>Loaded</h3>
 					<div class="tsd-signature tsd-kind-icon">wasm<wbr>Loaded<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/ac7742b/lib/tensor/wasm/tensor.ts#L9">tensor/wasm/tensor.ts:9</a></li>
+							<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/eff0d8d/lib/tensor/wasm/tensor.ts#L33">tensor/wasm/tensor.ts:33</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -137,8 +215,17 @@
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
-					<li class=" tsd-kind-class tsd-parent-kind-namespace">
+					<li class=" tsd-kind-class tsd-parent-kind-namespace tsd-has-type-parameter">
 						<a href="../classes/tensor.wasm.wasmtensor.html" class="tsd-kind-icon">WASMTensor</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-namespace">
+						<a href="tensor.wasm.html#dtypewasm" class="tsd-kind-icon">DType<wbr>Wasm</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-namespace">
+						<a href="tensor.wasm.html#wt" class="tsd-kind-icon">WT</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-parent-kind-namespace">
+						<a href="tensor.wasm.html#tensorconstructor" class="tsd-kind-icon">tensor<wbr>Constructor</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-parent-kind-namespace">
 						<a href="tensor.wasm.html#wasmloaded" class="tsd-kind-icon">wasm<wbr>Loaded</a>
@@ -153,7 +240,7 @@
 		<h2>Legend</h2>
 		<div class="tsd-legend-group">
 			<ul class="tsd-legend">
-				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
 				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
 			</ul>
 			<ul class="tsd-legend">

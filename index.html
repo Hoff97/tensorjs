@@ -62,8 +62,7 @@
 					<h1>TensorJS</h1>
 				</a>
 				<p><img src="https://github.com/Hoff97/tensorjs/workflows/Test/badge.svg?branch=develop" alt="Test">
-					<img src="https://img.shields.io/npm/v/@hoff97/tensor-js" alt="Version">
-				<img src="https://img.shields.io/david/Hoff97/tensorjs" alt="David"></p>
+				<img src="https://img.shields.io/npm/v/@hoff97/tensor-js" alt="Version"></p>
 				<p>This is a JS/TS library for accelerated tensor computation intended to be
 					run in the browser. It contains an implementation for numpy-style
 				multidimensional arrays and their operators.</p>
@@ -102,12 +101,12 @@
 					<li>WASM:<pre><code class="language-typescript"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">tensor</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">tjs</span><span style="color: #000000">.</span><span style="color: #267F99">tensor</span><span style="color: #000000">.</span><span style="color: #267F99">wasm</span><span style="color: #000000">.</span><span style="color: #267F99">WASMTensor</span><span style="color: #000000">(</span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">Float32Array</span><span style="color: #000000">([</span><span style="color: #098658">1</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">3</span><span style="color: #000000">,</span><span style="color: #098658">4</span><span style="color: #000000">]), [</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">]);</span>
 </code></pre>
 					</li>
-					<li>GPU:<pre><code class="language-typescript"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">tensor</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">tjs</span><span style="color: #000000">.</span><span style="color: #267F99">tensor</span><span style="color: #000000">.</span><span style="color: #267F99">gpu</span><span style="color: #000000">.</span><span style="color: #267F99">GPUTensor</span><span style="color: #000000">(</span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">Float32Array</span><span style="color: #000000">([</span><span style="color: #098658">1</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">3</span><span style="color: #000000">,</span><span style="color: #098658">4</span><span style="color: #000000">]), [</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">], </span><span style="color: #098658">32</span><span style="color: #000000">);</span>
+					<li>GPU:<pre><code class="language-typescript"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">tensor</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">tjs</span><span style="color: #000000">.</span><span style="color: #267F99">tensor</span><span style="color: #000000">.</span><span style="color: #267F99">gpu</span><span style="color: #000000">.</span><span style="color: #267F99">GPUTensor</span><span style="color: #000000">(</span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">Float32Array</span><span style="color: #000000">([</span><span style="color: #098658">1</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">3</span><span style="color: #000000">,</span><span style="color: #098658">4</span><span style="color: #000000">]), [</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">]);</span>
 </code></pre>
 						or directly from an image/video element:<pre><code class="language-typescript"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">video</span><span style="color: #000000">: </span><span style="color: #267F99">HTMLVideoElement</span><span style="color: #000000"> = </span><span style="color: #001080">document</span><span style="color: #000000">.</span><span style="color: #795E26">querySelector</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;#videoElement&quot;</span><span style="color: #000000">);</span>
 <span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">tensor</span><span style="color: #000000"> = </span><span style="color: #001080">tjs</span><span style="color: #000000">.</span><span style="color: #001080">tensor</span><span style="color: #000000">.</span><span style="color: #001080">gpu</span><span style="color: #000000">.</span><span style="color: #001080">GPUTensor</span><span style="color: #000000">.</span><span style="color: #795E26">fromData</span><span style="color: #000000">(</span><span style="color: #001080">video</span><span style="color: #000000">);</span>
 </code></pre>
-						which will be a tensor with shape <code>[height,width,4]</code>.
+						which will be a tensor with shape <code>[height,width,4]</code> and data type <code>float32</code>.
 						Creating a GPU tensor from a video element will usually be pretty fast.
 						Creation from an image not necessarily, since here the image data
 					first has to be transferred to the GPU.</li>
@@ -138,6 +137,34 @@
 				<p>which will give you the values as a array of the values.
 				For CPU tensors you can also get the value at an index:</p>
 				<pre><code class="language-typescript"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">value</span><span style="color: #000000"> = </span><span style="color: #001080">tensor</span><span style="color: #000000">.</span><span style="color: #795E26">get</span><span style="color: #000000">([</span><span style="color: #098658">1</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">3</span><span style="color: #000000">,</span><span style="color: #098658">4</span><span style="color: #000000">]);</span>
+</code></pre>
+				<a href="#data-types" id="data-types" style="color: inherit; text-decoration: none;">
+					<h3>Data types</h3>
+				</a>
+				<p>Tensors are created with float values (using 32 bits) by default.
+				You can specify another data type on creation:</p>
+				<pre><code class="language-typescript"><span style="color: #000000">  </span><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">tensor</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">tjs</span><span style="color: #000000">.</span><span style="color: #267F99">tensor</span><span style="color: #000000">.</span><span style="color: #267F99">cpu</span><span style="color: #000000">.</span><span style="color: #267F99">CPUTensor</span><span style="color: #000000">([</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">], [</span><span style="color: #098658">1</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">3</span><span style="color: #000000">,</span><span style="color: #098658">4</span><span style="color: #000000">], </span><span style="color: #A31515">&#039;float16&#039;</span><span style="color: #000000">);</span>
+</code></pre>
+				<p>or cast to another data type with:</p>
+				<pre><code class="language-typescript"><span style="color: #000000">  </span><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">casted</span><span style="color: #000000"> = </span><span style="color: #001080">tensor</span><span style="color: #000000">.</span><span style="color: #795E26">cast</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;float16&#039;</span><span style="color: #000000">);</span>
+</code></pre>
+				<p>The available data types are <code>float64</code>, <code>float32</code>, <code>float16</code>, <code>int32</code>, <code>int16</code>, <code>int8</code>, <code>uint32</code>, <code>uint16</code>, <code>uint8</code>.
+				Note that not all backends support all data types:</p>
+				<ul>
+					<li>CPU: Supports all data types, but <code>float16</code> will be represented as <code>float32</code> internally</li>
+					<li>WASM: Supports all except <code>float16</code></li>
+					<li>GPU: Supports all except <code>float64</code>. Note that except for <code>float16</code>, all other data types will be
+						represented by <code>float32</code> internally, since WebGL1 does not allow writing anything else than floats to
+					frame buffers. This means that for <code>int32</code> and <code>uint32</code>, not the whole range of the respective data type is available.</li>
+				</ul>
+				<p>The data type of a tensor can be accessed via <code>tensor.dtype</code>. Additionally, each tensor has a generic type argument,
+				which will carry its data type:</p>
+				<pre><code class="language-typescript"><span style="color: #000000">  </span><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">tensor</span><span style="color: #000000">: </span><span style="color: #267F99">Tensor</span><span style="color: #000000">&lt;</span><span style="color: #A31515">&#039;float16&#039;</span><span style="color: #000000">&gt; = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">tjs</span><span style="color: #000000">.</span><span style="color: #267F99">tensor</span><span style="color: #000000">.</span><span style="color: #267F99">cpu</span><span style="color: #000000">.</span><span style="color: #267F99">CPUTensor</span><span style="color: #000000">([</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">], [</span><span style="color: #098658">1</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">3</span><span style="color: #000000">,</span><span style="color: #098658">4</span><span style="color: #000000">], </span><span style="color: #A31515">&#039;float16&#039;</span><span style="color: #000000">);</span>
+</code></pre>
+				<p>This allows type checking tensor operations, which means that only tensor operations with the same
+					data type compile when using typescript.
+				The generic type defaults to <code>float32</code>. If you want to represent the data type of a tensor with an unknown data type, write for example</p>
+				<pre><code class="language-typescript"><span style="color: #000000">  </span><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">tensor</span><span style="color: #000000">: </span><span style="color: #267F99">Tensor</span><span style="color: #000000">&lt;</span><span style="color: #267F99">any</span><span style="color: #000000">&gt; = </span><span style="color: #001080">a</span><span style="color: #000000">.</span><span style="color: #795E26">add</span><span style="color: #000000">(</span><span style="color: #001080">b</span><span style="color: #000000">);</span>
 </code></pre>
 				<a href="#converting-between-backends" id="converting-between-backends" style="color: inherit; text-decoration: none;">
 					<h3>Converting between backends</h3>
@@ -182,16 +209,12 @@
 <span style="color: #001080">model</span><span style="color: #000000">.</span><span style="color: #795E26">toGPU</span><span style="color: #000000">();</span>
 </code></pre>
 				<p>For the best performance you should also create your GPU tensors with half precision</p>
-				<pre><code class="language-typescript"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">tensor</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">tjs</span><span style="color: #000000">.</span><span style="color: #267F99">tensor</span><span style="color: #000000">.</span><span style="color: #267F99">gpu</span><span style="color: #000000">.</span><span style="color: #267F99">GPUTensor</span><span style="color: #000000">(</span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">Float32Array</span><span style="color: #000000">([</span><span style="color: #098658">1</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">3</span><span style="color: #000000">,</span><span style="color: #098658">4</span><span style="color: #000000">]), [</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">], </span><span style="color: #098658">16</span><span style="color: #000000">);</span>
-</code></pre>
-				<p>or directly from an image/video element:</p>
-				<pre><code class="language-typescript"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">video</span><span style="color: #000000">: </span><span style="color: #267F99">HTMLVideoElement</span><span style="color: #000000"> = </span><span style="color: #001080">document</span><span style="color: #000000">.</span><span style="color: #795E26">querySelector</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;#videoElement&quot;</span><span style="color: #000000">);</span>
-<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">tensor</span><span style="color: #000000"> = </span><span style="color: #001080">tjs</span><span style="color: #000000">.</span><span style="color: #001080">tensor</span><span style="color: #000000">.</span><span style="color: #001080">gpu</span><span style="color: #000000">.</span><span style="color: #001080">GPUTensor</span><span style="color: #000000">.</span><span style="color: #795E26">fromData</span><span style="color: #000000">(</span><span style="color: #001080">video</span><span style="color: #000000">, </span><span style="color: #098658">16</span><span style="color: #000000">);</span>
+				<pre><code class="language-typescript"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">tensor</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">tjs</span><span style="color: #000000">.</span><span style="color: #267F99">tensor</span><span style="color: #000000">.</span><span style="color: #267F99">gpu</span><span style="color: #000000">.</span><span style="color: #267F99">GPUTensor</span><span style="color: #000000">(</span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">Float32Array</span><span style="color: #000000">([</span><span style="color: #098658">1</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">3</span><span style="color: #000000">,</span><span style="color: #098658">4</span><span style="color: #000000">]), [</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">], </span><span style="color: #A31515">&#039;float16&#039;</span><span style="color: #000000">);</span>
 </code></pre>
 				<p>The outputs of the model will be half-precision tensors as well.
 					To read the values of a half precision gpu tensor, you have to convert
 				it to full precision first, which can be done with:</p>
-				<pre><code class="language-typescript"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">values</span><span style="color: #000000"> = </span><span style="color: #AF00DB">await</span><span style="color: #000000"> </span><span style="color: #001080">tensor</span><span style="color: #000000">.</span><span style="color: #795E26">copy</span><span style="color: #000000">(</span><span style="color: #098658">32</span><span style="color: #000000">).</span><span style="color: #795E26">getValues</span><span style="color: #000000">();</span>
+				<pre><code class="language-typescript"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">values</span><span style="color: #000000"> = </span><span style="color: #AF00DB">await</span><span style="color: #000000"> </span><span style="color: #001080">tensor</span><span style="color: #000000">.</span><span style="color: #795E26">cast</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;float32&#039;</span><span style="color: #000000">).</span><span style="color: #795E26">getValues</span><span style="color: #000000">();</span>
 </code></pre>
 				<a href="#other-performance-considerations" id="other-performance-considerations" style="color: inherit; text-decoration: none;">
 					<h3>Other performance considerations</h3>
@@ -264,17 +287,17 @@
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
-					<li class=" tsd-kind-class">
+					<li class=" tsd-kind-class tsd-has-type-parameter">
 						<a href="classes/tensor.html" class="tsd-kind-icon">Tensor</a>
 					</li>
 					<li class=" tsd-kind-type-alias">
 						<a href="modules.html#activation" class="tsd-kind-icon">Activation</a>
 					</li>
 					<li class=" tsd-kind-type-alias">
-						<a href="modules.html#padmode" class="tsd-kind-icon">Pad<wbr>Mode</a>
+						<a href="modules.html#dtype" class="tsd-kind-icon">DType</a>
 					</li>
 					<li class=" tsd-kind-type-alias">
-						<a href="modules.html#precision" class="tsd-kind-icon">Precision</a>
+						<a href="modules.html#padmode" class="tsd-kind-icon">Pad<wbr>Mode</a>
 					</li>
 				</ul>
 			</nav>
@@ -286,7 +309,7 @@
 		<h2>Legend</h2>
 		<div class="tsd-legend-group">
 			<ul class="tsd-legend">
-				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
 				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
 			</ul>
 			<ul class="tsd-legend">
