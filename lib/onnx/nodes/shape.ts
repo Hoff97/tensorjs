@@ -16,13 +16,13 @@ export class ShapeNode extends OnnxNode {
     super(attributes, inputs, outputs, constants, onnxVersion, mode);
   }
 
-  async forward(inputs: Tensor<any>[]): Promise<Tensor<'uint32'>[]> {
+  async forward(inputs: Tensor<any>[]): Promise<Tensor<'int32'>[]> {
     if (this.onnxVersion < 13) {
       const a = inputs[0];
 
       const shape = a.getShape();
 
-      return [new CPUTensor([shape.length], [...shape], 'uint32')];
+      return [new CPUTensor([shape.length], [...shape], 'int32')];
     }
     throw new Error(
       `Shape not implemented for onnx version ${this.onnxVersion}`
