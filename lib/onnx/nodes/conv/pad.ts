@@ -1,5 +1,5 @@
 import {Mode} from '../../../model/module';
-import Tensor, {PadMode} from '../../../types';
+import Tensor, {DType, PadMode} from '../../../types';
 import {OnnxNode} from '../../node';
 import {Attributes, Constants} from '../../types';
 
@@ -24,7 +24,9 @@ export class PadNode extends OnnxNode {
     this.value = this.getAttributeFloat('value') || 0;
   }
 
-  async forward(inputs: Tensor[]): Promise<Tensor[]> {
+  async forward<DTpe extends DType>(
+    inputs: Tensor<DTpe>[]
+  ): Promise<Tensor<DTpe>[]> {
     if (this.onnxVersion < 11) {
       return [inputs[0].pad(this.pads, this.padMode, this.value)];
     }

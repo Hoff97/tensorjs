@@ -49,10 +49,12 @@ if (run) {
           const model1 = new OnnxModel(buffer1);
           const model2 = new OnnxModel(buffer1);
 
-          const inputs: Tensor[] = [];
+          const inputs: Tensor<'float32'>[] = [];
           for (const inputShape of test.inputsShape) {
             const values = randomValues(getSize(inputShape));
-            inputs.push(new CPUTensor(inputShape, new Float32Array(values)));
+            inputs.push(
+              new CPUTensor(inputShape, new Float32Array(values), 'float32')
+            );
           }
 
           if (backend === 'CPU') {
@@ -65,7 +67,7 @@ if (run) {
             await model1.toGPU();
             await model2.toGPU();
             for (let i = 0; i < inputs.length; i++) {
-              inputs[i] = await toGPU(inputs[i], 32);
+              inputs[i] = await toGPU(inputs[i]);
             }
           } else {
             await model1.toWASM();

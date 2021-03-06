@@ -12,7 +12,7 @@ export type NodeConstructor = (
   onnxVersion: number,
   mode: Mode
 ) => OnnxNode;
-export type Constants = {[name: string]: Tensor};
+export type Constants = {[name: string]: Tensor<any>};
 
 export interface OnnxModelI {
   getNodes(): {[id: number]: OnnxNode};

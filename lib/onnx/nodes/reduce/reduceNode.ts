@@ -1,5 +1,6 @@
 import {Tensor} from '../../../library';
 import {Mode} from '../../../model/module';
+import {DType} from '../../../types';
 import {OnnxNode} from '../../node';
 import {Attributes, Constants} from '../../types';
 
@@ -28,9 +29,9 @@ export abstract class ReduceNode extends OnnxNode {
     this.name = name;
   }
 
-  abstract calc(input: Tensor): Tensor;
+  abstract calc<DTpe extends DType>(input: Tensor<DTpe>): Tensor<DTpe>;
 
-  protected getAxes(input: Tensor) {
+  protected getAxes<DTpe extends DType>(input: Tensor<DTpe>) {
     if (this.axes !== undefined) {
       return this.axes;
     } else {
@@ -44,8 +45,10 @@ export abstract class ReduceNode extends OnnxNode {
     }
   }
 
-  async forward(inputs: Tensor[]): Promise<Tensor[]> {
-    if (this.onnxVersion < 11) {
+  async forward<DTpe extends DType>(
+    inputs: Tensor<DTpe>[]
+  ): Promise<Tensor<DTpe>[]> {
+    if (this.onnxVersion < 13) {
       return [this.calc(inputs[0])];
     }
     throw new Error(

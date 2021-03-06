@@ -1,15 +1,15 @@
-import {Tensor} from '../../../library';
+import {DType, Tensor} from '../../../library';
 import {BackwardOp, VariableI} from '../../types';
 
-export class ProductBack implements BackwardOp {
+export class ProductBack<DTpe extends DType> implements BackwardOp<DTpe> {
   constructor(
-    public input: VariableI,
-    public product: Tensor,
+    public input: VariableI<DTpe>,
+    public product: Tensor<DTpe>,
     public sumDims: number[],
     public keepDims: boolean
   ) {}
 
-  backward(grad: Tensor): void {
+  backward(grad: Tensor<DTpe>): void {
     const inShape = this.input.value.getShape();
 
     let mult = grad.multiply(this.product);

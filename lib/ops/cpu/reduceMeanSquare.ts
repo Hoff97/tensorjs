@@ -1,12 +1,13 @@
 import {CPUTensor} from '../../tensor/cpu/tensor';
+import {DType} from '../../types';
 
 import {pool} from './pool';
 
-export function reduceMeanSquare(
-  a: CPUTensor,
+export function reduceMeanSquare<DTpe extends DType>(
+  a: CPUTensor<DTpe>,
   axes: number[],
   keepDims: boolean
-): CPUTensor {
+): CPUTensor<DTpe> {
   let poolSize = 1;
   for (let i = 0; i < axes.length; i++) {
     poolSize *= a.shape[axes[i]];

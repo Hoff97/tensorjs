@@ -1,10 +1,10 @@
-import {Tensor} from '../../../library';
+import {DType, Tensor} from '../../../library';
 import {BackwardOp, VariableI} from '../../types';
 
-export class CosBack implements BackwardOp {
-  constructor(public input: VariableI) {}
+export class CosBack<DTpe extends DType> implements BackwardOp<DTpe> {
+  constructor(public input: VariableI<DTpe>) {}
 
-  backward(grad: Tensor): void {
+  backward(grad: Tensor<DTpe>): void {
     const sin = this.input.value.sin();
     const gradAbs = grad.multiply(sin, -1);
     sin.delete();
@@ -21,10 +21,10 @@ export class CosBack implements BackwardOp {
   }
 }
 
-export class ACosBack implements BackwardOp {
-  constructor(public input: VariableI) {}
+export class ACosBack<DTpe extends DType> implements BackwardOp<DTpe> {
+  constructor(public input: VariableI<DTpe>) {}
 
-  backward(grad: Tensor): void {
+  backward(grad: Tensor<DTpe>): void {
     const squared = this.input.value.multiply(this.input.value);
     const oneMinus = squared.addMultiplyScalar(-1, 1);
     squared.delete();
@@ -45,10 +45,10 @@ export class ACosBack implements BackwardOp {
   }
 }
 
-export class CosHBack implements BackwardOp {
-  constructor(public input: VariableI) {}
+export class CosHBack<DTpe extends DType> implements BackwardOp<DTpe> {
+  constructor(public input: VariableI<DTpe>) {}
 
-  backward(grad: Tensor): void {
+  backward(grad: Tensor<DTpe>): void {
     const sinh = this.input.value.sinh();
     const gradCosH = grad.multiply(sinh);
     sinh.delete();
@@ -65,10 +65,10 @@ export class CosHBack implements BackwardOp {
   }
 }
 
-export class ACosHBack implements BackwardOp {
-  constructor(public input: VariableI) {}
+export class ACosHBack<DTpe extends DType> implements BackwardOp<DTpe> {
+  constructor(public input: VariableI<DTpe>) {}
 
-  backward(grad: Tensor): void {
+  backward(grad: Tensor<DTpe>): void {
     const squared = this.input.value.multiply(this.input.value);
     const onePlus = squared.addMultiplyScalar(1, -1);
     squared.delete();

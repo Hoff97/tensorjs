@@ -1,6 +1,9 @@
-import {GPUTensorConstructor, GPUTensorI} from '../../../tensor/gpu/interface';
+import {
+  DTypeGpu,
+  GPUTensorConstructor,
+  GPUTensorI,
+} from '../../../tensor/gpu/interface';
 import {GPUMemoryAllocator} from '../../../tensor/gpu/memory';
-import {Precision} from '../../../types';
 import {Input} from '../operation';
 import {BinaryOperation, BinaryOpInfo, BinaryOpInput} from './binaryOperation';
 
@@ -19,9 +22,10 @@ export class SubtractOperation<
 > extends BinaryOperation<GPUTensor, SubtractInfo, SubtractInput> {
   constructor(
     tensorConstructor: GPUTensorConstructor<GPUTensor>,
+    dtype: DTypeGpu,
     allocator?: GPUMemoryAllocator
   ) {
-    super(tensorConstructor, allocator);
+    super(tensorConstructor, dtype, allocator);
   }
 
   getOp(a: string, b: string): string {
@@ -50,8 +54,8 @@ export class SubtractOperation<
     ];
   }
 
-  getCompilationInfo(input: SubtractInput, precision: Precision): SubtractInfo {
-    const info = super.getCompilationInfo(input, precision);
+  getCompilationInfo(input: SubtractInput): SubtractInfo {
+    const info = super.getCompilationInfo(input);
     return {
       ...info,
       alpha: input.alpha,

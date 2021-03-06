@@ -16,7 +16,7 @@ export abstract class Optimization {
 
   abstract apply(
     nodes: OnnxNode[],
-    resolveConstant: (name: string) => Tensor | undefined,
+    resolveConstant: (name: string) => Tensor<any> | undefined,
     constants: Constants,
     onnxVersion: number
   ): OnnxNode;

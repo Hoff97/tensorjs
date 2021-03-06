@@ -1,7 +1,10 @@
 import {defaultAllocator} from '../../../tensor/gpu/gl';
-import {GPUTensorConstructor, GPUTensorI} from '../../../tensor/gpu/interface';
+import {
+  DTypeGpu,
+  GPUTensorConstructor,
+  GPUTensorI,
+} from '../../../tensor/gpu/interface';
 import {GPUMemoryAllocator} from '../../../tensor/gpu/memory';
-import {Precision} from '../../../types';
 import {computeStrides, getSize} from '../../../util/shape';
 import {Input, Operation} from '../operation';
 
@@ -30,9 +33,10 @@ export class TransposeOperation<GPUTensor extends GPUTensorI> extends Operation<
 > {
   constructor(
     tensorConstructor: GPUTensorConstructor<GPUTensor>,
+    dtype: DTypeGpu,
     allocator?: GPUMemoryAllocator
   ) {
-    super(tensorConstructor, allocator);
+    super(tensorConstructor, dtype, allocator);
   }
 
   getVariables() {
@@ -93,7 +97,7 @@ export class TransposeOperation<GPUTensor extends GPUTensorI> extends Operation<
     return outputShape;
   }
 
-  compile(info: TransposeInfo, precision: Precision) {
+  compile(info: TransposeInfo) {
     if (info.shapeA !== undefined) {
       this.maxRank = info.shapeA.length;
 
@@ -112,17 +116,14 @@ export class TransposeOperation<GPUTensor extends GPUTensorI> extends Operation<
       }
     }
 
-    super.compile(info, precision);
+    super.compile(info);
   }
 
-  getCompilationInfo(
-    input: TransposeInput,
-    precision: Precision
-  ): TransposeInfo {
+  getCompilationInfo(input: TransposeInput): TransposeInfo {
     const outputShape = this.getOutputShape(input);
     const outputSize = defaultAllocator.getAllocationDimensions(
       getSize(outputShape),
-      precision
+      this.dtype
     );
 
     const rank = input.A.shape.length;

@@ -1,7 +1,10 @@
 import {defaultAllocator} from '../../../tensor/gpu/gl';
-import {GPUTensorConstructor, GPUTensorI} from '../../../tensor/gpu/interface';
+import {
+  DTypeGpu,
+  GPUTensorConstructor,
+  GPUTensorI,
+} from '../../../tensor/gpu/interface';
 import {GPUMemoryAllocator} from '../../../tensor/gpu/memory';
-import {Precision} from '../../../types';
 import {computeStrides, getSize} from '../../../util/shape';
 import {poolResultShape} from '../../util/pool';
 import {Input, Operation} from '../operation';
@@ -35,9 +38,10 @@ export abstract class PoolOperation<
 
   constructor(
     tensorConstructor: GPUTensorConstructor<GPUTensor>,
+    dtype: DTypeGpu,
     allocator?: GPUMemoryAllocator
   ) {
-    super(tensorConstructor, allocator);
+    super(tensorConstructor, dtype, allocator);
   }
 
   getVariables() {
@@ -159,7 +163,7 @@ export abstract class PoolOperation<
     return outputShape;
   }
 
-  compile(info: PoolInfo, precision: Precision) {
+  compile(info: PoolInfo) {
     if (
       info.shapeX !== undefined &&
       info.axes !== undefined &&
@@ -195,10 +199,10 @@ export abstract class PoolOperation<
       this.maxRank = info.shapeX.length;
     }
 
-    super.compile(info, precision);
+    super.compile(info);
   }
 
-  getCompilationInfo(input: PoolInput, precision: Precision): PoolInfo {
+  getCompilationInfo(input: PoolInput): PoolInfo {
     const [outputShape, ixMap] = poolResultShape(
       input.X.shape,
       input.axes,
@@ -220,7 +224,7 @@ export abstract class PoolOperation<
 
     const outputSize = defaultAllocator.getAllocationDimensions(
       getSize(outputShape),
-      precision
+      this.dtype
     );
 
     return {

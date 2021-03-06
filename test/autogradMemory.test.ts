@@ -11,8 +11,8 @@ const backends = [
   {
     name: 'GPU',
     constructor: (shape: ReadonlyArray<number>, values: number[]) =>
-      new GPUTensor(new Float32Array(values), shape, 32),
-    toBackend: (tensor: Tensor) => toGPU(tensor, 32),
+      new GPUTensor(values, shape, 'float32'),
+    toBackend: (tensor: Tensor<'float32'>) => toGPU(tensor),
   },
 ];
 
@@ -29,8 +29,8 @@ if (run) {
         const allocationsBefore = defaultAllocator.totalAllocations;
         const entriesBefore = defaultAllocator.getNumEntries();
 
-        const res1 = v.exp().sum() as Variable;
-        const res2 = v.exp().sum() as Variable;
+        const res1 = v.exp().sum() as Variable<'float32'>;
+        const res2 = v.exp().sum() as Variable<'float32'>;
         res1.backward();
         res2.backward();
         res1.delete();
@@ -54,8 +54,8 @@ if (run) {
         const allocationsBefore = defaultAllocator.totalAllocations;
         const entriesBefore = defaultAllocator.getNumEntries();
 
-        const res1 = v.log().sum() as Variable;
-        const res2 = v.log().sum() as Variable;
+        const res1 = v.log().sum() as Variable<'float32'>;
+        const res2 = v.log().sum() as Variable<'float32'>;
         res1.backward();
         res2.backward();
         res1.delete();
@@ -79,8 +79,8 @@ if (run) {
         const allocationsBefore = defaultAllocator.totalAllocations;
         const entriesBefore = defaultAllocator.getNumEntries();
 
-        const res1 = v.clip(1.5, 3.5).sum() as Variable;
-        const res2 = v.clip(1.5, 3.5).sum() as Variable;
+        const res1 = v.clip(1.5, 3.5).sum() as Variable<'float32'>;
+        const res2 = v.clip(1.5, 3.5).sum() as Variable<'float32'>;
         res1.backward();
         res2.backward();
         res1.delete();
@@ -104,8 +104,8 @@ if (run) {
         const allocationsBefore = defaultAllocator.totalAllocations;
         const entriesBefore = defaultAllocator.getNumEntries();
 
-        const res1 = v.abs().sum() as Variable;
-        const res2 = v.abs().sum() as Variable;
+        const res1 = v.abs().sum() as Variable<'float32'>;
+        const res2 = v.abs().sum() as Variable<'float32'>;
         res1.backward();
         res2.backward();
         res1.delete();
@@ -129,8 +129,8 @@ if (run) {
         const allocationsBefore = defaultAllocator.totalAllocations;
         const entriesBefore = defaultAllocator.getNumEntries();
 
-        const res1 = v.multiplyScalar(5).sum() as Variable;
-        const res2 = v.multiplyScalar(4).sum() as Variable;
+        const res1 = v.multiplyScalar(5).sum() as Variable<'float32'>;
+        const res2 = v.multiplyScalar(4).sum() as Variable<'float32'>;
         res1.backward();
         res2.backward();
         res1.delete();
@@ -154,8 +154,8 @@ if (run) {
         const allocationsBefore = defaultAllocator.totalAllocations;
         const entriesBefore = defaultAllocator.getNumEntries();
 
-        const res1 = v.negate().sum() as Variable;
-        const res2 = v.negate().sum() as Variable;
+        const res1 = v.negate().sum() as Variable<'float32'>;
+        const res2 = v.negate().sum() as Variable<'float32'>;
         res1.backward();
         res2.backward();
         res1.delete();
@@ -179,8 +179,8 @@ if (run) {
         const allocationsBefore = defaultAllocator.totalAllocations;
         const entriesBefore = defaultAllocator.getNumEntries();
 
-        const res1 = v.sqrt().sum() as Variable;
-        const res2 = v.sqrt().sum() as Variable;
+        const res1 = v.sqrt().sum() as Variable<'float32'>;
+        const res2 = v.sqrt().sum() as Variable<'float32'>;
         res1.backward();
         res2.backward();
         res1.delete();
@@ -206,8 +206,8 @@ if (run) {
         const allocationsBefore = defaultAllocator.totalAllocations;
         const entriesBefore = defaultAllocator.getNumEntries();
 
-        const res1 = vA.add(vB).sum() as Variable;
-        const res2 = vA.add(vB).sum() as Variable;
+        const res1 = vA.add(vB).sum() as Variable<'float32'>;
+        const res2 = vA.add(vB).sum() as Variable<'float32'>;
         res1.backward();
         res2.backward();
         res1.delete();
@@ -234,8 +234,8 @@ if (run) {
         const allocationsBefore = defaultAllocator.totalAllocations;
         const entriesBefore = defaultAllocator.getNumEntries();
 
-        const res1 = vA.add(vB).sum() as Variable;
-        const res2 = vA.add(vB).sum() as Variable;
+        const res1 = vA.add(vB).sum() as Variable<'float32'>;
+        const res2 = vA.add(vB).sum() as Variable<'float32'>;
         res1.backward();
         res2.backward();
         res1.delete();
@@ -262,8 +262,8 @@ if (run) {
         const allocationsBefore = defaultAllocator.totalAllocations;
         const entriesBefore = defaultAllocator.getNumEntries();
 
-        const res1 = vA.subtract(vB).sum() as Variable;
-        const res2 = vA.subtract(vB).sum() as Variable;
+        const res1 = vA.subtract(vB).sum() as Variable<'float32'>;
+        const res2 = vA.subtract(vB).sum() as Variable<'float32'>;
         res1.backward();
         res2.backward();
         res1.delete();
@@ -290,8 +290,8 @@ if (run) {
         const allocationsBefore = defaultAllocator.totalAllocations;
         const entriesBefore = defaultAllocator.getNumEntries();
 
-        const res1 = vA.subtract(vB).sum() as Variable;
-        const res2 = vA.subtract(vB).sum() as Variable;
+        const res1 = vA.subtract(vB).sum() as Variable<'float32'>;
+        const res2 = vA.subtract(vB).sum() as Variable<'float32'>;
         res1.backward();
         res2.backward();
         res1.delete();
@@ -318,8 +318,8 @@ if (run) {
         const allocationsBefore = defaultAllocator.totalAllocations;
         const entriesBefore = defaultAllocator.getNumEntries();
 
-        const res1 = vA.divide(vB).sum() as Variable;
-        const res2 = vA.divide(vB).sum() as Variable;
+        const res1 = vA.divide(vB).sum() as Variable<'float32'>;
+        const res2 = vA.divide(vB).sum() as Variable<'float32'>;
         res1.backward();
         res2.backward();
         res1.delete();
@@ -346,8 +346,8 @@ if (run) {
         const allocationsBefore = defaultAllocator.totalAllocations;
         const entriesBefore = defaultAllocator.getNumEntries();
 
-        const res1 = vA.divide(vB).sum() as Variable;
-        const res2 = vA.divide(vB).sum() as Variable;
+        const res1 = vA.divide(vB).sum() as Variable<'float32'>;
+        const res2 = vA.divide(vB).sum() as Variable<'float32'>;
         res1.backward();
         res2.backward();
         res1.delete();
@@ -374,8 +374,8 @@ if (run) {
         const allocationsBefore = defaultAllocator.totalAllocations;
         const entriesBefore = defaultAllocator.getNumEntries();
 
-        const res1 = vA.multiply(vB).sum() as Variable;
-        const res2 = vA.multiply(vB).sum() as Variable;
+        const res1 = vA.multiply(vB).sum() as Variable<'float32'>;
+        const res2 = vA.multiply(vB).sum() as Variable<'float32'>;
         res1.backward();
         res2.backward();
         res1.delete();
@@ -402,8 +402,8 @@ if (run) {
         const allocationsBefore = defaultAllocator.totalAllocations;
         const entriesBefore = defaultAllocator.getNumEntries();
 
-        const res1 = vA.multiply(vB).sum() as Variable;
-        const res2 = vA.multiply(vB).sum() as Variable;
+        const res1 = vA.multiply(vB).sum() as Variable<'float32'>;
+        const res2 = vA.multiply(vB).sum() as Variable<'float32'>;
         res1.backward();
         res2.backward();
         res1.delete();
@@ -430,8 +430,8 @@ if (run) {
         const allocationsBefore = defaultAllocator.totalAllocations;
         const entriesBefore = defaultAllocator.getNumEntries();
 
-        const res1 = vA.power(vB).sum() as Variable;
-        const res2 = vA.power(vB).sum() as Variable;
+        const res1 = vA.power(vB).sum() as Variable<'float32'>;
+        const res2 = vA.power(vB).sum() as Variable<'float32'>;
         res1.backward();
         res2.backward();
         res1.delete();
@@ -458,8 +458,8 @@ if (run) {
         const allocationsBefore = defaultAllocator.totalAllocations;
         const entriesBefore = defaultAllocator.getNumEntries();
 
-        const res1 = vA.power(vB).sum() as Variable;
-        const res2 = vA.power(vB).sum() as Variable;
+        const res1 = vA.power(vB).sum() as Variable<'float32'>;
+        const res2 = vA.power(vB).sum() as Variable<'float32'>;
         res1.backward();
         res2.backward();
         res1.delete();
@@ -484,8 +484,8 @@ if (run) {
         const allocationsBefore = defaultAllocator.totalAllocations;
         const entriesBefore = defaultAllocator.getNumEntries();
 
-        const res1 = vA.sum(1).sum() as Variable;
-        const res2 = vA.sum(1).sum() as Variable;
+        const res1 = vA.sum(1).sum() as Variable<'float32'>;
+        const res2 = vA.sum(1).sum() as Variable<'float32'>;
         res1.backward();
         res2.backward();
         res1.delete();
@@ -509,8 +509,8 @@ if (run) {
         const allocationsBefore = defaultAllocator.totalAllocations;
         const entriesBefore = defaultAllocator.getNumEntries();
 
-        const res1 = vA.sumSquare(1).sum() as Variable;
-        const res2 = vA.sumSquare(1).sum() as Variable;
+        const res1 = vA.sumSquare(1).sum() as Variable<'float32'>;
+        const res2 = vA.sumSquare(1).sum() as Variable<'float32'>;
         res1.backward();
         res2.backward();
         res1.delete();
@@ -534,8 +534,8 @@ if (run) {
         const allocationsBefore = defaultAllocator.totalAllocations;
         const entriesBefore = defaultAllocator.getNumEntries();
 
-        const res1 = vA.reshape([4]).sum() as Variable;
-        const res2 = vA.reshape([4]).sum() as Variable;
+        const res1 = vA.reshape([4]).sum() as Variable<'float32'>;
+        const res2 = vA.reshape([4]).sum() as Variable<'float32'>;
         res1.backward();
         res2.backward();
         res1.delete();
@@ -563,8 +563,12 @@ if (run) {
         const allocationsBefore = defaultAllocator.totalAllocations;
         const entriesBefore = defaultAllocator.getNumEntries();
 
-        const res1 = vA.gemm(vB, false, false, 1, vC).sum() as Variable;
-        const res2 = vA.gemm(vB, false, false, 1, vC).sum() as Variable;
+        const res1 = vA
+          .gemm(vB, false, false, 1, vC)
+          .sum() as Variable<'float32'>;
+        const res2 = vA
+          .gemm(vB, false, false, 1, vC)
+          .sum() as Variable<'float32'>;
         res1.backward();
         res2.backward();
         res1.delete();
@@ -594,7 +598,7 @@ if (run) {
           new Relu(),
           new Linear(4, 1),
         ]);
-        await model.toGPU(32);
+        await model.toGPU();
         const optim = new SGD(model);
 
         const allocationsBefore = defaultAllocator.totalAllocations;
@@ -602,7 +606,7 @@ if (run) {
 
         for (let i = 0; i < 5; i++) {
           const pred = (await model.forward([vInput]))[0];
-          const loss = pred.subtract(vY).sumSquare() as Variable;
+          const loss = pred.subtract(vY).sumSquare() as Variable<'float32'>;
           loss.backward();
           optim.step();
           loss.delete();

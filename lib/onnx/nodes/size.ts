@@ -17,13 +17,13 @@ export class SizeNode extends OnnxNode {
     super(attributes, inputs, outputs, constants, onnxVersion, mode);
   }
 
-  async forward(inputs: Tensor[]): Promise<Tensor[]> {
+  async forward(inputs: Tensor<any>[]): Promise<Tensor<'uint32'>[]> {
     const a = inputs[0];
 
     const shape = a.getShape();
     const size = getSize(shape);
 
-    return [new CPUTensor([1], [size], 'int')];
+    return [new CPUTensor([1], [size], 'uint32')];
   }
 
   getType() {

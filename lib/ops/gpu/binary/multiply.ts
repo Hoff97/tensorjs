@@ -1,6 +1,9 @@
-import {GPUTensorConstructor, GPUTensorI} from '../../../tensor/gpu/interface';
+import {
+  DTypeGpu,
+  GPUTensorConstructor,
+  GPUTensorI,
+} from '../../../tensor/gpu/interface';
 import {GPUMemoryAllocator} from '../../../tensor/gpu/memory';
-import {Precision} from '../../../types';
 import {Input} from '../operation';
 import {BinaryOperation, BinaryOpInfo, BinaryOpInput} from './binaryOperation';
 
@@ -17,9 +20,10 @@ export class MultiplyOperation<
 > extends BinaryOperation<GPUTensor, MultiplyInfo, MultiplyInput> {
   constructor(
     tensorConstructor: GPUTensorConstructor<GPUTensor>,
+    dtype: DTypeGpu,
     allocator?: GPUMemoryAllocator
   ) {
-    super(tensorConstructor, allocator);
+    super(tensorConstructor, dtype, allocator);
   }
 
   getOp(a: string, b: string): string {
@@ -44,8 +48,8 @@ export class MultiplyOperation<
     return [{name: 'alpha', type: 'float'}];
   }
 
-  getCompilationInfo(input: MultiplyInput, precision: Precision): MultiplyInfo {
-    const info = super.getCompilationInfo(input, precision);
+  getCompilationInfo(input: MultiplyInput): MultiplyInfo {
+    const info = super.getCompilationInfo(input);
     return {
       ...info,
       alpha: input.alpha,

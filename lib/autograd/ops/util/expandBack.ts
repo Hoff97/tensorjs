@@ -1,10 +1,10 @@
-import {Tensor} from '../../../library';
+import {DType, Tensor} from '../../../library';
 import {BackwardOp, VariableI} from '../../types';
 
-export class ExpandBack implements BackwardOp {
-  constructor(public a: VariableI, public shape: readonly number[]) {}
+export class ExpandBack<DTpe extends DType> implements BackwardOp<DTpe> {
+  constructor(public a: VariableI<DTpe>, public shape: readonly number[]) {}
 
-  backward(grad: Tensor): void {
+  backward(grad: Tensor<DTpe>): void {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [_shape, goal, resultShape] = this.a.value.alignShapes(
       this.a.getShape(),

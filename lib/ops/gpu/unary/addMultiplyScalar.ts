@@ -1,6 +1,9 @@
-import {GPUTensorConstructor, GPUTensorI} from '../../../tensor/gpu/interface';
+import {
+  DTypeGpu,
+  GPUTensorConstructor,
+  GPUTensorI,
+} from '../../../tensor/gpu/interface';
 import {GPUMemoryAllocator} from '../../../tensor/gpu/memory';
-import {Precision} from '../../../types';
 import {Input} from '../operation';
 import {UnaryOperation, UnaryOpInfo, UnaryOpInput} from './unaryOperation';
 
@@ -23,9 +26,10 @@ export class AddMultiplyScalarOperation<
 > {
   constructor(
     tensorConstructor: GPUTensorConstructor<GPUTensor>,
+    dtype: DTypeGpu,
     allocator?: GPUMemoryAllocator
   ) {
-    super(tensorConstructor, allocator);
+    super(tensorConstructor, dtype, allocator);
   }
 
   operation(input: string): string {
@@ -40,11 +44,8 @@ export class AddMultiplyScalarOperation<
     );
   }
 
-  getCompilationInfo(
-    input: AddMultiplyScalarInput,
-    precision: Precision
-  ): AddMultiplyScalarInfo {
-    const info = super.getCompilationInfo(input, precision);
+  getCompilationInfo(input: AddMultiplyScalarInput): AddMultiplyScalarInfo {
+    const info = super.getCompilationInfo(input);
 
     return {
       ...info,

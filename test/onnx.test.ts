@@ -39,7 +39,7 @@ if (run) {
 
                 const model = new OnnxModel(buffer);
 
-                const inputs: Tensor[] = [];
+                const inputs: Tensor<'float32'>[] = [];
                 let i = 0;
                 // eslint-disable-next-line no-constant-condition
                 while (true) {
@@ -65,8 +65,8 @@ if (run) {
                 const tensorProto = onnx.TensorProto.decode(arr);
                 const output = createTensor(tensorProto);
 
-                let out: Tensor;
-                const inputsDevice: Tensor[] = [];
+                let out: Tensor<'float32'>;
+                const inputsDevice: Tensor<'float32'>[] = [];
                 if (backend === 'CPU') {
                   await model.toCPU();
                   out = await toCPU(output);
@@ -75,9 +75,9 @@ if (run) {
                   }
                 } else if (backend === 'GPU') {
                   await model.toGPU();
-                  out = await toGPU(output, 32);
+                  out = await toGPU(output);
                   for (let i = 0; i < inputs.length; i++) {
-                    inputsDevice.push(await toGPU(inputs[i], 32));
+                    inputsDevice.push(await toGPU(inputs[i]));
                   }
                 } else {
                   model.toWASM();

@@ -1,7 +1,10 @@
 import {defaultAllocator} from '../../../tensor/gpu/gl';
-import {GPUTensorConstructor, GPUTensorI} from '../../../tensor/gpu/interface';
+import {
+  DTypeGpu,
+  GPUTensorConstructor,
+  GPUTensorI,
+} from '../../../tensor/gpu/interface';
 import {GPUMemoryAllocator} from '../../../tensor/gpu/memory';
-import {Precision} from '../../../types';
 import {getSize} from '../../../util/shape';
 import {Input, Operation} from '../operation';
 
@@ -49,9 +52,10 @@ export class NormalizeOperation<GPUTensor extends GPUTensorI> extends Operation<
 > {
   constructor(
     tensorConstructor: GPUTensorConstructor<GPUTensor>,
+    dtype: DTypeGpu,
     allocator?: GPUMemoryAllocator
   ) {
-    super(tensorConstructor, allocator);
+    super(tensorConstructor, dtype, allocator);
   }
 
   getVariables() {
@@ -100,22 +104,19 @@ export class NormalizeOperation<GPUTensor extends GPUTensorI> extends Operation<
     );
   }
 
-  compile(info: NormalizeOpInfo, precision: Precision) {
+  compile(info: NormalizeOpInfo) {
     if (info.shapeX !== undefined) {
       this.maxRank = info.shapeX.length;
     }
 
-    super.compile(info, precision);
+    super.compile(info);
   }
 
-  getCompilationInfo(
-    input: NormalizeOpInput,
-    precision: Precision
-  ): NormalizeOpInfo {
+  getCompilationInfo(input: NormalizeOpInput): NormalizeOpInfo {
     const outputShape = this.getOutputShape(input);
     const outputSize = defaultAllocator.getAllocationDimensions(
       getSize(outputShape),
-      precision
+      this.dtype
     );
 
     return {

@@ -1,12 +1,13 @@
 import {CPUTensor} from '../../tensor/cpu/tensor';
+import {DType} from '../../types';
 
 import {pool} from './pool';
 
-export function max(
-  a: CPUTensor,
+export function max<DTpe extends DType>(
+  a: CPUTensor<DTpe>,
   axes: number[],
   keepDims: boolean
-): CPUTensor {
+): CPUTensor<DTpe> {
   return pool(
     a,
     axes,

@@ -23,6 +23,7 @@ import {
   negate,
   power,
   powerScalar,
+  round,
   sigmoid,
   sign,
   sin,
@@ -55,7 +56,13 @@ import {sum} from '../../ops/cpu/sum';
 import {sumSquare} from '../../ops/cpu/sumSquare';
 import {transpose} from '../../ops/cpu/transpose';
 import {upsample} from '../../ops/cpu/upsample';
-import Tensor, {Activation, PadMode, TensorValues} from '../../types';
+import Tensor, {
+  Activation,
+  DType,
+  PadMode,
+  TensorValues,
+  tensorValuesConstructor,
+} from '../../types';
 import {
   compareShapes,
   computeStrides,
@@ -63,8 +70,17 @@ import {
   indexToPos,
 } from '../../util/shape';
 
-export class CPUTensor extends Tensor {
-  public values: TensorValues;
+export class CPUTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
+  static range(start: number, limit: number, delta: number) {
+    const size = Math.max(Math.ceil((limit - start) / delta), 0);
+    const values = new Float32Array(size);
+    for (let i = 0; i < size; i++) {
+      values[i] = start + i * delta;
+    }
+    return new CPUTensor([size], values);
+  }
+
+  public values: TensorValues[DTpe];
 
   public shape: ReadonlyArray<number>;
 
@@ -72,42 +88,32 @@ export class CPUTensor extends Tensor {
 
   public size: number;
 
-  public type: string;
-
   public deleted = false;
 
   constructor(
     shape: ReadonlyArray<number>,
-    values?: TensorValues | number[],
-    type?: string
+    values?: TensorValues[DTpe] | number[],
+    dtype?: DTpe
   ) {
-    super();
+    super(dtype || ('float32' as any));
 
     this.shape = shape;
     this.strides = computeStrides(shape);
     this.size = getSize(shape);
 
     if (values !== undefined) {
-      if (values instanceof Float32Array || values instanceof Int32Array) {
-        this.values = values;
-        this.type = values instanceof Float32Array ? 'float' : 'int';
-      } else if (type === 'int') {
-        this.values = Int32Array.from(values);
-        this.type = 'int';
+      if (values instanceof Array) {
+        this.values = new tensorValuesConstructor[this.dtype](
+          values
+        ) as TensorValues[DTpe];
       } else {
-        this.values = Float32Array.from(values);
-        this.type = 'float';
+        this.values = values;
       }
     } else {
-      if (type === 'int') {
-        this.values = new Int32Array(this.size);
-        this.type = 'int';
-      } else {
-        this.values = new Float32Array(this.size);
-        this.type = 'float';
-      }
+      this.values = new tensorValuesConstructor[this.dtype](
+        this.size
+      ) as TensorValues[DTpe];
     }
-    this.type = 'float';
   }
 
   getValues() {
@@ -118,16 +124,24 @@ export class CPUTensor extends Tensor {
     return this.shape;
   }
 
-  constantLike(value: number): Tensor {
-    return new CPUTensor(this.shape, new Float32Array(this.size).fill(value));
+  constantLike(value: number): Tensor<DTpe> {
+    return new CPUTensor<DTpe>(
+      this.shape,
+      new tensorValuesConstructor[this.dtype](this.size).fill(
+        value
+      ) as TensorValues[DTpe],
+      this.dtype
+    );
   }
 
-  singleConstant(value: number): Tensor {
-    return new CPUTensor([1], [value]);
+  singleConstant(value: number): Tensor<DTpe> {
+    return new CPUTensor([1], [value], this.dtype);
   }
 
-  async cpu(): Promise<CPUTensor> {
-    return this;
+  cast<DTpe2 extends DType>(dtype: DTpe2): Tensor<DTpe2> {
+    // TODO: Catch special cases here
+    // Eg casting to the same type
+    return new CPUTensor(this.shape, Array.from(this.values), dtype);
   }
 
   delete(): void {
@@ -136,15 +150,17 @@ export class CPUTensor extends Tensor {
     this.deleted = true;
   }
 
-  copy(newShape?: number[]): Tensor {
+  copy(newShape?: number[]): Tensor<DTpe> {
     if (newShape === undefined) {
       newShape = [...this.shape];
     }
-    const values = new Float32Array(this.size);
+    const values = new tensorValuesConstructor[this.dtype](
+      this.size
+    ) as TensorValues[DTpe];
     for (let i = 0; i < this.size; i++) {
       values[i] = this.values[i];
     }
-    return new CPUTensor(newShape, values);
+    return new CPUTensor<DTpe>(newShape, values, this.dtype);
   }
 
   get(index: number[] | number): number {
@@ -169,135 +185,139 @@ export class CPUTensor extends Tensor {
     this.values[pos] = value;
   }
 
-  setValues(values: Tensor, starts: number[]): Tensor {
+  setValues(values: Tensor<DTpe>, starts: number[]): Tensor<DTpe> {
     if (!(values instanceof CPUTensor)) {
       throw new Error('Can only set CPU values to CPU values');
     }
     return setValues(this, values, starts);
   }
 
-  exp(): Tensor {
+  exp(): Tensor<DTpe> {
     return exp(this);
   }
 
-  log(): Tensor {
+  log(): Tensor<DTpe> {
     return log(this);
   }
 
-  sqrt(): Tensor {
+  sqrt(): Tensor<DTpe> {
     return sqrt(this);
   }
 
-  abs(): Tensor {
+  abs(): Tensor<DTpe> {
     return abs(this);
   }
 
-  sin(): Tensor {
+  sin(): Tensor<DTpe> {
     return sin(this);
   }
 
-  cos(): Tensor {
+  cos(): Tensor<DTpe> {
     return cos(this);
   }
 
-  tan(): Tensor {
+  tan(): Tensor<DTpe> {
     return tan(this);
   }
 
-  asin(): Tensor {
+  asin(): Tensor<DTpe> {
     return asin(this);
   }
 
-  acos(): Tensor {
+  acos(): Tensor<DTpe> {
     return acos(this);
   }
 
-  atan(): Tensor {
+  atan(): Tensor<DTpe> {
     return atan(this);
   }
 
-  sinh(): Tensor {
+  sinh(): Tensor<DTpe> {
     return sinh(this);
   }
 
-  cosh(): Tensor {
+  cosh(): Tensor<DTpe> {
     return cosh(this);
   }
 
-  tanh(): Tensor {
+  tanh(): Tensor<DTpe> {
     return tanh(this);
   }
 
-  asinh(): Tensor {
+  asinh(): Tensor<DTpe> {
     return asinh(this);
   }
 
-  acosh(): Tensor {
+  acosh(): Tensor<DTpe> {
     return acosh(this);
   }
 
-  atanh(): Tensor {
+  atanh(): Tensor<DTpe> {
     return atanh(this);
   }
 
-  floor(): Tensor {
+  floor(): Tensor<DTpe> {
     return floor(this);
   }
 
-  ceil(): Tensor {
+  ceil(): Tensor<DTpe> {
     return ceil(this);
   }
 
-  negate(): Tensor {
+  round(): Tensor<DTpe> {
+    return round(this);
+  }
+
+  negate(): Tensor<DTpe> {
     return negate(this);
   }
 
-  powerScalar(power: number, factor: number): Tensor {
+  powerScalar(power: number, factor: number): Tensor<DTpe> {
     return powerScalar(this, power, factor);
   }
 
-  multiplyScalar(value: number): Tensor {
+  multiplyScalar(value: number): Tensor<DTpe> {
     return addMultiplyScalar(this, value, 0);
   }
 
-  addScalar(value: number): Tensor {
+  addScalar(value: number): Tensor<DTpe> {
     return addMultiplyScalar(this, 1, value);
   }
 
-  addMultiplyScalar(factor: number, add: number): Tensor {
+  addMultiplyScalar(factor: number, add: number): Tensor<DTpe> {
     return addMultiplyScalar(this, factor, add);
   }
 
-  sign(): Tensor {
+  sign(): Tensor<DTpe> {
     return sign(this);
   }
 
-  clip(min?: number, max?: number): Tensor {
+  clip(min?: number, max?: number): Tensor<DTpe> {
     return clip(this, min, max);
   }
 
-  clipBackward(grad: Tensor, min?: number, max?: number): Tensor {
+  clipBackward(grad: Tensor<DTpe>, min?: number, max?: number): Tensor<DTpe> {
     if (!(grad instanceof CPUTensor)) {
       throw new Error('Can only do clipBackward with CPUTensor');
     }
     return clipBackward(this, grad, this.getShape(), min, max);
   }
 
-  sigmoid(): Tensor {
+  sigmoid(): Tensor<DTpe> {
     return sigmoid(this);
   }
 
-  hardSigmoid(alpha: number, beta: number): Tensor {
+  hardSigmoid(alpha: number, beta: number): Tensor<DTpe> {
     return hardSigmoid(this, alpha, beta);
   }
 
   add_impl(
-    th: Tensor,
-    tensor: Tensor,
+    th: Tensor<DTpe>,
+    tensor: Tensor<DTpe>,
     resultShape: readonly number[],
     alpha: number,
     beta: number
-  ): Tensor {
+  ): Tensor<DTpe> {
     if (!(tensor instanceof CPUTensor) || !(th instanceof CPUTensor)) {
       throw new Error('Can only add CPU tensor to CPU tensor');
     }
@@ -305,12 +325,12 @@ export class CPUTensor extends Tensor {
   }
 
   subtract_impl(
-    th: Tensor,
-    tensor: Tensor,
+    th: Tensor<DTpe>,
+    tensor: Tensor<DTpe>,
     resultShape: readonly number[],
     alpha: number,
     beta: number
-  ): Tensor {
+  ): Tensor<DTpe> {
     if (!(tensor instanceof CPUTensor) || !(th instanceof CPUTensor)) {
       throw new Error('Can only subtract CPU tensor to CPU tensor');
     }
@@ -318,11 +338,11 @@ export class CPUTensor extends Tensor {
   }
 
   multiply_impl(
-    th: Tensor,
-    tensor: Tensor,
+    th: Tensor<DTpe>,
+    tensor: Tensor<DTpe>,
     resultShape: readonly number[],
     alpha: number
-  ): Tensor {
+  ): Tensor<DTpe> {
     if (!(tensor instanceof CPUTensor) || !(th instanceof CPUTensor)) {
       throw new Error('Can only add CPU tensor to CPU tensor');
     }
@@ -330,11 +350,11 @@ export class CPUTensor extends Tensor {
   }
 
   divide_impl(
-    th: Tensor,
-    tensor: Tensor,
+    th: Tensor<DTpe>,
+    tensor: Tensor<DTpe>,
     resultShape: readonly number[],
     alpha: number
-  ): Tensor {
+  ): Tensor<DTpe> {
     if (!(tensor instanceof CPUTensor) || !(th instanceof CPUTensor)) {
       throw new Error('Can only add CPU tensor to CPU tensor');
     }
@@ -342,17 +362,17 @@ export class CPUTensor extends Tensor {
   }
 
   power_impl(
-    th: Tensor,
-    tensor: Tensor,
+    th: Tensor<DTpe>,
+    tensor: Tensor<DTpe>,
     resultShape: readonly number[]
-  ): Tensor {
+  ): Tensor<DTpe> {
     if (!(tensor instanceof CPUTensor) || !(th instanceof CPUTensor)) {
       throw new Error('Can only take CPU tensor to power of CPU tensor');
     }
     return power(th, tensor, resultShape);
   }
 
-  matMul(tensor: Tensor): Tensor {
+  matMul(tensor: Tensor<DTpe>): Tensor<DTpe> {
     if (!(tensor instanceof CPUTensor)) {
       throw new Error('Can only add CPU tensor to CPU tensor');
     }
@@ -361,66 +381,74 @@ export class CPUTensor extends Tensor {
   }
 
   gemm_impl(
-    b: Tensor,
+    b: Tensor<DTpe>,
     aTranspose: boolean,
     bTranspose: boolean,
     alpha: number,
     beta: number,
-    c?: Tensor
-  ): Tensor {
+    c?: Tensor<DTpe>
+  ): Tensor<DTpe> {
     if (
       !(b instanceof CPUTensor && (c === undefined || c instanceof CPUTensor))
     ) {
       throw new Error('Can only do gemm with CPU tensors');
     }
-    return gemm(this, b, aTranspose, bTranspose, alpha, beta, c as CPUTensor);
+    return gemm(
+      this,
+      b,
+      aTranspose,
+      bTranspose,
+      alpha,
+      beta,
+      c as CPUTensor<DTpe>
+    );
   }
 
-  sum_impl(axes: number[], keepDims: boolean): Tensor {
+  sum_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
     return sum(this, axes, keepDims);
   }
 
-  sumSquare_impl(axes: number[], keepDims: boolean): Tensor {
+  sumSquare_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
     return sumSquare(this, axes, keepDims);
   }
 
-  product_impl(axes: number[], keepDims: boolean): Tensor {
+  product_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
     return product(this, axes, keepDims);
   }
 
-  max_impl(axes: number[], keepDims: boolean): Tensor {
+  max_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
     return max(this, axes, keepDims);
   }
 
-  min_impl(axes: number[], keepDims: boolean): Tensor {
+  min_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
     return min(this, axes, keepDims);
   }
 
-  reduceMean_impl(axes: number[], keepDims: boolean): Tensor {
+  reduceMean_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
     return reduceMean(this, axes, keepDims);
   }
 
-  reduceMeanSquare_impl(axes: number[], keepDims: boolean): Tensor {
+  reduceMeanSquare_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
     return reduceMeanSquare(this, axes, keepDims);
   }
 
-  reduceLogSum_impl(axes: number[], keepDims: boolean): Tensor {
+  reduceLogSum_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
     return reduceLogSum(this, axes, keepDims);
   }
 
-  reduceLogSumExp_impl(axes: number[], keepDims: boolean): Tensor {
+  reduceLogSumExp_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
     return reduceLogSumExp(this, axes, keepDims);
   }
 
   conv_impl(
-    kernel: Tensor,
+    kernel: Tensor<DTpe>,
     dilations: number[],
     group: number,
     pads: number[],
     strides: number[],
     activation: Activation,
-    bias?: Tensor
-  ): Tensor {
+    bias?: Tensor<DTpe>
+  ): Tensor<DTpe> {
     if (
       !(kernel instanceof CPUTensor) ||
       (bias !== undefined && !(bias instanceof CPUTensor))
@@ -435,17 +463,17 @@ export class CPUTensor extends Tensor {
       pads,
       strides,
       activation,
-      bias as CPUTensor
+      bias as CPUTensor<DTpe>
     );
   }
 
   protected convTranspose_impl(
-    kernel: Tensor,
+    kernel: Tensor<DTpe>,
     dilations: number[],
     group: number,
     pads: number[],
     strides: number[]
-  ): Tensor {
+  ): Tensor<DTpe> {
     if (!(kernel instanceof CPUTensor)) {
       throw new Error(
         'Can only do transpose convolution of CPU tensor with CPU tensor'
@@ -455,7 +483,7 @@ export class CPUTensor extends Tensor {
     return convTranspose(this, kernel, dilations, group, pads, strides);
   }
 
-  pad_impl(pads: number[], mode: PadMode, value: number): Tensor {
+  pad_impl(pads: number[], mode: PadMode, value: number): Tensor<DTpe> {
     return pad(this, pads, mode, value);
   }
 
@@ -464,61 +492,69 @@ export class CPUTensor extends Tensor {
     pads: number[],
     strides: number[],
     includePad: boolean
-  ): Tensor {
+  ): Tensor<DTpe> {
     return averagePool(this, kernelShape, pads, strides, includePad);
   }
 
-  reshape_impl(shape: number[], copy: boolean): Tensor {
+  reshape_impl(shape: number[], copy: boolean): Tensor<DTpe> {
     if (copy) {
       return this.copy(shape);
     } else {
-      return new CPUTensor(shape, this.values, this.type);
+      return new CPUTensor(shape, this.values, this.dtype);
     }
   }
 
-  concat(tensor: Tensor, axis: number): Tensor {
+  concat(tensor: Tensor<DTpe>, axis: number): Tensor<DTpe> {
     if (!(tensor instanceof CPUTensor)) {
       throw new Error('Can only concat CPU tensor to CPU tensor');
+    }
+    if (axis < 0) {
+      axis += this.shape.length;
     }
     return concat(this, tensor, axis);
   }
 
-  transpose_impl(permutation: number[]): Tensor {
+  transpose_impl(permutation: number[]): Tensor<DTpe> {
     return transpose(this, permutation);
   }
 
-  repeat(repeats: number[]): Tensor {
+  repeat(repeats: number[]): Tensor<DTpe> {
     return repeat(this, repeats);
   }
 
-  expand(shape: readonly number[]): Tensor {
+  expand(shape: readonly number[]): Tensor<DTpe> {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [_shape, goal, resultShape] = this.alignShapes(this.shape, shape);
     if (compareShapes(this.shape, resultShape)) {
       return this.copy();
     }
-    return expand(this.reshape(_shape, false) as CPUTensor, resultShape);
+    return expand(this.reshape(_shape, false) as CPUTensor<DTpe>, resultShape);
   }
 
-  gather(axis: number, indices: CPUTensor): Tensor {
+  gather(axis: number, indices: CPUTensor<'uint32'>): Tensor<DTpe> {
     return gather(this, axis, indices);
   }
 
-  slice_impl(starts: number[], ends: number[], axes: number[]): Tensor {
-    return slice(this, starts, ends, axes);
+  slice_impl(
+    starts: number[],
+    ends: number[],
+    axes: number[],
+    steps: number[]
+  ): Tensor<DTpe> {
+    return slice(this, starts, ends, axes, steps);
   }
 
-  upsample(scales: number[]): Tensor {
+  upsample(scales: number[]): Tensor<DTpe> {
     return upsample(this, scales);
   }
 
   normalize(
-    mean: Tensor,
-    variance: Tensor,
+    mean: Tensor<DTpe>,
+    variance: Tensor<DTpe>,
     epsilon: number,
-    scale: Tensor,
-    bias: Tensor
-  ): Tensor {
+    scale: Tensor<DTpe>,
+    bias: Tensor<DTpe>
+  ): Tensor<DTpe> {
     if (
       !(mean instanceof CPUTensor) ||
       !(variance instanceof CPUTensor) ||

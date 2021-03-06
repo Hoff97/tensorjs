@@ -4,7 +4,7 @@ import {onnx} from 'onnx-proto';
 import {Variable} from '../autograd/variable';
 import {Mode, Module} from '../model/module';
 import {glContext} from '../tensor/gpu/gl';
-import Tensor, {Precision} from '../types';
+import Tensor from '../types';
 import {toCPU, toGPU, toWASM} from '../util/convert';
 import {OnnxNode} from './node';
 import {ConstantNode} from './nodes/constant';
@@ -21,11 +21,18 @@ interface Intermediary {
 }
 
 interface IntermediaryRes {
-  value: Tensor;
+  value: Tensor<any>;
   used: number;
 }
 
 export interface ModelArgs {
+  /**
+   * Precision with which float tensors should be loaded. If 16 is specified,
+   * all 32 bit floats are casted to 16 bit floats.
+   *
+   * Defaults to 32.
+   */
+  precision?: 16 | 32;
   /**
    * Constants that should not be transferred to another device.
    *
@@ -40,17 +47,13 @@ export interface ModelArgs {
   noConvertNodes?: NodeId[];
 
   /**
-   * Precision that should be used. Only has an effect on GPU.
-   */
-  precision?: Precision;
-
-  /**
    * If the model should be loaded in training or inference mode.
    * In inference mode, no gradients can be supported and
    * the model expects tensors as input.
    *
-   * In training model, gradients can be supported and
-   * the inputs should be variables (although maybe with noGrad: true)
+   * In training mode, gradients can be computed and
+   * the inputs should be variables (although with noGrad: true if no gradient
+   * is needed for the respective input)
    */
   mode?: Mode;
 }
@@ -74,7 +77,7 @@ export class OnnxModel extends Module {
 
   private nodeIdCounter = 10000;
 
-  private precision: Precision;
+  private precision: 32 | 16;
 
   public inputs: onnx.IValueInfoProto[];
   public outputs: string[];
@@ -99,7 +102,6 @@ export class OnnxModel extends Module {
     );
 
     this.mode = args.mode || 'inference';
-
     this.precision = args.precision || 32;
 
     let arr: Uint8Array;
@@ -197,7 +199,10 @@ export class OnnxModel extends Module {
     for (let i = 0; i < initializer.length; i++) {
       const tensorProto = initializer[i];
 
-      let tensor: Tensor = createTensor(tensorProto);
+      let tensor: Tensor<any> = createTensor(
+        tensorProto,
+        this.precision === 16
+      );
       if (this.mode === 'train') {
         tensor = new Variable(tensor);
       }
@@ -216,7 +221,7 @@ export class OnnxModel extends Module {
    * @param returnIntermediary return after the given intermediary result
    *                           has been computed.
    */
-  async forward(inputs: Tensor[], wait?: number): Promise<Tensor[]> {
+  async forward(inputs: Tensor<any>[], wait?: number): Promise<Tensor<any>[]> {
     const intermediaryRes: {[name: string]: IntermediaryRes} = {};
 
     const nodes: {[id: number]: {variableInputs: number}} = {};
@@ -237,7 +242,7 @@ export class OnnxModel extends Module {
 
       const {inputs, toDelete} = this.getInputsToNode(node, intermediaryRes);
 
-      let outputs: Tensor[];
+      let outputs: Tensor<any>[];
       try {
         outputs = await node.forward(inputs);
       } catch (e) {
@@ -269,7 +274,7 @@ export class OnnxModel extends Module {
       }
     }
 
-    const outputs: Tensor[] = [];
+    const outputs: Tensor<any>[] = [];
     for (let i = 0; i < this.outputs.length; i++) {
       outputs.push(intermediaryRes[this.outputs[i]].value);
     }
@@ -278,7 +283,7 @@ export class OnnxModel extends Module {
   }
 
   protected initializeForward(
-    inputs: Tensor[],
+    inputs: Tensor<any>[],
     intermediaryRes: {[name: string]: IntermediaryRes},
     nodes: {[id: number]: {variableInputs: number}},
     nodesReady: NodeId[]
@@ -309,7 +314,7 @@ export class OnnxModel extends Module {
     node: OnnxNode,
     intermediaryRes: {[name: string]: IntermediaryRes}
   ) {
-    const inputs: Tensor[] = [];
+    const inputs: Tensor<any>[] = [];
     const toDelete: string[] = [];
     for (let i = 0; i < node.inputs.length; i++) {
       const input = node.inputs[i];
@@ -334,7 +339,7 @@ export class OnnxModel extends Module {
   protected propagateResults(
     node: OnnxNode,
     intermediaryRes: {[name: string]: IntermediaryRes},
-    outputs: Tensor[],
+    outputs: Tensor<any>[],
     nodes: {[id: number]: {variableInputs: number}},
     nodesReady: NodeId[]
   ) {
@@ -401,13 +406,13 @@ export class OnnxModel extends Module {
   async toGPU() {
     for (const i in this.constants) {
       if (!this.noConvertConstants.has(i)) {
-        this.constants[i] = await toGPU(this.constants[i], this.precision);
+        this.constants[i] = await toGPU(this.constants[i]);
       }
     }
 
     for (const i of this.nodeIds) {
       if (!this.noConvertNodes.has(i)) {
-        await this.nodes[i].toGPU(this.precision);
+        await this.nodes[i].toGPU();
       }
     }
   }
@@ -604,11 +609,11 @@ export class OnnxModel extends Module {
     return modules;
   }
 
-  getParameters(): Variable[] {
-    const parameters: Variable[] = super.getParameters();
+  getParameters(): Variable<any>[] {
+    const parameters: Variable<any>[] = super.getParameters();
     for (const c in this.constants) {
       if (this.constants[c] instanceof Variable) {
-        parameters.push(this.constants[c] as Variable);
+        parameters.push(this.constants[c] as Variable<any>);
       }
     }
     return parameters;

@@ -1,10 +1,11 @@
 import {CPUTensor} from '../../tensor/cpu/tensor';
+import {DType} from '../../types';
 import {getSize, incrementIndex} from '../../util/shape';
 import {outputDimsSize} from '../util/convTranspose';
 
-export function convTranspose(
-  x: CPUTensor,
-  w: CPUTensor,
+export function convTranspose<DTpe extends DType>(
+  x: CPUTensor<DTpe>,
+  w: CPUTensor<DTpe>,
   dilations: number[],
   group: number,
   pads: number[],
@@ -31,7 +32,7 @@ export function convTranspose(
   let outputShape = [N, M];
   outputShape = outputShape.concat(R);
 
-  const Y = new CPUTensor(outputShape);
+  const Y = new CPUTensor(outputShape, undefined, x.dtype);
 
   const dataRank = R.length;
 

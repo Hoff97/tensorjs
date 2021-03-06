@@ -1,5 +1,5 @@
 import {Mode} from '../../../model/module';
-import Tensor from '../../../types';
+import Tensor, {DType} from '../../../types';
 import {OnnxNode} from '../../node';
 import {Attributes, Constants} from '../../types';
 
@@ -15,7 +15,9 @@ export class MeanNode extends OnnxNode {
     super(attributes, inputs, outputs, constants, onnxVersion, mode);
   }
 
-  async forward(inputs: Tensor[]): Promise<Tensor[]> {
+  async forward<DTpe extends DType>(
+    inputs: Tensor<DTpe>[]
+  ): Promise<Tensor<DTpe>[]> {
     if (inputs.length > 2) {
       // This logging seems to slow down the operation more than the operation itself
       //console.warn(`Sum with more than 2 tensors is currently slow. Doing concat with ${inputs.length} tensors`);

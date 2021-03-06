@@ -1,6 +1,6 @@
 import {Variable} from '../../../autograd';
 import {Mode} from '../../../model/module';
-import Tensor, {Activation, Precision} from '../../../types';
+import Tensor, {Activation, DType} from '../../../types';
 import {toCPU, toGPU, toWASM} from '../../../util/convert';
 import {OnnxNode} from '../../node';
 import {Attributes, Constants} from '../../types';
@@ -11,8 +11,8 @@ export class ConvNode extends OnnxNode {
   private pads?: number[];
   private strides?: number[];
 
-  public kernel?: Tensor;
-  public bias?: Tensor;
+  public kernel?: Tensor<any>;
+  public bias?: Tensor<any>;
 
   private activation: Activation;
 
@@ -23,8 +23,8 @@ export class ConvNode extends OnnxNode {
     constants: Constants,
     onnxVersion: number,
     mode: Mode,
-    kernel?: Tensor,
-    bias?: Tensor,
+    kernel?: Tensor<any>,
+    bias?: Tensor<any>,
     activation?: Activation
   ) {
     super(attributes, inputs, outputs, constants, onnxVersion, mode);
@@ -54,7 +54,9 @@ export class ConvNode extends OnnxNode {
     }
   }
 
-  async forward(inputs: Tensor[]): Promise<Tensor[]> {
+  async forward<DTpe extends DType>(
+    inputs: Tensor<DTpe>[]
+  ): Promise<Tensor<DTpe>[]> {
     const x = inputs[0];
     const w = this.kernel !== undefined ? this.kernel : inputs[1];
     const b = inputs.length > 2 ? inputs[2] : this.bias;
@@ -115,15 +117,12 @@ export class ConvNode extends OnnxNode {
     }
   }
 
-  async toGPU(precision?: Precision) {
-    if (precision === undefined) {
-      precision = 32;
-    }
+  async toGPU() {
     if (this.kernel !== undefined) {
-      this.kernel = await toGPU(this.kernel, precision);
+      this.kernel = await toGPU(this.kernel);
     }
     if (this.bias !== undefined) {
-      this.bias = await toGPU(this.bias, precision);
+      this.bias = await toGPU(this.bias);
     }
   }
 

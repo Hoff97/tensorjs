@@ -3,36 +3,41 @@ import {Tensor} from '../../../../library';
 import {CPUTensor} from '../../../../tensor/cpu/tensor';
 import {GPUTensor} from '../../../../tensor/gpu/tensor';
 import {WASMTensor} from '../../../../tensor/wasm/tensor';
+import {DType} from '../../../../types';
 import {bceBack} from './cpu';
 import {defaultBCEBackD} from './gpu';
 
-export class BCEBack implements BackwardOp {
-  constructor(public x: VariableI, public y: VariableI) {}
+export class BCEBack<DTpe extends DType> implements BackwardOp<DTpe> {
+  constructor(public x: VariableI<DTpe>, public y: VariableI<DTpe>) {}
 
-  backward(grad: Tensor): void {
-    let gradX: Tensor;
+  backward(grad: Tensor<DTpe>): void {
+    let gradX: Tensor<DTpe>;
     if (grad instanceof CPUTensor) {
       const back = bceBack(
-        this.x.value as CPUTensor,
-        this.y.value as CPUTensor
+        this.x.value as CPUTensor<DTpe>,
+        this.y.value as CPUTensor<DTpe>
       );
       gradX = grad.multiply(back);
       back.delete();
     } else if (grad instanceof WASMTensor) {
-      const back = (this.x.value as WASMTensor).wasmTensor.bce_back(
-        (this.y.value as WASMTensor).wasmTensor
+      const back = ((this.x.value as WASMTensor<any>)
+        .wasmTensor as any).bce_back(
+        (this.y.value as WASMTensor<any>).wasmTensor
       );
-      gradX = new WASMTensor(grad.wasmTensor.multiply(back, 1.0));
+      gradX = new WASMTensor(
+        grad.wasmTensor.multiply(back, 1.0),
+        grad.dtype
+      ) as WASMTensor<any>;
       back.free();
     } else {
       const back = defaultBCEBackD.calc(
         {
-          A: this.x.value as GPUTensor,
-          B: this.y.value as GPUTensor,
+          A: this.x.value as GPUTensor<any>,
+          B: this.y.value as GPUTensor<any>,
           outputShape: this.x.getShape(),
         },
-        (this.x.value as GPUTensor).precision
-      ) as GPUTensor;
+        this.x.value.dtype as any
+      ) as GPUTensor<any>;
       gradX = grad.multiply(back);
       back.delete();
     }

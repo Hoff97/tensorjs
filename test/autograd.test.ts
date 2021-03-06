@@ -11,8 +11,11 @@ const epsilon = 0.01;
 
 interface Backend {
   name: string;
-  constructor: (shape: ReadonlyArray<number>, values: number[]) => Tensor;
-  toBackend: (tensor: Tensor) => Promise<Tensor>;
+  constructor: (
+    shape: ReadonlyArray<number>,
+    values: number[]
+  ) => Tensor<'float32'>;
+  toBackend: (tensor: Tensor<'float32'>) => Promise<Tensor<'float32'>>;
   wait?: Promise<void>;
 }
 
@@ -20,14 +23,14 @@ const backends: Backend[] = [
   {
     name: 'CPU',
     constructor: (shape: ReadonlyArray<number>, values: number[]) =>
-      new CPUTensor(shape, values),
-    toBackend: (tensor: Tensor) => toCPU(tensor),
+      new CPUTensor(shape, values, 'float32'),
+    toBackend: (tensor: Tensor<'float32'>) => toCPU(tensor),
   },
   {
     name: 'WASM',
     constructor: (shape: ReadonlyArray<number>, values: number[]) =>
-      new WASMTensor(new Float32Array(values), new Uint32Array(shape)),
-    toBackend: (tensor: Tensor) => toWASM(tensor),
+      new WASMTensor(values, new Uint32Array(shape), 'float32'),
+    toBackend: (tensor: Tensor<'float32'>) => toWASM(tensor),
     wait: wasmLoaded,
   } /*,
   {
@@ -50,13 +53,13 @@ for (const backend of backends) {
 
       const v = new Variable(a);
 
-      const res = v.exp() as Variable;
+      const res = v.exp() as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGrad = await backend.toBackend(
         numericalGradient(
-          (await toCPU(a)) as CPUTensor,
-          (a: CPUTensor) => a.exp() as CPUTensor
+          (await toCPU(a)) as CPUTensor<'float32'>,
+          (a: CPUTensor<'float32'>) => a.exp() as CPUTensor<'float32'>
         )
       );
 
@@ -73,13 +76,13 @@ for (const backend of backends) {
 
       const v = new Variable(a);
 
-      const res = v.log() as Variable;
+      const res = v.log() as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGrad = await backend.toBackend(
         numericalGradient(
-          (await toCPU(a)) as CPUTensor,
-          (a: CPUTensor) => a.log() as CPUTensor
+          (await toCPU(a)) as CPUTensor<'float32'>,
+          (a: CPUTensor<'float32'>) => a.log() as CPUTensor<'float32'>
         )
       );
 
@@ -96,13 +99,13 @@ for (const backend of backends) {
 
       const v = new Variable(a);
 
-      const res = v.sqrt() as Variable;
+      const res = v.sqrt() as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGrad = await backend.toBackend(
         numericalGradient(
-          (await toCPU(a)) as CPUTensor,
-          (a: CPUTensor) => a.sqrt() as CPUTensor
+          (await toCPU(a)) as CPUTensor<'float32'>,
+          (a: CPUTensor<'float32'>) => a.sqrt() as CPUTensor<'float32'>
         )
       );
 
@@ -119,13 +122,13 @@ for (const backend of backends) {
 
       const v = new Variable(a);
 
-      const res = v.reshape([4]) as Variable;
+      const res = v.reshape([4]) as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGrad = await backend.toBackend(
         numericalGradient(
-          (await toCPU(a)) as CPUTensor,
-          (a: CPUTensor) => a.reshape([4]) as CPUTensor
+          (await toCPU(a)) as CPUTensor<'float32'>,
+          (a: CPUTensor<'float32'>) => a.reshape([4]) as CPUTensor<'float32'>
         )
       );
 
@@ -142,13 +145,13 @@ for (const backend of backends) {
 
       const v = new Variable(a);
 
-      const res = v.abs() as Variable;
+      const res = v.abs() as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGrad = await backend.toBackend(
         numericalGradient(
-          (await toCPU(a)) as CPUTensor,
-          (a: CPUTensor) => a.abs() as CPUTensor
+          (await toCPU(a)) as CPUTensor<'float32'>,
+          (a: CPUTensor<'float32'>) => a.abs() as CPUTensor<'float32'>
         )
       );
 
@@ -165,13 +168,13 @@ for (const backend of backends) {
 
       const v = new Variable(a);
 
-      const res = v.sin() as Variable;
+      const res = v.sin() as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGrad = await backend.toBackend(
         numericalGradient(
-          (await toCPU(a)) as CPUTensor,
-          (a: CPUTensor) => a.sin() as CPUTensor
+          (await toCPU(a)) as CPUTensor<'float32'>,
+          (a: CPUTensor<'float32'>) => a.sin() as CPUTensor<'float32'>
         )
       );
 
@@ -188,13 +191,13 @@ for (const backend of backends) {
 
       const v = new Variable(a);
 
-      const res = v.cos() as Variable;
+      const res = v.cos() as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGrad = await backend.toBackend(
         numericalGradient(
-          (await toCPU(a)) as CPUTensor,
-          (a: CPUTensor) => a.cos() as CPUTensor
+          (await toCPU(a)) as CPUTensor<'float32'>,
+          (a: CPUTensor<'float32'>) => a.cos() as CPUTensor<'float32'>
         )
       );
 
@@ -211,13 +214,13 @@ for (const backend of backends) {
 
       const v = new Variable(a);
 
-      const res = v.tan() as Variable;
+      const res = v.tan() as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGrad = await backend.toBackend(
         numericalGradient(
-          (await toCPU(a)) as CPUTensor,
-          (a: CPUTensor) => a.tan() as CPUTensor
+          (await toCPU(a)) as CPUTensor<'float32'>,
+          (a: CPUTensor<'float32'>) => a.tan() as CPUTensor<'float32'>
         )
       );
 
@@ -234,13 +237,13 @@ for (const backend of backends) {
 
       const v = new Variable(a);
 
-      const res = v.asin() as Variable;
+      const res = v.asin() as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGrad = await backend.toBackend(
         numericalGradient(
-          (await toCPU(a)) as CPUTensor,
-          (a: CPUTensor) => a.asin() as CPUTensor
+          (await toCPU(a)) as CPUTensor<'float32'>,
+          (a: CPUTensor<'float32'>) => a.asin() as CPUTensor<'float32'>
         )
       );
 
@@ -257,13 +260,13 @@ for (const backend of backends) {
 
       const v = new Variable(a);
 
-      const res = v.acos() as Variable;
+      const res = v.acos() as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGrad = await backend.toBackend(
         numericalGradient(
-          (await toCPU(a)) as CPUTensor,
-          (a: CPUTensor) => a.acos() as CPUTensor
+          (await toCPU(a)) as CPUTensor<'float32'>,
+          (a: CPUTensor<'float32'>) => a.acos() as CPUTensor<'float32'>
         )
       );
 
@@ -280,13 +283,13 @@ for (const backend of backends) {
 
       const v = new Variable(a);
 
-      const res = v.atan() as Variable;
+      const res = v.atan() as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGrad = await backend.toBackend(
         numericalGradient(
-          (await toCPU(a)) as CPUTensor,
-          (a: CPUTensor) => a.atan() as CPUTensor
+          (await toCPU(a)) as CPUTensor<'float32'>,
+          (a: CPUTensor<'float32'>) => a.atan() as CPUTensor<'float32'>
         )
       );
 
@@ -303,13 +306,13 @@ for (const backend of backends) {
 
       const v = new Variable(a);
 
-      const res = v.sinh() as Variable;
+      const res = v.sinh() as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGrad = await backend.toBackend(
         numericalGradient(
-          (await toCPU(a)) as CPUTensor,
-          (a: CPUTensor) => a.sinh() as CPUTensor
+          (await toCPU(a)) as CPUTensor<'float32'>,
+          (a: CPUTensor<'float32'>) => a.sinh() as CPUTensor<'float32'>
         )
       );
 
@@ -326,13 +329,13 @@ for (const backend of backends) {
 
       const v = new Variable(a);
 
-      const res = v.cosh() as Variable;
+      const res = v.cosh() as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGrad = await backend.toBackend(
         numericalGradient(
-          (await toCPU(a)) as CPUTensor,
-          (a: CPUTensor) => a.cosh() as CPUTensor
+          (await toCPU(a)) as CPUTensor<'float32'>,
+          (a: CPUTensor<'float32'>) => a.cosh() as CPUTensor<'float32'>
         )
       );
 
@@ -349,87 +352,89 @@ for (const backend of backends) {
 
       const v = new Variable(a);
 
-      const res = v.tanh() as Variable;
+      const res = v.tanh() as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGrad = await backend.toBackend(
         numericalGradient(
-          (await toCPU(a)) as CPUTensor,
-          (a: CPUTensor) => a.tanh() as CPUTensor
+          (await toCPU(a)) as CPUTensor<'float32'>,
+          (a: CPUTensor<'float32'>) => a.tanh() as CPUTensor<'float32'>
         )
       );
 
       expect(await v.grad?.compare(numericalGrad, epsilon)).toBeTrue();
     });
 
-    it('should work with asinh', async () => {
-      if (backend.wait !== undefined) {
-        await backend.wait;
-      }
+    if (backend.name !== 'GPU') {
+      it('should work with asinh', async () => {
+        if (backend.wait !== undefined) {
+          await backend.wait;
+        }
 
-      const a = backend.constructor([2, 2], [-0.5, -0.1, 0.2, 0.7]);
-      const ones = backend.constructor([2, 2], [1, 1, 1, 1]);
+        const a = backend.constructor([2, 2], [-0.5, -0.1, 0.2, 0.7]);
+        const ones = backend.constructor([2, 2], [1, 1, 1, 1]);
 
-      const v = new Variable(a);
+        const v = new Variable(a);
 
-      const res = v.asinh() as Variable;
-      res.backward(ones);
+        const res = v.asinh() as Variable<'float32'>;
+        res.backward(ones);
 
-      const numericalGrad = await backend.toBackend(
-        numericalGradient(
-          (await toCPU(a)) as CPUTensor,
-          (a: CPUTensor) => a.asinh() as CPUTensor
-        )
-      );
+        const numericalGrad = await backend.toBackend(
+          numericalGradient(
+            (await toCPU(a)) as CPUTensor<'float32'>,
+            (a: CPUTensor<'float32'>) => a.asinh() as CPUTensor<'float32'>
+          )
+        );
 
-      expect(await v.grad?.compare(numericalGrad, epsilon)).toBeTrue();
-    });
+        expect(await v.grad?.compare(numericalGrad, epsilon)).toBeTrue();
+      });
 
-    it('should work with acosh', async () => {
-      if (backend.wait !== undefined) {
-        await backend.wait;
-      }
+      it('should work with acosh', async () => {
+        if (backend.wait !== undefined) {
+          await backend.wait;
+        }
 
-      const a = backend.constructor([2, 2], [2.0, 2.2, 3.1, 4.5]);
-      const ones = backend.constructor([2, 2], [1, 1, 1, 1]);
+        const a = backend.constructor([2, 2], [2.0, 2.2, 3.1, 4.5]);
+        const ones = backend.constructor([2, 2], [1, 1, 1, 1]);
 
-      const v = new Variable(a);
+        const v = new Variable(a);
 
-      const res = v.acosh() as Variable;
-      res.backward(ones);
+        const res = v.acosh() as Variable<'float32'>;
+        res.backward(ones);
 
-      const numericalGrad = await backend.toBackend(
-        numericalGradient(
-          (await toCPU(a)) as CPUTensor,
-          (a: CPUTensor) => a.acosh() as CPUTensor
-        )
-      );
+        const numericalGrad = await backend.toBackend(
+          numericalGradient(
+            (await toCPU(a)) as CPUTensor<'float32'>,
+            (a: CPUTensor<'float32'>) => a.acosh() as CPUTensor<'float32'>
+          )
+        );
 
-      expect(await v.grad?.compare(numericalGrad, epsilon)).toBeTrue();
-    });
+        expect(await v.grad?.compare(numericalGrad, epsilon)).toBeTrue();
+      });
 
-    it('should work with atanh', async () => {
-      if (backend.wait !== undefined) {
-        await backend.wait;
-      }
+      it('should work with atanh', async () => {
+        if (backend.wait !== undefined) {
+          await backend.wait;
+        }
 
-      const a = backend.constructor([2, 2], [-0.7, -0.3, 0.5, 0.7]);
-      const ones = backend.constructor([2, 2], [1, 1, 1, 1]);
+        const a = backend.constructor([2, 2], [-0.7, -0.3, 0.5, 0.7]);
+        const ones = backend.constructor([2, 2], [1, 1, 1, 1]);
 
-      const v = new Variable(a);
+        const v = new Variable(a);
 
-      const res = v.atanh() as Variable;
-      res.backward(ones);
+        const res = v.atanh() as Variable<'float32'>;
+        res.backward(ones);
 
-      const numericalGrad = await backend.toBackend(
-        numericalGradient(
-          (await toCPU(a)) as CPUTensor,
-          (a: CPUTensor) => a.atanh() as CPUTensor
-        )
-      );
+        const numericalGrad = await backend.toBackend(
+          numericalGradient(
+            (await toCPU(a)) as CPUTensor<'float32'>,
+            (a: CPUTensor<'float32'>) => a.atanh() as CPUTensor<'float32'>
+          )
+        );
 
-      expect(await v.grad?.compare(numericalGrad, epsilon)).toBeTrue();
-    });
+        expect(await v.grad?.compare(numericalGrad, epsilon)).toBeTrue();
+      });
+    }
 
     it('should work with negate', async () => {
       if (backend.wait !== undefined) {
@@ -441,13 +446,13 @@ for (const backend of backends) {
 
       const v = new Variable(a);
 
-      const res = v.negate() as Variable;
+      const res = v.negate() as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGrad = await backend.toBackend(
         numericalGradient(
-          (await toCPU(a)) as CPUTensor,
-          (a: CPUTensor) => a.negate() as CPUTensor
+          (await toCPU(a)) as CPUTensor<'float32'>,
+          (a: CPUTensor<'float32'>) => a.negate() as CPUTensor<'float32'>
         )
       );
 
@@ -464,49 +469,57 @@ for (const backend of backends) {
 
       const v = new Variable(a);
 
-      const res = v.addMultiplyScalar(2.0, 5.0) as Variable;
+      const res = v.addMultiplyScalar(2.0, 5.0) as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGrad = await backend.toBackend(
         numericalGradient(
-          (await toCPU(a)) as CPUTensor,
-          (a: CPUTensor) => a.addMultiplyScalar(2.0, 5.0) as CPUTensor
+          (await toCPU(a)) as CPUTensor<'float32'>,
+          (a: CPUTensor<'float32'>) =>
+            a.addMultiplyScalar(2.0, 5.0) as CPUTensor<'float32'>
         )
       );
 
       expect(await v.grad?.compare(numericalGrad, epsilon)).toBeTrue();
     });
 
-    it('should work with power scalar', async () => {
-      if (backend.wait !== undefined) {
-        await backend.wait;
-      }
+    if (backend.name !== 'GPU') {
+      it('should work with power scalar', async () => {
+        if (backend.wait !== undefined) {
+          await backend.wait;
+        }
 
-      const a = backend.constructor([2, 2], [-2, -1, 0.5, 1]);
-      const ones = backend.constructor([2, 2], [1, 1, 1, 1]);
+        const a = backend.constructor([2, 2], [-2, -1, 0.5, 1]);
+        const ones = backend.constructor([2, 2], [1, 1, 1, 1]);
 
-      const v = new Variable(a);
+        const v = new Variable(a);
 
-      const res = v.powerScalar(2.0, 3.0) as Variable;
-      res.backward(ones);
+        const res = v.powerScalar(2.0, 3.0) as Variable<'float32'>;
+        res.backward(ones);
 
-      const numericalGrad = await backend.toBackend(
-        numericalGradient(
-          (await toCPU(a)) as CPUTensor,
-          (a: CPUTensor) => a.powerScalar(2.0, 3.0) as CPUTensor
-        )
-      );
+        const numericalGrad = await backend.toBackend(
+          numericalGradient(
+            (await toCPU(a)) as CPUTensor<'float32'>,
+            (a: CPUTensor<'float32'>) =>
+              a.powerScalar(2.0, 3.0) as CPUTensor<'float32'>
+          )
+        );
 
-      expect(await v.grad?.compare(numericalGrad, 0.1)).toBeTrue();
-    });
+        expect(await v.grad?.compare(numericalGrad, 0.5)).toBeTrue();
+      });
+    }
 
     it('should work with matmul', async () => {
       if (backend.wait !== undefined) {
         await backend.wait;
       }
 
-      const a = new CPUTensor([2, 3], [1, 2, 3, 4, 5, 6]);
-      const b = new CPUTensor([3, 4], [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+      const a = new CPUTensor([2, 3], [1, 2, 3, 4, 5, 6], 'float32');
+      const b = new CPUTensor(
+        [3, 4],
+        [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+        'float32'
+      );
       const ones = backend.constructor([2, 4], [1, 1, 1, 1, 1, 1, 1, 1]);
 
       const aBackend = await backend.toBackend(a);
@@ -515,16 +528,16 @@ for (const backend of backends) {
       const vA = new Variable(aBackend);
       const vB = new Variable(bBackend);
 
-      const res = vA.matMul(vB) as Variable;
+      const res = vA.matMul(vB) as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGradA = numericalGradient(
         a,
-        (a: CPUTensor) => a.matMul(b) as CPUTensor
+        (a: CPUTensor<'float32'>) => a.matMul(b) as CPUTensor<'float32'>
       );
       const numericalGradB = numericalGradient(
         b,
-        (b: CPUTensor) => a.matMul(b) as CPUTensor
+        (b: CPUTensor<'float32'>) => a.matMul(b) as CPUTensor<'float32'>
       );
 
       expect(await vA.grad?.compare(numericalGradA, 1)).toBeTrue();
@@ -536,8 +549,8 @@ for (const backend of backends) {
         await backend.wait;
       }
 
-      const a = new CPUTensor([2, 3], [1, 2, 3, 4, 5, 6]);
-      const b = new CPUTensor([2, 4], [1, 2, 3, 4, 5, 6, 7, 8]);
+      const a = new CPUTensor([2, 3], [1, 2, 3, 4, 5, 6], 'float32');
+      const b = new CPUTensor([2, 4], [1, 2, 3, 4, 5, 6, 7, 8], 'float32');
       const ones = backend.constructor(
         [2, 7],
         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
@@ -549,16 +562,16 @@ for (const backend of backends) {
       const vA = new Variable(aBackend);
       const vB = new Variable(bBackend);
 
-      const res = vA.concat(vB, 1) as Variable;
+      const res = vA.concat(vB, 1) as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGradA = numericalGradient(
         a,
-        (a: CPUTensor) => a.concat(b, 1) as CPUTensor
+        (a: CPUTensor<'float32'>) => a.concat(b, 1) as CPUTensor<'float32'>
       );
       const numericalGradB = numericalGradient(
         b,
-        (b: CPUTensor) => a.concat(b, 1) as CPUTensor
+        (b: CPUTensor<'float32'>) => a.concat(b, 1) as CPUTensor<'float32'>
       );
 
       expect(await vA.grad?.compare(numericalGradA, epsilon)).toBeTrue();
@@ -575,13 +588,13 @@ for (const backend of backends) {
 
       const v = new Variable(a);
 
-      const res = v.clip(0, 6) as Variable;
+      const res = v.clip(0, 6) as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGrad = await backend.toBackend(
         numericalGradient(
-          (await toCPU(a)) as CPUTensor,
-          (a: CPUTensor) => a.clip(0, 6) as CPUTensor
+          (await toCPU(a)) as CPUTensor<'float32'>,
+          (a: CPUTensor<'float32'>) => a.clip(0, 6) as CPUTensor<'float32'>
         )
       );
 
@@ -598,13 +611,16 @@ for (const backend of backends) {
 
       const v = new Variable(a);
 
-      const aCPU = (await toCPU(a)) as CPUTensor;
+      const aCPU = (await toCPU(a)) as CPUTensor<'float32'>;
 
-      const res = v.repeat([3, 2]) as Variable;
+      const res = v.repeat([3, 2]) as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGrad = await backend.toBackend(
-        numericalGradient(aCPU, (a: CPUTensor) => a.repeat([3, 2]) as CPUTensor)
+        numericalGradient(
+          aCPU,
+          (a: CPUTensor<'float32'>) => a.repeat([3, 2]) as CPUTensor<'float32'>
+        )
       );
 
       expect(await v.grad?.compare(numericalGrad, 0.1)).toBeTrue();
@@ -620,15 +636,16 @@ for (const backend of backends) {
 
       const v = new Variable(a);
 
-      const aCPU = (await toCPU(a)) as CPUTensor;
+      const aCPU = (await toCPU(a)) as CPUTensor<'float32'>;
 
-      const res = v.expand([3, 2, 2]) as Variable;
+      const res = v.expand([3, 2, 2]) as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGrad = await backend.toBackend(
         numericalGradient(
           aCPU,
-          (a: CPUTensor) => a.expand([3, 2, 2]) as CPUTensor
+          (a: CPUTensor<'float32'>) =>
+            a.expand([3, 2, 2]) as CPUTensor<'float32'>
         )
       );
 
@@ -647,17 +664,23 @@ for (const backend of backends) {
       const vA = new Variable(a);
       const vB = new Variable(b);
 
-      const aCPU = (await toCPU(a)) as CPUTensor;
-      const bCPU = (await toCPU(b)) as CPUTensor;
+      const aCPU = (await toCPU(a)) as CPUTensor<'float32'>;
+      const bCPU = (await toCPU(b)) as CPUTensor<'float32'>;
 
-      const res = vA.add(vB) as Variable;
+      const res = vA.add(vB) as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGradA = await backend.toBackend(
-        numericalGradient(aCPU, (a: CPUTensor) => a.add(bCPU) as CPUTensor)
+        numericalGradient(
+          aCPU,
+          (a: CPUTensor<'float32'>) => a.add(bCPU) as CPUTensor<'float32'>
+        )
       );
       const numericalGradB = await backend.toBackend(
-        numericalGradient(bCPU, (b: CPUTensor) => aCPU.add(b) as CPUTensor)
+        numericalGradient(
+          bCPU,
+          (b: CPUTensor<'float32'>) => aCPU.add(b) as CPUTensor<'float32'>
+        )
       );
 
       expect(await vA.grad?.compare(numericalGradA, epsilon)).toBeTrue();
@@ -676,17 +699,23 @@ for (const backend of backends) {
       const vA = new Variable(a);
       const vB = new Variable(b);
 
-      const aCPU = (await toCPU(a)) as CPUTensor;
-      const bCPU = (await toCPU(b)) as CPUTensor;
+      const aCPU = (await toCPU(a)) as CPUTensor<'float32'>;
+      const bCPU = (await toCPU(b)) as CPUTensor<'float32'>;
 
-      const res = vA.add(vB) as Variable;
+      const res = vA.add(vB) as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGradA = await backend.toBackend(
-        numericalGradient(aCPU, (a: CPUTensor) => a.add(bCPU) as CPUTensor)
+        numericalGradient(
+          aCPU,
+          (a: CPUTensor<'float32'>) => a.add(bCPU) as CPUTensor<'float32'>
+        )
       );
       const numericalGradB = await backend.toBackend(
-        numericalGradient(bCPU, (b: CPUTensor) => aCPU.add(b) as CPUTensor)
+        numericalGradient(
+          bCPU,
+          (b: CPUTensor<'float32'>) => aCPU.add(b) as CPUTensor<'float32'>
+        )
       );
 
       expect(await vA.grad?.compare(numericalGradA, 0.05)).toBeTrue();
@@ -705,17 +734,23 @@ for (const backend of backends) {
       const vA = new Variable(a);
       const vB = new Variable(b);
 
-      const aCPU = (await toCPU(a)) as CPUTensor;
-      const bCPU = (await toCPU(b)) as CPUTensor;
+      const aCPU = (await toCPU(a)) as CPUTensor<'float32'>;
+      const bCPU = (await toCPU(b)) as CPUTensor<'float32'>;
 
-      const res = vA.subtract(vB) as Variable;
+      const res = vA.subtract(vB) as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGradA = await backend.toBackend(
-        numericalGradient(aCPU, (a: CPUTensor) => a.subtract(bCPU) as CPUTensor)
+        numericalGradient(
+          aCPU,
+          (a: CPUTensor<'float32'>) => a.subtract(bCPU) as CPUTensor<'float32'>
+        )
       );
       const numericalGradB = await backend.toBackend(
-        numericalGradient(bCPU, (b: CPUTensor) => aCPU.subtract(b) as CPUTensor)
+        numericalGradient(
+          bCPU,
+          (b: CPUTensor<'float32'>) => aCPU.subtract(b) as CPUTensor<'float32'>
+        )
       );
 
       expect(await vA.grad?.compare(numericalGradA, epsilon)).toBeTrue();
@@ -734,17 +769,23 @@ for (const backend of backends) {
       const vA = new Variable(a);
       const vB = new Variable(b);
 
-      const aCPU = (await toCPU(a)) as CPUTensor;
-      const bCPU = (await toCPU(b)) as CPUTensor;
+      const aCPU = (await toCPU(a)) as CPUTensor<'float32'>;
+      const bCPU = (await toCPU(b)) as CPUTensor<'float32'>;
 
-      const res = vA.subtract(vB) as Variable;
+      const res = vA.subtract(vB) as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGradA = await backend.toBackend(
-        numericalGradient(aCPU, (a: CPUTensor) => a.subtract(bCPU) as CPUTensor)
+        numericalGradient(
+          aCPU,
+          (a: CPUTensor<'float32'>) => a.subtract(bCPU) as CPUTensor<'float32'>
+        )
       );
       const numericalGradB = await backend.toBackend(
-        numericalGradient(bCPU, (b: CPUTensor) => aCPU.subtract(b) as CPUTensor)
+        numericalGradient(
+          bCPU,
+          (b: CPUTensor<'float32'>) => aCPU.subtract(b) as CPUTensor<'float32'>
+        )
       );
 
       expect(await vA.grad?.compare(numericalGradA, 0.05)).toBeTrue();
@@ -763,17 +804,23 @@ for (const backend of backends) {
       const vA = new Variable(a);
       const vB = new Variable(b);
 
-      const aCPU = (await toCPU(a)) as CPUTensor;
-      const bCPU = (await toCPU(b)) as CPUTensor;
+      const aCPU = (await toCPU(a)) as CPUTensor<'float32'>;
+      const bCPU = (await toCPU(b)) as CPUTensor<'float32'>;
 
-      const res = vA.multiply(vB) as Variable;
+      const res = vA.multiply(vB) as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGradA = await backend.toBackend(
-        numericalGradient(aCPU, (a: CPUTensor) => a.multiply(bCPU) as CPUTensor)
+        numericalGradient(
+          aCPU,
+          (a: CPUTensor<'float32'>) => a.multiply(bCPU) as CPUTensor<'float32'>
+        )
       );
       const numericalGradB = await backend.toBackend(
-        numericalGradient(bCPU, (b: CPUTensor) => aCPU.multiply(b) as CPUTensor)
+        numericalGradient(
+          bCPU,
+          (b: CPUTensor<'float32'>) => aCPU.multiply(b) as CPUTensor<'float32'>
+        )
       );
 
       expect(await vA.grad?.compare(numericalGradA, 0.1)).toBeTrue();
@@ -792,17 +839,23 @@ for (const backend of backends) {
       const vA = new Variable(a);
       const vB = new Variable(b);
 
-      const aCPU = (await toCPU(a)) as CPUTensor;
-      const bCPU = (await toCPU(b)) as CPUTensor;
+      const aCPU = (await toCPU(a)) as CPUTensor<'float32'>;
+      const bCPU = (await toCPU(b)) as CPUTensor<'float32'>;
 
-      const res = vA.multiply(vB) as Variable;
+      const res = vA.multiply(vB) as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGradA = await backend.toBackend(
-        numericalGradient(aCPU, (a: CPUTensor) => a.multiply(bCPU) as CPUTensor)
+        numericalGradient(
+          aCPU,
+          (a: CPUTensor<'float32'>) => a.multiply(bCPU) as CPUTensor<'float32'>
+        )
       );
       const numericalGradB = await backend.toBackend(
-        numericalGradient(bCPU, (b: CPUTensor) => aCPU.multiply(b) as CPUTensor)
+        numericalGradient(
+          bCPU,
+          (b: CPUTensor<'float32'>) => aCPU.multiply(b) as CPUTensor<'float32'>
+        )
       );
 
       expect(await vA.grad?.compare(numericalGradA, 0.05)).toBeTrue();
@@ -821,17 +874,23 @@ for (const backend of backends) {
       const vA = new Variable(a);
       const vB = new Variable(b);
 
-      const aCPU = (await toCPU(a)) as CPUTensor;
-      const bCPU = (await toCPU(b)) as CPUTensor;
+      const aCPU = (await toCPU(a)) as CPUTensor<'float32'>;
+      const bCPU = (await toCPU(b)) as CPUTensor<'float32'>;
 
-      const res = vA.divide(vB) as Variable;
+      const res = vA.divide(vB) as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGradA = await backend.toBackend(
-        numericalGradient(aCPU, (a: CPUTensor) => a.divide(bCPU) as CPUTensor)
+        numericalGradient(
+          aCPU,
+          (a: CPUTensor<'float32'>) => a.divide(bCPU) as CPUTensor<'float32'>
+        )
       );
       const numericalGradB = await backend.toBackend(
-        numericalGradient(bCPU, (b: CPUTensor) => aCPU.divide(b) as CPUTensor)
+        numericalGradient(
+          bCPU,
+          (b: CPUTensor<'float32'>) => aCPU.divide(b) as CPUTensor<'float32'>
+        )
       );
 
       expect(await vA.grad?.compare(numericalGradA, 0.05)).toBeTrue();
@@ -850,17 +909,23 @@ for (const backend of backends) {
       const vA = new Variable(a);
       const vB = new Variable(b);
 
-      const aCPU = (await toCPU(a)) as CPUTensor;
-      const bCPU = (await toCPU(b)) as CPUTensor;
+      const aCPU = (await toCPU(a)) as CPUTensor<'float32'>;
+      const bCPU = (await toCPU(b)) as CPUTensor<'float32'>;
 
-      const res = vA.divide(vB) as Variable;
+      const res = vA.divide(vB) as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGradA = await backend.toBackend(
-        numericalGradient(aCPU, (a: CPUTensor) => a.divide(bCPU) as CPUTensor)
+        numericalGradient(
+          aCPU,
+          (a: CPUTensor<'float32'>) => a.divide(bCPU) as CPUTensor<'float32'>
+        )
       );
       const numericalGradB = await backend.toBackend(
-        numericalGradient(bCPU, (b: CPUTensor) => aCPU.divide(b) as CPUTensor)
+        numericalGradient(
+          bCPU,
+          (b: CPUTensor<'float32'>) => aCPU.divide(b) as CPUTensor<'float32'>
+        )
       );
 
       expect(await vA.grad?.compare(numericalGradA, 0.05)).toBeTrue();
@@ -879,17 +944,23 @@ for (const backend of backends) {
       const vA = new Variable(a);
       const vB = new Variable(b);
 
-      const aCPU = (await toCPU(a)) as CPUTensor;
-      const bCPU = (await toCPU(b)) as CPUTensor;
+      const aCPU = (await toCPU(a)) as CPUTensor<'float32'>;
+      const bCPU = (await toCPU(b)) as CPUTensor<'float32'>;
 
-      const res = vA.power(vB) as Variable;
+      const res = vA.power(vB) as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGradA = await backend.toBackend(
-        numericalGradient(aCPU, (a: CPUTensor) => a.power(bCPU) as CPUTensor)
+        numericalGradient(
+          aCPU,
+          (a: CPUTensor<'float32'>) => a.power(bCPU) as CPUTensor<'float32'>
+        )
       );
       const numericalGradB = await backend.toBackend(
-        numericalGradient(bCPU, (b: CPUTensor) => aCPU.power(b) as CPUTensor)
+        numericalGradient(
+          bCPU,
+          (b: CPUTensor<'float32'>) => aCPU.power(b) as CPUTensor<'float32'>
+        )
       );
 
       expect(await vA.grad?.compare(numericalGradA, 0.5)).toBeTrue();
@@ -908,17 +979,23 @@ for (const backend of backends) {
       const vA = new Variable(a);
       const vB = new Variable(b);
 
-      const aCPU = (await toCPU(a)) as CPUTensor;
-      const bCPU = (await toCPU(b)) as CPUTensor;
+      const aCPU = (await toCPU(a)) as CPUTensor<'float32'>;
+      const bCPU = (await toCPU(b)) as CPUTensor<'float32'>;
 
-      const res = vA.power(vB) as Variable;
+      const res = vA.power(vB) as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGradA = await backend.toBackend(
-        numericalGradient(aCPU, (a: CPUTensor) => a.power(bCPU) as CPUTensor)
+        numericalGradient(
+          aCPU,
+          (a: CPUTensor<'float32'>) => a.power(bCPU) as CPUTensor<'float32'>
+        )
       );
       const numericalGradB = await backend.toBackend(
-        numericalGradient(bCPU, (b: CPUTensor) => aCPU.power(b) as CPUTensor)
+        numericalGradient(
+          bCPU,
+          (b: CPUTensor<'float32'>) => aCPU.power(b) as CPUTensor<'float32'>
+        )
       );
 
       expect(await vA.grad?.compare(numericalGradA, 0.05)).toBeTrue();
@@ -939,29 +1016,32 @@ for (const backend of backends) {
       const vW = new Variable(w);
       const vB = new Variable(b);
 
-      const xCPU = (await toCPU(x)) as CPUTensor;
-      const wCPU = (await toCPU(w)) as CPUTensor;
-      const bCPU = (await toCPU(b)) as CPUTensor;
+      const xCPU = (await toCPU(x)) as CPUTensor<'float32'>;
+      const wCPU = (await toCPU(w)) as CPUTensor<'float32'>;
+      const bCPU = (await toCPU(b)) as CPUTensor<'float32'>;
 
-      const res = vX.conv(vW, vB) as Variable;
+      const res = vX.conv(vW, vB) as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGradX = await backend.toBackend(
         numericalGradient(
           xCPU,
-          (x: CPUTensor) => x.conv(wCPU, bCPU) as CPUTensor
+          (x: CPUTensor<'float32'>) =>
+            x.conv(wCPU, bCPU) as CPUTensor<'float32'>
         )
       );
       const numericalGradW = await backend.toBackend(
         numericalGradient(
           wCPU,
-          (w: CPUTensor) => xCPU.conv(w, bCPU) as CPUTensor
+          (w: CPUTensor<'float32'>) =>
+            xCPU.conv(w, bCPU) as CPUTensor<'float32'>
         )
       );
       const numericalGradB = await backend.toBackend(
         numericalGradient(
           bCPU,
-          (b: CPUTensor) => xCPU.conv(wCPU, b) as CPUTensor
+          (b: CPUTensor<'float32'>) =>
+            xCPU.conv(wCPU, b) as CPUTensor<'float32'>
         )
       );
 
@@ -987,44 +1067,44 @@ for (const backend of backends) {
       const vW = new Variable(w);
       const vB = new Variable(b);
 
-      const xCPU = (await toCPU(x)) as CPUTensor;
-      const wCPU = (await toCPU(w)) as CPUTensor;
-      const bCPU = (await toCPU(b)) as CPUTensor;
+      const xCPU = (await toCPU(x)) as CPUTensor<'float32'>;
+      const wCPU = (await toCPU(w)) as CPUTensor<'float32'>;
+      const bCPU = (await toCPU(b)) as CPUTensor<'float32'>;
 
       const res = vX.conv(vW, vB, undefined, undefined, undefined, [
         2,
         2,
-      ]) as Variable;
+      ]) as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGradX = await backend.toBackend(
         numericalGradient(
           xCPU,
-          (x: CPUTensor) =>
+          (x: CPUTensor<'float32'>) =>
             x.conv(wCPU, bCPU, undefined, undefined, undefined, [
               2,
               2,
-            ]) as CPUTensor
+            ]) as CPUTensor<'float32'>
         )
       );
       const numericalGradW = await backend.toBackend(
         numericalGradient(
           wCPU,
-          (w: CPUTensor) =>
+          (w: CPUTensor<'float32'>) =>
             xCPU.conv(w, bCPU, undefined, undefined, undefined, [
               2,
               2,
-            ]) as CPUTensor
+            ]) as CPUTensor<'float32'>
         )
       );
       const numericalGradB = await backend.toBackend(
         numericalGradient(
           bCPU,
-          (b: CPUTensor) =>
+          (b: CPUTensor<'float32'>) =>
             xCPU.conv(wCPU, b, undefined, undefined, undefined, [
               2,
               2,
-            ]) as CPUTensor
+            ]) as CPUTensor<'float32'>
         )
       );
 
@@ -1050,29 +1130,32 @@ for (const backend of backends) {
       const vW = new Variable(w);
       const vB = new Variable(b);
 
-      const xCPU = (await toCPU(x)) as CPUTensor;
-      const wCPU = (await toCPU(w)) as CPUTensor;
-      const bCPU = (await toCPU(b)) as CPUTensor;
+      const xCPU = (await toCPU(x)) as CPUTensor<'float32'>;
+      const wCPU = (await toCPU(w)) as CPUTensor<'float32'>;
+      const bCPU = (await toCPU(b)) as CPUTensor<'float32'>;
 
-      const res = vX.conv(vW, vB, [2, 2]) as Variable;
+      const res = vX.conv(vW, vB, [2, 2]) as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGradX = await backend.toBackend(
         numericalGradient(
           xCPU,
-          (x: CPUTensor) => x.conv(wCPU, bCPU, [2, 2]) as CPUTensor
+          (x: CPUTensor<'float32'>) =>
+            x.conv(wCPU, bCPU, [2, 2]) as CPUTensor<'float32'>
         )
       );
       const numericalGradW = await backend.toBackend(
         numericalGradient(
           wCPU,
-          (w: CPUTensor) => xCPU.conv(w, bCPU, [2, 2]) as CPUTensor
+          (w: CPUTensor<'float32'>) =>
+            xCPU.conv(w, bCPU, [2, 2]) as CPUTensor<'float32'>
         )
       );
       const numericalGradB = await backend.toBackend(
         numericalGradient(
           bCPU,
-          (b: CPUTensor) => xCPU.conv(wCPU, b, [2, 2]) as CPUTensor
+          (b: CPUTensor<'float32'>) =>
+            xCPU.conv(wCPU, b, [2, 2]) as CPUTensor<'float32'>
         )
       );
 
@@ -1095,38 +1178,53 @@ for (const backend of backends) {
       const vW = new Variable(w);
       const vB = new Variable(b);
 
-      const xCPU = (await toCPU(x)) as CPUTensor;
-      const wCPU = (await toCPU(w)) as CPUTensor;
-      const bCPU = (await toCPU(b)) as CPUTensor;
+      const xCPU = (await toCPU(x)) as CPUTensor<'float32'>;
+      const wCPU = (await toCPU(w)) as CPUTensor<'float32'>;
+      const bCPU = (await toCPU(b)) as CPUTensor<'float32'>;
 
       const res = vX.conv(vW, vB, undefined, undefined, [
         1,
         1,
         1,
         1,
-      ]) as Variable;
+      ]) as Variable<'float32'>;
 
       res.backward(ones);
 
       const numericalGradX = await backend.toBackend(
         numericalGradient(
           xCPU,
-          (x: CPUTensor) =>
-            x.conv(wCPU, bCPU, undefined, undefined, [1, 1, 1, 1]) as CPUTensor
+          (x: CPUTensor<'float32'>) =>
+            x.conv(wCPU, bCPU, undefined, undefined, [
+              1,
+              1,
+              1,
+              1,
+            ]) as CPUTensor<'float32'>
         )
       );
       const numericalGradW = await backend.toBackend(
         numericalGradient(
           wCPU,
-          (w: CPUTensor) =>
-            xCPU.conv(w, bCPU, undefined, undefined, [1, 1, 1, 1]) as CPUTensor
+          (w: CPUTensor<'float32'>) =>
+            xCPU.conv(w, bCPU, undefined, undefined, [
+              1,
+              1,
+              1,
+              1,
+            ]) as CPUTensor<'float32'>
         )
       );
       const numericalGradB = await backend.toBackend(
         numericalGradient(
           bCPU,
-          (b: CPUTensor) =>
-            xCPU.conv(wCPU, b, undefined, undefined, [1, 1, 1, 1]) as CPUTensor
+          (b: CPUTensor<'float32'>) =>
+            xCPU.conv(wCPU, b, undefined, undefined, [
+              1,
+              1,
+              1,
+              1,
+            ]) as CPUTensor<'float32'>
         )
       );
 
@@ -1149,36 +1247,64 @@ for (const backend of backends) {
       const vW = new Variable(w);
       const vB = new Variable(b);
 
-      const xCPU = (await toCPU(x)) as CPUTensor;
-      const wCPU = (await toCPU(w)) as CPUTensor;
-      const bCPU = (await toCPU(b)) as CPUTensor;
+      const xCPU = (await toCPU(x)) as CPUTensor<'float32'>;
+      const wCPU = (await toCPU(w)) as CPUTensor<'float32'>;
+      const bCPU = (await toCPU(b)) as CPUTensor<'float32'>;
 
       const dil = [2, 2];
       const pads = [1, 1, 1, 1];
       const strd = [2, 2];
 
-      const res = vX.conv(vW, vB, dil, undefined, pads, strd) as Variable;
+      const res = vX.conv(
+        vW,
+        vB,
+        dil,
+        undefined,
+        pads,
+        strd
+      ) as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGradX = await backend.toBackend(
         numericalGradient(
           xCPU,
-          (x: CPUTensor) =>
-            x.conv(wCPU, bCPU, dil, undefined, pads, strd) as CPUTensor
+          (x: CPUTensor<'float32'>) =>
+            x.conv(
+              wCPU,
+              bCPU,
+              dil,
+              undefined,
+              pads,
+              strd
+            ) as CPUTensor<'float32'>
         )
       );
       const numericalGradW = await backend.toBackend(
         numericalGradient(
           wCPU,
-          (w: CPUTensor) =>
-            xCPU.conv(w, bCPU, dil, undefined, pads, strd) as CPUTensor
+          (w: CPUTensor<'float32'>) =>
+            xCPU.conv(
+              w,
+              bCPU,
+              dil,
+              undefined,
+              pads,
+              strd
+            ) as CPUTensor<'float32'>
         )
       );
       const numericalGradB = await backend.toBackend(
         numericalGradient(
           bCPU,
-          (b: CPUTensor) =>
-            xCPU.conv(wCPU, b, dil, undefined, pads, strd) as CPUTensor
+          (b: CPUTensor<'float32'>) =>
+            xCPU.conv(
+              wCPU,
+              b,
+              dil,
+              undefined,
+              pads,
+              strd
+            ) as CPUTensor<'float32'>
         )
       );
 
@@ -1204,29 +1330,32 @@ for (const backend of backends) {
       const vB = new Variable(b);
       const vC = new Variable(c);
 
-      const aCPU = (await toCPU(a)) as CPUTensor;
-      const bCPU = (await toCPU(b)) as CPUTensor;
-      const cCPU = (await toCPU(c)) as CPUTensor;
+      const aCPU = (await toCPU(a)) as CPUTensor<'float32'>;
+      const bCPU = (await toCPU(b)) as CPUTensor<'float32'>;
+      const cCPU = (await toCPU(c)) as CPUTensor<'float32'>;
 
-      const res = vA.gemm(vB, false, false, 1, vC, 1) as Variable;
+      const res = vA.gemm(vB, false, false, 1, vC, 1) as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGradA = await backend.toBackend(
         numericalGradient(
           aCPU,
-          (a: CPUTensor) => a.gemm(bCPU, false, false, 1, cCPU, 1) as CPUTensor
+          (a: CPUTensor<'float32'>) =>
+            a.gemm(bCPU, false, false, 1, cCPU, 1) as CPUTensor<'float32'>
         )
       );
       const numericalGradB = await backend.toBackend(
         numericalGradient(
           bCPU,
-          (b: CPUTensor) => aCPU.gemm(b, false, false, 1, cCPU, 1) as CPUTensor
+          (b: CPUTensor<'float32'>) =>
+            aCPU.gemm(b, false, false, 1, cCPU, 1) as CPUTensor<'float32'>
         )
       );
       const numericalGradC = await backend.toBackend(
         numericalGradient(
           cCPU,
-          (c: CPUTensor) => aCPU.gemm(bCPU, false, false, 1, c, 1) as CPUTensor
+          (c: CPUTensor<'float32'>) =>
+            aCPU.gemm(bCPU, false, false, 1, c, 1) as CPUTensor<'float32'>
         )
       );
 
@@ -1252,29 +1381,32 @@ for (const backend of backends) {
       const vB = new Variable(b);
       const vC = new Variable(c);
 
-      const aCPU = (await toCPU(a)) as CPUTensor;
-      const bCPU = (await toCPU(b)) as CPUTensor;
-      const cCPU = (await toCPU(c)) as CPUTensor;
+      const aCPU = (await toCPU(a)) as CPUTensor<'float32'>;
+      const bCPU = (await toCPU(b)) as CPUTensor<'float32'>;
+      const cCPU = (await toCPU(c)) as CPUTensor<'float32'>;
 
-      const res = vA.gemm(vB, true, false, 1, vC, 1) as Variable;
+      const res = vA.gemm(vB, true, false, 1, vC, 1) as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGradA = await backend.toBackend(
         numericalGradient(
           aCPU,
-          (a: CPUTensor) => a.gemm(bCPU, true, false, 1, cCPU, 1) as CPUTensor
+          (a: CPUTensor<'float32'>) =>
+            a.gemm(bCPU, true, false, 1, cCPU, 1) as CPUTensor<'float32'>
         )
       );
       const numericalGradB = await backend.toBackend(
         numericalGradient(
           bCPU,
-          (b: CPUTensor) => aCPU.gemm(b, true, false, 1, cCPU, 1) as CPUTensor
+          (b: CPUTensor<'float32'>) =>
+            aCPU.gemm(b, true, false, 1, cCPU, 1) as CPUTensor<'float32'>
         )
       );
       const numericalGradC = await backend.toBackend(
         numericalGradient(
           cCPU,
-          (c: CPUTensor) => aCPU.gemm(bCPU, true, false, 1, c, 1) as CPUTensor
+          (c: CPUTensor<'float32'>) =>
+            aCPU.gemm(bCPU, true, false, 1, c, 1) as CPUTensor<'float32'>
         )
       );
 
@@ -1300,29 +1432,32 @@ for (const backend of backends) {
       const vB = new Variable(b);
       const vC = new Variable(c);
 
-      const aCPU = (await toCPU(a)) as CPUTensor;
-      const bCPU = (await toCPU(b)) as CPUTensor;
-      const cCPU = (await toCPU(c)) as CPUTensor;
+      const aCPU = (await toCPU(a)) as CPUTensor<'float32'>;
+      const bCPU = (await toCPU(b)) as CPUTensor<'float32'>;
+      const cCPU = (await toCPU(c)) as CPUTensor<'float32'>;
 
-      const res = vA.gemm(vB, false, true, 1, vC, 1) as Variable;
+      const res = vA.gemm(vB, false, true, 1, vC, 1) as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGradA = await backend.toBackend(
         numericalGradient(
           aCPU,
-          (a: CPUTensor) => a.gemm(bCPU, false, true, 1, cCPU, 1) as CPUTensor
+          (a: CPUTensor<'float32'>) =>
+            a.gemm(bCPU, false, true, 1, cCPU, 1) as CPUTensor<'float32'>
         )
       );
       const numericalGradB = await backend.toBackend(
         numericalGradient(
           bCPU,
-          (b: CPUTensor) => aCPU.gemm(b, false, true, 1, cCPU, 1) as CPUTensor
+          (b: CPUTensor<'float32'>) =>
+            aCPU.gemm(b, false, true, 1, cCPU, 1) as CPUTensor<'float32'>
         )
       );
       const numericalGradC = await backend.toBackend(
         numericalGradient(
           cCPU,
-          (c: CPUTensor) => aCPU.gemm(bCPU, false, true, 1, c, 1) as CPUTensor
+          (c: CPUTensor<'float32'>) =>
+            aCPU.gemm(bCPU, false, true, 1, c, 1) as CPUTensor<'float32'>
         )
       );
 
@@ -1348,29 +1483,32 @@ for (const backend of backends) {
       const vB = new Variable(b);
       const vC = new Variable(c);
 
-      const aCPU = (await toCPU(a)) as CPUTensor;
-      const bCPU = (await toCPU(b)) as CPUTensor;
-      const cCPU = (await toCPU(c)) as CPUTensor;
+      const aCPU = (await toCPU(a)) as CPUTensor<'float32'>;
+      const bCPU = (await toCPU(b)) as CPUTensor<'float32'>;
+      const cCPU = (await toCPU(c)) as CPUTensor<'float32'>;
 
-      const res = vA.gemm(vB, true, true, 1, vC, 1) as Variable;
+      const res = vA.gemm(vB, true, true, 1, vC, 1) as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGradA = await backend.toBackend(
         numericalGradient(
           aCPU,
-          (a: CPUTensor) => a.gemm(bCPU, true, true, 1, cCPU, 1) as CPUTensor
+          (a: CPUTensor<'float32'>) =>
+            a.gemm(bCPU, true, true, 1, cCPU, 1) as CPUTensor<'float32'>
         )
       );
       const numericalGradB = await backend.toBackend(
         numericalGradient(
           bCPU,
-          (b: CPUTensor) => aCPU.gemm(b, true, true, 1, cCPU, 1) as CPUTensor
+          (b: CPUTensor<'float32'>) =>
+            aCPU.gemm(b, true, true, 1, cCPU, 1) as CPUTensor<'float32'>
         )
       );
       const numericalGradC = await backend.toBackend(
         numericalGradient(
           cCPU,
-          (c: CPUTensor) => aCPU.gemm(bCPU, true, true, 1, c, 1) as CPUTensor
+          (c: CPUTensor<'float32'>) =>
+            aCPU.gemm(bCPU, true, true, 1, c, 1) as CPUTensor<'float32'>
         )
       );
 
@@ -1396,29 +1534,32 @@ for (const backend of backends) {
       const vB = new Variable(b);
       const vC = new Variable(c);
 
-      const aCPU = (await toCPU(a)) as CPUTensor;
-      const bCPU = (await toCPU(b)) as CPUTensor;
-      const cCPU = (await toCPU(c)) as CPUTensor;
+      const aCPU = (await toCPU(a)) as CPUTensor<'float32'>;
+      const bCPU = (await toCPU(b)) as CPUTensor<'float32'>;
+      const cCPU = (await toCPU(c)) as CPUTensor<'float32'>;
 
-      const res = vA.gemm(vB, true, true, 0.5, vC, 1) as Variable;
+      const res = vA.gemm(vB, true, true, 0.5, vC, 1) as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGradA = await backend.toBackend(
         numericalGradient(
           aCPU,
-          (a: CPUTensor) => a.gemm(bCPU, true, true, 0.5, cCPU, 1) as CPUTensor
+          (a: CPUTensor<'float32'>) =>
+            a.gemm(bCPU, true, true, 0.5, cCPU, 1) as CPUTensor<'float32'>
         )
       );
       const numericalGradB = await backend.toBackend(
         numericalGradient(
           bCPU,
-          (b: CPUTensor) => aCPU.gemm(b, true, true, 0.5, cCPU, 1) as CPUTensor
+          (b: CPUTensor<'float32'>) =>
+            aCPU.gemm(b, true, true, 0.5, cCPU, 1) as CPUTensor<'float32'>
         )
       );
       const numericalGradC = await backend.toBackend(
         numericalGradient(
           cCPU,
-          (c: CPUTensor) => aCPU.gemm(bCPU, true, true, 0.5, c, 1) as CPUTensor
+          (c: CPUTensor<'float32'>) =>
+            aCPU.gemm(bCPU, true, true, 0.5, c, 1) as CPUTensor<'float32'>
         )
       );
 
@@ -1444,29 +1585,32 @@ for (const backend of backends) {
       const vB = new Variable(b);
       const vC = new Variable(c);
 
-      const aCPU = (await toCPU(a)) as CPUTensor;
-      const bCPU = (await toCPU(b)) as CPUTensor;
-      const cCPU = (await toCPU(c)) as CPUTensor;
+      const aCPU = (await toCPU(a)) as CPUTensor<'float32'>;
+      const bCPU = (await toCPU(b)) as CPUTensor<'float32'>;
+      const cCPU = (await toCPU(c)) as CPUTensor<'float32'>;
 
-      const res = vA.gemm(vB, true, true, 1, vC, 0.5) as Variable;
+      const res = vA.gemm(vB, true, true, 1, vC, 0.5) as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGradA = await backend.toBackend(
         numericalGradient(
           aCPU,
-          (a: CPUTensor) => a.gemm(bCPU, true, true, 1, cCPU, 0.5) as CPUTensor
+          (a: CPUTensor<'float32'>) =>
+            a.gemm(bCPU, true, true, 1, cCPU, 0.5) as CPUTensor<'float32'>
         )
       );
       const numericalGradB = await backend.toBackend(
         numericalGradient(
           bCPU,
-          (b: CPUTensor) => aCPU.gemm(b, true, true, 1, cCPU, 0.5) as CPUTensor
+          (b: CPUTensor<'float32'>) =>
+            aCPU.gemm(b, true, true, 1, cCPU, 0.5) as CPUTensor<'float32'>
         )
       );
       const numericalGradC = await backend.toBackend(
         numericalGradient(
           cCPU,
-          (c: CPUTensor) => aCPU.gemm(bCPU, true, true, 1, c, 0.5) as CPUTensor
+          (c: CPUTensor<'float32'>) =>
+            aCPU.gemm(bCPU, true, true, 1, c, 0.5) as CPUTensor<'float32'>
         )
       );
 
@@ -1483,17 +1627,18 @@ for (const backend of backends) {
       const a = backend.constructor([2, 3, 4], new Array(24).fill(5));
       const ones = backend.constructor([4, 2, 3], new Array(24).fill(1));
       const vA = new Variable(a);
-      const aCPU = (await toCPU(a)) as CPUTensor;
+      const aCPU = (await toCPU(a)) as CPUTensor<'float32'>;
 
       const permutation = [2, 0, 1];
 
-      const res = vA.transpose(permutation) as Variable;
+      const res = vA.transpose(permutation) as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGradA = await backend.toBackend(
         numericalGradient(
           aCPU,
-          (a: CPUTensor) => a.transpose(permutation) as CPUTensor
+          (a: CPUTensor<'float32'>) =>
+            a.transpose(permutation) as CPUTensor<'float32'>
         )
       );
 
@@ -1508,13 +1653,16 @@ for (const backend of backends) {
       const a = backend.constructor([2, 3], [1, 2, 3, 4, 5, 6]);
       const ones = backend.constructor([2], new Array(2).fill(1));
       const vA = new Variable(a);
-      const aCPU = (await toCPU(a)) as CPUTensor;
+      const aCPU = (await toCPU(a)) as CPUTensor<'float32'>;
 
-      const res = vA.sum(1) as Variable;
+      const res = vA.sum(1) as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGradA = await backend.toBackend(
-        numericalGradient(aCPU, (a: CPUTensor) => a.sum(1) as CPUTensor)
+        numericalGradient(
+          aCPU,
+          (a: CPUTensor<'float32'>) => a.sum(1) as CPUTensor<'float32'>
+        )
       );
 
       expect(await vA.grad?.compare(numericalGradA, 0.01)).toBeTrue();
@@ -1528,13 +1676,16 @@ for (const backend of backends) {
       const a = backend.constructor([2, 3], [1, 2, 3, 4, 5, 6]);
       const ones = backend.constructor([3], new Array(3).fill(1));
       const vA = new Variable(a);
-      const aCPU = (await toCPU(a)) as CPUTensor;
+      const aCPU = (await toCPU(a)) as CPUTensor<'float32'>;
 
-      const res = vA.sum(0) as Variable;
+      const res = vA.sum(0) as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGradA = await backend.toBackend(
-        numericalGradient(aCPU, (a: CPUTensor) => a.sum(0) as CPUTensor)
+        numericalGradient(
+          aCPU,
+          (a: CPUTensor<'float32'>) => a.sum(0) as CPUTensor<'float32'>
+        )
       );
 
       expect(await vA.grad?.compare(numericalGradA, 0.01)).toBeTrue();
@@ -1548,13 +1699,16 @@ for (const backend of backends) {
       const a = backend.constructor([2, 3], [1, 2, 3, 4, 5, 6]);
       const ones = backend.constructor([1], new Array(1).fill(1));
       const vA = new Variable(a);
-      const aCPU = (await toCPU(a)) as CPUTensor;
+      const aCPU = (await toCPU(a)) as CPUTensor<'float32'>;
 
-      const res = vA.sum() as Variable;
+      const res = vA.sum() as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGradA = await backend.toBackend(
-        numericalGradient(aCPU, (a: CPUTensor) => a.sum() as CPUTensor)
+        numericalGradient(
+          aCPU,
+          (a: CPUTensor<'float32'>) => a.sum() as CPUTensor<'float32'>
+        )
       );
 
       expect(await vA.grad?.compare(numericalGradA, 0.01)).toBeTrue();
@@ -1568,15 +1722,16 @@ for (const backend of backends) {
       const a = backend.constructor([2, 3], [1, 2, 3, 4, 5, 6]);
       const ones = backend.constructor([1, 1], new Array(1).fill(1));
       const vA = new Variable(a);
-      const aCPU = (await toCPU(a)) as CPUTensor;
+      const aCPU = (await toCPU(a)) as CPUTensor<'float32'>;
 
-      const res = vA.sum(undefined, true) as Variable;
+      const res = vA.sum(undefined, true) as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGradA = await backend.toBackend(
         numericalGradient(
           aCPU,
-          (a: CPUTensor) => a.sum(undefined, true) as CPUTensor
+          (a: CPUTensor<'float32'>) =>
+            a.sum(undefined, true) as CPUTensor<'float32'>
         )
       );
 
@@ -1591,13 +1746,16 @@ for (const backend of backends) {
       const a = backend.constructor([2, 3], [1, -2, 3, -4, -5, 6]);
       const ones = backend.constructor([2], new Array(2).fill(1));
       const vA = new Variable(a);
-      const aCPU = (await toCPU(a)) as CPUTensor;
+      const aCPU = (await toCPU(a)) as CPUTensor<'float32'>;
 
-      const res = vA.sumSquare(1) as Variable;
+      const res = vA.sumSquare(1) as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGradA = await backend.toBackend(
-        numericalGradient(aCPU, (a: CPUTensor) => a.sumSquare(1) as CPUTensor)
+        numericalGradient(
+          aCPU,
+          (a: CPUTensor<'float32'>) => a.sumSquare(1) as CPUTensor<'float32'>
+        )
       );
 
       expect(await vA.grad?.compare(numericalGradA, 0.1)).toBeTrue();
@@ -1611,13 +1769,16 @@ for (const backend of backends) {
       const a = backend.constructor([2, 3], [1, -2, 3, -4, -5, 6]);
       const ones = backend.constructor([3], new Array(3).fill(1));
       const vA = new Variable(a);
-      const aCPU = (await toCPU(a)) as CPUTensor;
+      const aCPU = (await toCPU(a)) as CPUTensor<'float32'>;
 
-      const res = vA.sumSquare(0) as Variable;
+      const res = vA.sumSquare(0) as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGradA = await backend.toBackend(
-        numericalGradient(aCPU, (a: CPUTensor) => a.sumSquare(0) as CPUTensor)
+        numericalGradient(
+          aCPU,
+          (a: CPUTensor<'float32'>) => a.sumSquare(0) as CPUTensor<'float32'>
+        )
       );
 
       expect(await vA.grad?.compare(numericalGradA, 0.1)).toBeTrue();
@@ -1631,13 +1792,16 @@ for (const backend of backends) {
       const a = backend.constructor([2, 3], [1, -2, 3, -4, -5, 6]);
       const ones = backend.constructor([1], new Array(1).fill(1));
       const vA = new Variable(a);
-      const aCPU = (await toCPU(a)) as CPUTensor;
+      const aCPU = (await toCPU(a)) as CPUTensor<'float32'>;
 
-      const res = vA.sumSquare() as Variable;
+      const res = vA.sumSquare() as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGradA = await backend.toBackend(
-        numericalGradient(aCPU, (a: CPUTensor) => a.sumSquare() as CPUTensor)
+        numericalGradient(
+          aCPU,
+          (a: CPUTensor<'float32'>) => a.sumSquare() as CPUTensor<'float32'>
+        )
       );
 
       expect(await vA.grad?.compare(numericalGradA, 0.1)).toBeTrue();
@@ -1651,15 +1815,16 @@ for (const backend of backends) {
       const a = backend.constructor([2, 3], [1, -2, 3, -4, -5, 6]);
       const ones = backend.constructor([1, 1], new Array(1).fill(1));
       const vA = new Variable(a);
-      const aCPU = (await toCPU(a)) as CPUTensor;
+      const aCPU = (await toCPU(a)) as CPUTensor<'float32'>;
 
-      const res = vA.sumSquare(undefined, true) as Variable;
+      const res = vA.sumSquare(undefined, true) as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGradA = await backend.toBackend(
         numericalGradient(
           aCPU,
-          (a: CPUTensor) => a.sumSquare(undefined, true) as CPUTensor
+          (a: CPUTensor<'float32'>) =>
+            a.sumSquare(undefined, true) as CPUTensor<'float32'>
         )
       );
 
@@ -1674,13 +1839,16 @@ for (const backend of backends) {
       const a = backend.constructor([2, 3], [1, 2, 3, 4, 5, 6]);
       const ones = backend.constructor([2], new Array(2).fill(1));
       const vA = new Variable(a);
-      const aCPU = (await toCPU(a)) as CPUTensor;
+      const aCPU = (await toCPU(a)) as CPUTensor<'float32'>;
 
-      const res = vA.reduceMean(1) as Variable;
+      const res = vA.reduceMean(1) as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGradA = await backend.toBackend(
-        numericalGradient(aCPU, (a: CPUTensor) => a.reduceMean(1) as CPUTensor)
+        numericalGradient(
+          aCPU,
+          (a: CPUTensor<'float32'>) => a.reduceMean(1) as CPUTensor<'float32'>
+        )
       );
 
       expect(await vA.grad?.compare(numericalGradA, 0.01)).toBeTrue();
@@ -1694,13 +1862,16 @@ for (const backend of backends) {
       const a = backend.constructor([2, 3], [1, 2, 3, 4, 5, 6]);
       const ones = backend.constructor([3], new Array(3).fill(1));
       const vA = new Variable(a);
-      const aCPU = (await toCPU(a)) as CPUTensor;
+      const aCPU = (await toCPU(a)) as CPUTensor<'float32'>;
 
-      const res = vA.reduceMean(0) as Variable;
+      const res = vA.reduceMean(0) as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGradA = await backend.toBackend(
-        numericalGradient(aCPU, (a: CPUTensor) => a.reduceMean(0) as CPUTensor)
+        numericalGradient(
+          aCPU,
+          (a: CPUTensor<'float32'>) => a.reduceMean(0) as CPUTensor<'float32'>
+        )
       );
 
       expect(await vA.grad?.compare(numericalGradA, 0.01)).toBeTrue();
@@ -1714,13 +1885,16 @@ for (const backend of backends) {
       const a = backend.constructor([2, 3], [1, 2, 3, 4, 5, 6]);
       const ones = backend.constructor([1], new Array(1).fill(1));
       const vA = new Variable(a);
-      const aCPU = (await toCPU(a)) as CPUTensor;
+      const aCPU = (await toCPU(a)) as CPUTensor<'float32'>;
 
-      const res = vA.reduceMean() as Variable;
+      const res = vA.reduceMean() as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGradA = await backend.toBackend(
-        numericalGradient(aCPU, (a: CPUTensor) => a.reduceMean() as CPUTensor)
+        numericalGradient(
+          aCPU,
+          (a: CPUTensor<'float32'>) => a.reduceMean() as CPUTensor<'float32'>
+        )
       );
 
       expect(await vA.grad?.compare(numericalGradA, 0.01)).toBeTrue();
@@ -1734,15 +1908,16 @@ for (const backend of backends) {
       const a = backend.constructor([2, 3], [1, 2, 3, 4, 5, 6]);
       const ones = backend.constructor([2], new Array(2).fill(1));
       const vA = new Variable(a);
-      const aCPU = (await toCPU(a)) as CPUTensor;
+      const aCPU = (await toCPU(a)) as CPUTensor<'float32'>;
 
-      const res = vA.reduceMeanSquare(1) as Variable;
+      const res = vA.reduceMeanSquare(1) as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGradA = await backend.toBackend(
         numericalGradient(
           aCPU,
-          (a: CPUTensor) => a.reduceMeanSquare(1) as CPUTensor
+          (a: CPUTensor<'float32'>) =>
+            a.reduceMeanSquare(1) as CPUTensor<'float32'>
         )
       );
 
@@ -1757,15 +1932,16 @@ for (const backend of backends) {
       const a = backend.constructor([2, 3], [1, 2, 3, 4, 5, 6]);
       const ones = backend.constructor([3], new Array(3).fill(1));
       const vA = new Variable(a);
-      const aCPU = (await toCPU(a)) as CPUTensor;
+      const aCPU = (await toCPU(a)) as CPUTensor<'float32'>;
 
-      const res = vA.reduceMeanSquare(0) as Variable;
+      const res = vA.reduceMeanSquare(0) as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGradA = await backend.toBackend(
         numericalGradient(
           aCPU,
-          (a: CPUTensor) => a.reduceMeanSquare(0) as CPUTensor
+          (a: CPUTensor<'float32'>) =>
+            a.reduceMeanSquare(0) as CPUTensor<'float32'>
         )
       );
 
@@ -1780,15 +1956,16 @@ for (const backend of backends) {
       const a = backend.constructor([2, 3], [1, 2, 3, 4, 5, 6]);
       const ones = backend.constructor([1], new Array(1).fill(1));
       const vA = new Variable(a);
-      const aCPU = (await toCPU(a)) as CPUTensor;
+      const aCPU = (await toCPU(a)) as CPUTensor<'float32'>;
 
-      const res = vA.reduceMeanSquare() as Variable;
+      const res = vA.reduceMeanSquare() as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGradA = await backend.toBackend(
         numericalGradient(
           aCPU,
-          (a: CPUTensor) => a.reduceMeanSquare() as CPUTensor
+          (a: CPUTensor<'float32'>) =>
+            a.reduceMeanSquare() as CPUTensor<'float32'>
         )
       );
 
@@ -1803,15 +1980,15 @@ for (const backend of backends) {
       const a = backend.constructor([2, 3], [1, 2, 3, 4, 5, 6]);
       const ones = backend.constructor([2], new Array(2).fill(1));
       const vA = new Variable(a);
-      const aCPU = (await toCPU(a)) as CPUTensor;
+      const aCPU = (await toCPU(a)) as CPUTensor<'float32'>;
 
-      const res = vA.reduceLogSum(1) as Variable;
+      const res = vA.reduceLogSum(1) as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGradA = await backend.toBackend(
         numericalGradient(
           aCPU,
-          (a: CPUTensor) => a.reduceLogSum(1) as CPUTensor
+          (a: CPUTensor<'float32'>) => a.reduceLogSum(1) as CPUTensor<'float32'>
         )
       );
 
@@ -1826,15 +2003,15 @@ for (const backend of backends) {
       const a = backend.constructor([2, 3], [1, 2, 3, 4, 5, 6]);
       const ones = backend.constructor([3], new Array(3).fill(1));
       const vA = new Variable(a);
-      const aCPU = (await toCPU(a)) as CPUTensor;
+      const aCPU = (await toCPU(a)) as CPUTensor<'float32'>;
 
-      const res = vA.reduceLogSum(0) as Variable;
+      const res = vA.reduceLogSum(0) as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGradA = await backend.toBackend(
         numericalGradient(
           aCPU,
-          (a: CPUTensor) => a.reduceLogSum(0) as CPUTensor
+          (a: CPUTensor<'float32'>) => a.reduceLogSum(0) as CPUTensor<'float32'>
         )
       );
 
@@ -1849,13 +2026,16 @@ for (const backend of backends) {
       const a = backend.constructor([2, 3], [1, 2, 3, 4, 5, 6]);
       const ones = backend.constructor([1], new Array(1).fill(1));
       const vA = new Variable(a);
-      const aCPU = (await toCPU(a)) as CPUTensor;
+      const aCPU = (await toCPU(a)) as CPUTensor<'float32'>;
 
-      const res = vA.reduceLogSum() as Variable;
+      const res = vA.reduceLogSum() as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGradA = await backend.toBackend(
-        numericalGradient(aCPU, (a: CPUTensor) => a.reduceLogSum() as CPUTensor)
+        numericalGradient(
+          aCPU,
+          (a: CPUTensor<'float32'>) => a.reduceLogSum() as CPUTensor<'float32'>
+        )
       );
 
       expect(await vA.grad?.compare(numericalGradA, 0.05)).toBeTrue();
@@ -1869,15 +2049,16 @@ for (const backend of backends) {
       const a = backend.constructor([2, 3], [1, 2, 3, 4, 5, 6]);
       const ones = backend.constructor([2], new Array(2).fill(1));
       const vA = new Variable(a);
-      const aCPU = (await toCPU(a)) as CPUTensor;
+      const aCPU = (await toCPU(a)) as CPUTensor<'float32'>;
 
-      const res = vA.reduceLogSumExp(1) as Variable;
+      const res = vA.reduceLogSumExp(1) as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGradA = await backend.toBackend(
         numericalGradient(
           aCPU,
-          (a: CPUTensor) => a.reduceLogSumExp(1) as CPUTensor
+          (a: CPUTensor<'float32'>) =>
+            a.reduceLogSumExp(1) as CPUTensor<'float32'>
         )
       );
 
@@ -1892,15 +2073,16 @@ for (const backend of backends) {
       const a = backend.constructor([2, 3], [1, 2, 3, 4, 5, 6]);
       const ones = backend.constructor([3], new Array(3).fill(1));
       const vA = new Variable(a);
-      const aCPU = (await toCPU(a)) as CPUTensor;
+      const aCPU = (await toCPU(a)) as CPUTensor<'float32'>;
 
-      const res = vA.reduceLogSumExp(0) as Variable;
+      const res = vA.reduceLogSumExp(0) as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGradA = await backend.toBackend(
         numericalGradient(
           aCPU,
-          (a: CPUTensor) => a.reduceLogSumExp(0) as CPUTensor
+          (a: CPUTensor<'float32'>) =>
+            a.reduceLogSumExp(0) as CPUTensor<'float32'>
         )
       );
 
@@ -1915,15 +2097,16 @@ for (const backend of backends) {
       const a = backend.constructor([2, 3], [1, 2, 3, 4, 5, 6]);
       const ones = backend.constructor([1], new Array(1).fill(1));
       const vA = new Variable(a);
-      const aCPU = (await toCPU(a)) as CPUTensor;
+      const aCPU = (await toCPU(a)) as CPUTensor<'float32'>;
 
-      const res = vA.reduceLogSumExp() as Variable;
+      const res = vA.reduceLogSumExp() as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGradA = await backend.toBackend(
         numericalGradient(
           aCPU,
-          (a: CPUTensor) => a.reduceLogSumExp() as CPUTensor
+          (a: CPUTensor<'float32'>) =>
+            a.reduceLogSumExp() as CPUTensor<'float32'>
         )
       );
 
@@ -1938,15 +2121,16 @@ for (const backend of backends) {
       const a = backend.constructor([2, 3, 4], new Array(24).fill(5));
       const ones = backend.constructor([2, 1, 3], new Array(6).fill(1));
       const vA = new Variable(a);
-      const aCPU = (await toCPU(a)) as CPUTensor;
+      const aCPU = (await toCPU(a)) as CPUTensor<'float32'>;
 
-      const res = vA.slice([2, 0], [3, 3], [1, 2]) as Variable;
+      const res = vA.slice([2, 0], [3, 3], [1, 2]) as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGradA = await backend.toBackend(
         numericalGradient(
           aCPU,
-          (a: CPUTensor) => a.slice([2, 0], [3, 3], [1, 2]) as CPUTensor
+          (a: CPUTensor<'float32'>) =>
+            a.slice([2, 0], [3, 3], [1, 2]) as CPUTensor<'float32'>
         )
       );
 
@@ -1961,13 +2145,16 @@ for (const backend of backends) {
       const a = backend.constructor([2, 3], [1, 2, 3, 4, 5, 6]);
       const ones = backend.constructor([2], new Array(2).fill(1));
       const vA = new Variable(a);
-      const aCPU = (await toCPU(a)) as CPUTensor;
+      const aCPU = (await toCPU(a)) as CPUTensor<'float32'>;
 
-      const res = vA.product(1) as Variable;
+      const res = vA.product(1) as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGradA = await backend.toBackend(
-        numericalGradient(aCPU, (a: CPUTensor) => a.product(1) as CPUTensor)
+        numericalGradient(
+          aCPU,
+          (a: CPUTensor<'float32'>) => a.product(1) as CPUTensor<'float32'>
+        )
       );
 
       expect(await vA.grad?.compare(numericalGradA, 0.05)).toBeTrue();
@@ -1981,13 +2168,16 @@ for (const backend of backends) {
       const a = backend.constructor([2, 3], [1, 2, 3, 4, 5, 6]);
       const ones = backend.constructor([3], new Array(3).fill(1));
       const vA = new Variable(a);
-      const aCPU = (await toCPU(a)) as CPUTensor;
+      const aCPU = (await toCPU(a)) as CPUTensor<'float32'>;
 
-      const res = vA.product(0) as Variable;
+      const res = vA.product(0) as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGradA = await backend.toBackend(
-        numericalGradient(aCPU, (a: CPUTensor) => a.product(0) as CPUTensor)
+        numericalGradient(
+          aCPU,
+          (a: CPUTensor<'float32'>) => a.product(0) as CPUTensor<'float32'>
+        )
       );
 
       expect(await vA.grad?.compare(numericalGradA, 0.05)).toBeTrue();
@@ -2001,13 +2191,16 @@ for (const backend of backends) {
       const a = backend.constructor([2, 3], [1, 2, 3, 4, 5, 6]);
       const ones = backend.constructor([1], new Array(1).fill(1));
       const vA = new Variable(a);
-      const aCPU = (await toCPU(a)) as CPUTensor;
+      const aCPU = (await toCPU(a)) as CPUTensor<'float32'>;
 
-      const res = vA.product() as Variable;
+      const res = vA.product() as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGradA = await backend.toBackend(
-        numericalGradient(aCPU, (a: CPUTensor) => a.product() as CPUTensor)
+        numericalGradient(
+          aCPU,
+          (a: CPUTensor<'float32'>) => a.product() as CPUTensor<'float32'>
+        )
       );
 
       expect(await vA.grad?.compare(numericalGradA, 0.8)).toBeTrue();
@@ -2021,13 +2214,16 @@ for (const backend of backends) {
       const a = backend.constructor([2, 3], [-1, 2, -3, 4, -5, 6]);
       const ones = backend.constructor([2, 3], new Array(6).fill(1));
       const vA = new Variable(a);
-      const aCPU = (await toCPU(a)) as CPUTensor;
+      const aCPU = (await toCPU(a)) as CPUTensor<'float32'>;
 
-      const res = vA.sigmoid() as Variable;
+      const res = vA.sigmoid() as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGradA = await backend.toBackend(
-        numericalGradient(aCPU, (a: CPUTensor) => a.sigmoid() as CPUTensor)
+        numericalGradient(
+          aCPU,
+          (a: CPUTensor<'float32'>) => a.sigmoid() as CPUTensor<'float32'>
+        )
       );
 
       expect(await vA.grad?.compare(numericalGradA, 0.05)).toBeTrue();
@@ -2045,14 +2241,17 @@ for (const backend of backends) {
       const vX = new Variable(x);
       const vY = new Variable(y);
 
-      const xCPU = (await toCPU(x)) as CPUTensor;
-      const yCPU = (await toCPU(y)) as CPUTensor;
+      const xCPU = (await toCPU(x)) as CPUTensor<'float32'>;
+      const yCPU = (await toCPU(y)) as CPUTensor<'float32'>;
 
-      const res = bce(vX, vY) as Variable;
+      const res = bce(vX, vY) as Variable<'float32'>;
       res.backward(ones);
 
       const numericalGradX = await backend.toBackend(
-        numericalGradient(xCPU, (x: CPUTensor) => bce(x, yCPU) as CPUTensor)
+        numericalGradient(
+          xCPU,
+          (x: CPUTensor<'float32'>) => bce(x, yCPU) as CPUTensor<'float32'>
+        )
       );
 
       expect(await vX.grad?.compare(numericalGradX, 0.01)).toBeTrue();

@@ -63,6 +63,9 @@ import {SoftplusNode} from './nodes/softplus';
 import {SoftsignNode} from './nodes/softsign';
 import {SumNode} from './nodes/nary/sum';
 import {MeanNode} from './nodes/nary/mean';
+import {CeluNode} from './nodes/celu';
+import {RoundNode} from './nodes/unary/round';
+import {RangeNode} from './nodes/range';
 
 export const nodeResolve: {[opType: string]: NodeConstructor} = {
   Conv: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
@@ -104,6 +107,8 @@ export const nodeResolve: {[opType: string]: NodeConstructor} = {
     new ConstantNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   Reshape: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
     new ReshapeNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Range: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new RangeNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   Flatten: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
     new FlattenNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   Tile: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
@@ -275,6 +280,8 @@ export const nodeResolve: {[opType: string]: NodeConstructor} = {
     new PReluNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   Selu: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
     new SeluNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Celu: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new CeluNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   Shape: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
     new ShapeNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   Size: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
@@ -287,6 +294,8 @@ export const nodeResolve: {[opType: string]: NodeConstructor} = {
     new FloorNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   Ceil: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
     new CeilNode(attributes, inputs, outputs, constants, onnxVersion, mode),
+  Round: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new RoundNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   Abs: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
     new AbsNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   Neg: (attributes, inputs, outputs, constants, onnxVersion, mode) =>

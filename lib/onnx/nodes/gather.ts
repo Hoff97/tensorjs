@@ -20,7 +20,7 @@ export class GatherNode extends OnnxNode {
     this.axis = this.getAttributeInt('axis') || 0;
   }
 
-  async forward(inputs: Tensor[]): Promise<Tensor[]> {
+  async forward(inputs: Tensor<any>[]): Promise<Tensor<any>[]> {
     const x = inputs[0];
     const indices = inputs[1];
 

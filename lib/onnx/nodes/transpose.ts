@@ -1,5 +1,5 @@
 import {Mode} from '../../model/module';
-import Tensor from '../../types';
+import Tensor, {DType} from '../../types';
 import {OnnxNode} from '../node';
 import {Attributes, Constants} from '../types';
 
@@ -19,7 +19,9 @@ export class TransposeNode extends OnnxNode {
     this.permutation = this.getAttributeInts('perm');
   }
 
-  async forward(inputs: Tensor[]): Promise<Tensor[]> {
+  async forward<DTpe extends DType>(
+    inputs: Tensor<DTpe>[]
+  ): Promise<Tensor<DTpe>[]> {
     const a = inputs[0];
 
     return [a.transpose(this.permutation)];

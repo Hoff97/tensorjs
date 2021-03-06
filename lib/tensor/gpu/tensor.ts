@@ -1,4 +1,4 @@
-import Tensor, {Activation, PadMode, Precision} from '../../types';
+import Tensor, {Activation, DType, PadMode, TensorValues} from '../../types';
 
 import {compareShapes, getSize} from '../../util/shape';
 
@@ -8,7 +8,7 @@ import {MemoryEntry} from './memory';
 import {CPUTensor} from '../cpu/tensor';
 import REGL from 'regl';
 import {ExpOperation} from '../../ops/gpu/unary/exp';
-import {GPUTensorConstructor, GPUTensorI} from './interface';
+import {DTypeGpu, GPUTensorConstructor, GPUTensorI} from './interface';
 import {ConvBiasOperation, ConvOperation} from '../../ops/gpu/conv/conv';
 import {AbsOperation} from '../../ops/gpu/unary/abs';
 import {AddOperation} from '../../ops/gpu/binary/add';
@@ -67,8 +67,20 @@ import {ReduceLogSumOperation} from '../../ops/gpu/pool/reduceLogSum';
 import {ReduceLogSumExpOperation} from '../../ops/gpu/pool/reduceLogSumExp';
 import {HardSigmoidOperation} from '../../ops/gpu/unary/hardSigmoid';
 import {PowerScalarOperation} from '../../ops/gpu/unary/powerScalar';
+import {RoundOperation} from '../../ops/gpu/unary/round';
 
-export class GPUTensor extends Tensor implements GPUTensorI {
+export class GPUTensor<DTpe extends DTypeGpu = 'float32'>
+  extends Tensor<DTpe>
+  implements GPUTensorI {
+  static range(start: number, limit: number, delta: number, dtype?: DTypeGpu) {
+    const size = Math.max(Math.ceil((limit - start) / delta), 0);
+    const values = new Array(size);
+    for (let i = 0; i < size; i++) {
+      values[i] = start + i * delta;
+    }
+    return new GPUTensor(values, [size], dtype);
+  }
+
   public memory: MemoryEntry;
 
   public size: number;
@@ -76,64 +88,70 @@ export class GPUTensor extends Tensor implements GPUTensorI {
   public deleted = false;
 
   constructor(
-    values: Float32Array | MemoryEntry,
+    values: number[] | MemoryEntry,
     public shape: readonly number[],
-    public precision: Precision
+    dtype?: DTpe
   ) {
-    super();
+    super(dtype || ('float32' as any));
 
     this.size = getSize(shape);
 
-    if (values instanceof Float32Array) {
-      this.memory = defaultAllocator.allocateTexture(values, precision);
+    if (values instanceof Array) {
+      this.memory = defaultAllocator.allocateTexture(values, this.dtype);
     } else {
       this.memory = values;
     }
   }
 
-  static fromData(data: REGL.TextureImageData, precision: Precision) {
+  static fromData(data: REGL.TextureImageData) {
     const texture = gl.texture({
       data: data,
       format: 'rgba',
-      type: precision === 32 ? 'float' : 'half float',
+      type: defaultAllocator.getColorType('float32') as any,
     });
 
-    const memory = defaultAllocator.allocateFramebuffer(texture, precision);
+    const memory = defaultAllocator.allocateFramebuffer(texture, 'float32');
 
     const width = texture.width;
     const height = texture.height;
 
-    return new GPUTensor(memory, [height, width, 4], precision);
+    return new GPUTensor(memory, [height, width, 4], 'float32');
   }
 
-  getValues(): Promise<Float32Array> {
-    return new Promise(resolve => {
-      gl({framebuffer: this.memory.frameBuffer})(() => {
-        let result = new Float32Array(this.memory.size);
-        result = gl.read(result);
-        resolve(result.subarray(0, this.size));
+  cast<DTpe2 extends DType>(dtype: DTpe2): Tensor<DTpe2> {
+    if (dtype === 'float64') {
+      throw new Error('The WebGL backend does not support float64 tensors');
+    }
+    return defaultCopyD.calc({input: this}, dtype as any) as any;
+  }
+
+  getValues(): Promise<TensorValues[DTpe]> {
+    if (this.dtype === 'float32') {
+      return new Promise(resolve => {
+        gl({framebuffer: this.memory.frameBuffer})(() => {
+          let result = new Float32Array(this.memory.size);
+          result = gl.read(result);
+          resolve(result.subarray(0, this.size) as TensorValues[DTpe]);
+        });
       });
-    });
+    }
+    throw new Error('Reading values only supported for data type float32');
   }
 
   getShape(): readonly number[] {
     return this.shape;
   }
 
-  async gpu(): Promise<GPUTensor> {
-    return this;
-  }
-
-  constantLike(value: number): Tensor {
+  constantLike(value: number): Tensor<DTpe> {
     return new GPUTensor(
-      new Float32Array(this.size).fill(value),
+      new Array(this.size).fill(value),
       this.shape,
-      this.precision
+      this.dtype
     );
   }
 
-  singleConstant(value: number): Tensor {
-    return new GPUTensor(new Float32Array([value]), [1], this.precision);
+  singleConstant(value: number): Tensor<DTpe> {
+    return new GPUTensor([value], [1], this.dtype);
   }
 
   delete(): void {
@@ -145,222 +163,223 @@ export class GPUTensor extends Tensor implements GPUTensorI {
     }
   }
 
-  copy(precision?: Precision): Tensor {
-    return defaultCopyD.calc(
-      {input: this},
-      precision ? precision : this.precision
-    ) as GPUTensor;
+  copy(): Tensor<DTpe> {
+    return defaultCopyD.calc({input: this}, this.dtype) as GPUTensor<DTpe>;
   }
 
-  exp(): Tensor {
-    return defaultExpD.calc({input: this}, this.precision) as GPUTensor;
+  exp(): Tensor<DTpe> {
+    return defaultExpD.calc({input: this}, this.dtype) as GPUTensor<DTpe>;
   }
 
-  log(): Tensor {
-    return defaultLogD.calc({input: this}, this.precision) as GPUTensor;
+  log(): Tensor<DTpe> {
+    return defaultLogD.calc({input: this}, this.dtype) as GPUTensor<DTpe>;
   }
 
-  sqrt(): Tensor {
-    return defaultSqrtD.calc({input: this}, this.precision) as GPUTensor;
+  sqrt(): Tensor<DTpe> {
+    return defaultSqrtD.calc({input: this}, this.dtype) as GPUTensor<DTpe>;
   }
 
-  abs(): Tensor {
-    return defaultAbsD.calc({input: this}, this.precision) as GPUTensor;
+  abs(): Tensor<DTpe> {
+    return defaultAbsD.calc({input: this}, this.dtype) as GPUTensor<DTpe>;
   }
 
-  sin(): Tensor {
-    return defaultSinD.calc({input: this}, this.precision) as GPUTensor;
+  sin(): Tensor<DTpe> {
+    return defaultSinD.calc({input: this}, this.dtype) as GPUTensor<DTpe>;
   }
 
-  cos(): Tensor {
-    return defaultCosD.calc({input: this}, this.precision) as GPUTensor;
+  cos(): Tensor<DTpe> {
+    return defaultCosD.calc({input: this}, this.dtype) as GPUTensor<DTpe>;
   }
 
-  tan(): Tensor {
-    return defaultTanD.calc({input: this}, this.precision) as GPUTensor;
+  tan(): Tensor<DTpe> {
+    return defaultTanD.calc({input: this}, this.dtype) as GPUTensor<DTpe>;
   }
 
-  asin(): Tensor {
-    return defaultASinD.calc({input: this}, this.precision) as GPUTensor;
+  asin(): Tensor<DTpe> {
+    return defaultASinD.calc({input: this}, this.dtype) as GPUTensor<DTpe>;
   }
 
-  acos(): Tensor {
-    return defaultACosD.calc({input: this}, this.precision) as GPUTensor;
+  acos(): Tensor<DTpe> {
+    return defaultACosD.calc({input: this}, this.dtype) as GPUTensor<DTpe>;
   }
 
-  atan(): Tensor {
-    return defaultATanD.calc({input: this}, this.precision) as GPUTensor;
+  atan(): Tensor<DTpe> {
+    return defaultATanD.calc({input: this}, this.dtype) as GPUTensor<DTpe>;
   }
 
-  sinh(): Tensor {
-    return defaultSinHD.calc({input: this}, this.precision) as GPUTensor;
+  sinh(): Tensor<DTpe> {
+    return defaultSinHD.calc({input: this}, this.dtype) as GPUTensor<DTpe>;
   }
 
-  cosh(): Tensor {
-    return defaultCosHD.calc({input: this}, this.precision) as GPUTensor;
+  cosh(): Tensor<DTpe> {
+    return defaultCosHD.calc({input: this}, this.dtype) as GPUTensor<DTpe>;
   }
 
-  tanh(): Tensor {
-    return defaultTanHD.calc({input: this}, this.precision) as GPUTensor;
+  tanh(): Tensor<DTpe> {
+    return defaultTanHD.calc({input: this}, this.dtype) as GPUTensor<DTpe>;
   }
 
-  asinh(): Tensor {
+  asinh(): Tensor<DTpe> {
     throw new Error('Method not implemented');
   }
 
-  acosh(): Tensor {
+  acosh(): Tensor<DTpe> {
     throw new Error('Method not implemented');
   }
 
-  atanh(): Tensor {
+  atanh(): Tensor<DTpe> {
     throw new Error('Method not implemented');
   }
 
-  sigmoid(): Tensor {
-    return defaultSigmoidD.calc({input: this}, this.precision) as GPUTensor;
+  sigmoid(): Tensor<DTpe> {
+    return defaultSigmoidD.calc({input: this}, this.dtype) as GPUTensor<DTpe>;
   }
 
-  hardSigmoid(alpha: number, beta: number): Tensor {
+  hardSigmoid(alpha: number, beta: number): Tensor<DTpe> {
     return defaultHardSigmoidD.calc(
       {input: this, alpha, beta},
-      this.precision
-    ) as GPUTensor;
+      this.dtype
+    ) as GPUTensor<DTpe>;
   }
 
-  floor(): Tensor {
-    return defaultFloorD.calc({input: this}, this.precision) as GPUTensor;
+  floor(): Tensor<DTpe> {
+    return defaultFloorD.calc({input: this}, this.dtype) as GPUTensor<DTpe>;
   }
 
-  ceil(): Tensor {
-    return defaultCeilD.calc({input: this}, this.precision) as GPUTensor;
+  ceil(): Tensor<DTpe> {
+    return defaultCeilD.calc({input: this}, this.dtype) as GPUTensor<DTpe>;
   }
 
-  negate(): Tensor {
-    return defaultNegateD.calc({input: this}, this.precision) as GPUTensor;
+  round(): Tensor<DTpe> {
+    return defaultRoundD.calc({input: this}, this.dtype) as GPUTensor<DTpe>;
   }
 
-  addMultiplyScalar(factor: number, add: number): Tensor {
+  negate(): Tensor<DTpe> {
+    return defaultNegateD.calc({input: this}, this.dtype) as GPUTensor<DTpe>;
+  }
+
+  addMultiplyScalar(factor: number, add: number): Tensor<DTpe> {
     return defaultAddMultiplyScalarD.calc(
       {input: this, factor, add},
-      this.precision
-    ) as GPUTensor;
+      this.dtype
+    ) as GPUTensor<DTpe>;
   }
 
-  powerScalar(power: number, factor: number): Tensor {
+  powerScalar(power: number, factor: number): Tensor<DTpe> {
     return defaultPowerScalarD.calc(
       {input: this, factor, power},
-      this.precision
-    ) as GPUTensor;
+      this.dtype
+    ) as GPUTensor<DTpe>;
   }
 
-  sign(): Tensor {
-    return defaultSignD.calc({input: this}, this.precision) as GPUTensor;
+  sign(): Tensor<DTpe> {
+    return defaultSignD.calc({input: this}, this.dtype) as GPUTensor<DTpe>;
   }
 
-  setValues(values: Tensor, starts: number[]): Tensor {
+  setValues(values: Tensor<DTpe>, starts: number[]): Tensor<DTpe> {
     if (!(values instanceof GPUTensor)) {
       throw new Error('Can only set GPU values to GPU tensor');
     }
     return defaultSetValuesD.calc(
       {A: this, Values: values, starts},
-      this.precision
-    ) as GPUTensor;
+      this.dtype
+    ) as GPUTensor<DTpe>;
   }
 
   add_impl(
-    th: Tensor,
-    tensor: Tensor,
+    th: Tensor<DTpe>,
+    tensor: Tensor<DTpe>,
     resultShape: readonly number[],
     alpha: number,
     beta: number
-  ): Tensor {
+  ): Tensor<DTpe> {
     if (!(tensor instanceof GPUTensor) || !(th instanceof GPUTensor)) {
       throw new Error('Can only add GPU tensor to GPU tensor');
     }
     return defaultAddD.calc(
       {A: th, B: tensor, outputShape: resultShape, alpha, beta},
-      this.precision
-    ) as GPUTensor;
+      this.dtype
+    ) as GPUTensor<DTpe>;
   }
 
   subtract_impl(
-    th: Tensor,
-    tensor: Tensor,
+    th: Tensor<DTpe>,
+    tensor: Tensor<DTpe>,
     resultShape: readonly number[],
     alpha: number,
     beta: number
-  ): Tensor {
+  ): Tensor<DTpe> {
     if (!(tensor instanceof GPUTensor) || !(th instanceof GPUTensor)) {
       throw new Error('Can only subtract GPU tensor from GPU tensor');
     }
     return defaultSubtractD.calc(
       {A: th, B: tensor, outputShape: resultShape, alpha, beta},
-      this.precision
-    ) as GPUTensor;
+      this.dtype
+    ) as GPUTensor<DTpe>;
   }
 
   multiply_impl(
-    th: Tensor,
-    tensor: Tensor,
+    th: Tensor<DTpe>,
+    tensor: Tensor<DTpe>,
     resultShape: readonly number[],
     alpha: number
-  ): Tensor {
+  ): Tensor<DTpe> {
     if (!(tensor instanceof GPUTensor) || !(th instanceof GPUTensor)) {
       throw new Error('Can only multiply GPU tensor with GPU tensor');
     }
     return defaultMultiplyD.calc(
       {A: th, B: tensor, outputShape: resultShape, alpha},
-      this.precision
-    ) as GPUTensor;
+      this.dtype
+    ) as GPUTensor<DTpe>;
   }
 
   divide_impl(
-    th: Tensor,
-    tensor: Tensor,
+    th: Tensor<DTpe>,
+    tensor: Tensor<DTpe>,
     resultShape: readonly number[],
     alpha: number
-  ): Tensor {
+  ): Tensor<DTpe> {
     if (!(tensor instanceof GPUTensor) || !(th instanceof GPUTensor)) {
       throw new Error('Can only divide GPU tensor by GPU tensor');
     }
     return defaultDivideD.calc(
       {A: th, B: tensor, outputShape: resultShape, alpha},
-      this.precision
-    ) as GPUTensor;
+      this.dtype
+    ) as GPUTensor<DTpe>;
   }
 
   power_impl(
-    th: Tensor,
-    tensor: Tensor,
+    th: Tensor<DTpe>,
+    tensor: Tensor<DTpe>,
     resultShape: readonly number[]
-  ): Tensor {
+  ): Tensor<DTpe> {
     if (!(tensor instanceof GPUTensor) || !(th instanceof GPUTensor)) {
       throw new Error('Can only take GPU tensor to power of GPU tensor');
     }
     return defaultPowerD.calc(
       {A: th, B: tensor, outputShape: resultShape},
-      this.precision
-    ) as GPUTensor;
+      this.dtype
+    ) as GPUTensor<DTpe>;
   }
 
-  matMul(tensor: Tensor): Tensor {
+  matMul(tensor: Tensor<DTpe>): Tensor<DTpe> {
     if (!(tensor instanceof GPUTensor)) {
       throw new Error('Can only matrix multiply GPU tensor to GPU tensor');
     }
     return defaultMatMulD.calc(
       {A: this, B: tensor},
-      this.precision
-    ) as GPUTensor;
+      this.dtype
+    ) as GPUTensor<DTpe>;
   }
 
   gemm_impl(
-    b: Tensor,
+    b: Tensor<DTpe>,
     aTranspose: boolean,
     bTranspose: boolean,
     alpha: number,
     beta: number,
-    c?: Tensor
-  ): Tensor {
+    c?: Tensor<DTpe>
+  ): Tensor<DTpe> {
     if (
       !(b instanceof GPUTensor && (c === undefined || c instanceof GPUTensor))
     ) {
@@ -369,88 +388,99 @@ export class GPUTensor extends Tensor implements GPUTensorI {
     if (c === undefined) {
       return defaultGemmD.calc(
         {a: this, b, aTranspose, bTranspose, alpha, beta},
-        this.precision
-      ) as GPUTensor;
+        this.dtype
+      ) as GPUTensor<DTpe>;
     } else {
       return defaultGemmCD.calc(
-        {a: this, b, c: c as GPUTensor, aTranspose, bTranspose, alpha, beta},
-        this.precision
-      ) as GPUTensor;
+        {
+          a: this,
+          b,
+          c: c as GPUTensor<DTpe>,
+          aTranspose,
+          bTranspose,
+          alpha,
+          beta,
+        },
+        this.dtype
+      ) as GPUTensor<DTpe>;
     }
   }
 
-  sum_impl(axes: number[], keepDims: boolean): Tensor {
+  sum_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
     return defaultSumD.calc(
       {X: this, axes, keepDims},
-      this.precision
-    ) as GPUTensor;
+      this.dtype
+    ) as GPUTensor<DTpe>;
   }
 
-  sumSquare_impl(axes: number[], keepDims: boolean): Tensor {
+  sumSquare_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
     return defaultSumSquareD.calc(
       {X: this, axes, keepDims},
-      this.precision
-    ) as GPUTensor;
+      this.dtype
+    ) as GPUTensor<DTpe>;
   }
 
-  reduceMean_impl(axes: number[], keepDims: boolean): Tensor {
+  reduceMean_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
     return defaultMeanD.calc(
       {X: this, axes, keepDims},
-      this.precision
-    ) as GPUTensor;
+      this.dtype
+    ) as GPUTensor<DTpe>;
   }
 
-  reduceMeanSquare_impl(axes: number[], keepDims: boolean): Tensor {
+  reduceMeanSquare_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
     return defaultMeanSquareD.calc(
       {X: this, axes, keepDims},
-      this.precision
-    ) as GPUTensor;
+      this.dtype
+    ) as GPUTensor<DTpe>;
   }
 
-  protected reduceLogSum_impl(axes: number[], keepDims: boolean): Tensor {
+  protected reduceLogSum_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
     return defaultLogSumD.calc(
       {X: this, axes, keepDims},
-      this.precision
-    ) as GPUTensor;
+      this.dtype
+    ) as GPUTensor<DTpe>;
   }
 
-  protected reduceLogSumExp_impl(axes: number[], keepDims: boolean): Tensor {
+  protected reduceLogSumExp_impl(
+    axes: number[],
+    keepDims: boolean
+  ): Tensor<DTpe> {
     return defaultLogSumExpD.calc(
       {X: this, axes, keepDims},
-      this.precision
-    ) as GPUTensor;
+      this.dtype
+    ) as GPUTensor<DTpe>;
   }
 
-  product_impl(axes: number[], keepDims: boolean): Tensor {
+  product_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
     return defaultProductD.calc(
       {X: this, axes, keepDims},
-      this.precision
-    ) as GPUTensor;
+      this.dtype
+    ) as GPUTensor<DTpe>;
   }
 
-  max_impl(axes: number[], keepDims: boolean): Tensor {
+  max_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
     return defaultMaxD.calc(
       {X: this, axes, keepDims},
-      this.precision
-    ) as GPUTensor;
+      this.dtype
+    ) as GPUTensor<DTpe>;
   }
 
-  min_impl(axes: number[], keepDims: boolean): Tensor {
+  min_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
     return defaultMinD.calc(
       {X: this, axes, keepDims},
-      this.precision
-    ) as GPUTensor;
+      this.dtype
+    ) as GPUTensor<DTpe>;
   }
 
   conv_impl(
-    kernel: Tensor,
+    kernel: Tensor<DTpe>,
     dilations: number[],
     group: number,
     pads: number[],
     strides: number[],
     activation?: Activation,
-    bias?: Tensor
-  ): Tensor {
+    bias?: Tensor<DTpe>
+  ): Tensor<DTpe> {
     if (
       !(kernel instanceof GPUTensor) ||
       (bias !== undefined && !(bias instanceof GPUTensor))
@@ -468,31 +498,31 @@ export class GPUTensor extends Tensor implements GPUTensorI {
           strides,
           activation,
         },
-        this.precision
-      ) as GPUTensor;
+        this.dtype
+      ) as GPUTensor<DTpe>;
     } else {
       return defaultConvBiasD.calc(
         {
           X: this,
           W: kernel,
-          B: bias as GPUTensor,
+          B: bias as GPUTensor<DTpe>,
           pads,
           dilations,
           strides,
           activation,
         },
-        this.precision
-      ) as GPUTensor;
+        this.dtype
+      ) as GPUTensor<DTpe>;
     }
   }
 
   protected convTranspose_impl(
-    kernel: Tensor,
+    kernel: Tensor<DTpe>,
     dilations: number[],
     group: number,
     pads: number[],
     strides: number[]
-  ): Tensor {
+  ): Tensor<DTpe> {
     if (!(kernel instanceof GPUTensor)) {
       throw new Error(
         'Can only do transpose convolution of GPU tensor with GPU tensor'
@@ -507,8 +537,8 @@ export class GPUTensor extends Tensor implements GPUTensorI {
         dilations,
         strides,
       },
-      this.precision
-    ) as GPUTensor;
+      this.dtype
+    ) as GPUTensor<DTpe>;
   }
 
   averagePool_impl(
@@ -516,7 +546,7 @@ export class GPUTensor extends Tensor implements GPUTensorI {
     pads: number[],
     strides: number[],
     includePad: boolean
-  ): Tensor {
+  ): Tensor<DTpe> {
     return defaultAveragePoolD.calc(
       {
         X: this,
@@ -525,57 +555,63 @@ export class GPUTensor extends Tensor implements GPUTensorI {
         pads,
         strides,
       },
-      this.precision
-    ) as GPUTensor;
+      this.dtype
+    ) as GPUTensor<DTpe>;
   }
 
-  reshape_impl(shape: number[], _copy: boolean): Tensor {
+  reshape_impl(shape: number[], _copy: boolean): Tensor<DTpe> {
     if (_copy) {
       return defaultCopyD.calc(
         {input: this, outputShape: shape},
-        this.precision
-      ) as GPUTensor;
+        this.dtype
+      ) as GPUTensor<DTpe>;
     } else {
-      return new GPUTensor(this.memory, shape, this.precision);
+      return new GPUTensor(this.memory, shape, this.dtype);
     }
   }
 
-  concat(tensor: Tensor, axis: number): Tensor {
+  concat(tensor: Tensor<DTpe>, axis: number): Tensor<DTpe> {
     if (!(tensor instanceof GPUTensor)) {
       throw new Error('Can only concat GPU tensor to GPU tensor');
     }
+    if (axis < 0) {
+      axis += this.shape.length;
+    }
     return defaultConcatD.calc(
       {A: this, B: tensor, axis},
-      this.precision
-    ) as GPUTensor;
+      this.dtype
+    ) as GPUTensor<DTpe>;
   }
 
-  transpose_impl(permutation: number[]): Tensor {
+  transpose_impl(permutation: number[]): Tensor<DTpe> {
     return defaultTransposeD.calc(
       {A: this, permutation},
-      this.precision
-    ) as GPUTensor;
+      this.dtype
+    ) as GPUTensor<DTpe>;
   }
 
-  clip(min?: number, max?: number): Tensor {
+  clip(min?: number, max?: number): Tensor<DTpe> {
     return defaultClipD.calc(
       {input: this, minVal: min, maxVal: max},
-      this.precision
-    ) as GPUTensor;
+      this.dtype
+    ) as GPUTensor<DTpe>;
   }
 
-  clipBackward(grad: Tensor, min?: number, max?: number): Tensor {
+  clipBackward(grad: Tensor<DTpe>, min?: number, max?: number): Tensor<DTpe> {
     return defaultClipBackwardD.calc(
       {input: this, minVal: min, maxVal: max, grad},
-      this.precision
-    ) as GPUTensor;
+      this.dtype
+    ) as GPUTensor<DTpe>;
   }
 
-  repeat(repeats: number[]): Tensor {
-    return defaultRepeatD.calc({A: this, repeats}, this.precision) as GPUTensor;
+  repeat(repeats: number[]): Tensor<DTpe> {
+    return defaultRepeatD.calc(
+      {A: this, repeats},
+      this.dtype
+    ) as GPUTensor<DTpe>;
   }
 
-  expand(shape: readonly number[]): Tensor {
+  expand(shape: readonly number[]): Tensor<DTpe> {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [_shape, _o, resultShape] = this.alignShapes(this.shape, shape);
     if (compareShapes(this.shape, resultShape)) {
@@ -583,48 +619,53 @@ export class GPUTensor extends Tensor implements GPUTensorI {
     }
     return defaultExpandD.calc(
       {
-        input: this.reshape(_shape, false) as GPUTensor,
+        input: this.reshape(_shape, false) as GPUTensor<DTpe>,
         outputShape: resultShape,
       },
-      this.precision
-    ) as GPUTensor;
+      this.dtype
+    ) as GPUTensor<DTpe>;
   }
 
-  pad_impl(pads: number[], mode: PadMode, value: number): Tensor {
+  pad_impl(pads: number[], mode: PadMode, value: number): Tensor<DTpe> {
     return defaultPadD.calc(
       {input: this, pads, mode, value},
-      this.precision
-    ) as GPUTensor;
+      this.dtype
+    ) as GPUTensor<DTpe>;
   }
 
-  gather(axis: number, indices: CPUTensor): Tensor {
+  gather(axis: number, indices: CPUTensor<'uint32'>): Tensor<DTpe> {
     return defaultGatherD.calc(
       {X: this, axis, indices},
-      this.precision
-    ) as GPUTensor;
+      this.dtype
+    ) as GPUTensor<DTpe>;
   }
 
-  slice_impl(starts: number[], ends: number[], axes: number[]): Tensor {
+  slice_impl(
+    starts: number[],
+    ends: number[],
+    axes: number[],
+    steps: number[]
+  ): Tensor<DTpe> {
     return defaultSliceD.calc(
-      {X: this, starts, ends, axes},
-      this.precision
-    ) as GPUTensor;
+      {X: this, starts, ends, axes, steps},
+      this.dtype
+    ) as GPUTensor<DTpe>;
   }
 
-  upsample(scales: number[]): Tensor {
+  upsample(scales: number[]): Tensor<DTpe> {
     return defaultUpsampleD.calc(
       {X: this, scales},
-      this.precision
-    ) as GPUTensor;
+      this.dtype
+    ) as GPUTensor<DTpe>;
   }
 
   normalize(
-    mean: Tensor,
-    variance: Tensor,
+    mean: Tensor<DTpe>,
+    variance: Tensor<DTpe>,
     epsilon: number,
-    scale: Tensor,
-    bias: Tensor
-  ): Tensor {
+    scale: Tensor<DTpe>,
+    bias: Tensor<DTpe>
+  ): Tensor<DTpe> {
     if (
       !(mean instanceof GPUTensor) ||
       !(variance instanceof GPUTensor) ||
@@ -643,134 +684,195 @@ export class GPUTensor extends Tensor implements GPUTensorI {
         Bias: bias,
         epsilon,
       },
-      this.precision
-    ) as GPUTensor;
+      this.dtype
+    ) as GPUTensor<DTpe>;
   }
 }
 
-export const gpuConstructor: GPUTensorConstructor<GPUTensor> = (
+export function gpuConstructor<DTpe extends DTypeGpu>(
   a: MemoryEntry,
   b: readonly number[],
-  precision: Precision
-) => new GPUTensor(a, b, precision);
+  dtype: DTpe
+) {
+  return new GPUTensor(a, b, dtype);
+}
 
 const defaultMatMulD = new Dispatcher(
-  () => new MatMulOperation(gpuConstructor)
+  (dtype: DTypeGpu) => new MatMulOperation(gpuConstructor, dtype)
 );
 
-const defaultGemmD = new Dispatcher(() => new GemmOperation(gpuConstructor));
-const defaultGemmCD = new Dispatcher(() => new GemmCOperation(gpuConstructor));
+const defaultGemmD = new Dispatcher(
+  (dtype: DTypeGpu) => new GemmOperation(gpuConstructor, dtype)
+);
+const defaultGemmCD = new Dispatcher(
+  (dtype: DTypeGpu) => new GemmCOperation(gpuConstructor, dtype)
+);
 
 //Unary operations
-const defaultExpD = new Dispatcher(() => new ExpOperation(gpuConstructor));
-const defaultAbsD = new Dispatcher(() => new AbsOperation(gpuConstructor));
-const defaultSinD = new Dispatcher(() => new SinOperation(gpuConstructor));
-const defaultCosD = new Dispatcher(() => new CosOperation(gpuConstructor));
-const defaultTanD = new Dispatcher(() => new TanOperation(gpuConstructor));
-const defaultASinD = new Dispatcher(() => new ASinOperation(gpuConstructor));
-const defaultACosD = new Dispatcher(() => new ACosOperation(gpuConstructor));
-const defaultATanD = new Dispatcher(() => new ATanOperation(gpuConstructor));
-const defaultSinHD = new Dispatcher(() => new SinHOperation(gpuConstructor));
-const defaultCosHD = new Dispatcher(() => new CosHOperation(gpuConstructor));
-const defaultTanHD = new Dispatcher(() => new TanHOperation(gpuConstructor));
+const defaultExpD = new Dispatcher(
+  (dtype: DTypeGpu) => new ExpOperation(gpuConstructor, dtype)
+);
+const defaultAbsD = new Dispatcher(
+  (dtype: DTypeGpu) => new AbsOperation(gpuConstructor, dtype)
+);
+const defaultSinD = new Dispatcher(
+  (dtype: DTypeGpu) => new SinOperation(gpuConstructor, dtype)
+);
+const defaultCosD = new Dispatcher(
+  (dtype: DTypeGpu) => new CosOperation(gpuConstructor, dtype)
+);
+const defaultTanD = new Dispatcher(
+  (dtype: DTypeGpu) => new TanOperation(gpuConstructor, dtype)
+);
+const defaultASinD = new Dispatcher(
+  (dtype: DTypeGpu) => new ASinOperation(gpuConstructor, dtype)
+);
+const defaultACosD = new Dispatcher(
+  (dtype: DTypeGpu) => new ACosOperation(gpuConstructor, dtype)
+);
+const defaultATanD = new Dispatcher(
+  (dtype: DTypeGpu) => new ATanOperation(gpuConstructor, dtype)
+);
+const defaultSinHD = new Dispatcher(
+  (dtype: DTypeGpu) => new SinHOperation(gpuConstructor, dtype)
+);
+const defaultCosHD = new Dispatcher(
+  (dtype: DTypeGpu) => new CosHOperation(gpuConstructor, dtype)
+);
+const defaultTanHD = new Dispatcher(
+  (dtype: DTypeGpu) => new TanHOperation(gpuConstructor, dtype)
+);
 const defaultSigmoidD = new Dispatcher(
-  () => new SigmoidOperation(gpuConstructor)
+  (dtype: DTypeGpu) => new SigmoidOperation(gpuConstructor, dtype)
 );
 const defaultHardSigmoidD = new Dispatcher(
-  () => new HardSigmoidOperation(gpuConstructor)
+  (dtype: DTypeGpu) => new HardSigmoidOperation(gpuConstructor, dtype)
 );
-const defaultCeilD = new Dispatcher(() => new CeilOperation(gpuConstructor));
-const defaultFloorD = new Dispatcher(() => new FloorOperation(gpuConstructor));
-const defaultClipD = new Dispatcher(() => new ClipOperation(gpuConstructor));
+const defaultCeilD = new Dispatcher(
+  (dtype: DTypeGpu) => new CeilOperation(gpuConstructor, dtype)
+);
+const defaultFloorD = new Dispatcher(
+  (dtype: DTypeGpu) => new FloorOperation(gpuConstructor, dtype)
+);
+const defaultRoundD = new Dispatcher(
+  (dtype: DTypeGpu) => new RoundOperation(gpuConstructor, dtype)
+);
+const defaultClipD = new Dispatcher(
+  (dtype: DTypeGpu) => new ClipOperation(gpuConstructor, dtype)
+);
 const defaultClipBackwardD = new Dispatcher(
-  () => new ClipBackwardOperation(gpuConstructor)
+  (dtype: DTypeGpu) => new ClipBackwardOperation(gpuConstructor, dtype)
 );
-const defaultSqrtD = new Dispatcher(() => new SqrtOperation(gpuConstructor));
-const defaultLogD = new Dispatcher(() => new LogOperation(gpuConstructor));
+const defaultSqrtD = new Dispatcher(
+  (dtype: DTypeGpu) => new SqrtOperation(gpuConstructor, dtype)
+);
+const defaultLogD = new Dispatcher(
+  (dtype: DTypeGpu) => new LogOperation(gpuConstructor, dtype)
+);
 const defaultNegateD = new Dispatcher(
-  () => new NegateOperation(gpuConstructor)
+  (dtype: DTypeGpu) => new NegateOperation(gpuConstructor, dtype)
 );
 const defaultAddMultiplyScalarD = new Dispatcher(
-  () => new AddMultiplyScalarOperation(gpuConstructor)
+  (dtype: DTypeGpu) => new AddMultiplyScalarOperation(gpuConstructor, dtype)
 );
 const defaultPowerScalarD = new Dispatcher(
-  () => new PowerScalarOperation(gpuConstructor)
+  (dtype: DTypeGpu) => new PowerScalarOperation(gpuConstructor, dtype)
 );
-const defaultSignD = new Dispatcher(() => new SignOperation(gpuConstructor));
+const defaultSignD = new Dispatcher(
+  (dtype: DTypeGpu) => new SignOperation(gpuConstructor, dtype)
+);
 
 //Convolutions
-const defaultConvD = new Dispatcher(() => new ConvOperation(gpuConstructor));
+const defaultConvD = new Dispatcher(
+  (dtype: DTypeGpu) => new ConvOperation(gpuConstructor, dtype)
+);
 const defaultAveragePoolD = new Dispatcher(
-  () => new AveragePoolOperation(gpuConstructor)
+  (dtype: DTypeGpu) => new AveragePoolOperation(gpuConstructor, dtype)
 );
 const defaultConvBiasD = new Dispatcher(
-  () => new ConvBiasOperation(gpuConstructor)
+  (dtype: DTypeGpu) => new ConvBiasOperation(gpuConstructor, dtype)
 );
 const defaultConvTransposeD = new Dispatcher(
-  () => new ConvTransposeOperation(gpuConstructor)
+  (dtype: DTypeGpu) => new ConvTransposeOperation(gpuConstructor, dtype)
 );
-const defaultPadD = new Dispatcher(() => new PadOperation(gpuConstructor));
+const defaultPadD = new Dispatcher(
+  (dtype: DTypeGpu) => new PadOperation(gpuConstructor, dtype)
+);
 const defaultUpsampleD = new Dispatcher(
-  () => new UpsampleOperation(gpuConstructor)
+  (dtype: DTypeGpu) => new UpsampleOperation(gpuConstructor, dtype)
 );
 
 //Binary operations
-const defaultAddD = new Dispatcher(() => new AddOperation(gpuConstructor));
+const defaultAddD = new Dispatcher(
+  (dtype: DTypeGpu) => new AddOperation(gpuConstructor, dtype)
+);
 const defaultSubtractD = new Dispatcher(
-  () => new SubtractOperation(gpuConstructor)
+  (dtype: DTypeGpu) => new SubtractOperation(gpuConstructor, dtype)
 );
 const defaultMultiplyD = new Dispatcher(
-  () => new MultiplyOperation(gpuConstructor)
+  (dtype: DTypeGpu) => new MultiplyOperation(gpuConstructor, dtype)
 );
 const defaultDivideD = new Dispatcher(
-  () => new DivideOperation(gpuConstructor)
+  (dtype: DTypeGpu) => new DivideOperation(gpuConstructor, dtype)
 );
-const defaultPowerD = new Dispatcher(() => new PowerOperation(gpuConstructor));
+const defaultPowerD = new Dispatcher(
+  (dtype: DTypeGpu) => new PowerOperation(gpuConstructor, dtype)
+);
 
 //Reductions
 const defaultMeanD = new Dispatcher(
-  () => new ReduceMeanOperation(gpuConstructor)
+  (dtype: DTypeGpu) => new ReduceMeanOperation(gpuConstructor, dtype)
 );
 const defaultMeanSquareD = new Dispatcher(
-  () => new ReduceMeanSquareOperation(gpuConstructor)
+  (dtype: DTypeGpu) => new ReduceMeanSquareOperation(gpuConstructor, dtype)
 );
 const defaultSumSquareD = new Dispatcher(
-  () => new SumSquareOperation(gpuConstructor)
+  (dtype: DTypeGpu) => new SumSquareOperation(gpuConstructor, dtype)
 );
-const defaultSumD = new Dispatcher(() => new SumOperation(gpuConstructor));
+const defaultSumD = new Dispatcher(
+  (dtype: DTypeGpu) => new SumOperation(gpuConstructor, dtype)
+);
 const defaultProductD = new Dispatcher(
-  () => new ProductOperation(gpuConstructor)
+  (dtype: DTypeGpu) => new ProductOperation(gpuConstructor, dtype)
 );
-const defaultMaxD = new Dispatcher(() => new MaxOperation(gpuConstructor));
-const defaultMinD = new Dispatcher(() => new MinOperation(gpuConstructor));
+const defaultMaxD = new Dispatcher(
+  (dtype: DTypeGpu) => new MaxOperation(gpuConstructor, dtype)
+);
+const defaultMinD = new Dispatcher(
+  (dtype: DTypeGpu) => new MinOperation(gpuConstructor, dtype)
+);
 const defaultLogSumD = new Dispatcher(
-  () => new ReduceLogSumOperation(gpuConstructor)
+  (dtype: DTypeGpu) => new ReduceLogSumOperation(gpuConstructor, dtype)
 );
 const defaultLogSumExpD = new Dispatcher(
-  () => new ReduceLogSumExpOperation(gpuConstructor)
+  (dtype: DTypeGpu) => new ReduceLogSumExpOperation(gpuConstructor, dtype)
 );
 
 //Util
 const defaultConcatD = new Dispatcher(
-  () => new ConcatOperation(gpuConstructor)
+  (dtype: DTypeGpu) => new ConcatOperation(gpuConstructor, dtype)
 );
 const defaultSetValuesD = new Dispatcher(
-  () => new SetValuesOperation(gpuConstructor)
+  (dtype: DTypeGpu) => new SetValuesOperation(gpuConstructor, dtype)
 );
-const defaultCopyD = new Dispatcher(() => new CopyOperation(gpuConstructor));
+const defaultCopyD = new Dispatcher(
+  (dtype: DTypeGpu) => new CopyOperation(gpuConstructor, dtype)
+);
 const defaultExpandD = new Dispatcher(
-  () => new ExpandOperation(gpuConstructor)
+  (dtype: DTypeGpu) => new ExpandOperation(gpuConstructor, dtype)
 );
 const defaultGatherD = new Dispatcher(
-  () => new GatherOperation(gpuConstructor)
+  (dtype: DTypeGpu) => new GatherOperation(gpuConstructor, dtype)
 );
 const defaultTransposeD = new Dispatcher(
-  () => new TransposeOperation(gpuConstructor)
+  (dtype: DTypeGpu) => new TransposeOperation(gpuConstructor, dtype)
 );
 const defaultRepeatD = new Dispatcher(
-  () => new RepeatOperation(gpuConstructor)
+  (dtype: DTypeGpu) => new RepeatOperation(gpuConstructor, dtype)
 );
-const defaultSliceD = new Dispatcher(() => new SliceOperation(gpuConstructor));
+const defaultSliceD = new Dispatcher(
+  (dtype: DTypeGpu) => new SliceOperation(gpuConstructor, dtype)
+);
 const defaultNormalizeD = new Dispatcher(
-  () => new NormalizeOperation(gpuConstructor)
+  (dtype: DTypeGpu) => new NormalizeOperation(gpuConstructor, dtype)
 );

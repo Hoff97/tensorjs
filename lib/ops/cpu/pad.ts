@@ -1,9 +1,9 @@
 import {CPUTensor} from '../../tensor/cpu/tensor';
-import {PadMode} from '../../types';
+import {DType, PadMode} from '../../types';
 import {incrementIndex} from '../../util/shape';
 
-export function pad(
-  x: CPUTensor,
+export function pad<DTpe extends DType>(
+  x: CPUTensor<DTpe>,
   pads: number[],
   mode: PadMode,
   value: number
@@ -15,7 +15,7 @@ export function pad(
     resultShape[i] += pads[i] + pads[i + rank];
   }
 
-  const Y = new CPUTensor(resultShape);
+  const Y = new CPUTensor(resultShape, undefined, x.dtype);
 
   const ix = new Array(rank).fill(0);
   const inputIx = new Array(rank).fill(0);
@@ -36,8 +36,8 @@ export function pad(
   return Y;
 }
 
-function getPadValue(
-  x: CPUTensor,
+function getPadValue<DTpe extends DType>(
+  x: CPUTensor<DTpe>,
   index: number[],
   mode: PadMode,
   value: number,

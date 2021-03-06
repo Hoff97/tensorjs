@@ -3,7 +3,7 @@ import {toGPU} from '../lib/util/convert';
 
 import {onnx} from 'onnx-proto';
 import {createTensor} from '../lib/onnx/util';
-import Tensor, {Precision} from '../lib/types';
+import Tensor from '../lib/types';
 import {GPUTensor} from '../lib/tensor/gpu/tensor';
 
 import {ModelData, models} from './data/models';
@@ -29,7 +29,7 @@ function randomValues(length: number) {
   return values;
 }
 
-async function loadData(modelData: ModelData, precision: Precision) {
+async function loadData(modelData: ModelData) {
   const resp = await fetch(
     `onnx/models/${modelData.name}/${modelData.name}.onnx`
   );
@@ -38,14 +38,13 @@ async function loadData(modelData: ModelData, precision: Precision) {
   const args = {
     //@ts-ignore
     ...modelArgs[modelData.name],
-    precision: precision,
   };
 
   //@ts-ignore
   const model = new OnnxModel(buffer, args);
 
-  const inputs: GPUTensor[] = [];
-  let output: GPUTensor;
+  const inputs: GPUTensor<'float32'>[] = [];
+  let output: GPUTensor<'float32'>;
 
   if (modelData.inputData) {
     let i = 0;
@@ -60,8 +59,8 @@ async function loadData(modelData: ModelData, precision: Precision) {
       const buffer = await resp.arrayBuffer();
       const arr = new Uint8Array(buffer);
       const tensorProto = onnx.TensorProto.decode(arr);
-      const tensor = await toGPU(createTensor(tensorProto), precision);
-      inputs.push(tensor as GPUTensor);
+      const tensor = await toGPU(createTensor(tensorProto));
+      inputs.push(tensor as GPUTensor<'float32'>);
       i++;
     }
 
@@ -71,14 +70,12 @@ async function loadData(modelData: ModelData, precision: Precision) {
     const bufferOut = await respOut.arrayBuffer();
     const arr = new Uint8Array(bufferOut);
     const tensorProto = onnx.TensorProto.decode(arr);
-    output = (await toGPU(createTensor(tensorProto), precision)) as GPUTensor;
+    output = (await toGPU(createTensor(tensorProto))) as GPUTensor<'float32'>;
   } else {
     //@ts-ignore
     for (const inputShape of modelData.inputsShape) {
       const values = randomValues(getSize(inputShape));
-      inputs.push(
-        new GPUTensor(new Float32Array(values), inputShape, precision)
-      );
+      inputs.push(new GPUTensor(values, inputShape, 'float32'));
     }
   }
 
@@ -90,7 +87,11 @@ async function loadData(modelData: ModelData, precision: Precision) {
   };
 }
 
-function cleanup(model: OnnxModel, inputs: Tensor[], output?: Tensor) {
+function cleanup(
+  model: OnnxModel,
+  inputs: Tensor<any>[],
+  output?: Tensor<any>
+) {
   model.delete();
   inputs.forEach(x => x.delete());
   if (output !== undefined) {
@@ -102,7 +103,7 @@ if (run) {
   for (const modelData of models) {
     describe(`Model ${modelData.name}`, () => {
       it('Should work on GPU', async () => {
-        const {model, inputs, output} = await loadData(modelData, 32);
+        const {model, inputs, output} = await loadData(modelData);
 
         await model.toGPU();
 
@@ -117,7 +118,7 @@ if (run) {
       });
 
       it('Should work on GPU when optimized', async () => {
-        const {model, inputs, output} = await loadData(modelData, 32);
+        const {model, inputs, output} = await loadData(modelData);
 
         const modelCompiled = model;
 
@@ -129,7 +130,7 @@ if (run) {
         if (output !== undefined) {
           expect(await result1.compare(output, epsilon)).toBeTrue();
         } else {
-          const {model, inputs, output} = await loadData(modelData, 32);
+          const {model, inputs, output} = await loadData(modelData);
 
           await model.toGPU();
           const result2 = (await model.forward(inputs))[0];
@@ -143,7 +144,8 @@ if (run) {
       });
 
       it('Should work with half precision', async () => {
-        const {model, inputs, output} = await loadData(modelData, 16);
+        // TODO: Load models/data with half precision here
+        const {model, inputs, output} = await loadData(modelData);
 
         const modelCompiled = model;
 
@@ -154,19 +156,19 @@ if (run) {
 
         if (output !== undefined) {
           expect(
-            await (result1 as GPUTensor)
-              .copy(32)
-              .compare((output as GPUTensor).copy(32), epsilon * 2)
+            await (result1 as GPUTensor<'float32'>)
+              .copy()
+              .compare((output as GPUTensor<'float32'>).copy(), epsilon * 2)
           ).toBeTrue();
         } else {
-          const {model, inputs, output} = await loadData(modelData, 32);
+          const {model, inputs, output} = await loadData(modelData);
 
           await model.toGPU();
           const result2 = (await model.forward(inputs))[0];
           expect(
-            await (result1 as GPUTensor)
-              .copy(32)
-              .compare((result2 as GPUTensor).copy(32), epsilon * 2)
+            await (result1 as GPUTensor<'float32'>)
+              .copy()
+              .compare((result2 as GPUTensor<'float32'>).copy(), epsilon * 2)
           ).toBeTrue();
 
           cleanup(model, inputs, output);

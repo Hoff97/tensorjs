@@ -1,5 +1,4 @@
-import {GPUTensorI} from '../../tensor/gpu/interface';
-import {Precision} from '../../types';
+import {DTypeGpu, GPUTensorI} from '../../tensor/gpu/interface';
 import {Operation} from './operation';
 
 interface OpInfo<Op> {
@@ -16,13 +15,16 @@ export class Dispatcher<
 > {
   private opDict: {[infoString: string]: OpInfo<Op>} = {};
 
-  constructor(private getOp: () => Op, private minCallsToCompile = 2) {}
+  constructor(
+    private getOp: (dtype: DTypeGpu) => Op,
+    private minCallsToCompile = 2
+  ) {}
 
-  getDefault(precision: Precision) {
-    const str = `default-${precision}`;
+  getDefault(dtype: DTypeGpu) {
+    const str = `default-${dtype}`;
     if (this.opDict[str] === undefined) {
-      const op = this.getOp();
-      op.compile({} as Info, precision);
+      const op = this.getOp(dtype);
+      op.compile({} as Info);
 
       this.opDict[str] = {
         infoString: str,
@@ -34,8 +36,8 @@ export class Dispatcher<
     return this.opDict[str];
   }
 
-  calc(input: Input, precision: Precision) {
-    const defaultOp = this.getDefault(precision);
+  calc(input: Input, dtype: DTypeGpu) {
+    const defaultOp = this.getDefault(dtype);
 
     //@ts-ignore
     const compileInfoString = defaultOp.operation.getInputInfoString(input);
@@ -51,14 +53,11 @@ export class Dispatcher<
 
     if (opInfo.numCalls >= this.minCallsToCompile) {
       if (opInfo.operation === undefined) {
-        opInfo.operation = this.getOp();
+        opInfo.operation = this.getOp(dtype);
         //@ts-ignore
-        const compileInfo = defaultOp.operation.getCompilationInfo(
-          input,
-          precision
-        );
+        const compileInfo = defaultOp.operation.getCompilationInfo(input);
 
-        opInfo.operation.compile(compileInfo, precision);
+        opInfo.operation.compile(compileInfo);
       }
       return opInfo.operation.calc(input);
     } else {
