@@ -27,6 +27,13 @@ interface IntermediaryRes {
 
 export interface ModelArgs {
   /**
+   * Precision with which float tensors should be loaded. If 16 is specified,
+   * all 32 bit floats are casted to 16 bit floats.
+   *
+   * Defaults to 32.
+   */
+  precision?: 16 | 32;
+  /**
    * Constants that should not be transferred to another device.
    *
    * Useful for operations that should only happen only on the CPU
@@ -44,8 +51,9 @@ export interface ModelArgs {
    * In inference mode, no gradients can be supported and
    * the model expects tensors as input.
    *
-   * In training model, gradients can be supported and
-   * the inputs should be variables (although maybe with noGrad: true)
+   * In training mode, gradients can be computed and
+   * the inputs should be variables (although with noGrad: true if no gradient
+   * is needed for the respective input)
    */
   mode?: Mode;
 }
@@ -68,6 +76,8 @@ export class OnnxModel extends Module {
   private modelProto: onnx.ModelProto;
 
   private nodeIdCounter = 10000;
+
+  private precision: 32 | 16;
 
   public inputs: onnx.IValueInfoProto[];
   public outputs: string[];
@@ -92,6 +102,7 @@ export class OnnxModel extends Module {
     );
 
     this.mode = args.mode || 'inference';
+    this.precision = args.precision || 32;
 
     let arr: Uint8Array;
     if (buffer instanceof ArrayBuffer) {
@@ -188,7 +199,10 @@ export class OnnxModel extends Module {
     for (let i = 0; i < initializer.length; i++) {
       const tensorProto = initializer[i];
 
-      let tensor: Tensor<any> = createTensor(tensorProto);
+      let tensor: Tensor<any> = createTensor(
+        tensorProto,
+        this.precision === 16
+      );
       if (this.mode === 'train') {
         tensor = new Variable(tensor);
       }

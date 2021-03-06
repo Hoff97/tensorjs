@@ -6,7 +6,10 @@ import {TENSOR_FLOAT, TENSOR_INT64} from './definitions';
 import Long from 'long';
 import {getSize} from '../util/shape';
 
-export function createTensor(tensorProto: onnx.ITensorProto): CPUTensor<any> {
+export function createTensor(
+  tensorProto: onnx.ITensorProto,
+  castFloats = false
+): CPUTensor<any> {
   if (tensorProto.segment !== undefined && tensorProto.segment !== null) {
     throw new Error('Handling of tensor proto segment not yet implemented');
   }
@@ -36,7 +39,7 @@ export function createTensor(tensorProto: onnx.ITensorProto): CPUTensor<any> {
         tensorProto.rawData.byteOffset + tensorProto.rawData.byteLength
       );
       const values = new Float32Array(buffer);
-      return new CPUTensor(shape, values);
+      return new CPUTensor(shape, values, castFloats ? 'float16' : 'float32');
     } else if (size === 0) {
       return new CPUTensor(shape);
     } else {
