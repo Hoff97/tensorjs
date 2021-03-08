@@ -146,74 +146,201 @@ export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
   }
 
   sqrt(): Tensor<DTpe> {
-    throw new Error('Method not implemented.');
+    return new SparseTensor(
+      this.values.sqrt(),
+      this.indices.copy(),
+      this.shape,
+      this.denseDims
+    );
   }
+
   abs(): Tensor<DTpe> {
-    throw new Error('Method not implemented.');
+    return new SparseTensor(
+      this.values.abs(),
+      this.indices.copy(),
+      this.shape,
+      this.denseDims
+    );
   }
+
   sin(): Tensor<DTpe> {
-    throw new Error('Method not implemented.');
+    return new SparseTensor(
+      this.values.sin(),
+      this.indices.copy(),
+      this.shape,
+      this.denseDims
+    );
   }
+
   cos(): Tensor<DTpe> {
-    throw new Error('Method not implemented.');
+    return new SparseTensor(
+      this.values.cos(),
+      this.indices.copy(),
+      this.shape,
+      this.denseDims
+    );
   }
+
   tan(): Tensor<DTpe> {
-    throw new Error('Method not implemented.');
+    return new SparseTensor(
+      this.values.tan(),
+      this.indices.copy(),
+      this.shape,
+      this.denseDims
+    );
   }
+
   asin(): Tensor<DTpe> {
-    throw new Error('Method not implemented.');
+    return new SparseTensor(
+      this.values.asin(),
+      this.indices.copy(),
+      this.shape,
+      this.denseDims
+    );
   }
+
   acos(): Tensor<DTpe> {
-    throw new Error('Method not implemented.');
+    return new SparseTensor(
+      this.values.acos(),
+      this.indices.copy(),
+      this.shape,
+      this.denseDims
+    );
   }
+
   atan(): Tensor<DTpe> {
-    throw new Error('Method not implemented.');
+    return new SparseTensor(
+      this.values.atan(),
+      this.indices.copy(),
+      this.shape,
+      this.denseDims
+    );
   }
+
   sinh(): Tensor<DTpe> {
-    throw new Error('Method not implemented.');
+    return new SparseTensor(
+      this.values.sinh(),
+      this.indices.copy(),
+      this.shape,
+      this.denseDims
+    );
   }
+
   cosh(): Tensor<DTpe> {
-    throw new Error('Method not implemented.');
+    return new SparseTensor(
+      this.values.cosh(),
+      this.indices.copy(),
+      this.shape,
+      this.denseDims
+    );
   }
+
   tanh(): Tensor<DTpe> {
-    throw new Error('Method not implemented.');
+    return new SparseTensor(
+      this.values.tanh(),
+      this.indices.copy(),
+      this.shape,
+      this.denseDims
+    );
   }
+
   asinh(): Tensor<DTpe> {
-    throw new Error('Method not implemented.');
+    return new SparseTensor(
+      this.values.asinh(),
+      this.indices.copy(),
+      this.shape,
+      this.denseDims
+    );
   }
+
   acosh(): Tensor<DTpe> {
-    throw new Error('Method not implemented.');
+    return new SparseTensor(
+      this.values.acosh(),
+      this.indices.copy(),
+      this.shape,
+      this.denseDims
+    );
   }
+
   atanh(): Tensor<DTpe> {
-    throw new Error('Method not implemented.');
+    return new SparseTensor(
+      this.values.atanh(),
+      this.indices.copy(),
+      this.shape,
+      this.denseDims
+    );
   }
+
   negate(): Tensor<DTpe> {
-    throw new Error('Method not implemented.');
+    return new SparseTensor(
+      this.values.negate(),
+      this.indices.copy(),
+      this.shape,
+      this.denseDims
+    );
   }
+
   powerScalar(power: number, factor: number): Tensor<DTpe> {
-    throw new Error('Method not implemented.');
+    return new SparseTensor(
+      this.values.powerScalar(power, factor),
+      this.indices.copy(),
+      this.shape,
+      this.denseDims
+    );
   }
+
   sigmoid(): Tensor<DTpe> {
-    throw new Error('Method not implemented.');
+    return new SparseTensor(
+      this.values.sigmoid(),
+      this.indices.copy(),
+      this.shape,
+      this.denseDims
+    );
   }
+
   hardSigmoid(alpha: number, beta: number): Tensor<DTpe> {
-    throw new Error('Method not implemented.');
+    return new SparseTensor(
+      this.values.hardSigmoid(alpha, beta),
+      this.indices.copy(),
+      this.shape,
+      this.denseDims
+    );
   }
+
   sign(): Tensor<DTpe> {
-    throw new Error('Method not implemented.');
+    return new SparseTensor(
+      this.values.sign(),
+      this.indices.copy(),
+      this.shape,
+      this.denseDims
+    );
   }
+
   addMultiplyScalar(factor: number, add: number): Tensor<DTpe> {
-    throw new Error('Method not implemented.');
+    return new SparseTensor(
+      this.values.addMultiplyScalar(factor, add),
+      this.indices.copy(),
+      this.shape,
+      this.denseDims
+    );
   }
+
   matMul(tensor: Tensor<DTpe>): Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
   concat(tensor: Tensor<DTpe>, axis: number): Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
+
   clip(min?: number, max?: number): Tensor<DTpe> {
-    throw new Error('Method not implemented.');
+    return new SparseTensor(
+      this.values.clip(min, max),
+      this.indices.copy(),
+      this.shape,
+      this.denseDims
+    );
   }
+
   clipBackward(grad: Tensor<DTpe>, min?: number, max?: number): Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
@@ -223,27 +350,54 @@ export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
   expand(shape: readonly number[]): Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
+
   copy(): Tensor<DTpe> {
-    throw new Error('Method not implemented.');
+    return new SparseTensor(
+      this.values.copy(),
+      this.indices.copy(),
+      this.shape,
+      this.denseDims
+    );
   }
+
   gather(axis: number, indices: CPUTensor<'uint32'>): Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
   setValues(values: Tensor<DTpe>, starts: number[]): Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
+
   floor(): Tensor<DTpe> {
-    throw new Error('Method not implemented.');
+    return new SparseTensor(
+      this.values.floor(),
+      this.indices.copy(),
+      this.shape,
+      this.denseDims
+    );
   }
+
   ceil(): Tensor<DTpe> {
-    throw new Error('Method not implemented.');
+    return new SparseTensor(
+      this.values.ceil(),
+      this.indices.copy(),
+      this.shape,
+      this.denseDims
+    );
   }
+
   round(): Tensor<DTpe> {
-    throw new Error('Method not implemented.');
+    return new SparseTensor(
+      this.values.round(),
+      this.indices.copy(),
+      this.shape,
+      this.denseDims
+    );
   }
+
   upsample(scales: number[]): Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
+
   normalize(
     mean: Tensor<DTpe>,
     variance: Tensor<DTpe>,
@@ -253,6 +407,7 @@ export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
   ): Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
+
   add_impl(
     th: Tensor<DTpe>,
     tensor: Tensor<DTpe>,
@@ -262,6 +417,7 @@ export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
   ): Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
+
   subtract_impl(
     th: Tensor<DTpe>,
     tensor: Tensor<DTpe>,
@@ -271,6 +427,7 @@ export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
   ): Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
+
   multiply_impl(
     th: Tensor<DTpe>,
     tensor: Tensor<DTpe>,
@@ -279,6 +436,7 @@ export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
   ): Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
+
   divide_impl(
     th: Tensor<DTpe>,
     tensor: Tensor<DTpe>,
@@ -287,6 +445,7 @@ export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
   ): Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
+
   power_impl(
     th: Tensor<DTpe>,
     tensor: Tensor<DTpe>,
@@ -294,6 +453,7 @@ export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
   ): Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
+
   gemm_impl(
     b: Tensor<DTpe>,
     aTranspose: boolean,
@@ -304,39 +464,49 @@ export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
   ): Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
+
   protected sum_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
+
   protected sumSquare_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
+
   protected product_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
+
   protected max_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
+
   protected min_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
+
   protected reduceMean_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
+
   protected reduceMeanSquare_impl(
     axes: number[],
     keepDims: boolean
   ): Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
+
   protected reduceLogSum_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
+
   protected reduceLogSumExp_impl(
     axes: number[],
     keepDims: boolean
   ): Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
+
   protected conv_impl(
     kernel: Tensor<DTpe>,
     dilations: number[],
@@ -348,6 +518,7 @@ export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
   ): Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
+
   protected convTranspose_impl(
     kernel: Tensor<DTpe>,
     dilations: number[],
@@ -357,6 +528,7 @@ export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
   ): Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
+
   protected pad_impl(
     pads: number[],
     mode: PadMode,
@@ -364,6 +536,7 @@ export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
   ): Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
+
   protected averagePool_impl(
     kernelShape: number[],
     pads: number[],
@@ -372,9 +545,11 @@ export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
   ): Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
+
   protected transpose_impl(permutation: number[]): Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
+
   protected slice_impl(
     starts: number[],
     ends: number[],
