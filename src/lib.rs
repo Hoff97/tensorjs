@@ -18,6 +18,7 @@ pub mod ops {
     pub mod binary;
     pub mod conv;
     pub mod matmul;
+    pub mod sparse;
     pub mod unary;
     pub mod util;
 }
@@ -29,6 +30,7 @@ pub mod tests {
         pub mod basic;
         pub mod conv;
         pub mod pool;
+        pub mod sparse;
         pub mod tensor;
     }
 }

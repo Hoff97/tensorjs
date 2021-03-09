@@ -371,4 +371,16 @@ impl TensorU32 {
             tensor: self.tensor.slice(starts, ends, axis, steps),
         }
     }
+
+    pub fn reshape_sparse_indices(
+        &self,
+        old_sparse_shape: Uint32Array,
+        new_shape: Uint32Array,
+    ) -> TensorU32 {
+        TensorU32 {
+            tensor: self
+                .tensor
+                .reshape_sparse_indices(old_sparse_shape, new_shape),
+        }
+    }
 }

@@ -97,7 +97,6 @@ impl<DType> Tensor<DType>
 where
     DType: Copy,
     DType: Num,
-    DType: Signed,
     DType: PartialOrd,
 {
     pub fn compare(&self, other: &Self, delta: DType) -> bool {
@@ -106,7 +105,9 @@ where
         }
 
         for i in 0..self.size {
-            if abs(self.get_ix(i) - other.get_ix(i)) > delta {
+            if (self.get_ix(i) > other.get_ix(i) && other.get_ix(i) + delta < self.get_ix(i))
+                || (self.get_ix(i) < other.get_ix(i) && self.get_ix(i) + delta < other.get_ix(i))
+            {
                 return false;
             }
         }
