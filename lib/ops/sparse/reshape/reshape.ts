@@ -1,8 +1,10 @@
 import {CPUTensor} from '../../../tensor/cpu/tensor';
+import {GPUTensor} from '../../../tensor/gpu/tensor';
 import {SparseTensor} from '../../../tensor/sparse/tensor';
 import {WASMTensor} from '../../../tensor/wasm/tensor';
 import {DType} from '../../../types';
 import {reshapeCPU} from './cpu';
+import {reshapeGPU} from './gpu';
 import {reshapeWasm} from './wasm';
 
 export function reshape<DTpe extends DType>(
@@ -23,9 +25,12 @@ export function reshape<DTpe extends DType>(
       tensor.indices as WASMTensor<'uint32'>,
       shape
     );
+  } else {
+    return reshapeGPU(
+      tensor as any,
+      tensor.values as any,
+      tensor.indices as any,
+      shape
+    ) as any;
   }
-
-  throw new Error(
-    'Reshape of sparse tensors on WASM/WebGL backend is currently not supported'
-  );
 }

@@ -1,4 +1,10 @@
-import Tensor, {Activation, DType, PadMode, TensorValues} from '../../types';
+import Tensor, {
+  Activation,
+  DType,
+  PadMode,
+  TensorValues,
+  tensorValuesConstructor,
+} from '../../types';
 
 import {compareShapes, getSize} from '../../util/shape';
 
@@ -126,16 +132,27 @@ export class GPUTensor<DTpe extends DTypeGpu = 'float32'>
   }
 
   getValues(): Promise<TensorValues[DTpe]> {
-    if (this.dtype === 'float32') {
+    if (this.dtype !== 'float16') {
       return new Promise(resolve => {
         gl({framebuffer: this.memory.frameBuffer})(() => {
           let result = new Float32Array(this.memory.size);
           result = gl.read(result);
-          resolve(result.subarray(0, this.size) as TensorValues[DTpe]);
+
+          if (this.dtype === 'float32') {
+            resolve(result.subarray(0, this.size) as TensorValues[DTpe]);
+          } else {
+            const arr = new tensorValuesConstructor[this.dtype](
+              this.size
+            ) as TensorValues[DTpe];
+            for (let i = 0; i < this.size; i++) {
+              arr[i] = result[i];
+            }
+            resolve(arr);
+          }
         });
       });
     }
-    throw new Error('Reading values only supported for data type float32');
+    throw new Error('Reading values not supported for data type float16');
   }
 
   getShape(): readonly number[] {
