@@ -1,3 +1,4 @@
+import {reshape} from '../../ops/sparse/reshape/reshape';
 import Tensor, {
   Activation,
   DType,
@@ -40,7 +41,7 @@ export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
   constructor(
     public values: Tensor<DTpe>,
     public indices: Tensor<'uint32'>,
-    public shape: number[],
+    public shape: readonly number[],
     public denseDims = 0
   ) {
     super(values.dtype);
@@ -124,7 +125,7 @@ export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
     shape: readonly number[],
     copy: boolean
   ): Tensor<DTpe> {
-    throw new Error('Method not implemented.');
+    return reshape(this, shape);
   }
 
   exp(): Tensor<DTpe> {
