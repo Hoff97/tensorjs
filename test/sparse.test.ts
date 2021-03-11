@@ -27,7 +27,7 @@ const backends: Backend[] = [
       dtype: DTpe
     ) => new CPUTensor(shape, values, dtype),
     toBackend: <DTpe extends DType>(tensor: Tensor<DTpe>) => toCPU(tensor),
-  },
+  } /*,
   {
     name: 'WASM',
     constructor: <DTpe extends DType>(
@@ -37,7 +37,7 @@ const backends: Backend[] = [
     ) => new WASMTensor(values, new Uint32Array(shape), dtype as any),
     toBackend: <DTpe extends DType>(tensor: Tensor<DTpe>) => toWASM(tensor),
     wait: wasmLoaded,
-  } /*,
+  },
   {
     name: 'GPU',
     constructor: <DTpe extends DType>(
@@ -51,7 +51,7 @@ const backends: Backend[] = [
 
 for (const backend of backends) {
   describe(`Sparse tensor on ${backend.name}`, () => {
-    it('should get the same values back after creation', async () => {
+    /*it('should get the same values back after creation', async () => {
       if (backend.wait !== undefined) {
         await backend.wait;
       }
@@ -332,6 +332,130 @@ for (const backend of backends) {
 
       expect(res1.nnz).toBe(4);
       expect(res1.shape).toEqual([4, 2]);
+
+      expect(await res1.compare(tensorResult1)).toBeTrue();
+    });*/
+
+    it('should work with repeating along sparse and dense axis', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const nnz = 2;
+      const shape = [3, 2];
+      const denseDims = 1;
+
+      const indiceValsA = [0, 2];
+      const indiceTensorA = backend.constructor(
+        [nnz, shape.length - denseDims],
+        indiceValsA,
+        'uint32'
+      );
+      const valueValsA = [1, 2, 3, 4];
+      const valueTensorA = backend.constructor(
+        [nnz, ...shape.slice(shape.length - denseDims)],
+        valueValsA,
+        'float32'
+      );
+      const tensorA = new SparseTensor(
+        valueTensorA,
+        indiceTensorA,
+        shape,
+        denseDims
+      );
+
+      const indiceValsResult1 = [0, 2, 3, 5];
+      const indiceTensorResult1 = backend.constructor(
+        [4, shape.length - denseDims],
+        indiceValsResult1,
+        'uint32'
+      );
+      const valueValsResult1 = [1, 2, 1, 2, 3, 4, 3, 4, 1, 2, 1, 2, 3, 4, 3, 4];
+      const valueTensorResult1 = backend.constructor(
+        [4, 4],
+        valueValsResult1,
+        'float32'
+      );
+      const tensorResult1 = new SparseTensor(
+        valueTensorResult1,
+        indiceTensorResult1,
+        [6, 4],
+        denseDims
+      );
+
+      const res1 = tensorA.repeat([2, 2]) as SparseTensor;
+
+      expect(res1.nnz).toBe(4);
+      expect(res1.shape).toEqual([6, 4]);
+
+      expect(await res1.compare(tensorResult1)).toBeTrue();
+    });
+
+    it('should work with repeating along sparse axis', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const nnzA = 2;
+      const shape = [2, 2];
+
+      const indiceValsA = [0, 0, 1, 1];
+      const indiceTensorA = backend.constructor(
+        [nnzA, shape.length],
+        indiceValsA,
+        'uint32'
+      );
+      const valueValsA = [1, 2];
+      const valueTensorA = backend.constructor([nnzA], valueValsA, 'float32');
+      const tensorA = new SparseTensor(valueTensorA, indiceTensorA, shape);
+
+      const indiceValsResult1 = [
+        0,
+        0,
+        1,
+        1,
+        0,
+        2,
+        1,
+        3,
+        0,
+        4,
+        1,
+        5,
+        2,
+        0,
+        3,
+        1,
+        2,
+        2,
+        3,
+        3,
+        2,
+        4,
+        3,
+        5,
+      ];
+      const indiceTensorResult1 = backend.constructor(
+        [12, shape.length],
+        indiceValsResult1,
+        'uint32'
+      );
+      const valueValsResult1 = [1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2];
+      const valueTensorResult1 = backend.constructor(
+        [12],
+        valueValsResult1,
+        'float32'
+      );
+      const tensorResult1 = new SparseTensor(
+        valueTensorResult1,
+        indiceTensorResult1,
+        [4, 6]
+      );
+
+      const res1 = tensorA.repeat([2, 3]) as SparseTensor;
+
+      expect(res1.nnz).toBe(12);
+      expect(res1.shape).toEqual([4, 6]);
 
       expect(await res1.compare(tensorResult1)).toBeTrue();
     });

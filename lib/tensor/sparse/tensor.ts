@@ -1,4 +1,5 @@
 import {concat} from '../../ops/sparse/concat/concat';
+import {repeat} from '../../ops/sparse/repeat/repeat';
 import {reshape} from '../../ops/sparse/reshape/reshape';
 import Tensor, {
   Activation,
@@ -351,7 +352,7 @@ export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
   repeat(repeats: number[]): Tensor<DTpe> {
-    throw new Error('Method not implemented.');
+    return repeat(this, repeats);
   }
   expand(shape: readonly number[]): Tensor<DTpe> {
     throw new Error('Method not implemented.');
