@@ -1,8 +1,10 @@
 import {CPUTensor} from '../../../tensor/cpu/tensor';
 import {SparseTensor} from '../../../tensor/sparse/tensor';
+import {WASMTensor} from '../../../tensor/wasm/tensor';
 import Tensor, {DType} from '../../../types';
 import {compareShapes} from '../../../util/shape';
 import {addIndexCPU} from './cpu';
+import {addIndexWASM} from './wasm';
 
 export function concat<DTpe extends DType>(
   a: SparseTensor<DTpe>,
@@ -39,6 +41,8 @@ function addIndex(
 ): Tensor<'uint32'> {
   if (indices instanceof CPUTensor) {
     return addIndexCPU(indices, axis, count);
+  } else if (indices instanceof WASMTensor) {
+    return addIndexWASM(indices, axis, count);
   }
-  throw new Error('Concat on backend WASM/WebGL not yet implemented');
+  throw new Error('Concat on backend WebGL not yet implemented');
 }

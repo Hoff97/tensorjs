@@ -37,6 +37,10 @@ impl<DType> Tensor<DType> {
         return &self.shape;
     }
 
+    pub fn get_values(&self) -> &Vec<DType> {
+        return &self.values;
+    }
+
     pub fn get_dim_size(&self, dim: usize) -> usize {
         return self.shape[dim];
     }
@@ -51,10 +55,6 @@ impl<DType> Tensor<DType> {
 
     pub fn get_strides_at(&self, ix: usize) -> usize {
         return self.strides[ix];
-    }
-
-    pub fn get_values(&self) -> &Vec<DType> {
-        return &self.values;
     }
 }
 

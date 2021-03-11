@@ -70,4 +70,17 @@ impl Tensor<u32> {
 
         self._reshape_sparse_indices(&_old_sparse_shape, &_new_shape)
     }
+
+    pub fn add_index(&self, axis: i32, count: i32) -> Tensor<u32> {
+        let result_shape = self.get_sh().to_vec();
+        let result_strides = self.get_strides().to_vec();
+        let result_size = self.size;
+        let mut result_values = self.get_values().to_vec();
+
+        for i in ((axis as usize)..result_size).step_by(result_shape[1]) {
+            result_values[i] += count as u32;
+        }
+
+        Tensor::new(result_shape, result_strides, result_size, result_values)
+    }
 }

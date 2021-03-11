@@ -383,4 +383,10 @@ impl TensorU32 {
                 .reshape_sparse_indices(old_sparse_shape, new_shape),
         }
     }
+
+    pub fn add_index(&self, axis: i32, count: i32) -> TensorU32 {
+        TensorU32 {
+            tensor: self.tensor.add_index(axis, count),
+        }
+    }
 }
