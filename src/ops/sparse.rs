@@ -53,6 +53,38 @@ impl Tensor<u32> {
         )
     }
 
+    pub fn _repeat_sparse_indices(
+        &self,
+        repeats: &Vec<usize>,
+        shape: &Vec<usize>,
+        repeats_prod: u32,
+    ) -> Tensor<u32> {
+        let nnz = self.get_dim_size(0);
+        let nnz_new = nnz * repeats_prod as usize;
+        let s = self.get_dim_size(1);
+
+        let result_shape = vec![nnz_new, s];
+        let result_size = nnz_new * s;
+        let result_strides = vec![s, 1];
+        let mut result_values = vec![0; result_size];
+
+        let mut repeat_ix = vec![0; s];
+        for repeat_pos in 0..repeats_prod {
+            for i in 0..nnz {
+                for j in 0..s {
+                    result_values[(repeat_pos as usize * nnz + i) * s + j] =
+                        repeat_ix[j] as u32 * shape[j] as u32 + self.get_ix(i * s + j);
+                }
+            }
+
+            increment_index(&mut repeat_ix, repeats);
+        }
+
+        Tensor::new(result_shape, result_strides, result_size, result_values)
+    }
+}
+
+impl Tensor<u32> {
     pub fn reshape_sparse_indices(
         &self,
         old_sparse_shape: Uint32Array,
@@ -82,5 +114,21 @@ impl Tensor<u32> {
         }
 
         Tensor::new(result_shape, result_strides, result_size, result_values)
+    }
+
+    pub fn repeat_sparse_indices(
+        &self,
+        repeats: Uint32Array,
+        shape: Uint32Array,
+        repeats_prod: u32,
+    ) -> Tensor<u32> {
+        let mut _repeats: Vec<usize> = vec![0; repeats.length() as usize];
+        let mut _shape: Vec<usize> = vec![0; shape.length() as usize];
+        for i in 0..repeats.length() {
+            _repeats[i as usize] = repeats.get_index(i) as usize;
+            _shape[i as usize] = shape.get_index(i) as usize;
+        }
+
+        self._repeat_sparse_indices(&_repeats, &_shape, repeats_prod)
     }
 }

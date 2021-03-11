@@ -389,4 +389,17 @@ impl TensorU32 {
             tensor: self.tensor.add_index(axis, count),
         }
     }
+
+    pub fn repeat_sparse_indices(
+        &self,
+        repeats: Uint32Array,
+        shape: Uint32Array,
+        repeats_prod: u32,
+    ) -> TensorU32 {
+        TensorU32 {
+            tensor: self
+                .tensor
+                .repeat_sparse_indices(repeats, shape, repeats_prod),
+        }
+    }
 }

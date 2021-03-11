@@ -27,7 +27,7 @@ const backends: Backend[] = [
       dtype: DTpe
     ) => new CPUTensor(shape, values, dtype),
     toBackend: <DTpe extends DType>(tensor: Tensor<DTpe>) => toCPU(tensor),
-  } /*,
+  },
   {
     name: 'WASM',
     constructor: <DTpe extends DType>(
@@ -37,7 +37,7 @@ const backends: Backend[] = [
     ) => new WASMTensor(values, new Uint32Array(shape), dtype as any),
     toBackend: <DTpe extends DType>(tensor: Tensor<DTpe>) => toWASM(tensor),
     wait: wasmLoaded,
-  },
+  } /*,
   {
     name: 'GPU',
     constructor: <DTpe extends DType>(
@@ -51,7 +51,7 @@ const backends: Backend[] = [
 
 for (const backend of backends) {
   describe(`Sparse tensor on ${backend.name}`, () => {
-    /*it('should get the same values back after creation', async () => {
+    it('should get the same values back after creation', async () => {
       if (backend.wait !== undefined) {
         await backend.wait;
       }
@@ -334,7 +334,7 @@ for (const backend of backends) {
       expect(res1.shape).toEqual([4, 2]);
 
       expect(await res1.compare(tensorResult1)).toBeTrue();
-    });*/
+    });
 
     it('should work with repeating along sparse and dense axis', async () => {
       if (backend.wait !== undefined) {

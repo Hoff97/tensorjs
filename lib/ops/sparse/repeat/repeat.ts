@@ -4,6 +4,7 @@ import {SparseTensor} from '../../../tensor/sparse/tensor';
 import {WASMTensor} from '../../../tensor/wasm/tensor';
 import Tensor, {DType} from '../../../types';
 import {repeatIndicesCPU} from './cpu';
+import {repeatIndicesWASM} from './wasm';
 
 export function repeat<DTpe extends DType>(
   tensor: SparseTensor<DTpe>,
@@ -40,6 +41,8 @@ function repeatIndices(
 ): Tensor<'uint32'> {
   if (indices instanceof CPUTensor) {
     return repeatIndicesCPU(indices, repeats, shape, repeatsProd);
+  } else if (indices instanceof WASMTensor) {
+    return repeatIndicesWASM(indices, repeats, shape, repeatsProd);
   }
   throw new Error('Repeat not implemented on backend WASM/GPU');
 }
