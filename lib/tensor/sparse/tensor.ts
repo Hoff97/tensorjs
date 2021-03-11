@@ -332,6 +332,13 @@ export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
 
+  /**
+   * Concatenate the two tensors along the given axis
+   *
+   * Note that at the moment, only concatenation along
+   * sparse dimensions is supported!
+   *
+   */
   concat(tensor: Tensor<DTpe>, axis: number): Tensor<DTpe> {
     if (!(tensor instanceof SparseTensor)) {
       throw new Error('Can only concatenate sparse tensors!');
