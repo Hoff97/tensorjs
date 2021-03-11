@@ -7,6 +7,27 @@ const path = require('path');
 const process = require('process');
 process.env.CHROME_BIN = require('puppeteer').executablePath();
 
+const debug = process.argv.find(x => x === '--debug') !== undefined;
+
+const webpackRules = [
+  {
+    test: /\.tsx?$/,
+    use: 'ts-loader',
+    exclude: /node_modules/,
+  },
+];
+if (!debug) {
+  webpackRules.push({
+    test: /\.ts$/,
+    exclude: [path.resolve(__dirname, 'test')],
+    enforce: 'post',
+    use: {
+      loader: 'istanbul-instrumenter-loader',
+      options: {esModules: true},
+    },
+  });
+}
+
 module.exports = function (config) {
   config.set({
     basePath: '',
@@ -26,37 +47,43 @@ module.exports = function (config) {
     },
     exclude: [],
     preprocessors: {
-      '**/*.ts': ['webpack'],
+      '**/*.ts': ['webpack', 'sourcemap'],
     },
     mime: {'text/x-typescript': ['ts', 'tsx']},
     webpack: {
-      module: webpackConfig.module,
+      module: {
+        rules: webpackRules,
+      },
       resolve: webpackConfig.resolve,
       mode: 'development',
-      devtool: 'false',
-      plugins: [
-        new webpack.SourceMapDevToolPlugin({
-          test: /\.(ts|js|css)($|\?)/i,
-          filename: null,
-        }),
-      ],
+      devtool: 'eval-source-map',
     },
     webpackMiddleware: {
-      logLevel: 'error',
-      noInfo: true
+      logLevel: 'info',
     },
-    reporters: ['spec', 'coverage-istanbul'],
+    plugins: [
+      'karma-chrome-launcher',
+      'karma-jasmine',
+      'karma-sourcemap-loader',
+      'karma-webpack',
+      'karma-coverage-istanbul-reporter',
+      'karma-spec-reporter',
+      'karma-firefox-launcher',
+    ],
+    reporters: debug ? ['spec'] : ['spec', 'coverage-istanbul'],
     port: 9876,
     colors: true,
 
-    coverageIstanbulReporter: {
-      reports: [ 'html', 'text-summary', 'lcovonly', 'json' ],
-      dir: path.join(__dirname, 'coverage'),
-      fixWebpackSourcePaths: true,
-      'report-config': {
-        html: { outdir: 'html' }
-      }
-    },
+    coverageIstanbulReporter: debug
+      ? undefined
+      : {
+          reports: ['html', 'text-summary', 'lcovonly', 'json'],
+          dir: path.join(__dirname, 'coverage'),
+          fixWebpackSourcePaths: true,
+          'report-config': {
+            html: {outdir: 'html'},
+          },
+        },
 
     // level of logging
     // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
@@ -65,7 +92,10 @@ module.exports = function (config) {
     // enable / disable watching file and executing tests whenever any file changes
     autoWatch: true,
 
-    browsers: ['ChromeDebugging'],
+    // When debugging, the browser shouldnt be timed out too quickly,
+    // since one might stay in one breakpoint for a while
+    browserNoActivityTimeout: debug ? 600 * 1000 : 30 * 1000,
+    browsers: debug ? [] : ['ChromeDebugging'],
 
     customLaunchers: {
       ChromeDebugging: {
