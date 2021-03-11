@@ -27,7 +27,7 @@ const backends: Backend[] = [
       dtype: DTpe
     ) => new CPUTensor(shape, values, dtype),
     toBackend: <DTpe extends DType>(tensor: Tensor<DTpe>) => toCPU(tensor),
-  } /*,
+  },
   {
     name: 'WASM',
     constructor: <DTpe extends DType>(
@@ -37,7 +37,7 @@ const backends: Backend[] = [
     ) => new WASMTensor(values, new Uint32Array(shape), dtype as any),
     toBackend: <DTpe extends DType>(tensor: Tensor<DTpe>) => toWASM(tensor),
     wait: wasmLoaded,
-  },
+  } /*,
   {
     name: 'GPU',
     constructor: <DTpe extends DType>(
@@ -51,7 +51,7 @@ const backends: Backend[] = [
 
 for (const backend of backends) {
   describe(`Sparse tensor on ${backend.name}`, () => {
-    /*it('should get the same values back after creation', async () => {
+    it('should get the same values back after creation', async () => {
       if (backend.wait !== undefined) {
         await backend.wait;
       }
@@ -107,26 +107,7 @@ for (const backend of backends) {
         denseDims
       );
 
-      const allVals = [
-        1,
-        2,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        3,
-        4,
-        0,
-        0,
-        0,
-        0,
-        5,
-        6,
-        7,
-        8,
-      ];
+      const allVals = [1, 2, 0, 0, 0, 0, 0, 0, 3, 4, 0, 0, 0, 0, 5, 6, 7, 8];
 
       expect(tensor.denseDims).toEqual(1);
       expect(tensor.nnz).toEqual(nnz);
@@ -298,7 +279,7 @@ for (const backend of backends) {
       expect(result.getDenseShape()).toEqual([2]);
 
       expect(await result.getValues()).toEqual(await tensor.getValues());
-    });*/
+    });
 
     it('should work with concatenating along sparse axis', async () => {
       if (backend.wait !== undefined) {

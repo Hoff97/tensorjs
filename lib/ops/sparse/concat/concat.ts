@@ -1,9 +1,11 @@
 import {CPUTensor} from '../../../tensor/cpu/tensor';
+import {GPUTensor} from '../../../tensor/gpu/tensor';
 import {SparseTensor} from '../../../tensor/sparse/tensor';
 import {WASMTensor} from '../../../tensor/wasm/tensor';
 import Tensor, {DType} from '../../../types';
 import {compareShapes} from '../../../util/shape';
 import {addIndexCPU} from './cpu';
+import {addIndexGPU} from './gpu';
 import {addIndexWASM} from './wasm';
 
 export function concat<DTpe extends DType>(
@@ -22,10 +24,9 @@ export function concat<DTpe extends DType>(
     );
   } else {
     const values = a.values.concat(b.values, 0);
-    const indices = a.indices.concat(
-      addIndex(b.indices, axis, a.shape[axis]),
-      0
-    );
+    const indexAdded = addIndex(b.indices, axis, a.shape[axis]);
+    const indices = a.indices.concat(indexAdded, 0);
+    indexAdded.delete();
 
     const resultShape = [...a.shape];
     resultShape[axis] += b.shape[axis];
@@ -43,6 +44,7 @@ function addIndex(
     return addIndexCPU(indices, axis, count);
   } else if (indices instanceof WASMTensor) {
     return addIndexWASM(indices, axis, count);
+  } else {
+    return addIndexGPU(indices as GPUTensor<'uint32'>, axis, count);
   }
-  throw new Error('Concat on backend WebGL not yet implemented');
 }
