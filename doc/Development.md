@@ -55,7 +55,15 @@ This will run:
 
 Coverage reports are generated in `coverage`.
 
-## Testing the GPU implementation:
+### Debugging tests
+
+There are 2 launch configurations in `.vscode/launch.json`:
+- "Debug unit tests in library 'rust-wasm-tensor'": These debug the rust tests defined in `src/tests/` and
+  are useful for debugging the WASM backend.
+- "Debug tests in firefox": This allows you to debug the typescript tests. This uses Firefox so
+  you need Firefox installed on your computer and the "Debugger for Firefox" extension.
+
+### Testing the GPU implementation:
 
 The tests are run in a Headless Chrome by default.
 Unfortunately headless chrome relies on a software
