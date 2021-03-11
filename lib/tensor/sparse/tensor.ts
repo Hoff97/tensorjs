@@ -1,3 +1,4 @@
+import {concat} from '../../ops/sparse/concat/concat';
 import {reshape} from '../../ops/sparse/reshape/reshape';
 import Tensor, {
   Activation,
@@ -329,8 +330,12 @@ export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
   matMul(tensor: Tensor<DTpe>): Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
+
   concat(tensor: Tensor<DTpe>, axis: number): Tensor<DTpe> {
-    throw new Error('Method not implemented.');
+    if (!(tensor instanceof SparseTensor)) {
+      throw new Error('Can only concatenate sparse tensors!');
+    }
+    return concat(this, tensor, axis);
   }
 
   clip(min?: number, max?: number): Tensor<DTpe> {
