@@ -4,6 +4,7 @@ import {SparseTensor} from '../../../tensor/sparse/tensor';
 import {WASMTensor} from '../../../tensor/wasm/tensor';
 import Tensor, {DType} from '../../../types';
 import {repeatIndicesCPU} from './cpu';
+import {repeatIndexGPU} from './gpu';
 import {repeatIndicesWASM} from './wasm';
 
 export function repeat<DTpe extends DType>(
@@ -43,6 +44,12 @@ function repeatIndices(
     return repeatIndicesCPU(indices, repeats, shape, repeatsProd);
   } else if (indices instanceof WASMTensor) {
     return repeatIndicesWASM(indices, repeats, shape, repeatsProd);
+  } else {
+    return repeatIndexGPU(
+      indices as GPUTensor<'uint32'>,
+      repeats,
+      shape,
+      repeatsProd
+    );
   }
-  throw new Error('Repeat not implemented on backend WASM/GPU');
 }
