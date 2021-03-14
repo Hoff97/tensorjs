@@ -46,7 +46,7 @@ const backends: Backend[] = [
       dtype: DTpe
     ) => new GPUTensor(values, shape, dtype as any),
     toBackend: <DTpe extends DType>(tensor: Tensor<DTpe>) => toGPU(tensor),
-  },*/,
+  }*/,
 ];
 
 for (const backend of backends) {
@@ -79,6 +79,40 @@ for (const backend of backends) {
       expect(tensor.getSparseShape()).toEqual([3, 3]);
       expect(tensor.getDenseShape()).toEqual([]);
       expect(await tensor.getValues()).toEqual(new Float32Array(allVals));
+    });
+
+    it('should work with creation from dense tensor', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const allVals = [1, 0, 0, 0, 2, 0, 0, 3, 4];
+      const input = new CPUTensor([3, 3], allVals);
+      const fromDense: SparseTensor = (await backend.toBackend(
+        SparseTensor.fromDense(input)
+      )) as SparseTensor;
+
+      const nnz = 4;
+      const shape = [3, 3];
+
+      const indiceVals = [0, 0, 1, 1, 2, 1, 2, 2];
+      const indiceTensor = backend.constructor(
+        [nnz, shape.length],
+        indiceVals,
+        'uint32'
+      );
+
+      const valueVals = [1, 2, 3, 4];
+      const valueTensor = backend.constructor([nnz], valueVals, 'float32');
+      const expected = new SparseTensor(valueTensor, indiceTensor, shape);
+
+      expect(fromDense.nnz).toBe(4);
+      expect(fromDense.denseDims).toBe(0);
+      expect(fromDense.shape).toEqual([3, 3]);
+
+      expect(await fromDense.compare(expected)).toBeTrue();
+      expect(await fromDense.values.compare(expected.values)).toBeTrue();
+      expect(await fromDense.indices.compare(expected.indices)).toBeTrue();
     });
 
     it('should work with nonzero dense dimensions', async () => {

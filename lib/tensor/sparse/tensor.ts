@@ -1,4 +1,5 @@
 import {concat} from '../../ops/sparse/concat/concat';
+import {matMul} from '../../ops/sparse/matMul/matMul';
 import {repeat} from '../../ops/sparse/repeat/repeat';
 import {reshape} from '../../ops/sparse/reshape/reshape';
 import Tensor, {
@@ -8,10 +9,38 @@ import Tensor, {
   TensorValues,
   tensorValuesConstructor,
 } from '../../types';
-import {computeStrides, getSize, indexToPos} from '../../util/shape';
+import {
+  computeStrides,
+  getSize,
+  indexToPos,
+  posToIndex,
+} from '../../util/shape';
 import {CPUTensor} from '../cpu/tensor';
 
 export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
+  static fromDense<DTpe extends DType>(
+    tensor: CPUTensor<DTpe>
+  ): SparseTensor<DTpe> {
+    let nnz = 0;
+    const ix = [];
+    const vals = [];
+    for (let i = 0; i < tensor.size; i++) {
+      if (tensor.get(i) !== 0) {
+        nnz++;
+
+        const index = posToIndex(i, tensor.strides);
+        for (let j = 0; j < tensor.shape.length; j++) {
+          ix.push(index[j]);
+        }
+        vals.push(tensor.get(i));
+      }
+    }
+
+    const indices = new CPUTensor([nnz, tensor.shape.length], ix, 'uint32');
+    const values = new CPUTensor([nnz], vals, tensor.dtype);
+    return new SparseTensor(values, indices, tensor.shape);
+  }
+
   public size: number;
 
   public strides: number[];
@@ -328,8 +357,21 @@ export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
     );
   }
 
+  /**
+   * Calculates the matrix product. This tensor should have shape [M,N]
+   *
+   * Two cases are supported for sparse tensors:
+   * - If this tensor has one sparse dimension, the resulting tensor is
+   *   a sparse tensor with the same number of non-zero entries
+   * - If this tensor has two sparse dimensions, the resulting tensor
+   *   is dense.
+   *
+   * @param tensor Matrix to multiply with. Should have shape [N,O]
+   *
+   * @result Tensor with shape [M,O]
+   */
   matMul(tensor: Tensor<DTpe>): Tensor<DTpe> {
-    throw new Error('Method not implemented.');
+    return matMul(this, tensor);
   }
 
   /**
