@@ -12,3 +12,10 @@ fn bench_add(b: &mut Bencher) {
     let y = Tensor::new_from_shape(&vec![2, 2], &vec![5., 6., 7., 8.]);
     b.iter(|| x.addition(&y, 1., 1.));
 }
+
+#[bench]
+fn bench_matmul(b: &mut Bencher) {
+    let x = Tensor::new_from_shape(&vec![2, 2], &vec![1., 2., 3., 4.]);
+    let y = Tensor::new_from_shape(&vec![2, 2], &vec![5., 6., 7., 8.]);
+    b.iter(|| x.matmul(&y));
+}

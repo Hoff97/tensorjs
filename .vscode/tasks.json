@@ -45,18 +45,27 @@
 				"focus": true,
 				"panel": "dedicated"
 			},
-			"problemMatcher": [{
-				"base": "$tsc",
-				"background": {
-					"activeOnStart": true,
-					"beginsPattern": {
-						"regexp": "(.*?)"
-					},
-					"endsPattern": {
-						"regexp": "No captured browser"
+			"problemMatcher": [
+				{
+					"base": "$tsc",
+					"background": {
+						"activeOnStart": true,
+						"beginsPattern": {
+							"regexp": "(.*?)"
+						},
+						"endsPattern": {
+							"regexp": "No captured browser"
+						}
 					}
 				}
-			}]
+			]
+		},
+		{
+			"type": "npm",
+			"script": "test:rustBenchmark",
+			"problemMatcher": [],
+			"label": "npm: test:rustBenchmark",
+			"detail": "cargo +nightly bench --features benchmark"
 		}
 	]
 }
