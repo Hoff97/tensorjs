@@ -125,9 +125,10 @@ where
         let o = other.get_dim_size(1);
 
         let mut values = vec![zero(); m * o];
-        for i in 0..m {
-            for k in 0..o {
-                for j in 0..n {
+        // The ordering kji of the loops was found to be the fastest with some benchmark experiments
+        for k in 0..o {
+            for j in 0..n {
+                for i in 0..m {
                     values[i * o + k] =
                         values[i * o + k] + self.get_ix(i * n + j) * other.get_ix(j * o + k);
                 }
