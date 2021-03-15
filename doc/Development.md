@@ -94,3 +94,14 @@ As in the unit tests, Chrome doesnt use the GPU by default.
 If you want to run performance tests with the GPU,
 change the `browsers` field in `karma.performance.js` to `ChromeGPU` and
 optionally follow the instructions of the paragraph above.
+
+Additionally, the rust implementation can be benchmarked by running
+```
+$ npm run test:rustBenchmark
+```
+You can also run individual benchmarks with
+```
+$ cargo +nightly bench --features benchmark BENCHMARK_NAME
+```
+
+All rust benchmarks are contained in `src/test/tensor/benchmark.rs`.

@@ -24,8 +24,8 @@ fn random_tensor(shape: &Vec<usize>) -> Tensor<f32> {
 
 #[bench]
 fn bench_add(b: &mut Bencher) {
-    let x = Tensor::new_from_shape(&vec![2, 2], &vec![1., 2., 3., 4.]);
-    let y = Tensor::new_from_shape(&vec![2, 2], &vec![5., 6., 7., 8.]);
+    let x = random_tensor(&vec![100, 100]);
+    let y = random_tensor(&vec![100, 100]);
     b.iter(|| x.addition(&y, 1., 1.));
 }
 
