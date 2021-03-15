@@ -156,7 +156,7 @@ export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
     shape: readonly number[],
     copy: boolean
   ): Tensor<DTpe> {
-    return reshape(this, shape);
+    return reshape(this, shape, copy);
   }
 
   exp(): Tensor<DTpe> {
@@ -365,8 +365,9 @@ export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
    *   a sparse tensor with the same number of non-zero entries
    * - If this tensor has two sparse dimensions, the resulting tensor
    *   is dense.
+   * Right now this only supports sparse-dense matrix multiplication.
    *
-   * @param tensor Matrix to multiply with. Should have shape [N,O]
+   * @param tensor Dense matrix to multiply with. Should have shape [N,O]
    *
    * @result Tensor with shape [M,O]
    */

@@ -12,7 +12,8 @@ export function reshapeCPU<DTpe extends DType>(
   tensor: SparseTensor<DTpe>,
   values: CPUTensor<DTpe>,
   indices: CPUTensor<'uint32'>,
-  shape: readonly number[]
+  shape: readonly number[],
+  copy: boolean
 ): SparseTensor<DTpe> {
   const oldSparseSize = getSize(tensor.getSparseShape());
 
@@ -34,7 +35,7 @@ export function reshapeCPU<DTpe extends DType>(
   const nnzFraction = sparseSize / oldSparseSize;
   const nnz = tensor.nnz * nnzFraction;
 
-  const newValues = values.reshape([nnz, ...denseShape]);
+  const newValues = values.reshape([nnz, ...denseShape], copy);
   const newIndices = new CPUTensor(
     [nnz, sparseShape.length],
     undefined,

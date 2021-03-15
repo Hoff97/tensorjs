@@ -6,7 +6,8 @@ export function reshapeWasm<DTpe extends DTypeWasm>(
   tensor: SparseTensor<DTpe>,
   values: WASMTensor<DTpe>,
   indices: WASMTensor<'uint32'>,
-  shape: readonly number[]
+  shape: readonly number[],
+  copy: boolean
 ): SparseTensor<DTpe> {
   const oldSparseSize = getSize(tensor.getSparseShape());
 
@@ -25,7 +26,7 @@ export function reshapeWasm<DTpe extends DTypeWasm>(
   const nnzFraction = sparseSize / oldSparseSize;
   const nnz = tensor.nnz * nnzFraction;
 
-  const newValues = values.reshape([nnz, ...denseShape]);
+  const newValues = values.reshape([nnz, ...denseShape], copy);
   const newIndices = new WASMTensor(
     indices.wasmTensor.reshape_sparse_indices(
       new Uint32Array(tensor.getSparseShape()),
