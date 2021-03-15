@@ -2,6 +2,7 @@ import {CPUTensor} from '../../../tensor/cpu/tensor';
 import {SparseTensor} from '../../../tensor/sparse/tensor';
 import {DType} from '../../../types';
 import {
+  compareShapes,
   computeStrides,
   getSize,
   indexToPos,
@@ -36,23 +37,25 @@ export function reshapeCPU<DTpe extends DType>(
   const nnz = tensor.nnz * nnzFraction;
 
   const newValues = values.reshape([nnz, ...denseShape], copy);
-  const newIndices = new CPUTensor(
-    [nnz, sparseShape.length],
-    undefined,
-    'uint32'
-  );
-  for (let i = 0; i < nnz; i++) {
-    const oldNnzIx = Math.floor(i / nnzFraction);
 
-    const oldSparseIx = [];
-    for (let j = 0; j < tensor.sparseDims; j++) {
-      oldSparseIx.push(indices.get(oldNnzIx * tensor.sparseDims + j));
-    }
-    const oldSparsePos = indexToPos(oldSparseIx, oldSparseStrides);
-    const newSparsePos = oldSparsePos * nnzFraction + (i % nnzFraction);
-    const newSparseIx = posToIndex(newSparsePos, newSparseStrides);
-    for (let j = 0; j < sparseShape.length; j++) {
-      newIndices.set(i * sparseShape.length + j, newSparseIx[j]);
+  let newIndices: CPUTensor<'uint32'>;
+  if (!copy && compareShapes(sparseShape, tensor.getSparseShape())) {
+    newIndices = indices;
+  } else {
+    newIndices = new CPUTensor([nnz, sparseShape.length], undefined, 'uint32');
+    for (let i = 0; i < nnz; i++) {
+      const oldNnzIx = Math.floor(i / nnzFraction);
+
+      const oldSparseIx = [];
+      for (let j = 0; j < tensor.sparseDims; j++) {
+        oldSparseIx.push(indices.get(oldNnzIx * tensor.sparseDims + j));
+      }
+      const oldSparsePos = indexToPos(oldSparseIx, oldSparseStrides);
+      const newSparsePos = oldSparsePos * nnzFraction + (i % nnzFraction);
+      const newSparseIx = posToIndex(newSparsePos, newSparseStrides);
+      for (let j = 0; j < sparseShape.length; j++) {
+        newIndices.set(i * sparseShape.length + j, newSparseIx[j]);
+      }
     }
   }
 

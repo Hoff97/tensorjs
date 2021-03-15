@@ -7,7 +7,7 @@ import {
 import {GPUMemoryAllocator} from '../../../tensor/gpu/memory';
 import {gpuConstructor, GPUTensor} from '../../../tensor/gpu/tensor';
 import {SparseTensor} from '../../../tensor/sparse/tensor';
-import {computeStrides, getSize} from '../../../util/shape';
+import {compareShapes, computeStrides, getSize} from '../../../util/shape';
 import {Dispatcher} from '../../gpu/dispatcher';
 import {Input, Operation} from '../../gpu/operation';
 
@@ -216,11 +216,13 @@ export function reshapeGPU<DTpe extends DTypeGpu>(
 ): SparseTensor<DTpe> {
   const oldSparseSize = getSize(tensor.getSparseShape());
 
+  const sparseShape = [];
   const denseShape = [];
   let sparseSize = 1;
   for (let i = 0; i < shape.length; i++) {
     if (sparseSize < oldSparseSize) {
       sparseSize *= shape[i];
+      sparseShape.push(shape[i]);
     } else {
       denseShape.push(shape[i]);
     }
@@ -230,15 +232,20 @@ export function reshapeGPU<DTpe extends DTypeGpu>(
   const nnz = tensor.nnz * nnzFraction;
 
   const newValues = values.reshape([nnz, ...denseShape], copy);
-  const newIndices = defaultReshapeIndicesD.calc(
-    {
-      A: indices,
-      sparseShape: tensor.getSparseShape(),
-      shape: shape,
-      nnz: tensor.nnz,
-    },
-    'uint32'
-  ) as GPUTensor<'uint32'>;
+  let newIndices: GPUTensor<'uint32'>;
+  if (!copy && compareShapes(sparseShape, tensor.getSparseShape())) {
+    newIndices = indices;
+  } else {
+    newIndices = defaultReshapeIndicesD.calc(
+      {
+        A: indices,
+        sparseShape: tensor.getSparseShape(),
+        shape: shape,
+        nnz: tensor.nnz,
+      },
+      'uint32'
+    ) as GPUTensor<'uint32'>;
+  }
 
   return new SparseTensor(newValues, newIndices, shape, denseShape.length);
 }
