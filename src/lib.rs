@@ -1,3 +1,4 @@
+#![cfg_attr(feature = "benchmark", feature(test))]
 pub mod shape;
 pub mod tensor;
 pub mod utils;
@@ -28,6 +29,9 @@ pub mod tests {
     pub mod tensor {
         pub mod aggregate;
         pub mod basic;
+
+        #[cfg(feature = "benchmark")]
+        pub mod benchmark;
         pub mod conv;
         pub mod pool;
         pub mod sparse;

@@ -127,11 +127,10 @@ where
         let mut values = vec![zero(); m * o];
         for i in 0..m {
             for k in 0..o {
-                let mut res = zero();
                 for j in 0..n {
-                    res = res + self.get_ix(i * n + j) * other.get_ix(j * o + k);
+                    values[i * o + k] =
+                        values[i * o + k] + self.get_ix(i * n + j) * other.get_ix(j * o + k);
                 }
-                values[i * o + k] = res;
             }
         }
 
