@@ -1,7 +1,7 @@
 import {CPUTensor} from '../../../tensor/cpu/tensor';
 import {SparseTensor} from '../../../tensor/sparse/tensor';
 import Tensor, {DType} from '../../../types';
-import {addDenseCPU} from './cpu';
+import {addDenseCPU, addSparseCPU} from './cpu';
 
 export function add<DTpe extends DType>(
   a: SparseTensor<DTpe>,
@@ -24,7 +24,21 @@ function addSparse<DTpe extends DType>(
   alpha: number,
   beta: number
 ): SparseTensor<DTpe> {
-  throw new Error('Sparse-sparse matrix addition not yet implemented');
+  if (a.nnz !== b.nnz) {
+    throw new Error(
+      'Addition with two sparse tensors expects the same sparsity pattern, and thus the same number of nonzero entries in both tensors'
+    );
+  } else if (a.denseDims !== b.denseDims) {
+    throw new Error(
+      'Addition with two sparse tensors expects the same number of sparse and dense dimensions in both tensors'
+    );
+  }
+  if (a.values instanceof CPUTensor) {
+    return addSparseCPU(a, b, resultShape, alpha, beta);
+  }
+  throw new Error(
+    'Sparse-sparse matrix addition not supported on WASM/WebGL backend'
+  );
 }
 
 function addDense<DTpe extends DType>(

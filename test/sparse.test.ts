@@ -556,5 +556,33 @@ for (const backend of backends) {
 
       expect(await result.compare(expected)).toBeTrue();
     });
+
+    it('should work with sparse-sparse addition', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = await backend.toBackend(
+        SparseTensor.fromDense(
+          new CPUTensor([3, 3], [1, 0, 0, 0, 2, 0, 0, 3, 4])
+        )
+      );
+
+      const b = await backend.toBackend(
+        SparseTensor.fromDense(
+          new CPUTensor([3, 3], [5, 0, 0, 0, 6, 0, 0, 7, 8])
+        )
+      );
+
+      const result = a.add(b);
+
+      const expected = await backend.toBackend(
+        SparseTensor.fromDense(
+          new CPUTensor([3, 3], [6, 0, 0, 0, 8, 0, 0, 10, 12])
+        )
+      );
+
+      expect(await result.compare(expected)).toBeTrue();
+    });
   });
 }
