@@ -35,3 +35,18 @@ fn bench_matmul(b: &mut Bencher) {
     let y = random_tensor(&vec![100, 100]);
     b.iter(|| x.matmul(&y));
 }
+
+#[bench]
+fn bench_gemm(b: &mut Bencher) {
+    let x = random_tensor(&vec![256, 128]);
+    let y = random_tensor(&vec![128, 256]);
+    b.iter(|| x._gemm(&y, false, false, 1.0, None, 1.0));
+}
+
+#[bench]
+fn bench_gemm_with_c(b: &mut Bencher) {
+    let x = random_tensor(&vec![256, 128]);
+    let y = random_tensor(&vec![128, 256]);
+    let c = random_tensor(&vec![1, 256]);
+    b.iter(|| x._gemm(&y, false, false, 1.0, Some(&c), 1.0));
+}

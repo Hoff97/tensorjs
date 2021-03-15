@@ -87,25 +87,27 @@ where
             let y_base = i * y_batch_mult;
             let c_base = i * c_batch_mult;
 
-            for m in 0..M {
-                for o in 0..O {
-                    let mut result = zero();
-
-                    for n in 0..N {
-                        result = result
-                            + self.get_ix(a_base + m * a_m_mult + n * a_n_mult)
-                                * b.get_ix(b_base + n * b_n_mult + o * b_o_mult);
+            for n in 0..N {
+                for m in 0..M {
+                    for o in 0..O {
+                        values[y_base + m * O + o] = values[y_base + m * O + o]
+                            + (self.get_ix(a_base + m * a_m_mult + n * a_n_mult)
+                                * b.get_ix(b_base + n * b_n_mult + o * b_o_mult))
+                                * alpha;
                     }
+                }
+            }
 
-                    result = alpha * result;
-                    match c {
-                        None => {}
-                        Some(c_) => {
+            match c {
+                None => {}
+                Some(c_) => {
+                    for m in 0..M {
+                        for o in 0..O {
                             let ix = c_base + m * c_m_mult + o * c_o_mult;
-                            result = result + beta * c_.get_ix(ix);
+                            values[y_base + m * O + o] =
+                                values[y_base + m * O + o] + beta * c_.get_ix(ix);
                         }
                     }
-                    values[y_base + m * O + o] = result;
                 }
             }
         }
