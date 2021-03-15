@@ -1,3 +1,4 @@
+import {add} from '../../ops/sparse/add/add';
 import {concat} from '../../ops/sparse/concat/concat';
 import {matMul} from '../../ops/sparse/matMul/matMul';
 import {repeat} from '../../ops/sparse/repeat/repeat';
@@ -472,7 +473,7 @@ export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
     alpha: number,
     beta: number
   ): Tensor<DTpe> {
-    throw new Error('Method not implemented.');
+    return add(th as SparseTensor<DTpe>, tensor, resultShape, alpha, beta);
   }
 
   subtract_impl(

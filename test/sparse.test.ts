@@ -27,7 +27,7 @@ const backends: Backend[] = [
       dtype: DTpe
     ) => new CPUTensor(shape, values, dtype),
     toBackend: <DTpe extends DType>(tensor: Tensor<DTpe>) => toCPU(tensor),
-  },
+  } /*,
   {
     name: 'WASM',
     constructor: <DTpe extends DType>(
@@ -492,6 +492,69 @@ for (const backend of backends) {
       expect(res1.shape).toEqual([4, 6]);
 
       expect(await res1.compare(tensorResult1)).toBeTrue();
+    });
+
+    it('should work with sparse-dense matmul', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = await backend.toBackend(
+        SparseTensor.fromDense(
+          new CPUTensor([3, 3], [1, 0, 0, 0, 2, 0, 0, 3, 4])
+        )
+      );
+
+      const b = await backend.toBackend(
+        new CPUTensor([3, 3], [5, 6, 7, 8, 9, 10, 11, 12, 13])
+      );
+
+      const expected = await backend.toBackend(
+        new CPUTensor([3, 3], [5, 6, 7, 16, 18, 20, 68, 75, 82])
+      );
+
+      const result = a.matMul(b);
+
+      expect(await result.compare(expected)).toBeTrue();
+    });
+
+    it('should work with sparse-dense addition', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = await backend.toBackend(
+        SparseTensor.fromDense(
+          new CPUTensor([3, 3], [1, 0, 0, 0, 2, 0, 0, 3, 4])
+        )
+      );
+
+      const b = await backend.toBackend(new CPUTensor([2], [5, 6]));
+
+      const result = a
+        .reshape([3, 3, 1], false)
+        .add(b.reshape([1, 1, 2], false));
+
+      const expectedIx = [0, 0, 1, 1, 2, 1, 2, 2];
+      const expectedIxTensor = backend.constructor(
+        [4, 2],
+        expectedIx,
+        'uint32'
+      );
+      const expectedValues = [6, 7, 7, 8, 8, 9, 9, 10];
+      const expectedVTensor = backend.constructor(
+        [4, 2],
+        expectedValues,
+        'float32'
+      );
+      const expected = new SparseTensor(
+        expectedVTensor,
+        expectedIxTensor,
+        [3, 3, 2],
+        1
+      );
+
+      expect(await result.compare(expected)).toBeTrue();
     });
   });
 }
