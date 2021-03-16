@@ -469,6 +469,45 @@ export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
 
+  /**
+   * Adds a second tensor, which can either be a sparse or a dense tensor:
+   * - If the second tensor is a dense tensor, it is assumed that it has a rank at most
+   *   equal to the dense dimensions of the first tensor.
+   *   If this is not the case, entries in the second tensors that are zero in the first
+   *   tensor are simply ignored!
+   *   This also means that broadcasting in the first tensor is only supported
+   *   on the dense dimensions!
+   * - If the second tensor is a sparse tensor, it is assumed that the first and
+   *   second tensor have exactly the same sparsity pattern!
+   */
+  add(tensor: Tensor<DTpe>, alpha?: number, beta?: number) {
+    return super.add(tensor, alpha, beta);
+  }
+
+  /**
+   * Subtracts a second tensor, which can either be a sparse or a dense tensor.
+   * The same restrictions as for {@link SparseTensor.add} apply!
+   */
+  subtract(tensor: Tensor<DTpe>, alpha?: number, beta?: number) {
+    return super.subtract(tensor, alpha, beta);
+  }
+
+  /**
+   * Multiplies a second tensor element wise, which can either be a sparse or a dense tensor.
+   * The same restrictions as for {@link SparseTensor.add} apply!
+   */
+  multiply(tensor: Tensor<DTpe>, alpha?: number) {
+    return super.multiply(tensor, alpha);
+  }
+
+  /**
+   * Divides a second tensor element wise, which can either be a sparse or a dense tensor.
+   * The same restrictions as for {@link SparseTensor.add} apply!
+   */
+  divide(tensor: Tensor<DTpe>, alpha?: number) {
+    return super.divide(tensor, alpha);
+  }
+
   add_impl(
     th: Tensor<DTpe>,
     tensor: Tensor<DTpe>,

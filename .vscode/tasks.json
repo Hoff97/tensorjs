@@ -66,6 +66,13 @@
 			"problemMatcher": [],
 			"label": "npm: test:rustBenchmark",
 			"detail": "cargo +nightly bench --features benchmark"
+		},
+		{
+			"type": "npm",
+			"script": "docs",
+			"problemMatcher": [],
+			"label": "npm: docs",
+			"detail": "typedoc"
 		}
 	]
 }
