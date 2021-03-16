@@ -22,6 +22,18 @@ import {
 import {CPUTensor} from '../cpu/tensor';
 
 export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
+  /**
+   * Creates a sparse tensor with zero dense dimensions from a dense CPU tensor.
+   *
+   * @example
+   * ```typescript
+   * const denseTensor = new CPUTensor([3,3],[1,0,0,0,2,0,0,3,4]);
+   *
+   * const sparseTensor = SparseTensor.fromDense(denseTensor);
+   * console.log(sparseTensor.nnz); // Will log '4'
+   * console.log(sparseTensor.sparseDims); // Will log '2'
+   * ```
+   */
   static fromDense<DTpe extends DType>(
     tensor: CPUTensor<DTpe>
   ): SparseTensor<DTpe> {
@@ -72,6 +84,31 @@ export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
    * maintain the sparsity pattern. Otherwise, many operations would
    * create effectively dense tensors (eg. exp()), or would simply not be
    * well defined (eg. log()).
+   *
+   * @example
+   *
+   * If you want to create a sparse tensor, equivalent to the following CPU
+   * tensor:
+   * ```typescript
+   * const a = new CPUTensor([3,3],[1,0,0,0,2,0,0,3,4]);
+   * ```
+   * you collect the indices, where the value is nonzero:
+   * ```typescript
+   * const indices = [
+   *  0,0,  // Corresponds to value 1
+   *  1,1,  // Corresponds to value 2
+   *  2,1,  // Corresponds to value 3
+   *  2,2   // Corresponds to value 4
+   * ];
+   * const indiceTensor = new CPUTensor([4, 2], indices, 'uint32');
+   * ```
+   * and the corresponding values:
+   * ```typescript
+   * const values = [1,2,3,4];
+   * const valueTensor = new CPUTensor([4],values);
+   *
+   * const sparseTensor = new SparseTensor(valueTensor, indiceTensor, [3,3]);
+   * ```
    */
   constructor(
     public values: Tensor<DTpe>,
