@@ -584,5 +584,72 @@ for (const backend of backends) {
 
       expect(await result.compare(expected)).toBeTrue();
     });
+
+    it('should work with sparse-dense subtraction', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = await backend.toBackend(
+        SparseTensor.fromDense(
+          new CPUTensor([3, 3], [1, 0, 0, 0, 2, 0, 0, 3, 4])
+        )
+      );
+
+      const b = await backend.toBackend(new CPUTensor([2], [5, 6]));
+
+      const result = a
+        .reshape([3, 3, 1], false)
+        .add(b.reshape([1, 1, 2], false));
+
+      const expectedIx = [0, 0, 1, 1, 2, 1, 2, 2];
+      const expectedIxTensor = backend.constructor(
+        [4, 2],
+        expectedIx,
+        'uint32'
+      );
+      const expectedValues = [-4, -5, -3, -4, -2, -3, -1, -2];
+      const expectedVTensor = backend.constructor(
+        [4, 2],
+        expectedValues,
+        'float32'
+      );
+      const expected = new SparseTensor(
+        expectedVTensor,
+        expectedIxTensor,
+        [3, 3, 2],
+        1
+      );
+
+      expect(await result.compare(expected)).toBeTrue();
+    });
+
+    it('should work with sparse-sparse subtraction', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const b = await backend.toBackend(
+        SparseTensor.fromDense(
+          new CPUTensor([3, 3], [1, 0, 0, 0, 2, 0, 0, 3, 4])
+        )
+      );
+
+      const a = await backend.toBackend(
+        SparseTensor.fromDense(
+          new CPUTensor([3, 3], [5, 0, 0, 0, 6, 0, 0, 7, 8])
+        )
+      );
+
+      const result = a.add(b);
+
+      const expected = await backend.toBackend(
+        SparseTensor.fromDense(
+          new CPUTensor([3, 3], [4, 0, 0, 0, 4, 0, 0, 4, 4])
+        )
+      );
+
+      expect(await result.compare(expected)).toBeTrue();
+    });
   });
 }

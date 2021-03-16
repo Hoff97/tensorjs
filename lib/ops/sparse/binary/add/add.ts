@@ -1,6 +1,6 @@
-import {CPUTensor} from '../../../tensor/cpu/tensor';
-import {SparseTensor} from '../../../tensor/sparse/tensor';
-import Tensor, {DType} from '../../../types';
+import {CPUTensor} from '../../../../tensor/cpu/tensor';
+import {SparseTensor} from '../../../../tensor/sparse/tensor';
+import Tensor, {DType} from '../../../../types';
 import {addDenseCPU, addSparseCPU} from './cpu';
 
 export function add<DTpe extends DType>(

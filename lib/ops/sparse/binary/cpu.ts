@@ -3,12 +3,11 @@ import {SparseTensor} from '../../../tensor/sparse/tensor';
 import {DType} from '../../../types';
 import {computeStrides, getSize, incrementIndex} from '../../../util/shape';
 
-export function addDenseCPU<DTpe extends DType>(
+export function binaryDenseCPU<DTpe extends DType>(
   a: SparseTensor<DTpe>,
   b: CPUTensor<DTpe>,
   resultShape: readonly number[],
-  alpha: number,
-  beta: number
+  op: (a: number, b: number) => number
 ): SparseTensor<DTpe> {
   const S = a.sparseDims;
 
@@ -37,7 +36,7 @@ export function addDenseCPU<DTpe extends DType>(
       const vA = valsA.get([i, ...denseIx]);
       const vB = b.get([...sparseIx, ...denseIx]);
 
-      values.set(i * denseSize + j, alpha * vA + beta * vB);
+      values.set(i * denseSize + j, op(vA, vB));
 
       incrementIndex(denseIx, denseResultShape);
     }
@@ -46,12 +45,11 @@ export function addDenseCPU<DTpe extends DType>(
   return new SparseTensor(values, indices, resultShape, a.denseDims);
 }
 
-export function addSparseCPU<DTpe extends DType>(
+export function binarySparseCPU<DTpe extends DType>(
   a: SparseTensor<DTpe>,
   b: SparseTensor<DTpe>,
   resultShape: readonly number[],
-  alpha: number,
-  beta: number
+  op: (a: number, b: number) => number
 ): SparseTensor<DTpe> {
   const S = a.sparseDims;
 
@@ -95,7 +93,7 @@ export function addSparseCPU<DTpe extends DType>(
       const vA = valsA.get([i, ...denseIx]);
       const vB = valsB.get([iB, ...denseIx]);
 
-      values.set(i * denseSize + j, alpha * vA + beta * vB);
+      values.set(i * denseSize + j, op(vA, vB));
 
       incrementIndex(denseIx, denseResultShape);
     }
