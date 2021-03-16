@@ -600,7 +600,7 @@ for (const backend of backends) {
 
       const result = a
         .reshape([3, 3, 1], false)
-        .add(b.reshape([1, 1, 2], false));
+        .subtract(b.reshape([1, 1, 2], false));
 
       const expectedIx = [0, 0, 1, 1, 2, 1, 2, 2];
       const expectedIxTensor = backend.constructor(
@@ -641,11 +641,154 @@ for (const backend of backends) {
         )
       );
 
-      const result = a.add(b);
+      const result = a.subtract(b);
 
       const expected = await backend.toBackend(
         SparseTensor.fromDense(
           new CPUTensor([3, 3], [4, 0, 0, 0, 4, 0, 0, 4, 4])
+        )
+      );
+
+      expect(await result.compare(expected)).toBeTrue();
+    });
+
+    it('should work with sparse-dense multiplication', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = await backend.toBackend(
+        SparseTensor.fromDense(
+          new CPUTensor([3, 3], [1, 0, 0, 0, 2, 0, 0, 3, 4])
+        )
+      );
+
+      const b = await backend.toBackend(new CPUTensor([2], [5, 6]));
+
+      const result = a
+        .reshape([3, 3, 1], false)
+        .multiply(b.reshape([1, 1, 2], false));
+
+      const expectedIx = [0, 0, 1, 1, 2, 1, 2, 2];
+      const expectedIxTensor = backend.constructor(
+        [4, 2],
+        expectedIx,
+        'uint32'
+      );
+      const expectedValues = [5, 6, 10, 12, 15, 18, 20, 24];
+      const expectedVTensor = backend.constructor(
+        [4, 2],
+        expectedValues,
+        'float32'
+      );
+      const expected = new SparseTensor(
+        expectedVTensor,
+        expectedIxTensor,
+        [3, 3, 2],
+        1
+      );
+
+      expect(await result.compare(expected)).toBeTrue();
+    });
+
+    it('should work with sparse-sparse multiplication', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const b = await backend.toBackend(
+        SparseTensor.fromDense(
+          new CPUTensor([3, 3], [1, 0, 0, 0, 2, 0, 0, 3, 4])
+        )
+      );
+
+      const a = await backend.toBackend(
+        SparseTensor.fromDense(
+          new CPUTensor([3, 3], [5, 0, 0, 0, 6, 0, 0, 7, 8])
+        )
+      );
+
+      const result = a.multiply(b);
+
+      const expected = await backend.toBackend(
+        SparseTensor.fromDense(
+          new CPUTensor([3, 3], [5, 0, 0, 0, 12, 0, 0, 21, 32])
+        )
+      );
+
+      expect(await result.compare(expected)).toBeTrue();
+    });
+
+    it('should work with sparse-dense division', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = await backend.toBackend(
+        SparseTensor.fromDense(
+          new CPUTensor([3, 3], [7, 0, 0, 0, 8, 0, 0, 9, 10])
+        )
+      );
+
+      const b = await backend.toBackend(new CPUTensor([2], [5, 6]));
+
+      const result = a
+        .reshape([3, 3, 1], false)
+        .divide(b.reshape([1, 1, 2], false));
+
+      const expectedIx = [0, 0, 1, 1, 2, 1, 2, 2];
+      const expectedIxTensor = backend.constructor(
+        [4, 2],
+        expectedIx,
+        'uint32'
+      );
+      const expectedValues = [
+        7 / 5,
+        7 / 6,
+        8 / 5,
+        8 / 6,
+        9 / 5,
+        9 / 6,
+        10 / 5,
+        10 / 6,
+      ];
+      const expectedVTensor = backend.constructor(
+        [4, 2],
+        expectedValues,
+        'float32'
+      );
+      const expected = new SparseTensor(
+        expectedVTensor,
+        expectedIxTensor,
+        [3, 3, 2],
+        1
+      );
+
+      expect(await result.compare(expected)).toBeTrue();
+    });
+
+    it('should work with sparse-sparse division', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const b = await backend.toBackend(
+        SparseTensor.fromDense(
+          new CPUTensor([3, 3], [1, 0, 0, 0, 2, 0, 0, 3, 4])
+        )
+      );
+
+      const a = await backend.toBackend(
+        SparseTensor.fromDense(
+          new CPUTensor([3, 3], [5, 0, 0, 0, 6, 0, 0, 7, 8])
+        )
+      );
+
+      const result = a.divide(b);
+
+      const expected = await backend.toBackend(
+        SparseTensor.fromDense(
+          new CPUTensor([3, 3], [5, 0, 0, 0, 3, 0, 0, 7 / 3, 2])
         )
       );
 

@@ -1,4 +1,6 @@
 import {add} from '../../ops/sparse/binary/add/add';
+import {divide} from '../../ops/sparse/binary/divide/divide';
+import {multiply} from '../../ops/sparse/binary/multiply/multiply';
 import {subtract} from '../../ops/sparse/binary/subtract/subtract';
 import {concat} from '../../ops/sparse/concat/concat';
 import {matMul} from '../../ops/sparse/matMul/matMul';
@@ -493,7 +495,7 @@ export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
     resultShape: readonly number[],
     alpha: number
   ): Tensor<DTpe> {
-    throw new Error('Method not implemented.');
+    return multiply(th as SparseTensor<DTpe>, tensor, resultShape, alpha);
   }
 
   divide_impl(
@@ -502,7 +504,7 @@ export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
     resultShape: readonly number[],
     alpha: number
   ): Tensor<DTpe> {
-    throw new Error('Method not implemented.');
+    return divide(th as SparseTensor<DTpe>, tensor, resultShape, alpha);
   }
 
   power_impl(
