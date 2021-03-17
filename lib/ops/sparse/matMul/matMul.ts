@@ -1,7 +1,9 @@
 import {CPUTensor} from '../../../tensor/cpu/tensor';
 import {SparseTensor} from '../../../tensor/sparse/tensor';
+import {WASMTensor} from '../../../tensor/wasm/tensor';
 import Tensor, {DType} from '../../../types';
 import {sparseDenseMatMulCPU} from './cpu';
+import {sparseDenseMatMulWASM} from './wasm';
 
 export function matMul<DTpe extends DType>(
   a: SparseTensor<DTpe>,
@@ -29,8 +31,10 @@ function sparseDenseMatMul<DTpe extends DType>(
 
   if (b instanceof CPUTensor) {
     return sparseDenseMatMulCPU(a, b);
+  } else if (b instanceof WASMTensor) {
+    return sparseDenseMatMulWASM(a, b);
   }
   throw new Error(
-    'Sparse-dense matrix multiplication not yet supported on WASM/WebGL'
+    'Sparse-dense matrix multiplication not yet supported on WebGL'
   );
 }

@@ -1,3 +1,4 @@
+use crate::dtype::u32::TensorU32;
 use crate::shape::compute_strides;
 use crate::shape::get_size;
 use crate::tensor::Tensor;
@@ -550,6 +551,14 @@ impl TensorF32 {
     ) -> TensorF32 {
         TensorF32 {
             tensor: self.tensor.slice(starts, ends, axis, steps),
+        }
+    }
+
+    pub fn matmul_sparse_dense(&self, indices: &TensorU32, b: &TensorF32, m: usize) -> TensorF32 {
+        TensorF32 {
+            tensor: self
+                .tensor
+                .matmul_sparse_dense(indices.get_tensor(), &b.tensor, m),
         }
     }
 }

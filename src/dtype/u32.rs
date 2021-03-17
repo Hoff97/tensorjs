@@ -12,6 +12,12 @@ pub struct TensorU32 {
     tensor: Tensor<u32>,
 }
 
+impl TensorU32 {
+    pub fn get_tensor(&self) -> &Tensor<u32> {
+        &self.tensor
+    }
+}
+
 #[wasm_bindgen]
 impl TensorU32 {
     pub fn create(shape: Uint32Array, values: Uint32Array) -> TensorU32 {
@@ -400,6 +406,14 @@ impl TensorU32 {
             tensor: self
                 .tensor
                 .repeat_sparse_indices(repeats, shape, repeats_prod),
+        }
+    }
+
+    pub fn matmul_sparse_dense(&self, indices: &TensorU32, b: &TensorU32, m: usize) -> TensorU32 {
+        TensorU32 {
+            tensor: self
+                .tensor
+                .matmul_sparse_dense(&indices.tensor, &b.tensor, m),
         }
     }
 }

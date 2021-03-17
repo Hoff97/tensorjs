@@ -1,6 +1,6 @@
 import {CPUTensor} from '../../../tensor/cpu/tensor';
 import {SparseTensor} from '../../../tensor/sparse/tensor';
-import Tensor, {DType} from '../../../types';
+import {DType} from '../../../types';
 
 /**
  * Calculates the sparse-dense matrix product, assuming that a
