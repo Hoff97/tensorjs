@@ -22,3 +22,26 @@ export function addDenseWASM<DTpe extends DTypeWasm>(
 
   return new SparseTensor(vals, a.indices.copy(), resultShape, a.denseDims);
 }
+
+export function addSparseWASM<DTpe extends DTypeWasm>(
+  a: SparseTensor<DTpe>,
+  b: SparseTensor<DTpe>,
+  resultShape: readonly number[],
+  alpha: number,
+  beta: number
+): SparseTensor<DTpe> {
+  const vals = new WASMTensor(
+    (a.values as WASMTensor<DTpe>).wasmTensor.add_sparse_sparse(
+      (a.indices as WASMTensor<'uint32'>).wasmTensor,
+      (b.indices as WASMTensor<'uint32'>).wasmTensor,
+      (b.values as WASMTensor<DTpe>).wasmTensor as any,
+      new Uint32Array(resultShape),
+      alpha,
+      beta
+    ) as any,
+    undefined,
+    a.dtype
+  );
+
+  return new SparseTensor(vals, a.indices.copy(), resultShape, a.denseDims);
+}

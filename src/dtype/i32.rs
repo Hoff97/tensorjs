@@ -473,4 +473,25 @@ impl TensorI32 {
             ),
         }
     }
+
+    pub fn add_sparse_sparse(
+        &self,
+        indices: &TensorU32,
+        b_indices: &TensorU32,
+        b_values: &Sel,
+        result_shape: Uint32Array,
+        alpha: Elem,
+        beta: Elem,
+    ) -> Self {
+        Self {
+            tensor: self.tensor.add_sparse_sparse(
+                indices.get_tensor(),
+                b_indices.get_tensor(),
+                &b_values.tensor,
+                result_shape,
+                alpha,
+                beta,
+            ),
+        }
+    }
 }
