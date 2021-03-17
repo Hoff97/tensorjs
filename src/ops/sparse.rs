@@ -166,14 +166,16 @@ where
         Tensor::new(result_shape, result_strides, result_size, result_values)
     }
 
-    pub fn _add_sparse_dense(
+    pub fn binary_sparse_dense<F>(
         &self,
         indices: &Tensor<u32>,
         b: &Tensor<DType>,
         result_shape: &Vec<usize>,
-        alpha: DType,
-        beta: DType,
-    ) -> Tensor<DType> {
+        op: F,
+    ) -> Tensor<DType>
+    where
+        F: Fn(DType, DType) -> DType,
+    {
         let s = indices.get_dim_size(1);
         let nnz = indices.get_dim_size(0);
 
@@ -205,7 +207,7 @@ where
                 let v_a = self.get(&ix_a);
                 let v_b = b.get(&result_ix);
 
-                result_values[i * dense_size + j] = alpha * v_a + beta * v_b;
+                result_values[i * dense_size + j] = op(v_a, v_b);
 
                 increment_index(&mut result_ix, &result_shape);
             }
@@ -217,6 +219,52 @@ where
             result_values_size,
             result_values,
         )
+    }
+
+    pub fn _add_sparse_dense(
+        &self,
+        indices: &Tensor<u32>,
+        b: &Tensor<DType>,
+        result_shape: &Vec<usize>,
+        alpha: DType,
+        beta: DType,
+    ) -> Tensor<DType> {
+        self.binary_sparse_dense(indices, b, result_shape, |a: DType, b: DType| {
+            alpha * a + beta * b
+        })
+    }
+
+    pub fn _subtract_sparse_dense(
+        &self,
+        indices: &Tensor<u32>,
+        b: &Tensor<DType>,
+        result_shape: &Vec<usize>,
+        alpha: DType,
+        beta: DType,
+    ) -> Tensor<DType> {
+        self.binary_sparse_dense(indices, b, result_shape, |a: DType, b: DType| {
+            alpha * a - beta * b
+        })
+    }
+
+    pub fn _multiply_sparse_dense(
+        &self,
+        indices: &Tensor<u32>,
+        b: &Tensor<DType>,
+        result_shape: &Vec<usize>,
+        alpha: DType,
+    ) -> Tensor<DType> {
+        self.binary_sparse_dense(indices, b, result_shape, |a: DType, b: DType| alpha * a * b)
+    }
+
+    pub fn _divide_sparse_dense(
+        &self,
+        indices: &Tensor<u32>,
+        b: &Tensor<DType>,
+        result_shape: &Vec<usize>,
+        alpha: DType,
+    ) -> Tensor<DType> {
+        self.binary_sparse_dense(indices, b, result_shape, |a: DType, b: DType| alpha * a / b)
     }
 
     pub fn add_sparse_dense(
@@ -234,5 +282,54 @@ where
         }
 
         self._add_sparse_dense(indices, b, &_result_shape, alpha, beta)
+    }
+
+    pub fn subtract_sparse_dense(
+        &self,
+        indices: &Tensor<u32>,
+        b: &Tensor<DType>,
+        result_shape: Uint32Array,
+        alpha: DType,
+        beta: DType,
+    ) -> Tensor<DType> {
+        let l = result_shape.length() as usize;
+        let mut _result_shape = vec![0; l];
+        for i in 0..l {
+            _result_shape[i] = result_shape.get_index(i as u32) as usize;
+        }
+
+        self._subtract_sparse_dense(indices, b, &_result_shape, alpha, beta)
+    }
+
+    pub fn multiply_sparse_dense(
+        &self,
+        indices: &Tensor<u32>,
+        b: &Tensor<DType>,
+        result_shape: Uint32Array,
+        alpha: DType,
+    ) -> Tensor<DType> {
+        let l = result_shape.length() as usize;
+        let mut _result_shape = vec![0; l];
+        for i in 0..l {
+            _result_shape[i] = result_shape.get_index(i as u32) as usize;
+        }
+
+        self._multiply_sparse_dense(indices, b, &_result_shape, alpha)
+    }
+
+    pub fn divide_sparse_dense(
+        &self,
+        indices: &Tensor<u32>,
+        b: &Tensor<DType>,
+        result_shape: Uint32Array,
+        alpha: DType,
+    ) -> Tensor<DType> {
+        let l = result_shape.length() as usize;
+        let mut _result_shape = vec![0; l];
+        for i in 0..l {
+            _result_shape[i] = result_shape.get_index(i as u32) as usize;
+        }
+
+        self._divide_sparse_dense(indices, b, &_result_shape, alpha)
     }
 }

@@ -14,6 +14,9 @@ pub struct TensorI16 {
     tensor: Tensor<i16>,
 }
 
+type Elem = i16;
+type Sel = TensorI16;
+
 #[wasm_bindgen]
 impl TensorI16 {
     pub fn create(shape: Uint32Array, values: Int16Array) -> TensorI16 {
@@ -403,18 +406,71 @@ impl TensorI16 {
     pub fn add_sparse_dense(
         &self,
         indices: &TensorU32,
-        b: &TensorI16,
+        b: &Sel,
         result_shape: Uint32Array,
-        alpha: i16,
-        beta: i16,
-    ) -> TensorI16 {
-        TensorI16 {
+        alpha: Elem,
+        beta: Elem,
+    ) -> Self {
+        Self {
             tensor: self.tensor.add_sparse_dense(
                 indices.get_tensor(),
                 &b.tensor,
                 result_shape,
                 alpha,
                 beta,
+            ),
+        }
+    }
+
+    pub fn subtract_sparse_dense(
+        &self,
+        indices: &TensorU32,
+        b: &Sel,
+        result_shape: Uint32Array,
+        alpha: Elem,
+        beta: Elem,
+    ) -> Self {
+        Self {
+            tensor: self.tensor.subtract_sparse_dense(
+                indices.get_tensor(),
+                &b.tensor,
+                result_shape,
+                alpha,
+                beta,
+            ),
+        }
+    }
+
+    pub fn multiply_sparse_dense(
+        &self,
+        indices: &TensorU32,
+        b: &Sel,
+        result_shape: Uint32Array,
+        alpha: Elem,
+    ) -> Self {
+        Self {
+            tensor: self.tensor.multiply_sparse_dense(
+                indices.get_tensor(),
+                &b.tensor,
+                result_shape,
+                alpha,
+            ),
+        }
+    }
+
+    pub fn divide_sparse_dense(
+        &self,
+        indices: &TensorU32,
+        b: &Sel,
+        result_shape: Uint32Array,
+        alpha: Elem,
+    ) -> Self {
+        Self {
+            tensor: self.tensor.divide_sparse_dense(
+                indices.get_tensor(),
+                &b.tensor,
+                result_shape,
+                alpha,
             ),
         }
     }

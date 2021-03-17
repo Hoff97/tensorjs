@@ -1,7 +1,9 @@
 import {CPUTensor} from '../../../../tensor/cpu/tensor';
 import {SparseTensor} from '../../../../tensor/sparse/tensor';
+import {WASMTensor} from '../../../../tensor/wasm/tensor';
 import Tensor, {DType} from '../../../../types';
 import {divideDenseCPU, divideSparseCPU} from './cpu';
+import {divideDenseWASM} from './wasm';
 
 export function divide<DTpe extends DType>(
   a: SparseTensor<DTpe>,
@@ -47,8 +49,10 @@ function divideDense<DTpe extends DType>(
 ): SparseTensor<DTpe> {
   if (b instanceof CPUTensor) {
     return divideDenseCPU(a, b, resultShape, alpha);
+  } else if (b instanceof WASMTensor) {
+    return divideDenseWASM(a, b, resultShape, alpha);
   }
   throw new Error(
-    'Sparse-dense matrix element wise division not supported on WASM/WebGL backend'
+    'Sparse-dense matrix element wise division not supported on WebGL backend'
   );
 }

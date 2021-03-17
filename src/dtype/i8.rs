@@ -14,6 +14,9 @@ pub struct TensorI8 {
     tensor: Tensor<i8>,
 }
 
+type Elem = i8;
+type Sel = TensorI8;
+
 #[wasm_bindgen]
 impl TensorI8 {
     pub fn create(shape: Uint32Array, values: Int8Array) -> TensorI8 {
@@ -403,18 +406,71 @@ impl TensorI8 {
     pub fn add_sparse_dense(
         &self,
         indices: &TensorU32,
-        b: &TensorI8,
+        b: &Sel,
         result_shape: Uint32Array,
-        alpha: i8,
-        beta: i8,
-    ) -> TensorI8 {
-        TensorI8 {
+        alpha: Elem,
+        beta: Elem,
+    ) -> Self {
+        Self {
             tensor: self.tensor.add_sparse_dense(
                 indices.get_tensor(),
                 &b.tensor,
                 result_shape,
                 alpha,
                 beta,
+            ),
+        }
+    }
+
+    pub fn subtract_sparse_dense(
+        &self,
+        indices: &TensorU32,
+        b: &Sel,
+        result_shape: Uint32Array,
+        alpha: Elem,
+        beta: Elem,
+    ) -> Self {
+        Self {
+            tensor: self.tensor.subtract_sparse_dense(
+                indices.get_tensor(),
+                &b.tensor,
+                result_shape,
+                alpha,
+                beta,
+            ),
+        }
+    }
+
+    pub fn multiply_sparse_dense(
+        &self,
+        indices: &TensorU32,
+        b: &Sel,
+        result_shape: Uint32Array,
+        alpha: Elem,
+    ) -> Self {
+        Self {
+            tensor: self.tensor.multiply_sparse_dense(
+                indices.get_tensor(),
+                &b.tensor,
+                result_shape,
+                alpha,
+            ),
+        }
+    }
+
+    pub fn divide_sparse_dense(
+        &self,
+        indices: &TensorU32,
+        b: &Sel,
+        result_shape: Uint32Array,
+        alpha: Elem,
+    ) -> Self {
+        Self {
+            tensor: self.tensor.divide_sparse_dense(
+                indices.get_tensor(),
+                &b.tensor,
+                result_shape,
+                alpha,
             ),
         }
     }

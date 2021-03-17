@@ -1,7 +1,9 @@
 import {CPUTensor} from '../../../../tensor/cpu/tensor';
 import {SparseTensor} from '../../../../tensor/sparse/tensor';
+import {WASMTensor} from '../../../../tensor/wasm/tensor';
 import Tensor, {DType} from '../../../../types';
 import {multiplyDenseCPU, multiplySparseCPU} from './cpu';
+import {multiplyDenseWASM} from './wasm';
 
 export function multiply<DTpe extends DType>(
   a: SparseTensor<DTpe>,
@@ -47,6 +49,8 @@ function multiplyDense<DTpe extends DType>(
 ): SparseTensor<DTpe> {
   if (b instanceof CPUTensor) {
     return multiplyDenseCPU(a, b, resultShape, alpha);
+  } else if (b instanceof WASMTensor) {
+    return multiplyDenseWASM(a, b, resultShape, alpha);
   }
   throw new Error(
     'Sparse-dense matrix element wise multiplication not supported on WASM/WebGL backend'

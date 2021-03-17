@@ -12,6 +12,9 @@ pub struct TensorU32 {
     tensor: Tensor<u32>,
 }
 
+type Elem = u32;
+type Sel = TensorU32;
+
 impl TensorU32 {
     pub fn get_tensor(&self) -> &Tensor<u32> {
         &self.tensor
@@ -420,18 +423,71 @@ impl TensorU32 {
     pub fn add_sparse_dense(
         &self,
         indices: &TensorU32,
-        b: &TensorU32,
+        b: &Sel,
         result_shape: Uint32Array,
-        alpha: u32,
-        beta: u32,
-    ) -> TensorU32 {
-        TensorU32 {
+        alpha: Elem,
+        beta: Elem,
+    ) -> Self {
+        Self {
             tensor: self.tensor.add_sparse_dense(
                 indices.get_tensor(),
                 &b.tensor,
                 result_shape,
                 alpha,
                 beta,
+            ),
+        }
+    }
+
+    pub fn subtract_sparse_dense(
+        &self,
+        indices: &TensorU32,
+        b: &Sel,
+        result_shape: Uint32Array,
+        alpha: Elem,
+        beta: Elem,
+    ) -> Self {
+        Self {
+            tensor: self.tensor.subtract_sparse_dense(
+                indices.get_tensor(),
+                &b.tensor,
+                result_shape,
+                alpha,
+                beta,
+            ),
+        }
+    }
+
+    pub fn multiply_sparse_dense(
+        &self,
+        indices: &TensorU32,
+        b: &Sel,
+        result_shape: Uint32Array,
+        alpha: Elem,
+    ) -> Self {
+        Self {
+            tensor: self.tensor.multiply_sparse_dense(
+                indices.get_tensor(),
+                &b.tensor,
+                result_shape,
+                alpha,
+            ),
+        }
+    }
+
+    pub fn divide_sparse_dense(
+        &self,
+        indices: &TensorU32,
+        b: &Sel,
+        result_shape: Uint32Array,
+        alpha: Elem,
+    ) -> Self {
+        Self {
+            tensor: self.tensor.divide_sparse_dense(
+                indices.get_tensor(),
+                &b.tensor,
+                result_shape,
+                alpha,
             ),
         }
     }

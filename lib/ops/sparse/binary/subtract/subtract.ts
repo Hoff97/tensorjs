@@ -1,7 +1,9 @@
 import {CPUTensor} from '../../../../tensor/cpu/tensor';
 import {SparseTensor} from '../../../../tensor/sparse/tensor';
+import {WASMTensor} from '../../../../tensor/wasm/tensor';
 import Tensor, {DType} from '../../../../types';
 import {subtractDenseCPU, subtractSparseCPU} from './cpu';
+import {subtractDenseWASM} from './wasm';
 
 export function subtract<DTpe extends DType>(
   a: SparseTensor<DTpe>,
@@ -50,6 +52,8 @@ function subtractDense<DTpe extends DType>(
 ): SparseTensor<DTpe> {
   if (b instanceof CPUTensor) {
     return subtractDenseCPU(a, b, resultShape, alpha, beta);
+  } else if (b instanceof WASMTensor) {
+    return subtractDenseWASM(a, b, resultShape, alpha, beta);
   }
   throw new Error(
     'Sparse-dense matrix addition not supported on WASM/WebGL backend'
