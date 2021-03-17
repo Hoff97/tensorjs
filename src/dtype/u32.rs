@@ -416,4 +416,23 @@ impl TensorU32 {
                 .matmul_sparse_dense(&indices.tensor, &b.tensor, m),
         }
     }
+
+    pub fn add_sparse_dense(
+        &self,
+        indices: &TensorU32,
+        b: &TensorU32,
+        result_shape: Uint32Array,
+        alpha: u32,
+        beta: u32,
+    ) -> TensorU32 {
+        TensorU32 {
+            tensor: self.tensor.add_sparse_dense(
+                indices.get_tensor(),
+                &b.tensor,
+                result_shape,
+                alpha,
+                beta,
+            ),
+        }
+    }
 }

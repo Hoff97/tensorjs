@@ -399,4 +399,23 @@ impl TensorI8 {
                 .matmul_sparse_dense(indices.get_tensor(), &b.tensor, m),
         }
     }
+
+    pub fn add_sparse_dense(
+        &self,
+        indices: &TensorU32,
+        b: &TensorI8,
+        result_shape: Uint32Array,
+        alpha: i8,
+        beta: i8,
+    ) -> TensorI8 {
+        TensorI8 {
+            tensor: self.tensor.add_sparse_dense(
+                indices.get_tensor(),
+                &b.tensor,
+                result_shape,
+                alpha,
+                beta,
+            ),
+        }
+    }
 }

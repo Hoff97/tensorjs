@@ -16,6 +16,8 @@ export function sparseDenseMatMulWASM<DTpe extends DTypeWasm>(
       (a.indices as WASMTensor<'uint32'>).wasmTensor,
       b.wasmTensor as any,
       a.shape[0]
-    ) as any
+    ) as any,
+    undefined,
+    a.dtype
   );
 }

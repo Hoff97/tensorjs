@@ -561,4 +561,23 @@ impl TensorF32 {
                 .matmul_sparse_dense(indices.get_tensor(), &b.tensor, m),
         }
     }
+
+    pub fn add_sparse_dense(
+        &self,
+        indices: &TensorU32,
+        b: &TensorF32,
+        result_shape: Uint32Array,
+        alpha: f32,
+        beta: f32,
+    ) -> TensorF32 {
+        TensorF32 {
+            tensor: self.tensor.add_sparse_dense(
+                indices.get_tensor(),
+                &b.tensor,
+                result_shape,
+                alpha,
+                beta,
+            ),
+        }
+    }
 }

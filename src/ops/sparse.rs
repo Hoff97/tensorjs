@@ -165,4 +165,74 @@ where
 
         Tensor::new(result_shape, result_strides, result_size, result_values)
     }
+
+    pub fn _add_sparse_dense(
+        &self,
+        indices: &Tensor<u32>,
+        b: &Tensor<DType>,
+        result_shape: &Vec<usize>,
+        alpha: DType,
+        beta: DType,
+    ) -> Tensor<DType> {
+        let s = indices.get_dim_size(1);
+        let nnz = indices.get_dim_size(0);
+
+        let d = result_shape.len() - s;
+
+        let mut result_values_shape = vec![0; d + 1];
+        result_values_shape[0] = nnz;
+        for i in 0..d {
+            result_values_shape[i + 1] = result_shape[s + i];
+        }
+        let result_values_strides = compute_strides(&result_values_shape);
+        let result_values_size = get_size(&result_values_shape);
+        let mut result_values = vec![zero(); result_values_size];
+
+        let dense_size = result_values_strides[0];
+
+        for i in 0..nnz {
+            let mut result_ix: Vec<usize> = vec![0; result_shape.len()];
+            for j in 0..s {
+                result_ix[j] = indices.get_ix(i * s + j) as usize;
+            }
+
+            for j in 0..dense_size {
+                let mut ix_a = vec![0; d + 1];
+                ix_a[0] = i;
+                for k in 0..d {
+                    ix_a[k + 1] = result_ix[s + k];
+                }
+                let v_a = self.get(&ix_a);
+                let v_b = b.get(&result_ix);
+
+                result_values[i * dense_size + j] = alpha * v_a + beta * v_b;
+
+                increment_index(&mut result_ix, &result_shape);
+            }
+        }
+
+        Tensor::new(
+            result_values_shape,
+            result_values_strides,
+            result_values_size,
+            result_values,
+        )
+    }
+
+    pub fn add_sparse_dense(
+        &self,
+        indices: &Tensor<u32>,
+        b: &Tensor<DType>,
+        result_shape: Uint32Array,
+        alpha: DType,
+        beta: DType,
+    ) -> Tensor<DType> {
+        let l = result_shape.length() as usize;
+        let mut _result_shape = vec![0; l];
+        for i in 0..l {
+            _result_shape[i] = result_shape.get_index(i as u32) as usize;
+        }
+
+        self._add_sparse_dense(indices, b, &_result_shape, alpha, beta)
+    }
 }
