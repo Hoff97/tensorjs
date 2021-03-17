@@ -27,7 +27,7 @@ const backends: Backend[] = [
       dtype: DTpe
     ) => new CPUTensor(shape, values, dtype),
     toBackend: <DTpe extends DType>(tensor: Tensor<DTpe>) => toCPU(tensor),
-  } /*,
+  },
   {
     name: 'WASM',
     constructor: <DTpe extends DType>(

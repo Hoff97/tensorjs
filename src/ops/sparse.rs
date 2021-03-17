@@ -440,4 +440,108 @@ where
 
         self._add_sparse_sparse(indices, b_indices, b_values, &_result_shape, alpha, beta)
     }
+
+    pub fn _subtract_sparse_sparse(
+        &self,
+        indices: &Tensor<u32>,
+        b_indices: &Tensor<u32>,
+        b_values: &Tensor<DType>,
+        result_shape: &Vec<usize>,
+        alpha: DType,
+        beta: DType,
+    ) -> Tensor<DType> {
+        self.binary_sparse_sparse(
+            indices,
+            b_indices,
+            b_values,
+            result_shape,
+            |a: DType, b: DType| alpha * a - beta * b,
+        )
+    }
+
+    pub fn subtract_sparse_sparse(
+        &self,
+        indices: &Tensor<u32>,
+        b_indices: &Tensor<u32>,
+        b_values: &Tensor<DType>,
+        result_shape: Uint32Array,
+        alpha: DType,
+        beta: DType,
+    ) -> Tensor<DType> {
+        let l = result_shape.length() as usize;
+        let mut _result_shape = vec![0; l];
+        for i in 0..l {
+            _result_shape[i] = result_shape.get_index(i as u32) as usize;
+        }
+
+        self._subtract_sparse_sparse(indices, b_indices, b_values, &_result_shape, alpha, beta)
+    }
+
+    pub fn _multiply_sparse_sparse(
+        &self,
+        indices: &Tensor<u32>,
+        b_indices: &Tensor<u32>,
+        b_values: &Tensor<DType>,
+        result_shape: &Vec<usize>,
+        alpha: DType,
+    ) -> Tensor<DType> {
+        self.binary_sparse_sparse(
+            indices,
+            b_indices,
+            b_values,
+            result_shape,
+            |a: DType, b: DType| alpha * a * b,
+        )
+    }
+
+    pub fn multiply_sparse_sparse(
+        &self,
+        indices: &Tensor<u32>,
+        b_indices: &Tensor<u32>,
+        b_values: &Tensor<DType>,
+        result_shape: Uint32Array,
+        alpha: DType,
+    ) -> Tensor<DType> {
+        let l = result_shape.length() as usize;
+        let mut _result_shape = vec![0; l];
+        for i in 0..l {
+            _result_shape[i] = result_shape.get_index(i as u32) as usize;
+        }
+
+        self._multiply_sparse_sparse(indices, b_indices, b_values, &_result_shape, alpha)
+    }
+
+    pub fn _divide_sparse_sparse(
+        &self,
+        indices: &Tensor<u32>,
+        b_indices: &Tensor<u32>,
+        b_values: &Tensor<DType>,
+        result_shape: &Vec<usize>,
+        alpha: DType,
+    ) -> Tensor<DType> {
+        self.binary_sparse_sparse(
+            indices,
+            b_indices,
+            b_values,
+            result_shape,
+            |a: DType, b: DType| alpha * a / b,
+        )
+    }
+
+    pub fn divide_sparse_sparse(
+        &self,
+        indices: &Tensor<u32>,
+        b_indices: &Tensor<u32>,
+        b_values: &Tensor<DType>,
+        result_shape: Uint32Array,
+        alpha: DType,
+    ) -> Tensor<DType> {
+        let l = result_shape.length() as usize;
+        let mut _result_shape = vec![0; l];
+        for i in 0..l {
+            _result_shape[i] = result_shape.get_index(i as u32) as usize;
+        }
+
+        self._divide_sparse_sparse(indices, b_indices, b_values, &_result_shape, alpha)
+    }
 }

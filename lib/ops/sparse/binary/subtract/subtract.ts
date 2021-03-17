@@ -3,7 +3,7 @@ import {SparseTensor} from '../../../../tensor/sparse/tensor';
 import {WASMTensor} from '../../../../tensor/wasm/tensor';
 import Tensor, {DType} from '../../../../types';
 import {subtractDenseCPU, subtractSparseCPU} from './cpu';
-import {subtractDenseWASM} from './wasm';
+import {subtractDenseWASM, subtractSparseWASM} from './wasm';
 
 export function subtract<DTpe extends DType>(
   a: SparseTensor<DTpe>,
@@ -37,9 +37,17 @@ function subtractSparse<DTpe extends DType>(
   }
   if (a.values instanceof CPUTensor) {
     return subtractSparseCPU(a, b, resultShape, alpha, beta);
+  } else if (a.values instanceof WASMTensor) {
+    return subtractSparseWASM(
+      a as any,
+      b as any,
+      resultShape,
+      alpha,
+      beta
+    ) as any;
   }
   throw new Error(
-    'Sparse-sparse matrix subtraction not supported on WASM/WebGL backend'
+    'Sparse-sparse matrix subtraction not supported on WebGL backend'
   );
 }
 

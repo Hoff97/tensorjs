@@ -3,7 +3,7 @@ import {SparseTensor} from '../../../../tensor/sparse/tensor';
 import {WASMTensor} from '../../../../tensor/wasm/tensor';
 import Tensor, {DType} from '../../../../types';
 import {divideDenseCPU, divideSparseCPU} from './cpu';
-import {divideDenseWASM} from './wasm';
+import {divideDenseWASM, divideSparseWASM} from './wasm';
 
 export function divide<DTpe extends DType>(
   a: SparseTensor<DTpe>,
@@ -35,9 +35,11 @@ function divideSparse<DTpe extends DType>(
   }
   if (a.values instanceof CPUTensor) {
     return divideSparseCPU(a, b, resultShape, alpha);
+  } else if (a.values instanceof WASMTensor) {
+    return divideSparseWASM(a as any, b as any, resultShape, alpha) as any;
   }
   throw new Error(
-    'Sparse-sparse matrix division not supported on WASM/WebGL backend'
+    'Sparse-sparse matrix division not supported on WebGL backend'
   );
 }
 

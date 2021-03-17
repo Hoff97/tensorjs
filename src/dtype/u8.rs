@@ -477,4 +477,63 @@ impl TensorU8 {
             ),
         }
     }
+
+    pub fn subtract_sparse_sparse(
+        &self,
+        indices: &TensorU32,
+        b_indices: &TensorU32,
+        b_values: &Sel,
+        result_shape: Uint32Array,
+        alpha: Elem,
+        beta: Elem,
+    ) -> Self {
+        Self {
+            tensor: self.tensor.subtract_sparse_sparse(
+                indices.get_tensor(),
+                b_indices.get_tensor(),
+                &b_values.tensor,
+                result_shape,
+                alpha,
+                beta,
+            ),
+        }
+    }
+
+    pub fn divide_sparse_sparse(
+        &self,
+        indices: &TensorU32,
+        b_indices: &TensorU32,
+        b_values: &Sel,
+        result_shape: Uint32Array,
+        alpha: Elem,
+    ) -> Self {
+        Self {
+            tensor: self.tensor.divide_sparse_sparse(
+                indices.get_tensor(),
+                b_indices.get_tensor(),
+                &b_values.tensor,
+                result_shape,
+                alpha,
+            ),
+        }
+    }
+
+    pub fn multiply_sparse_sparse(
+        &self,
+        indices: &TensorU32,
+        b_indices: &TensorU32,
+        b_values: &Sel,
+        result_shape: Uint32Array,
+        alpha: Elem,
+    ) -> Self {
+        Self {
+            tensor: self.tensor.multiply_sparse_sparse(
+                indices.get_tensor(),
+                b_indices.get_tensor(),
+                &b_values.tensor,
+                result_shape,
+                alpha,
+            ),
+        }
+    }
 }
