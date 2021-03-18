@@ -1,3 +1,7 @@
+import {max} from '../../ops/sparse/aggregate/max/max';
+import {min} from '../../ops/sparse/aggregate/min/min';
+import {product} from '../../ops/sparse/aggregate/product/product';
+import {reduceMean} from '../../ops/sparse/aggregate/reduceMean/reduceMean';
 import {sum} from '../../ops/sparse/aggregate/sum/sum';
 import {sumSquare} from '../../ops/sparse/aggregate/sumSquare/sumSquare';
 import {add} from '../../ops/sparse/binary/add/add';
@@ -613,19 +617,19 @@ export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
   }
 
   protected product_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
-    throw new Error('Method not implemented.');
+    return product(this, axes, keepDims);
   }
 
   protected max_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
-    throw new Error('Method not implemented.');
+    return max(this, axes, keepDims);
   }
 
   protected min_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
-    throw new Error('Method not implemented.');
+    return min(this, axes, keepDims);
   }
 
   protected reduceMean_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
-    throw new Error('Method not implemented.');
+    return reduceMean(this, axes, keepDims);
   }
 
   protected reduceMeanSquare_impl(
