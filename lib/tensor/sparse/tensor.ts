@@ -1,4 +1,5 @@
 import {sum} from '../../ops/sparse/aggregate/sum/sum';
+import {sumSquare} from '../../ops/sparse/aggregate/sumSquare/sumSquare';
 import {add} from '../../ops/sparse/binary/add/add';
 import {divide} from '../../ops/sparse/binary/divide/divide';
 import {multiply} from '../../ops/sparse/binary/multiply/multiply';
@@ -608,7 +609,7 @@ export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
   }
 
   protected sumSquare_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
-    throw new Error('Method not implemented.');
+    return sumSquare(this, axes, keepDims);
   }
 
   protected product_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {

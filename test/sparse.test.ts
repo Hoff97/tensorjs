@@ -18,6 +18,8 @@ interface Backend {
   wait?: Promise<void>;
 }
 
+const epsilon = 0.0001;
+
 const backends: Backend[] = [
   {
     name: 'CPU',
@@ -27,7 +29,7 @@ const backends: Backend[] = [
       dtype: DTpe
     ) => new CPUTensor(shape, values, dtype),
     toBackend: <DTpe extends DType>(tensor: Tensor<DTpe>) => toCPU(tensor),
-  },
+  } /*,
   {
     name: 'WASM',
     constructor: <DTpe extends DType>(
@@ -791,6 +793,188 @@ for (const backend of backends) {
           new CPUTensor([3, 3], [5, 0, 0, 0, 3, 0, 0, 7 / 3, 2])
         )
       );
+
+      expect(await result.compare(expected)).toBeTrue();
+    });
+
+    it('should work with summing over dense dimensions', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const nnz = 4;
+      const shape = [3, 3, 2];
+      const denseDims = 1;
+
+      const indiceValsA = [0, 0, 1, 1, 2, 1, 2, 2];
+      const indiceTensorA = backend.constructor(
+        [nnz, shape.length - denseDims],
+        indiceValsA,
+        'uint32'
+      );
+      const valueValsA = [1, 2, 3, 4, 5, 6, 7, 8];
+      const valueTensorA = backend.constructor(
+        [nnz, ...shape.slice(shape.length - denseDims)],
+        valueValsA,
+        'float32'
+      );
+      const tensorA = new SparseTensor(
+        valueTensorA,
+        indiceTensorA,
+        shape,
+        denseDims
+      );
+
+      const indiceValsResult1 = [0, 0, 1, 1, 2, 1, 2, 2];
+      const indiceTensorResult1 = backend.constructor(
+        [nnz, shape.length - denseDims],
+        indiceValsResult1,
+        'uint32'
+      );
+      const valueValsResult1 = [3, 7, 11, 15];
+      const valueTensorResult1 = backend.constructor(
+        [4],
+        valueValsResult1,
+        'float32'
+      );
+      const tensorResult1 = new SparseTensor(
+        valueTensorResult1,
+        indiceTensorResult1,
+        [3, 3]
+      );
+
+      const res1 = tensorA.sum(2) as SparseTensor;
+      expect(res1.nnz).toBe(4);
+      expect(res1.shape).toEqual([3, 3]);
+
+      expect(await res1.compare(tensorResult1, epsilon)).toBeTrue();
+    });
+
+    it('should work with summing over sparse dimension 1', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = await backend.toBackend(
+        SparseTensor.fromDense(
+          new CPUTensor([3, 4], [1, 0, 0, 2, 0, 3, 0, 0, 0, 4, 5, 0])
+        )
+      );
+
+      const result = a.sum(0);
+
+      const expected = await backend.constructor([4], [1, 7, 5, 2], 'float32');
+
+      expect(await result.compare(expected)).toBeTrue();
+    });
+
+    it('should work with summing over sparse dimension 2', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = await backend.toBackend(
+        SparseTensor.fromDense(
+          new CPUTensor([3, 4], [1, 0, 0, 2, 0, 3, 0, 0, 0, 4, 5, 0])
+        )
+      );
+
+      const result = a.sum(1);
+
+      const expected = await backend.constructor([3], [3, 3, 9], 'float32');
+
+      expect(await result.compare(expected)).toBeTrue();
+    });
+
+    it('should work with summing squared over dense dimensions', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const nnz = 4;
+      const shape = [3, 3, 2];
+      const denseDims = 1;
+
+      const indiceValsA = [0, 0, 1, 1, 2, 1, 2, 2];
+      const indiceTensorA = backend.constructor(
+        [nnz, shape.length - denseDims],
+        indiceValsA,
+        'uint32'
+      );
+      const valueValsA = [1, 2, 3, 4, 5, 6, 7, 8];
+      const valueTensorA = backend.constructor(
+        [nnz, ...shape.slice(shape.length - denseDims)],
+        valueValsA,
+        'float32'
+      );
+      const tensorA = new SparseTensor(
+        valueTensorA,
+        indiceTensorA,
+        shape,
+        denseDims
+      );
+
+      const indiceValsResult1 = [0, 0, 1, 1, 2, 1, 2, 2];
+      const indiceTensorResult1 = backend.constructor(
+        [nnz, shape.length - denseDims],
+        indiceValsResult1,
+        'uint32'
+      );
+      const valueValsResult1 = [5, 25, 61, 113];
+      const valueTensorResult1 = backend.constructor(
+        [4],
+        valueValsResult1,
+        'float32'
+      );
+      const tensorResult1 = new SparseTensor(
+        valueTensorResult1,
+        indiceTensorResult1,
+        [3, 3]
+      );
+
+      const res1 = tensorA.sumSquare(2) as SparseTensor;
+      expect(res1.nnz).toBe(4);
+      expect(res1.shape).toEqual([3, 3]);
+
+      expect(await res1.compare(tensorResult1, epsilon)).toBeTrue();
+    });
+
+    it('should work with summing squared over sparse dimension 1', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = await backend.toBackend(
+        SparseTensor.fromDense(
+          new CPUTensor([3, 4], [1, 0, 0, 2, 0, 3, 0, 0, 0, 4, 5, 0])
+        )
+      );
+
+      const result = a.sumSquare(0);
+
+      const expected = await backend.constructor(
+        [4],
+        [1, 25, 25, 4],
+        'float32'
+      );
+
+      expect(await result.compare(expected)).toBeTrue();
+    });
+
+    it('should work with summing squared over sparse dimension 2', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = await backend.toBackend(
+        SparseTensor.fromDense(
+          new CPUTensor([3, 4], [1, 0, 0, 2, 0, 3, 0, 0, 0, 4, 5, 0])
+        )
+      );
+
+      const result = a.sumSquare(1);
+
+      const expected = await backend.constructor([3], [5, 9, 41], 'float32');
 
       expect(await result.compare(expected)).toBeTrue();
     });
