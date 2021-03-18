@@ -1342,5 +1342,204 @@ for (const backend of backends) {
 
       expect(await result.compare(expected)).toBeTrue();
     });
+
+    it('should work with mean squared over dense dimensions', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const nnz = 4;
+      const shape = [3, 3, 2];
+      const denseDims = 1;
+
+      const indiceValsA = [0, 0, 1, 1, 2, 1, 2, 2];
+      const indiceTensorA = backend.constructor(
+        [nnz, shape.length - denseDims],
+        indiceValsA,
+        'uint32'
+      );
+      const valueValsA = [1, 2, 3, 4, 5, 6, 7, 8];
+      const valueTensorA = backend.constructor(
+        [nnz, ...shape.slice(shape.length - denseDims)],
+        valueValsA,
+        'float32'
+      );
+      const tensorA = new SparseTensor(
+        valueTensorA,
+        indiceTensorA,
+        shape,
+        denseDims
+      );
+
+      const indiceValsResult1 = [0, 0, 1, 1, 2, 1, 2, 2];
+      const indiceTensorResult1 = backend.constructor(
+        [nnz, shape.length - denseDims],
+        indiceValsResult1,
+        'uint32'
+      );
+      const valueValsResult1 = [5 / 2, 25 / 2, 61 / 2, 113 / 2];
+      const valueTensorResult1 = backend.constructor(
+        [4],
+        valueValsResult1,
+        'float32'
+      );
+      const tensorResult1 = new SparseTensor(
+        valueTensorResult1,
+        indiceTensorResult1,
+        [3, 3]
+      );
+
+      const res1 = tensorA.reduceMeanSquare(2) as SparseTensor;
+      expect(res1.nnz).toBe(4);
+      expect(res1.shape).toEqual([3, 3]);
+
+      expect(await res1.compare(tensorResult1, epsilon)).toBeTrue();
+    });
+
+    it('should work with mean squared over sparse dimension 1', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = await backend.toBackend(
+        SparseTensor.fromDense(
+          new CPUTensor([3, 4], [1, 0, 0, 2, 0, 3, 0, 0, 0, 4, 5, 0])
+        )
+      );
+
+      const result = a.reduceMeanSquare(0);
+
+      const expected = await backend.constructor(
+        [4],
+        [1, 25 / 2, 25, 4],
+        'float32'
+      );
+
+      expect(await result.compare(expected)).toBeTrue();
+    });
+
+    it('should work with mean squared over sparse dimension 2', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = await backend.toBackend(
+        SparseTensor.fromDense(
+          new CPUTensor([3, 4], [1, 0, 0, 2, 0, 3, 0, 0, 0, 4, 5, 0])
+        )
+      );
+
+      const result = a.reduceMeanSquare(1);
+
+      const expected = await backend.constructor(
+        [3],
+        [5 / 2, 9, 41 / 2],
+        'float32'
+      );
+
+      expect(await result.compare(expected)).toBeTrue();
+    });
+
+    it('should work with log sum over dense dimensions', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const nnz = 4;
+      const shape = [3, 3, 2];
+      const denseDims = 1;
+
+      const indiceValsA = [0, 0, 1, 1, 2, 1, 2, 2];
+      const indiceTensorA = backend.constructor(
+        [nnz, shape.length - denseDims],
+        indiceValsA,
+        'uint32'
+      );
+      const valueValsA = [1, 2, 3, 4, 5, 6, 7, 8];
+      const valueTensorA = backend.constructor(
+        [nnz, ...shape.slice(shape.length - denseDims)],
+        valueValsA,
+        'float32'
+      );
+      const tensorA = new SparseTensor(
+        valueTensorA,
+        indiceTensorA,
+        shape,
+        denseDims
+      );
+
+      const indiceValsResult1 = [0, 0, 1, 1, 2, 1, 2, 2];
+      const indiceTensorResult1 = backend.constructor(
+        [nnz, shape.length - denseDims],
+        indiceValsResult1,
+        'uint32'
+      );
+      const valueValsResult1 = [
+        Math.log(3),
+        Math.log(7),
+        Math.log(11),
+        Math.log(15),
+      ];
+      const valueTensorResult1 = backend.constructor(
+        [4],
+        valueValsResult1,
+        'float32'
+      );
+      const tensorResult1 = new SparseTensor(
+        valueTensorResult1,
+        indiceTensorResult1,
+        [3, 3]
+      );
+
+      const res1 = tensorA.reduceLogSum(2) as SparseTensor;
+      expect(res1.nnz).toBe(4);
+      expect(res1.shape).toEqual([3, 3]);
+
+      expect(await res1.compare(tensorResult1, epsilon)).toBeTrue();
+    });
+
+    it('should work with log sum over sparse dimension 1', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = await backend.toBackend(
+        SparseTensor.fromDense(
+          new CPUTensor([3, 4], [1, 0, 0, 2, 0, 3, 0, 0, 0, 4, 5, 0])
+        )
+      );
+
+      const result = a.reduceLogSum(0);
+
+      const expected = await backend.constructor(
+        [4],
+        [Math.log(1), Math.log(7), Math.log(5), Math.log(2)],
+        'float32'
+      );
+
+      expect(await result.compare(expected)).toBeTrue();
+    });
+
+    it('should work with log sum over sparse dimension 2', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = await backend.toBackend(
+        SparseTensor.fromDense(
+          new CPUTensor([3, 4], [1, 0, 0, 2, 0, 3, 0, 0, 0, 4, 5, 0])
+        )
+      );
+
+      const result = a.reduceLogSum(1);
+
+      const expected = await backend.constructor(
+        [3],
+        [Math.log(3), Math.log(3), Math.log(9)],
+        'float32'
+      );
+
+      expect(await result.compare(expected)).toBeTrue();
+    });
   });
 }

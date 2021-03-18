@@ -1,7 +1,10 @@
 import {max} from '../../ops/sparse/aggregate/max/max';
 import {min} from '../../ops/sparse/aggregate/min/min';
 import {product} from '../../ops/sparse/aggregate/product/product';
+import {reduceLogSum} from '../../ops/sparse/aggregate/reduceLogSum/reduceLogSum';
+import {reduceLogSumExp} from '../../ops/sparse/aggregate/reduceLogSumExp/reduceLogSumExp';
 import {reduceMean} from '../../ops/sparse/aggregate/reduceMean/reduceMean';
+import {reduceMeanSquare} from '../../ops/sparse/aggregate/reduceMeanSquare/reduceMeanSquare';
 import {sum} from '../../ops/sparse/aggregate/sum/sum';
 import {sumSquare} from '../../ops/sparse/aggregate/sumSquare/sumSquare';
 import {add} from '../../ops/sparse/binary/add/add';
@@ -636,18 +639,18 @@ export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
     axes: number[],
     keepDims: boolean
   ): Tensor<DTpe> {
-    throw new Error('Method not implemented.');
+    return reduceMeanSquare(this, axes, keepDims);
   }
 
   protected reduceLogSum_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
-    throw new Error('Method not implemented.');
+    return reduceLogSum(this, axes, keepDims);
   }
 
   protected reduceLogSumExp_impl(
     axes: number[],
     keepDims: boolean
   ): Tensor<DTpe> {
-    throw new Error('Method not implemented.');
+    return reduceLogSumExp(this, axes, keepDims);
   }
 
   protected conv_impl(
