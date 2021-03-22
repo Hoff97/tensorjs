@@ -19,9 +19,13 @@ pub mod ops {
     pub mod binary;
     pub mod conv;
     pub mod matmul;
-    pub mod sparse;
     pub mod unary;
     pub mod util;
+    pub mod sparse {
+        pub mod binary;
+        pub mod matmul;
+        pub mod util;
+    }
 }
 
 pub mod tests {
