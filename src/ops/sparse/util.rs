@@ -1,9 +1,6 @@
 use crate::shape::*;
 use crate::tensor::*;
 use js_sys::Uint32Array;
-use num_traits::zero;
-use num_traits::Num;
-use std::collections::HashMap;
 
 impl Tensor<u32> {
     pub fn _reshape_sparse_indices(

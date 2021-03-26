@@ -95,6 +95,7 @@ module.exports = function (config) {
     // When debugging, the browser shouldnt be timed out too quickly,
     // since one might stay in one breakpoint for a while
     browserNoActivityTimeout: debug ? 600 * 1000 : 30 * 1000,
+    browserDisconnectTimeout: debug ? 600 * 1000 : 2 * 1000,
     browsers: debug ? [] : ['ChromeDebugging'],
 
     customLaunchers: {
