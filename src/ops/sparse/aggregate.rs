@@ -9,16 +9,19 @@ where
     DType: Copy,
     DType: Num,
 {
-    pub fn aggregate_sparse<F>(
+    pub fn aggregate_sparse<F, F2>(
         &self,
         shape: &Vec<usize>,
         indices: &Tensor<u32>,
         axes: &Vec<usize>,
         keep_dims: bool,
         op: F,
+        init: bool,
+        init_op: F2,
     ) -> Tensor<DType>
     where
         F: Fn(DType, DType) -> DType,
+        F2: Fn(DType) -> DType,
     {
         let nnz = self.get_dim_size(0);
         let s = indices.get_dim_size(1);
@@ -81,7 +84,12 @@ where
                     }
                 }
 
-                values[out_pos] = op(values[out_pos], v);
+                if init && !initialized[out_pos] {
+                    values[out_pos] = init_op(v);
+                    initialized[out_pos] = true;
+                } else {
+                    values[out_pos] = op(values[out_pos], v);
+                }
 
                 increment_index_slice(&mut dense_ix, &self.get_sh()[1..]);
             }
@@ -97,7 +105,15 @@ where
         axes: &Vec<usize>,
         keep_dims: bool,
     ) -> Tensor<DType> {
-        self.aggregate_sparse(shape, indices, axes, keep_dims, |a: DType, b: DType| a + b)
+        self.aggregate_sparse(
+            shape,
+            indices,
+            axes,
+            keep_dims,
+            |a: DType, b: DType| a + b,
+            false,
+            |a: DType| a,
+        )
     }
 
     pub fn sum_sparse(
@@ -118,5 +134,43 @@ where
         }
 
         self._sum_sparse(&_shape, indices, &_axes, keep_dims)
+    }
+
+    pub fn _sum_square_sparse(
+        &self,
+        shape: &Vec<usize>,
+        indices: &Tensor<u32>,
+        axes: &Vec<usize>,
+        keep_dims: bool,
+    ) -> Tensor<DType> {
+        self.aggregate_sparse(
+            shape,
+            indices,
+            axes,
+            keep_dims,
+            |a: DType, b: DType| a + b * b,
+            true,
+            |a: DType| a * a,
+        )
+    }
+
+    pub fn sum_square_sparse(
+        &self,
+        shape: Uint32Array,
+        indices: &Tensor<u32>,
+        axes: Uint32Array,
+        keep_dims: bool,
+    ) -> Tensor<DType> {
+        let mut _shape: Vec<usize> = vec![0; shape.length() as usize];
+        for i in 0..shape.length() {
+            _shape[i as usize] = shape.get_index(i as u32) as usize;
+        }
+
+        let mut _axes: Vec<usize> = vec![0; axes.length() as usize];
+        for i in 0..axes.length() {
+            _axes[i as usize] = axes.get_index(i as u32) as usize;
+        }
+
+        self._sum_square_sparse(&_shape, indices, &_axes, keep_dims)
     }
 }

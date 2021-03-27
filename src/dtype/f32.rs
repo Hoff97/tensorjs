@@ -730,4 +730,18 @@ impl TensorF32 {
                 .sum_sparse(shape, indices.get_tensor(), axes, keep_dims),
         }
     }
+
+    pub fn sum_square_sparse(
+        &self,
+        shape: Uint32Array,
+        indices: &TensorU32,
+        axes: Uint32Array,
+        keep_dims: bool,
+    ) -> Self {
+        Self {
+            tensor: self
+                .tensor
+                .sum_square_sparse(shape, indices.get_tensor(), axes, keep_dims),
+        }
+    }
 }
