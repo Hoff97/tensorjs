@@ -9,6 +9,7 @@ impl<DType> Tensor<DType>
 where
     DType: Copy,
     DType: Num,
+    DType: PartialOrd,
     DType: FromPrimitive,
 {
     pub fn aggregate_sparse<F, F2, F3>(
@@ -228,5 +229,165 @@ where
         }
 
         self._reduce_mean_sparse(&_shape, indices, &_axes, keep_dims)
+    }
+
+    pub fn _product_sparse(
+        &self,
+        shape: &Vec<usize>,
+        indices: &Tensor<u32>,
+        axes: &Vec<usize>,
+        keep_dims: bool,
+    ) -> Tensor<DType> {
+        self.aggregate_sparse(
+            shape,
+            indices,
+            axes,
+            keep_dims,
+            |a: DType, b: DType| a * b,
+            false,
+            |a: DType| a,
+            false,
+            |a: DType, b: usize| a,
+        )
+    }
+
+    pub fn product_sparse(
+        &self,
+        shape: Uint32Array,
+        indices: &Tensor<u32>,
+        axes: Uint32Array,
+        keep_dims: bool,
+    ) -> Tensor<DType> {
+        let mut _shape: Vec<usize> = vec![0; shape.length() as usize];
+        for i in 0..shape.length() {
+            _shape[i as usize] = shape.get_index(i as u32) as usize;
+        }
+
+        let mut _axes: Vec<usize> = vec![0; axes.length() as usize];
+        for i in 0..axes.length() {
+            _axes[i as usize] = axes.get_index(i as u32) as usize;
+        }
+
+        self._product_sparse(&_shape, indices, &_axes, keep_dims)
+    }
+
+    pub fn _max_sparse(
+        &self,
+        shape: &Vec<usize>,
+        indices: &Tensor<u32>,
+        axes: &Vec<usize>,
+        keep_dims: bool,
+    ) -> Tensor<DType> {
+        self.aggregate_sparse(
+            shape,
+            indices,
+            axes,
+            keep_dims,
+            |a: DType, b: DType| if a.le(&b) { b } else { a },
+            true,
+            |a: DType| a,
+            false,
+            |a: DType, b: usize| a,
+        )
+    }
+
+    pub fn max_sparse(
+        &self,
+        shape: Uint32Array,
+        indices: &Tensor<u32>,
+        axes: Uint32Array,
+        keep_dims: bool,
+    ) -> Tensor<DType> {
+        let mut _shape: Vec<usize> = vec![0; shape.length() as usize];
+        for i in 0..shape.length() {
+            _shape[i as usize] = shape.get_index(i as u32) as usize;
+        }
+
+        let mut _axes: Vec<usize> = vec![0; axes.length() as usize];
+        for i in 0..axes.length() {
+            _axes[i as usize] = axes.get_index(i as u32) as usize;
+        }
+
+        self._max_sparse(&_shape, indices, &_axes, keep_dims)
+    }
+
+    pub fn _min_sparse(
+        &self,
+        shape: &Vec<usize>,
+        indices: &Tensor<u32>,
+        axes: &Vec<usize>,
+        keep_dims: bool,
+    ) -> Tensor<DType> {
+        self.aggregate_sparse(
+            shape,
+            indices,
+            axes,
+            keep_dims,
+            |a: DType, b: DType| if a.le(&b) { a } else { b },
+            true,
+            |a: DType| a,
+            false,
+            |a: DType, b: usize| a,
+        )
+    }
+
+    pub fn min_sparse(
+        &self,
+        shape: Uint32Array,
+        indices: &Tensor<u32>,
+        axes: Uint32Array,
+        keep_dims: bool,
+    ) -> Tensor<DType> {
+        let mut _shape: Vec<usize> = vec![0; shape.length() as usize];
+        for i in 0..shape.length() {
+            _shape[i as usize] = shape.get_index(i as u32) as usize;
+        }
+
+        let mut _axes: Vec<usize> = vec![0; axes.length() as usize];
+        for i in 0..axes.length() {
+            _axes[i as usize] = axes.get_index(i as u32) as usize;
+        }
+
+        self._min_sparse(&_shape, indices, &_axes, keep_dims)
+    }
+
+    pub fn _reduce_mean_squared_sparse(
+        &self,
+        shape: &Vec<usize>,
+        indices: &Tensor<u32>,
+        axes: &Vec<usize>,
+        keep_dims: bool,
+    ) -> Tensor<DType> {
+        self.aggregate_sparse(
+            shape,
+            indices,
+            axes,
+            keep_dims,
+            |a: DType, b: DType| a + b*b,
+            true,
+            |a: DType| a*a,
+            true,
+            |a: DType, b: usize| a / DType::from_usize(b).expect("Error in squared sparse mean: Data type can not represent number of items contained in dimension"),
+        )
+    }
+
+    pub fn reduce_mean_squared_sparse(
+        &self,
+        shape: Uint32Array,
+        indices: &Tensor<u32>,
+        axes: Uint32Array,
+        keep_dims: bool,
+    ) -> Tensor<DType> {
+        let mut _shape: Vec<usize> = vec![0; shape.length() as usize];
+        for i in 0..shape.length() {
+            _shape[i as usize] = shape.get_index(i as u32) as usize;
+        }
+
+        let mut _axes: Vec<usize> = vec![0; axes.length() as usize];
+        for i in 0..axes.length() {
+            _axes[i as usize] = axes.get_index(i as u32) as usize;
+        }
+
+        self._reduce_mean_squared_sparse(&_shape, indices, &_axes, keep_dims)
     }
 }

@@ -1,9 +1,11 @@
 import {Tensor} from '../../../../library';
 import {CPUTensor} from '../../../../tensor/cpu/tensor';
 import {SparseTensor} from '../../../../tensor/sparse/tensor';
+import {WASMTensor} from '../../../../tensor/wasm/tensor';
 import {DType} from '../../../../types';
 import {poolResultShape} from '../../../util/pool';
 import {minSparseCPU} from './cpu';
+import {minSparseWASM} from './wasm';
 
 export function min<DTpe extends DType>(
   tensor: SparseTensor<DTpe>,
@@ -33,8 +35,10 @@ function minSparse<DTpe extends DType>(
 ): Tensor<DTpe> {
   if (tensor.values instanceof CPUTensor) {
     return minSparseCPU(tensor, axes, keepDims);
+  } else if (tensor.values instanceof WASMTensor) {
+    return minSparseWASM(tensor as any, axes, keepDims) as any;
   }
   throw new Error(
-    'Minimum over sparse dimensions not implemented in WASM/WebGL yet'
+    'Minimum over sparse dimensions not implemented in WebGL yet'
   );
 }

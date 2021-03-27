@@ -21,7 +21,7 @@ interface Backend {
 const epsilon = 0.0001;
 
 const backends: Backend[] = [
-  {
+  /*{
     name: 'CPU',
     constructor: <DTpe extends DType>(
       shape: ReadonlyArray<number>,
@@ -29,7 +29,7 @@ const backends: Backend[] = [
       dtype: DTpe
     ) => new CPUTensor(shape, values, dtype),
     toBackend: <DTpe extends DType>(tensor: Tensor<DTpe>) => toCPU(tensor),
-  } /*,
+  },*/
   {
     name: 'WASM',
     constructor: <DTpe extends DType>(
@@ -53,7 +53,7 @@ const backends: Backend[] = [
 
 for (const backend of backends) {
   describe(`Sparse tensor on ${backend.name}`, () => {
-    it('should get the same values back after creation', async () => {
+    /*it('should get the same values back after creation', async () => {
       if (backend.wait !== undefined) {
         await backend.wait;
       }
@@ -795,7 +795,7 @@ for (const backend of backends) {
       );
 
       expect(await result.compare(expected)).toBeTrue();
-    });
+    });*/
 
     it('should work with summing over dense dimensions', async () => {
       if (backend.wait !== undefined) {
