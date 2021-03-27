@@ -22,6 +22,7 @@ pub mod ops {
     pub mod unary;
     pub mod util;
     pub mod sparse {
+        pub mod aggregate;
         pub mod binary;
         pub mod matmul;
         pub mod util;
