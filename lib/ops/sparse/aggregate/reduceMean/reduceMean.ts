@@ -1,9 +1,11 @@
 import {Tensor} from '../../../../library';
 import {CPUTensor} from '../../../../tensor/cpu/tensor';
 import {SparseTensor} from '../../../../tensor/sparse/tensor';
+import {WASMTensor} from '../../../../tensor/wasm/tensor';
 import {DType} from '../../../../types';
 import {poolResultShape} from '../../../util/pool';
 import {reduceMeanSparseCPU} from './cpu';
+import {reduceMeanSparseWASM} from './wasm';
 
 export function reduceMean<DTpe extends DType>(
   tensor: SparseTensor<DTpe>,
@@ -33,8 +35,10 @@ function reduceMeanSparse<DTpe extends DType>(
 ): Tensor<DTpe> {
   if (tensor.values instanceof CPUTensor) {
     return reduceMeanSparseCPU(tensor, axes, keepDims);
+  } else if (tensor.values instanceof WASMTensor) {
+    return reduceMeanSparseWASM(tensor as any, axes, keepDims) as any;
   }
   throw new Error(
-    'Reduce mean over sparse dimensions not implemented in WASM/WebGL yet'
+    'Reduce mean over sparse dimensions not implemented in WebGL yet'
   );
 }
