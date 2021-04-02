@@ -1047,7 +1047,7 @@ for (const backend of backends) {
 
       const expected = await backend.constructor([4], [1, 12, 5, 2], 'float32');
 
-      expect(await result.compare(expected)).toBeTrue();
+      expect(await result.compare(expected, epsilon)).toBeTrue();
     });
 
     it('should work with product over sparse dimension 2', async () => {
@@ -1065,7 +1065,7 @@ for (const backend of backends) {
 
       const expected = await backend.constructor([3], [2, 3, 20], 'float32');
 
-      expect(await result.compare(expected)).toBeTrue();
+      expect(await result.compare(expected, epsilon)).toBeTrue();
     });
 
     it('should work with maximum over dense dimensions', async () => {

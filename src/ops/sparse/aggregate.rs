@@ -244,7 +244,7 @@ where
             axes,
             keep_dims,
             |a: DType, b: DType| a * b,
-            false,
+            true,
             |a: DType| a,
             false,
             |a: DType, b: usize| a,
