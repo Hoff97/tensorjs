@@ -80,14 +80,29 @@ export class CPUTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
     return new CPUTensor([size], values);
   }
 
+  /**
+   * Array of values of the tensor in contiguous layout
+   */
   public values: TensorValues[DTpe];
 
+  /**
+   * Shape of the tensor
+   */
   public shape: ReadonlyArray<number>;
 
+  /**
+   * Strides for all dimensions, ie. the step size per dimension in the contiguous layout
+   */
   public strides: ReadonlyArray<number>;
 
+  /**
+   * Total number of entries in the tensor
+   */
   public size: number;
 
+  /**
+   * If this tensor was already deleted
+   */
   public deleted = false;
 
   constructor(

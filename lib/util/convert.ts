@@ -7,6 +7,9 @@ import Tensor, {DType} from '../types';
 
 export type Backend = 'CPU' | 'WASM' | 'GPU';
 
+/**
+ * Convert a tensor to the specified backend
+ */
 export async function toBackend<DTpe extends DType>(
   tensor: Tensor<DTpe>,
   backend: Backend
@@ -107,6 +110,9 @@ export async function toGPU<DTpe extends DType>(
   );
 }
 
+/**
+ * Determines if the two tensors are of the same type, ie. if they are on the same backend
+ */
 export function sameType<DTpe1 extends DType, DTpe2 extends DType>(
   a: Tensor<DTpe1>,
   b: Tensor<DTpe2>

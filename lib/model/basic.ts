@@ -79,7 +79,7 @@ export class Sequential extends Module {
 }
 
 /**
- * Dictionary of modules. Use this if you want to store submodules in a list
+ * Dictionary of modules. Use this if you want to store submodules in a dictionary
  */
 export class ModuleDict extends Module {
   constructor(public modules: {[name: string]: Module} = {}) {
@@ -109,7 +109,7 @@ export class ModuleDict extends Module {
 }
 
 /**
- * Dictionary of modules. Use this if you want to store submodules in a list
+ * List of modules. Use this if you want to store submodules in a list
  */
 export class ModuleList extends Module {
   constructor(public modules: Module[] = []) {
