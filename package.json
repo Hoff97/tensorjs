@@ -14,7 +14,7 @@
     "url": "https://github.com/Hoff97/tensorjs.git"
   },
   "license": "MIT",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "types": "./dist/lib/library.d.ts",
   "main": "./dist/lib/library.js",
   "files": [
