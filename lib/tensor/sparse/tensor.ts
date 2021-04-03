@@ -66,12 +66,24 @@ export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
     return new SparseTensor(values, indices, tensor.shape);
   }
 
+  /**
+   * Total number of entries (including zero entries) in the tensor
+   */
   public size: number;
 
+  /**
+   * Dense strides of the tensor
+   */
   public strides: number[];
 
+  /**
+   * Number of nonzero entries in the tensor
+   */
   public nnz: number;
 
+  /**
+   * Number of sparse dimensions
+   */
   public sparseDims: number;
 
   /**
@@ -120,9 +132,28 @@ export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
    * ```
    */
   constructor(
+    /**
+     * Values of the nonzero entries
+     */
     public values: Tensor<DTpe>,
+
+    /**
+     * Coordinates of the nonzero entries. Has shape [nnz, S],
+     * where nnz is the number of nonzero entries and S the number of
+     * sparse dimension.
+     *
+     * Each row contains the coordinate of the respective nonzero entry.
+     */
     public indices: Tensor<'uint32'>,
+
+    /**
+     * Shape of the tensor
+     */
     public shape: readonly number[],
+
+    /**
+     * Number of dense dimensions. Defaults to 0
+     */
     public denseDims = 0
   ) {
     super(values.dtype);
@@ -157,10 +188,18 @@ export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
     return result as TensorValues[DTpe];
   }
 
+  /**
+   * Sparse part of the shape of the tensor, ie. the S first values of
+   * the shape, where S is then number of sparse dimension.
+   */
   getSparseShape(): readonly number[] {
     return this.shape.slice(0, this.shape.length - this.denseDims);
   }
 
+  /**
+   * Dense part of the shape of the tensor, ie. the D last values of
+   * the shape, where D is then number of dense dimension.
+   */
   getDenseShape(): readonly number[] {
     return this.shape.slice(this.shape.length - this.denseDims);
   }
@@ -184,6 +223,9 @@ export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
     );
   }
 
+  /**
+   * Not implemented yet
+   */
   singleConstant(value: number): Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
