@@ -44,8 +44,32 @@ export type DType =
   | 'uint16'
   | 'uint8';
 
+/**
+ * Activation functions supported in some operators
+ */
 export type Activation = 'id' | 'relu' | 'relu6';
 
+/**
+ * Multi-dimensional array ala numpy.
+ *
+ * A tensor is any multidimensional array. The number of
+ * dimensions is called the rank, and the size of all dimensions the shape.
+ *
+ * @example
+ * ```typescript
+ * const a = [[1,2,3],[4,5,6]];
+ * ```
+ * here a has rank 2 and shape [2,3].
+ *
+ * Tensors store values of a particular data type like floats or integers.
+ * The datatype can be accessed via the dtype property.
+ *
+ * Many operations can be done on tensors. For fast execution, three different
+ * backends exist:
+ * - CPU: Simple to use and works in any browser, but not particularly fast
+ * - WebAssembly: Reasonably fast and works in most modern browsers
+ * - WebGL: Very fast when a GPU is available, but comes with some restrictions
+ */
 export default abstract class Tensor<DTpe extends DType = 'float32'> {
   /**
    * Data type of the tensor

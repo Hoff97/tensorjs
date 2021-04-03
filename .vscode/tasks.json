@@ -36,6 +36,43 @@
 			"type": "shell",
 			"command": "Xvfb -ac :0 -screen 0 1280x1024x16 & export DISPLAY=:0",
 			"problemMatcher": []
+		},
+		{
+			"type": "npm",
+			"script": "test:integrationDebug",
+			"isBackground": true,
+			"presentation": {
+				"focus": true,
+				"panel": "dedicated"
+			},
+			"problemMatcher": [
+				{
+					"base": "$tsc",
+					"background": {
+						"activeOnStart": true,
+						"beginsPattern": {
+							"regexp": "(.*?)"
+						},
+						"endsPattern": {
+							"regexp": "No captured browser"
+						}
+					}
+				}
+			]
+		},
+		{
+			"type": "npm",
+			"script": "test:rustBenchmark",
+			"problemMatcher": [],
+			"label": "npm: test:rustBenchmark",
+			"detail": "cargo +nightly bench --features benchmark"
+		},
+		{
+			"type": "npm",
+			"script": "docs",
+			"problemMatcher": [],
+			"label": "npm: docs",
+			"detail": "typedoc"
 		}
 	]
 }

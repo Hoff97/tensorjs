@@ -13,11 +13,30 @@
                     "--package=rust-wasm-tensor"
                 ],
                 "filter": {
-                    "name": "rust-wasm-tensor",
+                    "name": "rust-wasm-tensor"
                 }
             },
             "args": [],
             "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "Debug tests in firefox",
+            "type": "firefox",
+            "request": "launch",
+            "preLaunchTask": "npm: test:integrationDebug",
+            "reAttach": false,
+            "url": "http://localhost:9876/",
+            "webRoot": "${workspaceFolder}",
+            "pathMappings": [
+                {
+                    "url": "webpack:///lib",
+                    "path": "${workspaceFolder}/lib"
+                },
+                {
+                    "url": "webpack:///test",
+                    "path": "${workspaceFolder}/test"
+                }
+            ]
         }
     ]
 }

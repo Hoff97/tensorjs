@@ -1,6 +1,22 @@
 import {Variable} from '../autograd';
 import {Module} from './module';
 
+/**
+ * L2 weight regularization for a particular model.
+ *
+ * @example
+ * ```typescript
+ * const model = new Linear(32,1);
+ * const regularizer = new L2Regularization(model, 0.01);
+ * //...
+ * const prediction = (await model.forward([x]))[0];
+ * let loss = prediction.subtract(y).reduceSumSquare();
+ * loss = loss.add(regularizer.getLoss());
+ * //...
+ * loss.backward();
+ * //...
+ * ```
+ */
 export class L2Regularization {
   public parameters: Variable<any>[];
 
@@ -19,6 +35,22 @@ export class L2Regularization {
   }
 }
 
+/**
+ * L1 weight regularization for a particular model.
+ *
+ * @example
+ * ```typescript
+ * const model = new Linear(32,1);
+ * const regularizer = new L1Regularization(model, 0.01);
+ * //...
+ * const prediction = (await model.forward([x]))[0];
+ * let loss = prediction.subtract(y).reduceSumSquare();
+ * loss = loss.add(regularizer.getLoss());
+ * //...
+ * loss.backward();
+ * //...
+ * ```
+ */
 export class L1Regularization {
   public parameters: Variable<any>[];
 
