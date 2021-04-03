@@ -3,6 +3,24 @@
 ![Test](https://github.com/Hoff97/tensorjs/workflows/Test/badge.svg?branch=develop)
 ![Version](https://img.shields.io/npm/v/@hoff97/tensor-js)
 
+- [TensorJS](#tensorjs)
+- [How to use](#how-to-use)
+  - [Tensors](#tensors)
+    - [Tensor operations](#tensor-operations)
+    - [Reading values](#reading-values)
+    - [Data types](#data-types)
+    - [Converting between backends](#converting-between-backends)
+  - [Onnx model support](#onnx-model-support)
+    - [Optimizations](#optimizations)
+    - [Running with half precision](#running-with-half-precision)
+    - [Other performance considerations](#other-performance-considerations)
+  - [Autograd functionality](#autograd-functionality)
+  - [Sparse tensors](#sparse-tensors)
+    - [Backend support for sparse tensors](#backend-support-for-sparse-tensors)
+- [Documentation](#documentation)
+- [Contributing](#contributing)
+- [Development](#development)
+
 This is a JS/TS library for accelerated tensor computation intended to be
 run in the browser. It contains an implementation for numpy-style
 multidimensional arrays and their operators.
@@ -107,7 +125,8 @@ Note that not all backends support all data types:
 - WASM: Supports all except `float16`
 - GPU: Supports all except `float64`. Note that except for `float16`, all other data types will be
   represented by `float32` internally, since WebGL1 does not allow writing anything else than floats to
-  frame buffers. This means that for `int32` and `uint32`, not the whole range of the respective data type is available.
+  frame buffers. This means that for `int32` and `uint32`, not the whole range of values of the respective
+  data type is available.
 
 The data type of a tensor can be accessed via `tensor.dtype`. Additionally, each tensor has a generic type argument,
 which will carry its data type:
@@ -120,6 +139,10 @@ The generic type defaults to `float32`. If you want to represent the data type o
 ```typescript
   const tensor: Tensor<any> = a.add(b);
 ```
+or alternatively
+```typescript
+  const tensor: Tensor<DType> = a.add(b);
+```
 
 ### Converting between backends
 
@@ -131,15 +154,15 @@ const wasmTensor = await tjs.util.convert.toWASM(tensor);
 const gpuTensor = await tjs.util.convert.toGPU(tensor);
 ```
 
-Note that converting to/from a GPU tensor is very expensive and should
-be prevented if possible.
+Note that converting between backends (especially from/to WebGL) is an expensive
+operation and should be prevented if possible!
 
 
 ## Onnx model support
 
 You can load an onnx model like this:
 ```typescript
-const res = await fetch(`model.onnx`);
+const respones = await fetch(`model.onnx`);
 const buffer = await res.arrayBuffer();
 
 const model = new tjs.onnx.model.OnnxModel(buffer);
@@ -225,6 +248,45 @@ console.log(varA.grad);
 
 Multiple backward passes will add up the gradients.
 After you are done with the variable, delete the computation graph by calling `delete()`.
+
+## Sparse tensors
+
+Sparse tensors are tensors where most entries are zero, for example the following one:
+
+```typescript
+const a = new CPUTensor([3,3],
+  [1,0,0,
+   0,2,0,
+   0,3,4]);
+```
+
+TensorJS supports sparse tensors in coordinate format, where we store the coordinates and values of the nonzero entries
+in two tensors:
+
+```typescript
+  const indices = [
+    0,0,  // Corresponds to value 1
+    1,1,  // Corresponds to value 2
+    2,1,  // Corresponds to value 3
+    2,2   // Corresponds to value 4
+  ];
+  const indiceTensor = new CPUTensor([4, 2], indices, 'uint32');
+
+  const values = [1,2,3,4];
+  const valueTensor = new CPUTensor([4],values);
+  const sparseTensor = new SparseTensor(valueTensor, indiceTensor, [3,3]);
+```
+
+The implementations of the operators for sparse tensors only consider the nonzero entries and are thus faster
+than their dense counterparts.
+
+Note that some operators make specific assumptions on the sparse tensor, for details check the corresponding
+documentation [here](https://hoff97.github.io/tensorjs/classes/tensor.sparse.sparsetensor.html).
+
+### Backend support for sparse tensors
+
+As of now, most operators are only supported on the CPU and WASM backend. If an operation
+is not supported, this is noted in the docs.
 
 # Documentation
 

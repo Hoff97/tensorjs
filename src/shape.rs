@@ -57,8 +57,8 @@ pub fn compute_strides(shape: &Vec<usize>) -> Vec<usize> {
     }
     let mut last_stride = 1;
 
-    for i in (0..(shape.len()-1)).rev() {
-        last_stride = last_stride * shape[i+1];
+    for i in (0..(shape.len() - 1)).rev() {
+        last_stride = last_stride * shape[i + 1];
         if shape[i] == 1 {
             res[i] = 0;
         } else {
@@ -83,8 +83,8 @@ pub fn compute_strides_no_zero(shape: &Vec<usize>) -> Vec<usize> {
 
     let mut last_stride = 1;
 
-    for i in (0..(shape.len()-1)).rev() {
-        last_stride = last_stride * shape[i+1];
+    for i in (0..(shape.len() - 1)).rev() {
+        last_stride = last_stride * shape[i + 1];
         res[i] = last_stride;
     }
 
@@ -112,7 +112,7 @@ pub fn compute_strides_uint32(shape: &Uint32Array) -> Vec<usize> {
     }
     let mut last_stride = 1;
 
-    for i in (0..(shape.length()-1)).rev() {
+    for i in (0..(shape.length() - 1)).rev() {
         last_stride = last_stride * (shape.get_index(i + 1) as usize);
         if shape.get_index(i) == 1 {
             res[i as usize] = 0;
@@ -159,6 +159,17 @@ pub fn pos_to_index(pos: usize, strides: &Vec<usize>) -> Vec<usize> {
 }
 
 pub fn increment_index(index: &mut Vec<usize>, shape: &Vec<usize>) {
+    for i in (0..index.len()).rev() {
+        index[i] += 1;
+        if index[i] >= shape[i] {
+            index[i] = 0;
+        } else {
+            return;
+        }
+    }
+}
+
+pub fn increment_index_slice(index: &mut Vec<usize>, shape: &[usize]) {
     for i in (0..index.len()).rev() {
         index[i] += 1;
         if index[i] >= shape[i] {

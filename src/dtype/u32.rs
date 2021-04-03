@@ -12,6 +12,15 @@ pub struct TensorU32 {
     tensor: Tensor<u32>,
 }
 
+type Elem = u32;
+type Sel = TensorU32;
+
+impl TensorU32 {
+    pub fn get_tensor(&self) -> &Tensor<u32> {
+        &self.tensor
+    }
+}
+
 #[wasm_bindgen]
 impl TensorU32 {
     pub fn create(shape: Uint32Array, values: Uint32Array) -> TensorU32 {
@@ -369,6 +378,298 @@ impl TensorU32 {
     ) -> TensorU32 {
         TensorU32 {
             tensor: self.tensor.slice(starts, ends, axis, steps),
+        }
+    }
+
+    pub fn reshape_sparse_indices(
+        &self,
+        old_sparse_shape: Uint32Array,
+        new_shape: Uint32Array,
+    ) -> TensorU32 {
+        TensorU32 {
+            tensor: self
+                .tensor
+                .reshape_sparse_indices(old_sparse_shape, new_shape),
+        }
+    }
+
+    pub fn add_index(&self, axis: i32, count: i32) -> TensorU32 {
+        TensorU32 {
+            tensor: self.tensor.add_index(axis, count),
+        }
+    }
+
+    pub fn repeat_sparse_indices(
+        &self,
+        repeats: Uint32Array,
+        shape: Uint32Array,
+        repeats_prod: u32,
+    ) -> TensorU32 {
+        TensorU32 {
+            tensor: self
+                .tensor
+                .repeat_sparse_indices(repeats, shape, repeats_prod),
+        }
+    }
+
+    pub fn matmul_sparse_dense(&self, indices: &TensorU32, b: &TensorU32, m: usize) -> TensorU32 {
+        TensorU32 {
+            tensor: self
+                .tensor
+                .matmul_sparse_dense(&indices.tensor, &b.tensor, m),
+        }
+    }
+
+    pub fn add_sparse_dense(
+        &self,
+        indices: &TensorU32,
+        b: &Sel,
+        result_shape: Uint32Array,
+        alpha: Elem,
+        beta: Elem,
+    ) -> Self {
+        Self {
+            tensor: self.tensor.add_sparse_dense(
+                indices.get_tensor(),
+                &b.tensor,
+                result_shape,
+                alpha,
+                beta,
+            ),
+        }
+    }
+
+    pub fn subtract_sparse_dense(
+        &self,
+        indices: &TensorU32,
+        b: &Sel,
+        result_shape: Uint32Array,
+        alpha: Elem,
+        beta: Elem,
+    ) -> Self {
+        Self {
+            tensor: self.tensor.subtract_sparse_dense(
+                indices.get_tensor(),
+                &b.tensor,
+                result_shape,
+                alpha,
+                beta,
+            ),
+        }
+    }
+
+    pub fn multiply_sparse_dense(
+        &self,
+        indices: &TensorU32,
+        b: &Sel,
+        result_shape: Uint32Array,
+        alpha: Elem,
+    ) -> Self {
+        Self {
+            tensor: self.tensor.multiply_sparse_dense(
+                indices.get_tensor(),
+                &b.tensor,
+                result_shape,
+                alpha,
+            ),
+        }
+    }
+
+    pub fn divide_sparse_dense(
+        &self,
+        indices: &TensorU32,
+        b: &Sel,
+        result_shape: Uint32Array,
+        alpha: Elem,
+    ) -> Self {
+        Self {
+            tensor: self.tensor.divide_sparse_dense(
+                indices.get_tensor(),
+                &b.tensor,
+                result_shape,
+                alpha,
+            ),
+        }
+    }
+
+    pub fn add_sparse_sparse(
+        &self,
+        indices: &TensorU32,
+        b_indices: &TensorU32,
+        b_values: &Sel,
+        result_shape: Uint32Array,
+        alpha: Elem,
+        beta: Elem,
+    ) -> Self {
+        Self {
+            tensor: self.tensor.add_sparse_sparse(
+                indices.get_tensor(),
+                b_indices.get_tensor(),
+                &b_values.tensor,
+                result_shape,
+                alpha,
+                beta,
+            ),
+        }
+    }
+
+    pub fn subtract_sparse_sparse(
+        &self,
+        indices: &TensorU32,
+        b_indices: &TensorU32,
+        b_values: &Sel,
+        result_shape: Uint32Array,
+        alpha: Elem,
+        beta: Elem,
+    ) -> Self {
+        Self {
+            tensor: self.tensor.subtract_sparse_sparse(
+                indices.get_tensor(),
+                b_indices.get_tensor(),
+                &b_values.tensor,
+                result_shape,
+                alpha,
+                beta,
+            ),
+        }
+    }
+
+    pub fn divide_sparse_sparse(
+        &self,
+        indices: &TensorU32,
+        b_indices: &TensorU32,
+        b_values: &Sel,
+        result_shape: Uint32Array,
+        alpha: Elem,
+    ) -> Self {
+        Self {
+            tensor: self.tensor.divide_sparse_sparse(
+                indices.get_tensor(),
+                b_indices.get_tensor(),
+                &b_values.tensor,
+                result_shape,
+                alpha,
+            ),
+        }
+    }
+
+    pub fn multiply_sparse_sparse(
+        &self,
+        indices: &TensorU32,
+        b_indices: &TensorU32,
+        b_values: &Sel,
+        result_shape: Uint32Array,
+        alpha: Elem,
+    ) -> Self {
+        Self {
+            tensor: self.tensor.multiply_sparse_sparse(
+                indices.get_tensor(),
+                b_indices.get_tensor(),
+                &b_values.tensor,
+                result_shape,
+                alpha,
+            ),
+        }
+    }
+
+    pub fn sum_sparse(
+        &self,
+        shape: Uint32Array,
+        indices: &TensorU32,
+        axes: Uint32Array,
+        keep_dims: bool,
+    ) -> Self {
+        Self {
+            tensor: self
+                .tensor
+                .sum_sparse(shape, indices.get_tensor(), axes, keep_dims),
+        }
+    }
+
+    pub fn sum_square_sparse(
+        &self,
+        shape: Uint32Array,
+        indices: &TensorU32,
+        axes: Uint32Array,
+        keep_dims: bool,
+    ) -> Self {
+        Self {
+            tensor: self
+                .tensor
+                .sum_square_sparse(shape, indices.get_tensor(), axes, keep_dims),
+        }
+    }
+
+    pub fn reduce_mean_sparse(
+        &self,
+        shape: Uint32Array,
+        indices: &TensorU32,
+        axes: Uint32Array,
+        keep_dims: bool,
+    ) -> Self {
+        Self {
+            tensor: self
+                .tensor
+                .reduce_mean_sparse(shape, indices.get_tensor(), axes, keep_dims),
+        }
+    }
+
+    pub fn product_sparse(
+        &self,
+        shape: Uint32Array,
+        indices: &TensorU32,
+        axes: Uint32Array,
+        keep_dims: bool,
+    ) -> Self {
+        Self {
+            tensor: self
+                .tensor
+                .product_sparse(shape, indices.get_tensor(), axes, keep_dims),
+        }
+    }
+
+    pub fn max_sparse(
+        &self,
+        shape: Uint32Array,
+        indices: &TensorU32,
+        axes: Uint32Array,
+        keep_dims: bool,
+    ) -> Self {
+        Self {
+            tensor: self
+                .tensor
+                .max_sparse(shape, indices.get_tensor(), axes, keep_dims),
+        }
+    }
+
+    pub fn min_sparse(
+        &self,
+        shape: Uint32Array,
+        indices: &TensorU32,
+        axes: Uint32Array,
+        keep_dims: bool,
+    ) -> Self {
+        Self {
+            tensor: self
+                .tensor
+                .min_sparse(shape, indices.get_tensor(), axes, keep_dims),
+        }
+    }
+
+    pub fn reduce_mean_squared_sparse(
+        &self,
+        shape: Uint32Array,
+        indices: &TensorU32,
+        axes: Uint32Array,
+        keep_dims: bool,
+    ) -> Self {
+        Self {
+            tensor: self.tensor.reduce_mean_squared_sparse(
+                shape,
+                indices.get_tensor(),
+                axes,
+                keep_dims,
+            ),
         }
     }
 }

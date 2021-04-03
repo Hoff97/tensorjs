@@ -26,7 +26,7 @@ import Select from '@material-ui/core/Select';
 //const featureDim = 64;
 const featureDim = 1280;
 
-type AppStage = 'start' | 'compiling' | 'trainData-1' | 'between-stages' | 'trainData-2' | 'training' | 'monitoring';
+type AppStage = 'getting-video' | 'warming-up' | 'start' | 'compiling' | 'trainData-1' | 'between-stages' | 'trainData-2' | 'training' | 'monitoring';
 
 interface AppState {
   stage: AppStage;
@@ -103,14 +103,14 @@ class App extends React.Component<{}, AppState> {
     super(props);
 
     this.state = {
-      stage: 'start',
+      stage: 'getting-video',
       numIterations: 3,
       threshold: 0.5,
       sound: true,
       notification: false,
       model: 'mobilenet050',
       numTrainSamples: 64,
-      numValidationSamples: 0
+      numValidationSamples: 0,
     };
   }
 
@@ -161,12 +161,31 @@ class App extends React.Component<{}, AppState> {
     }
   }
 
+  async warmup() {
+    await wait(1000);
+
+    if (this.state.stage === 'warming-up') {
+      const reshaped = this.prepareVideo() as tjs.Tensor;
+      for (let i = 0; i < 2; i++) {
+
+        const result = await this.model?.forward([reshaped]);
+        if (result !== undefined) {
+          result[0].delete();
+        }
+      }
+      reshaped.delete();
+
+      this.setState({
+        stage: 'start'
+      });
+    }
+  }
+
   async setModel(name: string) {
     const model = models.find(x => x.name === name);
 
     this.setState({
       model: name,
-      stage: 'start'
     });
 
     this.model = await loadModel(name);
@@ -190,6 +209,12 @@ class App extends React.Component<{}, AppState> {
         }
       });
       video.srcObject = stream;
+
+      this.setState({
+        stage: 'warming-up'
+      });
+
+      this.warmup();
     }
   }
 
@@ -724,7 +749,12 @@ class App extends React.Component<{}, AppState> {
   }
 
   renderState() {
-    if (this.state.stage === 'start') {
+    if (this.state.stage === 'getting-video') {
+      return (<> Please activate your webcam </>);
+    } else if (this.state.stage === 'warming-up') {
+      return (<> Warming up model. </>);
+    }
+    else if (this.state.stage === 'start') {
       return (<Button variant="contained" color="primary" onClick={() => this.prepareTraining()}>Start</Button>);
     } else if (this.state.stage === 'compiling') {
       return (<> Dont touch your face until the bar is full. Starting in {this.state.countDown} seconds. </>);

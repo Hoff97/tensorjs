@@ -2,10 +2,8 @@ use crate::shape::compare_shapes;
 use crate::shape::compute_strides;
 use crate::shape::get_size;
 use crate::shape::index_to_pos;
-use num_traits::abs;
 use num_traits::FromPrimitive;
 use num_traits::Num;
-use num_traits::Signed;
 use std::cmp::Ordering;
 use std::ops::Add;
 use std::ops::Sub;
@@ -37,6 +35,10 @@ impl<DType> Tensor<DType> {
         return &self.shape;
     }
 
+    pub fn get_values(&self) -> &Vec<DType> {
+        return &self.values;
+    }
+
     pub fn get_dim_size(&self, dim: usize) -> usize {
         return self.shape[dim];
     }
@@ -51,10 +53,6 @@ impl<DType> Tensor<DType> {
 
     pub fn get_strides_at(&self, ix: usize) -> usize {
         return self.strides[ix];
-    }
-
-    pub fn get_values(&self) -> &Vec<DType> {
-        return &self.values;
     }
 }
 
@@ -97,7 +95,6 @@ impl<DType> Tensor<DType>
 where
     DType: Copy,
     DType: Num,
-    DType: Signed,
     DType: PartialOrd,
 {
     pub fn compare(&self, other: &Self, delta: DType) -> bool {
@@ -106,7 +103,9 @@ where
         }
 
         for i in 0..self.size {
-            if abs(self.get_ix(i) - other.get_ix(i)) > delta {
+            if (self.get_ix(i) > other.get_ix(i) && other.get_ix(i) + delta < self.get_ix(i))
+                || (self.get_ix(i) < other.get_ix(i) && self.get_ix(i) + delta < other.get_ix(i))
+            {
                 return false;
             }
         }

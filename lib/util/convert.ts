@@ -1,6 +1,7 @@
 import {Variable} from '../autograd/variable';
 import {CPUTensor} from '../tensor/cpu/tensor';
 import {GPUTensor} from '../tensor/gpu/tensor';
+import {SparseTensor} from '../tensor/sparse/tensor';
 import {WASMTensor} from '../tensor/wasm/tensor';
 import Tensor, {DType} from '../types';
 
@@ -26,6 +27,13 @@ export async function toCPU<DTpe extends DType>(
     return new Variable(await toCPU(tensor.value), {
       grad: tensor.grad !== undefined ? await toCPU(tensor.grad) : undefined,
     });
+  } else if (tensor instanceof SparseTensor) {
+    return new SparseTensor(
+      await toCPU(tensor.values),
+      await toCPU(tensor.indices),
+      tensor.shape,
+      tensor.denseDims
+    );
   }
   if (tensor instanceof CPUTensor) {
     return tensor;
@@ -44,6 +52,13 @@ export async function toWASM<DTpe extends DType>(
     return new Variable(await toWASM(tensor.value), {
       grad: tensor.grad !== undefined ? await toWASM(tensor.grad) : undefined,
     });
+  } else if (tensor instanceof SparseTensor) {
+    return new SparseTensor(
+      await toWASM(tensor.values),
+      await toWASM(tensor.indices),
+      tensor.shape,
+      tensor.denseDims
+    );
   }
   if (tensor instanceof WASMTensor) {
     return tensor;
@@ -70,6 +85,13 @@ export async function toGPU<DTpe extends DType>(
     return new Variable(await toGPU(tensor.value), {
       grad: tensor.grad !== undefined ? await toGPU(tensor.grad) : undefined,
     });
+  } else if (tensor instanceof SparseTensor) {
+    return new SparseTensor(
+      await toGPU(tensor.values),
+      await toGPU(tensor.indices),
+      tensor.shape,
+      tensor.denseDims
+    );
   }
   if (tensor instanceof GPUTensor) {
     return tensor;

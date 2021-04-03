@@ -13,7 +13,7 @@ import {defaultBCED} from './gpu';
  * Calculates the binary cross entropy loss, given probabilities x
  * and ground truth y. Returns a tensor of the same shape as
  * x. To use for a loss, you have to sum over the result:
- * ```typecript
+ * ```typescript
  * const loss = bce(x,y).sum();
  * ```
  *
