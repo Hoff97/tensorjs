@@ -21,7 +21,7 @@ interface Backend {
 const epsilon = 0.0001;
 
 const backends: Backend[] = [
-  /*{
+  {
     name: 'CPU',
     constructor: <DTpe extends DType>(
       shape: ReadonlyArray<number>,
@@ -29,7 +29,7 @@ const backends: Backend[] = [
       dtype: DTpe
     ) => new CPUTensor(shape, values, dtype),
     toBackend: <DTpe extends DType>(tensor: Tensor<DTpe>) => toCPU(tensor),
-  },*/
+  },
   {
     name: 'WASM',
     constructor: <DTpe extends DType>(
