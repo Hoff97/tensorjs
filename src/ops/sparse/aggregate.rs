@@ -2,6 +2,7 @@ use crate::shape::*;
 use crate::tensor::*;
 use js_sys::Uint32Array;
 use num_traits::zero;
+use num_traits::Float;
 use num_traits::FromPrimitive;
 use num_traits::Num;
 
@@ -389,5 +390,53 @@ where
         }
 
         self._reduce_mean_squared_sparse(&_shape, indices, &_axes, keep_dims)
+    }
+}
+
+impl<DType> Tensor<DType>
+where
+    DType: Copy,
+    DType: Num,
+    DType: Float,
+    DType: FromPrimitive,
+{
+    pub fn _reduce_log_sum_sparse(
+        &self,
+        shape: &Vec<usize>,
+        indices: &Tensor<u32>,
+        axes: &Vec<usize>,
+        keep_dims: bool,
+    ) -> Tensor<DType> {
+        self.aggregate_sparse(
+            shape,
+            indices,
+            axes,
+            keep_dims,
+            |a: DType, b: DType| a + b,
+            false,
+            |a: DType| a,
+            true,
+            |a: DType, b: usize| a.ln(),
+        )
+    }
+
+    pub fn reduce_log_sum_sparse(
+        &self,
+        shape: Uint32Array,
+        indices: &Tensor<u32>,
+        axes: Uint32Array,
+        keep_dims: bool,
+    ) -> Tensor<DType> {
+        let mut _shape: Vec<usize> = vec![0; shape.length() as usize];
+        for i in 0..shape.length() {
+            _shape[i as usize] = shape.get_index(i as u32) as usize;
+        }
+
+        let mut _axes: Vec<usize> = vec![0; axes.length() as usize];
+        for i in 0..axes.length() {
+            _axes[i as usize] = axes.get_index(i as u32) as usize;
+        }
+
+        self._reduce_log_sum_sparse(&_shape, indices, &_axes, keep_dims)
     }
 }

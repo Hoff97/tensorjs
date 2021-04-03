@@ -1517,7 +1517,7 @@ for (const backend of backends) {
         'float32'
       );
 
-      expect(await result.compare(expected)).toBeTrue();
+      expect(await result.compare(expected, epsilon)).toBeTrue();
     });
 
     it('should work with log sum over sparse dimension 2', async () => {

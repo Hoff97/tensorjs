@@ -817,4 +817,18 @@ impl TensorF32 {
             ),
         }
     }
+
+    pub fn reduce_log_sum_sparse(
+        &self,
+        shape: Uint32Array,
+        indices: &TensorU32,
+        axes: Uint32Array,
+        keep_dims: bool,
+    ) -> Self {
+        Self {
+            tensor: self
+                .tensor
+                .reduce_log_sum_sparse(shape, indices.get_tensor(), axes, keep_dims),
+        }
+    }
 }

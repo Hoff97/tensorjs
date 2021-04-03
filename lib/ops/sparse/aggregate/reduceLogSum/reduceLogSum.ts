@@ -1,9 +1,11 @@
 import {Tensor} from '../../../../library';
 import {CPUTensor} from '../../../../tensor/cpu/tensor';
 import {SparseTensor} from '../../../../tensor/sparse/tensor';
+import {WASMTensor} from '../../../../tensor/wasm/tensor';
 import {DType} from '../../../../types';
 import {poolResultShape} from '../../../util/pool';
 import {reduceLogSumSparseCPU} from './cpu';
+import {reduceLogSumSparseWASM} from './wasm';
 
 export function reduceLogSum<DTpe extends DType>(
   tensor: SparseTensor<DTpe>,
@@ -33,8 +35,10 @@ function reduceLogSumSparse<DTpe extends DType>(
 ): Tensor<DTpe> {
   if (tensor.values instanceof CPUTensor) {
     return reduceLogSumSparseCPU(tensor, axes, keepDims);
+  } else if (tensor.values instanceof WASMTensor) {
+    return reduceLogSumSparseWASM(tensor as any, axes, keepDims) as any;
   }
   throw new Error(
-    'Reduce log sum over sparse dimensions not implemented in WASM/WebGL yet'
+    'Reduce log sum over sparse dimensions not implemented in WebGL yet'
   );
 }
