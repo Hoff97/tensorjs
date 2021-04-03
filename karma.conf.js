@@ -43,6 +43,7 @@ module.exports = function (config) {
       },
     ],
     proxies: {
+      // Onnx data is loaded from the test directory
       '/onnx/': 'http://localhost:9876/base/test/data/onnx/',
     },
     exclude: [],
@@ -74,6 +75,8 @@ module.exports = function (config) {
     port: 9876,
     colors: true,
 
+    // Coverage is disabled in debug mode, since it messes
+    // with source mappings
     coverageIstanbulReporter: debug
       ? undefined
       : {
@@ -96,6 +99,9 @@ module.exports = function (config) {
     // since one might stay in one breakpoint for a while
     browserNoActivityTimeout: debug ? 600 * 1000 : 30 * 1000,
     browserDisconnectTimeout: debug ? 600 * 1000 : 2 * 1000,
+
+    // When debugging, firefox will be started by VSCode once compilation has
+    // finished, so no browsers should be started automatically
     browsers: debug ? [] : ['ChromeDebugging'],
 
     customLaunchers: {
