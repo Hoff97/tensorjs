@@ -53,7 +53,7 @@ const backends: Backend[] = [
 
 for (const backend of backends) {
   describe(`Sparse tensor on ${backend.name}`, () => {
-    /*it('should get the same values back after creation', async () => {
+    it('should get the same values back after creation', async () => {
       if (backend.wait !== undefined) {
         await backend.wait;
       }
@@ -795,7 +795,7 @@ for (const backend of backends) {
       );
 
       expect(await result.compare(expected)).toBeTrue();
-    });*/
+    });
 
     it('should work with summing over dense dimensions', async () => {
       if (backend.wait !== undefined) {
