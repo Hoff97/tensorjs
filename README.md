@@ -226,6 +226,45 @@ console.log(varA.grad);
 Multiple backward passes will add up the gradients.
 After you are done with the variable, delete the computation graph by calling `delete()`.
 
+## Sparse tensors
+
+Sparse tensors are tensors where most entries are zero, for example the following one:
+
+```typescript
+const a = new CPUTensor([3,3],
+  [1,0,0,
+   0,2,0,
+   0,3,4]);
+```
+
+TensorJS supports sparse tensors in coordinate format, where we store the coordinates and values of the nonzero entries
+in two tensors:
+
+```typescript
+  const indices = [
+    0,0,  // Corresponds to value 1
+    1,1,  // Corresponds to value 2
+    2,1,  // Corresponds to value 3
+    2,2   // Corresponds to value 4
+  ];
+  const indiceTensor = new CPUTensor([4, 2], indices, 'uint32');
+
+  const values = [1,2,3,4];
+  const valueTensor = new CPUTensor([4],values);
+  const sparseTensor = new SparseTensor(valueTensor, indiceTensor, [3,3]);
+```
+
+The implementations of the operators for sparse tensors only consider the nonzero entries and are thus faster
+than their dense counterparts.
+
+Note that some operators make specific assumptions on the sparse tensor, for details check the corresponding
+documentation [here](https://hoff97.github.io/tensorjs/classes/tensor.html).
+
+## Backend support
+
+As of now, most operators are only supported on the CPU and WASM backend. If an operation
+is not supported, this is noted in the docs.
+
 # Documentation
 
 You can find the documentation [here](https://hoff97.github.io/tensorjs/).
