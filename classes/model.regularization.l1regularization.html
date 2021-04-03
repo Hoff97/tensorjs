@@ -71,6 +71,27 @@
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>L1 weight regularization for a particular model.</p>
+					</div>
+					<dl class="tsd-comment-tags">
+						<dt>example</dt>
+						<dd><pre><code class="language-typescript"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">model</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">Linear</span><span style="color: #000000">(</span><span style="color: #098658">32</span><span style="color: #000000">,</span><span style="color: #098658">1</span><span style="color: #000000">);</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">regularizer</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">L1Regularization</span><span style="color: #000000">(</span><span style="color: #001080">model</span><span style="color: #000000">, </span><span style="color: #098658">0.01</span><span style="color: #000000">);</span>
+<span style="color: #008000">//...</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">prediction</span><span style="color: #000000"> = (</span><span style="color: #AF00DB">await</span><span style="color: #000000"> </span><span style="color: #001080">model</span><span style="color: #000000">.</span><span style="color: #795E26">forward</span><span style="color: #000000">([</span><span style="color: #001080">x</span><span style="color: #000000">]))[</span><span style="color: #098658">0</span><span style="color: #000000">];</span>
+<span style="color: #0000FF">let</span><span style="color: #000000"> </span><span style="color: #001080">loss</span><span style="color: #000000"> = </span><span style="color: #001080">prediction</span><span style="color: #000000">.</span><span style="color: #795E26">subtract</span><span style="color: #000000">(</span><span style="color: #001080">y</span><span style="color: #000000">).</span><span style="color: #795E26">reduceSumSquare</span><span style="color: #000000">();</span>
+<span style="color: #001080">loss</span><span style="color: #000000"> = </span><span style="color: #001080">loss</span><span style="color: #000000">.</span><span style="color: #795E26">add</span><span style="color: #000000">(</span><span style="color: #001080">regularizer</span><span style="color: #000000">.</span><span style="color: #795E26">getLoss</span><span style="color: #000000">());</span>
+<span style="color: #008000">//...</span>
+<span style="color: #001080">loss</span><span style="color: #000000">.</span><span style="color: #795E26">backward</span><span style="color: #000000">();</span>
+<span style="color: #008000">//...</span>
+</code></pre>
+						</dd>
+					</dl>
+				</div>
+			</section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
@@ -118,7 +139,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/eff0d8d/lib/model/regularization.ts#L23">model/regularization.ts:23</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/a2af59b/lib/model/regularization.ts#L55">model/regularization.ts:55</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -157,7 +178,7 @@
 					<div class="tsd-signature tsd-kind-icon">parameters<span class="tsd-signature-symbol">:</span> <a href="autograd.variable.html" class="tsd-signature-type" data-tsd-kind="Class">Variable</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[]</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/eff0d8d/lib/model/regularization.ts#L23">model/regularization.ts:23</a></li>
+							<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/a2af59b/lib/model/regularization.ts#L55">model/regularization.ts:55</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -174,7 +195,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/eff0d8d/lib/model/regularization.ts#L29">model/regularization.ts:29</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/a2af59b/lib/model/regularization.ts#L61">model/regularization.ts:61</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="tensor.html" class="tsd-signature-type" data-tsd-kind="Class">Tensor</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></h4>

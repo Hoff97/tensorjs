@@ -71,6 +71,13 @@
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>Base class for all gradient based model optimizers.</p>
+					</div>
+				</div>
+			</section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
@@ -126,9 +133,14 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/eff0d8d/lib/model/optimizer/optimizer.ts#L5">model/optimizer/optimizer.ts:5</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/a2af59b/lib/model/optimizer/optimizer.ts#L8">model/optimizer/optimizer.ts:8</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Construct a new optimizer for a particular model</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
@@ -155,7 +167,7 @@
 					<div class="tsd-signature tsd-kind-icon">parameters<span class="tsd-signature-symbol">:</span> <a href="autograd.variable.html" class="tsd-signature-type" data-tsd-kind="Class">Variable</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[]</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/eff0d8d/lib/model/optimizer/optimizer.ts#L5">model/optimizer/optimizer.ts:5</a></li>
+							<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/a2af59b/lib/model/optimizer/optimizer.ts#L8">model/optimizer/optimizer.ts:8</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -172,9 +184,15 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/eff0d8d/lib/model/optimizer/optimizer.ts#L11">model/optimizer/optimizer.ts:11</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/a2af59b/lib/model/optimizer/optimizer.ts#L21">model/optimizer/optimizer.ts:21</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Make one optimization step. This assumes that gradients where
+									computed previously by calling backward on a scalar variable before.</p>
+								</div>
+							</div>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 						</li>
 					</ul>
@@ -189,9 +207,15 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/eff0d8d/lib/model/optimizer/optimizer.ts#L13">model/optimizer/optimizer.ts:13</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/a2af59b/lib/model/optimizer/optimizer.ts#L27">model/optimizer/optimizer.ts:27</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Zeros all gradients of the model parameters. This should be called
+									after each optimization step, when the gradients are no longer needed.</p>
+								</div>
+							</div>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 						</li>
 					</ul>

@@ -71,6 +71,13 @@
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>Stochastic gradient descent optimizer</p>
+					</div>
+				</div>
+			</section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
@@ -125,9 +132,14 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="model.optimizer.optimizer.html">Optimizer</a>.<a href="model.optimizer.optimizer.html#constructor">constructor</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/eff0d8d/lib/model/optimizer/SGD.ts#L4">model/optimizer/SGD.ts:4</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/a2af59b/lib/model/optimizer/SGD.ts#L7">model/optimizer/SGD.ts:7</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>New SGD optimizer for a particular model.</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
@@ -135,6 +147,9 @@
 								</li>
 								<li>
 									<h5>lr: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 0.001</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Learning rate, the step size for each update step</p>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="model.optimizer.sgd.html" class="tsd-signature-type" data-tsd-kind="Class">SGD</a></h4>
@@ -166,7 +181,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="model.optimizer.optimizer.html">Optimizer</a>.<a href="model.optimizer.optimizer.html#parameters">parameters</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/eff0d8d/lib/model/optimizer/optimizer.ts#L5">model/optimizer/optimizer.ts:5</a></li>
+							<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/a2af59b/lib/model/optimizer/optimizer.ts#L8">model/optimizer/optimizer.ts:8</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -184,7 +199,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="model.optimizer.optimizer.html">Optimizer</a>.<a href="model.optimizer.optimizer.html#step">step</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/eff0d8d/lib/model/optimizer/SGD.ts#L9">model/optimizer/SGD.ts:9</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/a2af59b/lib/model/optimizer/SGD.ts#L17">model/optimizer/SGD.ts:17</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -202,9 +217,15 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="model.optimizer.optimizer.html">Optimizer</a>.<a href="model.optimizer.optimizer.html#zerograds">zeroGrads</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/eff0d8d/lib/model/optimizer/optimizer.ts#L13">model/optimizer/optimizer.ts:13</a></li>
+									<li>Defined in <a href="https://github.com/Hoff97/tensorjs/blob/a2af59b/lib/model/optimizer/optimizer.ts#L27">model/optimizer/optimizer.ts:27</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Zeros all gradients of the model parameters. This should be called
+									after each optimization step, when the gradients are no longer needed.</p>
+								</div>
+							</div>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 						</li>
 					</ul>

@@ -63,6 +63,33 @@
 				</a>
 				<p><img src="https://github.com/Hoff97/tensorjs/workflows/Test/badge.svg?branch=develop" alt="Test">
 				<img src="https://img.shields.io/npm/v/@hoff97/tensor-js" alt="Version"></p>
+				<ul>
+					<li><a href="#tensorjs">TensorJS</a></li>
+					<li><a href="#how-to-use">How to use</a><ul>
+							<li><a href="#tensors">Tensors</a><ul>
+									<li><a href="#tensor-operations">Tensor operations</a></li>
+									<li><a href="#reading-values">Reading values</a></li>
+									<li><a href="#data-types">Data types</a></li>
+									<li><a href="#converting-between-backends">Converting between backends</a></li>
+								</ul>
+							</li>
+							<li><a href="#onnx-model-support">Onnx model support</a><ul>
+									<li><a href="#optimizations">Optimizations</a></li>
+									<li><a href="#running-with-half-precision">Running with half precision</a></li>
+									<li><a href="#other-performance-considerations">Other performance considerations</a></li>
+								</ul>
+							</li>
+							<li><a href="#autograd-functionality">Autograd functionality</a></li>
+							<li><a href="#sparse-tensors">Sparse tensors</a><ul>
+									<li><a href="#backend-support-for-sparse-tensors">Backend support for sparse tensors</a></li>
+								</ul>
+							</li>
+						</ul>
+					</li>
+					<li><a href="#documentation">Documentation</a></li>
+					<li><a href="#contributing">Contributing</a></li>
+					<li><a href="#development">Development</a></li>
+				</ul>
 				<p>This is a JS/TS library for accelerated tensor computation intended to be
 					run in the browser. It contains an implementation for numpy-style
 				multidimensional arrays and their operators.</p>
@@ -155,7 +182,8 @@
 					<li>WASM: Supports all except <code>float16</code></li>
 					<li>GPU: Supports all except <code>float64</code>. Note that except for <code>float16</code>, all other data types will be
 						represented by <code>float32</code> internally, since WebGL1 does not allow writing anything else than floats to
-					frame buffers. This means that for <code>int32</code> and <code>uint32</code>, not the whole range of the respective data type is available.</li>
+						frame buffers. This means that for <code>int32</code> and <code>uint32</code>, not the whole range of values of the respective
+					data type is available.</li>
 				</ul>
 				<p>The data type of a tensor can be accessed via <code>tensor.dtype</code>. Additionally, each tensor has a generic type argument,
 				which will carry its data type:</p>
@@ -166,6 +194,9 @@
 				The generic type defaults to <code>float32</code>. If you want to represent the data type of a tensor with an unknown data type, write for example</p>
 				<pre><code class="language-typescript"><span style="color: #000000">  </span><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">tensor</span><span style="color: #000000">: </span><span style="color: #267F99">Tensor</span><span style="color: #000000">&lt;</span><span style="color: #267F99">any</span><span style="color: #000000">&gt; = </span><span style="color: #001080">a</span><span style="color: #000000">.</span><span style="color: #795E26">add</span><span style="color: #000000">(</span><span style="color: #001080">b</span><span style="color: #000000">);</span>
 </code></pre>
+				<p>or alternatively</p>
+				<pre><code class="language-typescript"><span style="color: #000000">  </span><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">tensor</span><span style="color: #000000">: </span><span style="color: #267F99">Tensor</span><span style="color: #000000">&lt;</span><span style="color: #267F99">DType</span><span style="color: #000000">&gt; = </span><span style="color: #001080">a</span><span style="color: #000000">.</span><span style="color: #795E26">add</span><span style="color: #000000">(</span><span style="color: #001080">b</span><span style="color: #000000">);</span>
+</code></pre>
 				<a href="#converting-between-backends" id="converting-between-backends" style="color: inherit; text-decoration: none;">
 					<h3>Converting between backends</h3>
 				</a>
@@ -174,13 +205,13 @@
 <span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">wasmTensor</span><span style="color: #000000"> = </span><span style="color: #AF00DB">await</span><span style="color: #000000"> </span><span style="color: #001080">tjs</span><span style="color: #000000">.</span><span style="color: #001080">util</span><span style="color: #000000">.</span><span style="color: #001080">convert</span><span style="color: #000000">.</span><span style="color: #795E26">toWASM</span><span style="color: #000000">(</span><span style="color: #001080">tensor</span><span style="color: #000000">);</span>
 <span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">gpuTensor</span><span style="color: #000000"> = </span><span style="color: #AF00DB">await</span><span style="color: #000000"> </span><span style="color: #001080">tjs</span><span style="color: #000000">.</span><span style="color: #001080">util</span><span style="color: #000000">.</span><span style="color: #001080">convert</span><span style="color: #000000">.</span><span style="color: #795E26">toGPU</span><span style="color: #000000">(</span><span style="color: #001080">tensor</span><span style="color: #000000">);</span>
 </code></pre>
-				<p>Note that converting to/from a GPU tensor is very expensive and should
-				be prevented if possible.</p>
+				<p>Note that converting between backends (especially from/to WebGL) is an expensive
+				operation and should be prevented if possible!</p>
 				<a href="#onnx-model-support" id="onnx-model-support" style="color: inherit; text-decoration: none;">
 					<h2>Onnx model support</h2>
 				</a>
 				<p>You can load an onnx model like this:</p>
-				<pre><code class="language-typescript"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">res</span><span style="color: #000000"> = </span><span style="color: #AF00DB">await</span><span style="color: #000000"> </span><span style="color: #795E26">fetch</span><span style="color: #000000">(</span><span style="color: #A31515">`model.onnx`</span><span style="color: #000000">);</span>
+				<pre><code class="language-typescript"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">respones</span><span style="color: #000000"> = </span><span style="color: #AF00DB">await</span><span style="color: #000000"> </span><span style="color: #795E26">fetch</span><span style="color: #000000">(</span><span style="color: #A31515">`model.onnx`</span><span style="color: #000000">);</span>
 <span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">buffer</span><span style="color: #000000"> = </span><span style="color: #AF00DB">await</span><span style="color: #000000"> </span><span style="color: #001080">res</span><span style="color: #000000">.</span><span style="color: #795E26">arrayBuffer</span><span style="color: #000000">();</span>
 
 <span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">model</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">tjs</span><span style="color: #000000">.</span><span style="color: #267F99">onnx</span><span style="color: #000000">.</span><span style="color: #267F99">model</span><span style="color: #000000">.</span><span style="color: #267F99">OnnxModel</span><span style="color: #000000">(</span><span style="color: #001080">buffer</span><span style="color: #000000">);</span>
@@ -248,6 +279,38 @@
 </code></pre>
 				<p>Multiple backward passes will add up the gradients.
 				After you are done with the variable, delete the computation graph by calling <code>delete()</code>.</p>
+				<a href="#sparse-tensors" id="sparse-tensors" style="color: inherit; text-decoration: none;">
+					<h2>Sparse tensors</h2>
+				</a>
+				<p>Sparse tensors are tensors where most entries are zero, for example the following one:</p>
+				<pre><code class="language-typescript"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">a</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">CPUTensor</span><span style="color: #000000">([</span><span style="color: #098658">3</span><span style="color: #000000">,</span><span style="color: #098658">3</span><span style="color: #000000">],</span>
+<span style="color: #000000">  [</span><span style="color: #098658">1</span><span style="color: #000000">,</span><span style="color: #098658">0</span><span style="color: #000000">,</span><span style="color: #098658">0</span><span style="color: #000000">,</span>
+<span style="color: #000000">   </span><span style="color: #098658">0</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">0</span><span style="color: #000000">,</span>
+<span style="color: #000000">   </span><span style="color: #098658">0</span><span style="color: #000000">,</span><span style="color: #098658">3</span><span style="color: #000000">,</span><span style="color: #098658">4</span><span style="color: #000000">]);</span>
+</code></pre>
+				<p>TensorJS supports sparse tensors in coordinate format, where we store the coordinates and values of the nonzero entries
+				in two tensors:</p>
+				<pre><code class="language-typescript"><span style="color: #000000">  </span><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">indices</span><span style="color: #000000"> = [</span>
+<span style="color: #000000">    </span><span style="color: #098658">0</span><span style="color: #000000">,</span><span style="color: #098658">0</span><span style="color: #000000">,  </span><span style="color: #008000">// Corresponds to value 1</span>
+<span style="color: #000000">    </span><span style="color: #098658">1</span><span style="color: #000000">,</span><span style="color: #098658">1</span><span style="color: #000000">,  </span><span style="color: #008000">// Corresponds to value 2</span>
+<span style="color: #000000">    </span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">1</span><span style="color: #000000">,  </span><span style="color: #008000">// Corresponds to value 3</span>
+<span style="color: #000000">    </span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">   </span><span style="color: #008000">// Corresponds to value 4</span>
+<span style="color: #000000">  ];</span>
+<span style="color: #000000">  </span><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">indiceTensor</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">CPUTensor</span><span style="color: #000000">([</span><span style="color: #098658">4</span><span style="color: #000000">, </span><span style="color: #098658">2</span><span style="color: #000000">], </span><span style="color: #001080">indices</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;uint32&#039;</span><span style="color: #000000">);</span>
+
+<span style="color: #000000">  </span><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">values</span><span style="color: #000000"> = [</span><span style="color: #098658">1</span><span style="color: #000000">,</span><span style="color: #098658">2</span><span style="color: #000000">,</span><span style="color: #098658">3</span><span style="color: #000000">,</span><span style="color: #098658">4</span><span style="color: #000000">];</span>
+<span style="color: #000000">  </span><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">valueTensor</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">CPUTensor</span><span style="color: #000000">([</span><span style="color: #098658">4</span><span style="color: #000000">],</span><span style="color: #001080">values</span><span style="color: #000000">);</span>
+<span style="color: #000000">  </span><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">sparseTensor</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">SparseTensor</span><span style="color: #000000">(</span><span style="color: #001080">valueTensor</span><span style="color: #000000">, </span><span style="color: #001080">indiceTensor</span><span style="color: #000000">, [</span><span style="color: #098658">3</span><span style="color: #000000">,</span><span style="color: #098658">3</span><span style="color: #000000">]);</span>
+</code></pre>
+				<p>The implementations of the operators for sparse tensors only consider the nonzero entries and are thus faster
+				than their dense counterparts.</p>
+				<p>Note that some operators make specific assumptions on the sparse tensor, for details check the corresponding
+				documentation <a href="https://hoff97.github.io/tensorjs/classes/tensor.sparse.sparsetensor.html">here</a>.</p>
+				<a href="#backend-support-for-sparse-tensors" id="backend-support-for-sparse-tensors" style="color: inherit; text-decoration: none;">
+					<h3>Backend support for sparse tensors</h3>
+				</a>
+				<p>As of now, most operators are only supported on the CPU and WASM backend. If an operation
+				is not supported, this is noted in the docs.</p>
 				<a href="#documentation" id="documentation" style="color: inherit; text-decoration: none;">
 					<h1>Documentation</h1>
 				</a>
