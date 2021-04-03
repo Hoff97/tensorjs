@@ -416,6 +416,9 @@ export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
    * - If this tensor has two sparse dimensions, the resulting tensor
    *   is dense.
    * Right now this only supports sparse-dense matrix multiplication.
+   * Supported on
+   * - All backends if the sparse tensor has 1 sparse dimensions
+   * - Only on CPU/WASM if the sparse tensor has no sparse dimensions
    *
    * @param tensor Dense matrix to multiply with. Should have shape [N,O]
    *
@@ -448,12 +451,20 @@ export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
     );
   }
 
+  /**
+   * Not implemented yet
+   */
   clipBackward(grad: Tensor<DTpe>, min?: number, max?: number): Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
+
   repeat(repeats: number[]): Tensor<DTpe> {
     return repeat(this, repeats);
   }
+
+  /**
+   * Not implemented yet
+   */
   expand(shape: readonly number[]): Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
@@ -467,9 +478,16 @@ export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
     );
   }
 
+  /**
+   * Not implemented yet
+   */
   gather(axis: number, indices: CPUTensor<'uint32'>): Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
+
+  /**
+   * Not implemented yet
+   */
   setValues(values: Tensor<DTpe>, starts: number[]): Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
@@ -501,10 +519,16 @@ export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
     );
   }
 
+  /**
+   * Not implemented yet
+   */
   upsample(scales: number[]): Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
 
+  /**
+   * Not implemented yet
+   */
   normalize(
     mean: Tensor<DTpe>,
     variance: Tensor<DTpe>,
@@ -525,6 +549,8 @@ export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
    *   on the dense dimensions!
    * - If the second tensor is a sparse tensor, it is assumed that the first and
    *   second tensor have exactly the same sparsity pattern!
+   *
+   * This is not supported on the WebGL backend yet.
    */
   add(tensor: Tensor<DTpe>, alpha?: number, beta?: number) {
     return super.add(tensor, alpha, beta);
@@ -592,6 +618,9 @@ export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
     return divide(th as SparseTensor<DTpe>, tensor, resultShape, alpha);
   }
 
+  /**
+   * Not implemented yet
+   */
   power_impl(
     th: Tensor<DTpe>,
     tensor: Tensor<DTpe>,
@@ -600,6 +629,9 @@ export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
 
+  /**
+   * Not implemented yet
+   */
   gemm_impl(
     b: Tensor<DTpe>,
     aTranspose: boolean,
@@ -609,6 +641,17 @@ export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
     C?: Tensor<DTpe>
   ): Tensor<DTpe> {
     throw new Error('Method not implemented.');
+  }
+
+  /**
+   * Sums over sparse and/or dense dimensions according to the specified
+   * axes.
+   *
+   * - If summing only over dense dimensions, all backends are supported.
+   * - If summing over sparse dimensions, only CPU/WebGL are supported
+   */
+  sum(axes?: number | number[], keepDims?: boolean): Tensor<DTpe> {
+    return super.sum(axes, keepDims);
   }
 
   protected sum_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
@@ -653,6 +696,9 @@ export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
     return reduceLogSumExp(this, axes, keepDims);
   }
 
+  /**
+   * Not implemented yet
+   */
   protected conv_impl(
     kernel: Tensor<DTpe>,
     dilations: number[],
@@ -665,6 +711,9 @@ export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
 
+  /**
+   * Not implemented yet
+   */
   protected convTranspose_impl(
     kernel: Tensor<DTpe>,
     dilations: number[],
@@ -675,6 +724,9 @@ export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
 
+  /**
+   * Not implemented yet
+   */
   protected pad_impl(
     pads: number[],
     mode: PadMode,
@@ -683,6 +735,9 @@ export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
 
+  /**
+   * Not implemented yet
+   */
   protected averagePool_impl(
     kernelShape: number[],
     pads: number[],
@@ -692,10 +747,16 @@ export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
 
+  /**
+   * Not implemented yet
+   */
   protected transpose_impl(permutation: number[]): Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
 
+  /**
+   * Not implemented yet
+   */
   protected slice_impl(
     starts: number[],
     ends: number[],
