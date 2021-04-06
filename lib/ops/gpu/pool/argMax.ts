@@ -83,13 +83,14 @@ export class ArgMaxOperation<GPUTensor extends GPUTensorI> extends Operation<
       for (int j = 0; j < ${this.maxRank}; j++) {
         if (j == axResult) {
           axResult = axes[j];
+          break;
         }
       }
 
       ${this.posToIndex('stridesX', 'inputIx', 'inputPos')}
 
       float res = 0.0;
-      int ixResult = 0;
+      int ixResult = -1;
 
       for (int i = 0; i < ${this.maxIterations}; i++) {
         if (i >= sumSize) {
@@ -98,6 +99,12 @@ export class ArgMaxOperation<GPUTensor extends GPUTensorI> extends Operation<
         float curr = _X(inputIx);
         if (i == 0) {
           res = curr;
+          for (int j = 0; j < ${this.maxRank}; j++) {
+            if (j == axResult) {
+              ixResult = inputIx[j];
+              break;
+            }
+          }
         } else {
           if (curr > res || (res == curr && selectLast == 1)) {
             res = curr;
@@ -215,8 +222,6 @@ export class ArgMaxOperation<GPUTensor extends GPUTensorI> extends Operation<
       info.shapeOutput = [...outputShape, info.axes.length];
       info.mappedInputStrides = mappedInputStrides;
       info.sumSize = sumSize;
-
-      this.maxRank = info.shapeX.length;
     }
 
     super.compile(info);
