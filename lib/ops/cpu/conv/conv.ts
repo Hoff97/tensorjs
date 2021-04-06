@@ -1,15 +1,18 @@
-import {CPUTensor} from '../../tensor/cpu/tensor';
-import {DType} from '../../types';
-import {getSize, incrementIndex} from '../../util/shape';
-import {outputDimsSize} from '../util/convTranspose';
+import {Activation} from '../../../library';
+import {CPUTensor} from '../../../tensor/cpu/tensor';
+import {DType} from '../../../types';
+import {getSize, incrementIndex} from '../../../util/shape';
+import {outputDimsSize} from '../../util/conv';
 
-export function convTranspose<DTpe extends DType>(
+export function conv<DTpe extends DType>(
   x: CPUTensor<DTpe>,
   w: CPUTensor<DTpe>,
   dilations: number[],
   group: number,
   pads: number[],
-  strides: number[]
+  strides: number[],
+  activation: Activation,
+  bias?: CPUTensor<DTpe>
 ) {
   const N = x.shape[0];
   const C = x.shape[1];
@@ -40,6 +43,19 @@ export function convTranspose<DTpe extends DType>(
   for (let n = 0; n < N; n++) {
     // Iterate over all output channels
     for (let m = 0; m < M; m++) {
+      if (bias) {
+        const b = bias ? (bias.get([m]) as number) : 0;
+
+        const outputIndices = new Array(R.length).fill(0);
+        outputIndices.unshift(n, m);
+
+        for (let oIx = 0; oIx < outputSize; oIx++) {
+          Y.set(outputIndices, b);
+
+          incrementIndex(outputIndices, Y.shape);
+        }
+      }
+
       for (let cg = 0; cg < CG; cg++) {
         const c = (m * CG + cg) % C;
 
@@ -59,18 +75,10 @@ export function convTranspose<DTpe extends DType>(
               const pad = pads.length === 0 ? 0 : pads[axis];
               const dilation = dilations.length === 0 ? 1 : dilations[axis];
 
-              let ix =
-                outputIndices[axis + 2] -
+              const ix =
+                outputIndices[axis + 2] * stride -
                 pad +
                 kernelIndices[axis + 2] * dilation;
-
-              const res = ix % stride;
-
-              if (res !== 0) {
-                skip = true;
-                break;
-              }
-              ix = ix / stride;
 
               if (ix < 0 || ix >= D[axis]) {
                 skip = true;
@@ -81,11 +89,7 @@ export function convTranspose<DTpe extends DType>(
             }
 
             if (!skip) {
-              const transposedKernelIx = [m, cg];
-              for (let i = 0; i < dataRank; i++) {
-                transposedKernelIx.push(W[i] - kernelIndices[i + 2] - 1);
-              }
-              const Wi = w.get(transposedKernelIx) as number;
+              const Wi = w.get(kernelIndices) as number;
               const Xi = x.get(inputIx) as number;
               result += Wi * Xi;
             }
@@ -93,6 +97,23 @@ export function convTranspose<DTpe extends DType>(
             incrementIndex(kernelIndices, w.shape);
           }
 
+          Y.set(outputIndices, result);
+
+          incrementIndex(outputIndices, Y.shape);
+        }
+      }
+
+      if (activation !== 'id') {
+        const outputIndices = new Array(R.length).fill(0);
+        outputIndices.unshift(n, m);
+
+        for (let oIx = 0; oIx < outputSize; oIx++) {
+          let result = Y.get(outputIndices);
+          if (activation === 'relu') {
+            result = Math.max(0, result);
+          } else if (activation === 'relu6') {
+            result = Math.min(Math.max(0, result), 6);
+          }
           Y.set(outputIndices, result);
 
           incrementIndex(outputIndices, Y.shape);

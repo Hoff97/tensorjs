@@ -1,5 +1,5 @@
-import {CPUTensor} from '../../tensor/cpu/tensor';
-import {DType} from '../../types';
+import {CPUTensor} from '../../../tensor/cpu/tensor';
+import {DType} from '../../../types';
 
 export function concat<DTpe extends DType>(
   x: CPUTensor<DTpe>,

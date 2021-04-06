@@ -1,6 +1,6 @@
-import {CPUTensor} from '../../tensor/cpu/tensor';
-import {DType} from '../../types';
-import {incrementIndex} from '../../util/shape';
+import {CPUTensor} from '../../../tensor/cpu/tensor';
+import {DType} from '../../../types';
+import {incrementIndex} from '../../../util/shape';
 
 export function repeat<DTpe extends DType>(
   x: CPUTensor<DTpe>,

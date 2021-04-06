@@ -1,6 +1,6 @@
-import {CPUTensor} from '../../tensor/cpu/tensor';
-import {DType} from '../../types';
-import {getSize} from '../../util/shape';
+import {CPUTensor} from '../../../tensor/cpu/tensor';
+import {DType} from '../../../types';
+import {getSize} from '../../../util/shape';
 
 export function gemm<DTpe extends DType>(
   a: CPUTensor<DTpe>,

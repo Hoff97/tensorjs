@@ -1,7 +1,7 @@
-import {CPUTensor} from '../../tensor/cpu/tensor';
-import {DType} from '../../types';
-import {getSize, incrementIndex} from '../../util/shape';
-import {outputDimsSize} from '../util/conv';
+import {CPUTensor} from '../../../tensor/cpu/tensor';
+import {DType} from '../../../types';
+import {getSize, incrementIndex} from '../../../util/shape';
+import {outputDimsSize} from '../../util/conv';
 
 export function averagePool<DTpe extends DType>(
   x: CPUTensor<DTpe>,

@@ -1,6 +1,6 @@
-import {argMax} from '../../ops/cpu/argMax';
-import {argMin} from '../../ops/cpu/argMin';
-import {averagePool} from '../../ops/cpu/averagePool';
+import {argMax} from '../../ops/cpu/pool/argMax';
+import {argMin} from '../../ops/cpu/pool/argMin';
+import {averagePool} from '../../ops/cpu/conv/averagePool';
 import {
   abs,
   acos,
@@ -35,29 +35,29 @@ import {
   tan,
   tanh,
 } from '../../ops/cpu/basic';
-import {concat} from '../../ops/cpu/concat';
-import {conv} from '../../ops/cpu/conv';
-import {convTranspose} from '../../ops/cpu/convTranspose';
-import {expand} from '../../ops/cpu/expand';
-import {gather} from '../../ops/cpu/gather';
-import {gemm} from '../../ops/cpu/gemm';
-import {matMul} from '../../ops/cpu/matMul';
-import {max} from '../../ops/cpu/max';
-import {min} from '../../ops/cpu/min';
-import {normalize} from '../../ops/cpu/normalize';
-import {pad} from '../../ops/cpu/pad';
-import {product} from '../../ops/cpu/product';
-import {reduceLogSum} from '../../ops/cpu/reduceLogSum';
-import {reduceLogSumExp} from '../../ops/cpu/reduceLogSumExp';
-import {reduceMean} from '../../ops/cpu/reduceMean';
-import {reduceMeanSquare} from '../../ops/cpu/reduceMeanSquare';
-import {repeat} from '../../ops/cpu/repeat';
-import {setValues} from '../../ops/cpu/setValues';
-import {slice} from '../../ops/cpu/slice';
-import {sum} from '../../ops/cpu/sum';
-import {sumSquare} from '../../ops/cpu/sumSquare';
-import {transpose} from '../../ops/cpu/transpose';
-import {upsample} from '../../ops/cpu/upsample';
+import {concat} from '../../ops/cpu/util/concat';
+import {conv} from '../../ops/cpu/conv/conv';
+import {convTranspose} from '../../ops/cpu/conv/convTranspose';
+import {expand} from '../../ops/cpu/util/expand';
+import {gather} from '../../ops/cpu/util/gather';
+import {gemm} from '../../ops/cpu/matMul/gemm';
+import {matMul} from '../../ops/cpu/matMul/matMul';
+import {max} from '../../ops/cpu/pool/max';
+import {min} from '../../ops/cpu/pool/min';
+import {normalize} from '../../ops/cpu/conv/normalize';
+import {pad} from '../../ops/cpu/conv/pad';
+import {product} from '../../ops/cpu/pool/product';
+import {reduceLogSum} from '../../ops/cpu/pool/reduceLogSum';
+import {reduceLogSumExp} from '../../ops/cpu/pool/reduceLogSumExp';
+import {reduceMean} from '../../ops/cpu/pool/reduceMean';
+import {reduceMeanSquare} from '../../ops/cpu/pool/reduceMeanSquare';
+import {repeat} from '../../ops/cpu/util/repeat';
+import {setValues} from '../../ops/cpu/util/setValues';
+import {slice} from '../../ops/cpu/util/slice';
+import {sum} from '../../ops/cpu/pool/sum';
+import {sumSquare} from '../../ops/cpu/pool/sumSquare';
+import {transpose} from '../../ops/cpu/util/transpose';
+import {upsample} from '../../ops/cpu/conv/upsample';
 import Tensor, {
   Activation,
   DType,
