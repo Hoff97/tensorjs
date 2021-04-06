@@ -283,7 +283,6 @@ export abstract class Operation<
       }
     }
 
-    // TODO: Change return type based on dtype of operation
     float getValueAt(int index[${this.maxRank}], int strides[${this.maxRank}], int textureWidth, int textureHeight, sampler2D tex) {
       int pos = indexToPos(index, strides);
       return getValueAtPos(pos, textureWidth, textureHeight, tex);
@@ -314,7 +313,6 @@ export abstract class Operation<
     const textureFunctions = this.getTextureFunctions();
 
     const result = `
-    // TODO: Change between int/float here
     precision ${this.precisionString()} float;
 
     ${variableDecls}
@@ -549,7 +547,8 @@ export abstract class Operation<
     resultShape: readonly number[],
     inputTensors: {[name: string]: GPUTensorI},
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    inputs?: any
+    inputs?: any,
+    resultDtype?: DTypeGpu
   ) {
     if (this.drawCommand === undefined) {
       this.compile({} as Info);
@@ -618,8 +617,11 @@ export abstract class Operation<
       ...inputs,
     });
 
+    if (resultDtype === undefined) {
+      resultDtype = this.dtype;
+    }
     //@ts-ignore
-    return this.gpuTensorConstructor(result, resultShape, this.precision);
+    return this.gpuTensorConstructor(result, resultShape, resultDtype);
   }
 
   /**

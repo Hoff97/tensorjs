@@ -74,6 +74,7 @@ import {ReduceLogSumExpOperation} from '../../ops/gpu/pool/reduceLogSumExp';
 import {HardSigmoidOperation} from '../../ops/gpu/unary/hardSigmoid';
 import {PowerScalarOperation} from '../../ops/gpu/unary/powerScalar';
 import {RoundOperation} from '../../ops/gpu/unary/round';
+import {ArgMaxOperation} from '../../ops/gpu/pool/argMax';
 
 export class GPUTensor<DTpe extends DTypeGpu = 'float32'>
   extends Tensor<DTpe>
@@ -483,7 +484,10 @@ export class GPUTensor<DTpe extends DTypeGpu = 'float32'>
   }
 
   protected argMax_impl(axes: number[], selectLast: boolean): Tensor<'uint32'> {
-    throw new Error('Method not implemented.');
+    return defaultArgMaxD.calc(
+      {X: this, axes, selectLast},
+      this.dtype
+    ) as GPUTensor<'uint32'>;
   }
 
   min_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
@@ -858,6 +862,9 @@ const defaultProductD = new Dispatcher(
 );
 const defaultMaxD = new Dispatcher(
   (dtype: DTypeGpu) => new MaxOperation(gpuConstructor, dtype)
+);
+const defaultArgMaxD = new Dispatcher(
+  (dtype: DTypeGpu) => new ArgMaxOperation(gpuConstructor, dtype)
 );
 const defaultMinD = new Dispatcher(
   (dtype: DTypeGpu) => new MinOperation(gpuConstructor, dtype)

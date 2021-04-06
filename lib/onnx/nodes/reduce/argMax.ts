@@ -24,11 +24,13 @@ export class ArgMaxNode extends ReduceNode {
 
   calc<DTpe extends DType>(input: Tensor<DTpe>): Tensor<DTpe> {
     const result = input.argMax([this.axis], this.selectLastIndex);
+
     const [resultShape, _] = poolResultShape(
       input.getShape(),
       [this.axis],
       this.keepDims === false ? false : true
     );
+
     return result.reshape(resultShape, false) as any;
   }
 }
