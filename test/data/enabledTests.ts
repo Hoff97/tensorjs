@@ -32,12 +32,30 @@ export const enabledTests: Test[] = [
   //  "test_and_bcast4v2d",
   //  "test_and_bcast4v3d",
   // "test_and_bcast4v4d",
-  //  "test_argmax_default_axis_example",
-  //  "test_argmax_default_axis_random",
-  //  "test_argmax_keepdims_example",
-  //  "test_argmax_keepdims_random",
-  //  "test_argmax_no_keepdims_example",
-  //  "test_argmax_no_keepdims_random",
+  {
+    name: 'test_argmax_default_axis_example',
+    opsets: ['8', '9', '10', '11', '12'],
+  },
+  {
+    name: 'test_argmax_default_axis_random',
+    opsets: ['8', '9', '10', '11', '12'],
+  },
+  {
+    name: 'test_argmax_keepdims_example',
+    opsets: ['8', '9', '10', '11', '12'],
+  },
+  {
+    name: 'test_argmax_keepdims_random',
+    opsets: ['8', '9', '10', '11', '12'],
+  },
+  {
+    name: 'test_argmax_no_keepdims_example',
+    opsets: ['8', '9', '10', '11', '12'],
+  },
+  {
+    name: 'test_argmax_no_keepdims_random',
+    opsets: ['8', '9', '10', '11', '12'],
+  },
   //  "test_argmin_default_axis_example",
   //  "test_argmin_default_axis_random",
   //  "test_argmin_keepdims_example",
@@ -426,16 +444,46 @@ export const enabledTests: Test[] = [
   //'test_adagrad_multiple',
   //'test_adam',
   //'test_adam_multiple',
-  //'test_argmax_default_axis_example_select_last_index',
-  //'test_argmax_default_axis_random_select_last_index',
-  //'test_argmax_keepdims_example_select_last_index',
-  //'test_argmax_keepdims_random_select_last_index',
-  //'test_argmax_negative_axis_keepdims_example',
-  //'test_argmax_negative_axis_keepdims_example_select_last_index',
-  //'test_argmax_negative_axis_keepdims_random',
-  //'test_argmax_negative_axis_keepdims_random_select_last_index',
-  //'test_argmax_no_keepdims_example_select_last_index',
-  //'test_argmax_no_keepdims_random_select_last_index',
+  {
+    name: 'test_argmax_default_axis_example_select_last_index',
+    opsets: ['12'],
+  },
+  {
+    name: 'test_argmax_default_axis_random_select_last_index',
+    opsets: ['12'],
+  },
+  {
+    name: 'test_argmax_keepdims_example_select_last_index',
+    opsets: ['12'],
+  },
+  {
+    name: 'test_argmax_keepdims_random_select_last_index',
+    opsets: ['12'],
+  },
+  {
+    name: 'test_argmax_negative_axis_keepdims_example',
+    opsets: ['12'],
+  },
+  {
+    name: 'test_argmax_negative_axis_keepdims_example_select_last_index',
+    opsets: ['12'],
+  },
+  {
+    name: 'test_argmax_negative_axis_keepdims_random',
+    opsets: ['12'],
+  },
+  {
+    name: 'test_argmax_negative_axis_keepdims_random_select_last_index',
+    opsets: ['12'],
+  },
+  {
+    name: 'test_argmax_no_keepdims_example_select_last_index',
+    opsets: ['12'],
+  },
+  {
+    name: 'test_argmax_no_keepdims_random_select_last_index',
+    opsets: ['12'],
+  },
   //'test_argmin_default_axis_example_select_last_index',
   //'test_argmin_default_axis_random_select_last_index',
   //'test_argmin_keepdims_example_select_last_index',

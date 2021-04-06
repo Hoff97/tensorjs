@@ -19,15 +19,23 @@ export class ArgMaxNode extends ReduceNode {
     super(attributes, inputs, outputs, constants, onnxVersion, 'ArgMax', mode);
 
     this.selectLastIndex = this.getAttributeInt('select_last_index') === 1;
-    this.axis = this.getAttributeInt('axis') || 0;
+
+    const ax = this.getAttributeInt('axis');
+    if (ax !== undefined && ax !== null) {
+      this.axis = ax;
+    } else {
+      this.axis = 0;
+    }
   }
 
   calc<DTpe extends DType>(input: Tensor<DTpe>): Tensor<DTpe> {
     const result = input.argMax([this.axis], this.selectLastIndex);
 
+    const inputShape = input.getShape();
+
     const [resultShape, _] = poolResultShape(
-      input.getShape(),
-      [this.axis],
+      inputShape,
+      [this.axis < 0 ? this.axis + inputShape.length : this.axis],
       this.keepDims === false ? false : true
     );
 
