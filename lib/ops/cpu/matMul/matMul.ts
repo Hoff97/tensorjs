@@ -1,5 +1,5 @@
-import {CPUTensor} from '../../tensor/cpu/tensor';
-import {DType} from '../../types';
+import {CPUTensor} from '../../../tensor/cpu/tensor';
+import {DType} from '../../../types';
 
 export function matMul<DTpe extends DType>(
   a: CPUTensor<DTpe>,

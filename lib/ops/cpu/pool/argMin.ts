@@ -1,13 +1,13 @@
-import {CPUTensor} from '../../tensor/cpu/tensor';
-import {DType} from '../../types';
+import {CPUTensor} from '../../../tensor/cpu/tensor';
+import {DType} from '../../../types';
 import {
   getSize,
   incrementIndex,
   indexToPos,
   computeStrides,
-} from '../../util/shape';
+} from '../../../util/shape';
 
-import {poolResultShape} from '../util/pool';
+import {poolResultShape} from '../../util/pool';
 
 export function argMin<DTpe extends DType>(
   a: CPUTensor<DTpe>,

@@ -1,5 +1,5 @@
-import {CPUTensor} from '../../tensor/cpu/tensor';
-import {DType} from '../../types';
+import {CPUTensor} from '../../../tensor/cpu/tensor';
+import {DType} from '../../../types';
 
 import {pool} from './pool';
 
