@@ -482,6 +482,10 @@ export class GPUTensor<DTpe extends DTypeGpu = 'float32'>
     ) as GPUTensor<DTpe>;
   }
 
+  protected argMax_impl(axes: number[], selectLast: boolean): Tensor<'uint32'> {
+    throw new Error('Method not implemented.');
+  }
+
   min_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
     return defaultMinD.calc(
       {X: this, axes, keepDims},

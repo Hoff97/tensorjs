@@ -651,6 +651,11 @@ export class Variable<DTpe extends DType = 'float32'>
   protected max_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }
+
+  protected argMax_impl(axes: number[], selectLast: boolean): Tensor<'uint32'> {
+    return new Variable(this.value.argMax(axes, selectLast));
+  }
+
   protected min_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
     throw new Error('Method not implemented.');
   }

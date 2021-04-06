@@ -293,6 +293,28 @@ export default abstract class Tensor<DTpe extends DType = 'float32'> {
   }
 
   /**
+   * Gives the indices of the maximum over the specifed axes.
+   *
+   * @param axes One or multiple axes to take the maximum over. If not specified this will be all axes
+   *
+   * @example
+   * ```typescript
+   * const a = new CPUTensor([2,3], [1,2,3,4,5,6]);
+   *
+   * a.argMax(); //Will be [[1,2]]
+   * a.argMax(0); //Will be [1,1,1] (since the maximum values 4,5,6 are located in the second row)
+   * a.argMax(1); //Will [2,2] (Since the maximum values 3,6 are located in the third column)
+   * ```
+   */
+  argMax(axes?: number | number[], selectLast?: boolean): Tensor<'uint32'> {
+    const ax = this.getAxes(axes);
+    if (selectLast === undefined) {
+      selectLast = false;
+    }
+    return this.argMax_impl(ax, selectLast);
+  }
+
+  /**
    * Takes the mean over the specified axis/axes.
    * This is equal to `a.sum(axes, keepDims).divide(sumSize)` (where sumSize is the number
    * of entries in the summation axes) but faster.
@@ -1350,6 +1372,11 @@ export default abstract class Tensor<DTpe extends DType = 'float32'> {
   protected abstract max_impl(axes: number[], keepDims: boolean): Tensor<DTpe>;
 
   protected abstract min_impl(axes: number[], keepDims: boolean): Tensor<DTpe>;
+
+  protected abstract argMax_impl(
+    axes: number[],
+    selectLast: boolean
+  ): Tensor<'uint32'>;
 
   protected abstract reduceMean_impl(
     axes: number[],

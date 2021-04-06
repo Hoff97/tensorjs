@@ -712,6 +712,10 @@ export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
     return max(this, axes, keepDims);
   }
 
+  protected argMax_impl(axes: number[], selectLast: boolean): Tensor<'uint32'> {
+    throw new Error('Method not implemented.');
+  }
+
   protected min_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
     return min(this, axes, keepDims);
   }

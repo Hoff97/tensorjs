@@ -1,3 +1,4 @@
+import {argMax} from '../../ops/cpu/argMax';
 import {averagePool} from '../../ops/cpu/averagePool';
 import {
   abs,
@@ -437,6 +438,10 @@ export class CPUTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
 
   min_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
     return min(this, axes, keepDims);
+  }
+
+  protected argMax_impl(axes: number[], selectLast: boolean): Tensor<'uint32'> {
+    return argMax(this, axes, selectLast);
   }
 
   reduceMean_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
