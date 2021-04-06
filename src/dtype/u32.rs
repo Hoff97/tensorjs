@@ -19,6 +19,10 @@ impl TensorU32 {
     pub fn get_tensor(&self) -> &Tensor<u32> {
         &self.tensor
     }
+
+    pub fn create_u32(tensor: Tensor<u32>) -> TensorU32 {
+        TensorU32 { tensor }
+    }
 }
 
 #[wasm_bindgen]
@@ -178,6 +182,10 @@ impl TensorU32 {
         TensorU32 {
             tensor: self.tensor.max(axes, keep_dims),
         }
+    }
+
+    pub fn arg_max(&self, axes: Uint32Array, select_last_index: bool) -> TensorU32 {
+        TensorU32::create_u32(self.tensor.arg_max(axes, select_last_index))
     }
 
     pub fn min(&self, axes: Uint32Array, keep_dims: bool) -> TensorU32 {

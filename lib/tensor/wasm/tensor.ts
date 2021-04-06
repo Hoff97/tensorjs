@@ -527,7 +527,9 @@ export class WASMTensor<
   }
 
   protected argMax_impl(axes: number[], selectLast: boolean): Tensor<'uint32'> {
-    throw new Error('Method not implemented.');
+    return new WASMTensor(
+      this.wasmTensor.arg_max(new Uint32Array(axes), selectLast)
+    );
   }
 
   min_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {

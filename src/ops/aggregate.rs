@@ -309,6 +309,64 @@ where
             None => panic!("Cant convert from usize to given dtype"),
         }
     }
+
+    pub fn _arg_max(&self, axes: &Vec<usize>, select_last_index: bool) -> Tensor<u32> {
+        let result_rank = self.rank() - axes.len() as usize;
+
+        let mut result_shape = vec![0; result_rank + 1];
+        let mut result_size = 1;
+        let mut axes_ix = 0;
+        let mut result_ix = 0;
+        let mut res_ix_map = vec![0; result_rank];
+        for i in 0..self.rank() {
+            if axes_ix < axes.len() && axes[axes_ix] as usize == i {
+                axes_ix += 1;
+            } else {
+                result_shape[result_ix] = self.get_dim_size(i);
+                res_ix_map[result_ix] = i;
+                result_ix += 1;
+                result_size *= self.get_dim_size(i);
+            }
+        }
+
+        let agg_size = result_size;
+        result_size *= axes.len();
+
+        result_shape[result_rank] = axes.len();
+        let result_strides = compute_strides(&result_shape);
+        let mut values: Vec<u32> = vec![zero(); result_size];
+        let mut max_vals = vec![zero(); agg_size];
+        let mut initialized = vec![false; agg_size];
+
+        let mut input_index = vec![0; self.rank()];
+        for i in 0..self.size {
+            let mut res_ix = 0;
+            for j in 0..result_rank {
+                res_ix += result_strides[j] * input_index[res_ix_map[j]];
+            }
+            let val_ix = res_ix / axes.len();
+
+            if !initialized[val_ix] {
+                max_vals[val_ix] = self.get_ix(i);
+                initialized[val_ix] = true;
+                for j in 0..axes.len() {
+                    values[res_ix + j] = input_index[axes[j]] as u32;
+                }
+            } else {
+                let val = self.get_ix(i);
+                if max_vals[val_ix] < val || (max_vals[val_ix] == val && select_last_index) {
+                    max_vals[val_ix] = val;
+                    for j in 0..axes.len() {
+                        values[res_ix + j] = input_index[axes[j]] as u32;
+                    }
+                }
+            }
+
+            increment_index(&mut input_index, self.get_sh());
+        }
+
+        Tensor::new(result_shape, result_strides, result_size, values)
+    }
 }
 
 impl<DType> Tensor<DType>
@@ -405,6 +463,14 @@ where
             ax[i as usize] = axes.get_index(i) as usize;
         }
         return self._reduce_mean_square(&ax, keep_dims);
+    }
+
+    pub fn arg_max(&self, axes: Uint32Array, select_last_index: bool) -> Tensor<u32> {
+        let mut ax: Vec<usize> = vec![0; axes.length() as usize];
+        for i in 0..axes.length() {
+            ax[i as usize] = axes.get_index(i) as usize;
+        }
+        return self._arg_max(&ax, select_last_index);
     }
 }
 
