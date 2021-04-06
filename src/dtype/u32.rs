@@ -188,6 +188,10 @@ impl TensorU32 {
         TensorU32::create_u32(self.tensor.arg_max(axes, select_last_index))
     }
 
+    pub fn arg_min(&self, axes: Uint32Array, select_last_index: bool) -> TensorU32 {
+        TensorU32::create_u32(self.tensor.arg_min(axes, select_last_index))
+    }
+
     pub fn min(&self, axes: Uint32Array, keep_dims: bool) -> TensorU32 {
         TensorU32 {
             tensor: self.tensor.min(axes, keep_dims),

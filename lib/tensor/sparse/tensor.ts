@@ -712,7 +712,19 @@ export class SparseTensor<DTpe extends DType = 'float32'> extends Tensor<DTpe> {
     return max(this, axes, keepDims);
   }
 
+  /**
+   * Not implemented yet
+   */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected argMax_impl(axes: number[], selectLast: boolean): Tensor<'uint32'> {
+    throw new Error('Method not implemented.');
+  }
+
+  /**
+   * Not implemented yet
+   */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  protected argMin_impl(axes: number[], selectLast: boolean): Tensor<'uint32'> {
     throw new Error('Method not implemented.');
   }
 

@@ -67,6 +67,7 @@ import {CeluNode} from './nodes/celu';
 import {RoundNode} from './nodes/unary/round';
 import {RangeNode} from './nodes/range';
 import {ArgMaxNode} from './nodes/reduce/argMax';
+import {ArgMinNode} from './nodes/reduce/argMin';
 
 export const nodeResolve: {[opType: string]: NodeConstructor} = {
   Conv: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
@@ -162,6 +163,8 @@ export const nodeResolve: {[opType: string]: NodeConstructor} = {
       onnxVersion,
       mode
     ),
+  ArgMin: (attributes, inputs, outputs, constants, onnxVersion, mode) =>
+    new ArgMinNode(attributes, inputs, outputs, constants, onnxVersion, mode),
   ReduceSumSquare: (
     attributes,
     inputs,

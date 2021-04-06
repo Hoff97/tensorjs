@@ -648,6 +648,14 @@ export class WASMTensor<
     );
   }
 
+  protected argMin_impl(axes: number[], selectLast: boolean): Tensor<'uint32'> {
+    return new WASMTensor(
+      this.wasmTensor.arg_min(new Uint32Array(axes), selectLast),
+      undefined,
+      'uint32'
+    );
+  }
+
   min_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
     return new WASMTensor(
       this.wasmTensor.min(new Uint32Array(axes), keepDims) as WT[DTpe],

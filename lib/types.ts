@@ -315,6 +315,28 @@ export default abstract class Tensor<DTpe extends DType = 'float32'> {
   }
 
   /**
+   * Gives the indices of the minimum over the specifed axes.
+   *
+   * @param axes One or multiple axes to take the minimum over. If not specified this will be all axes
+   *
+   * @example
+   * ```typescript
+   * const a = new CPUTensor([2,3], [1,2,3,4,5,6]);
+   *
+   * a.argMin(); //Will be [[0,0]]
+   * a.argMin(0); //Will be [0,0,0] (since the minimum values 1,2,3 are located in the first row)
+   * a.argMin(1); //Will [0,0] (Since the minimum values 1,4 are located in the first column)
+   * ```
+   */
+  argMin(axes?: number | number[], selectLast?: boolean): Tensor<'uint32'> {
+    const ax = this.getAxes(axes);
+    if (selectLast === undefined) {
+      selectLast = false;
+    }
+    return this.argMin_impl(ax, selectLast);
+  }
+
+  /**
    * Takes the mean over the specified axis/axes.
    * This is equal to `a.sum(axes, keepDims).divide(sumSize)` (where sumSize is the number
    * of entries in the summation axes) but faster.
@@ -1374,6 +1396,11 @@ export default abstract class Tensor<DTpe extends DType = 'float32'> {
   protected abstract min_impl(axes: number[], keepDims: boolean): Tensor<DTpe>;
 
   protected abstract argMax_impl(
+    axes: number[],
+    selectLast: boolean
+  ): Tensor<'uint32'>;
+
+  protected abstract argMin_impl(
     axes: number[],
     selectLast: boolean
   ): Tensor<'uint32'>;
