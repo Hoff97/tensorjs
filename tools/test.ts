@@ -82,6 +82,6 @@ if (!existsSync(dataDir)) {
 mkdirSync('./tmp');
 
 loadOnnxUnitTests();
-loadOnnxModels();
+//loadOnnxModels();
 
 execSync('rm -rf ./tmp');
