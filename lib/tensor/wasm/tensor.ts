@@ -158,7 +158,11 @@ export class WASMTensor<
     ) {
       throw new Error('Exp can only be called on float tensors');
     }
-    return new WASMTensor(this.wasmTensor.exp() as WT[DTpe]);
+    return new WASMTensor(
+      this.wasmTensor.exp() as WT[DTpe],
+      undefined,
+      this.dtype
+    );
   }
 
   log(): Tensor<DTpe> {
@@ -168,7 +172,11 @@ export class WASMTensor<
     ) {
       throw new Error('Log can only be called on float tensors');
     }
-    return new WASMTensor(this.wasmTensor.log() as WT[DTpe]);
+    return new WASMTensor(
+      this.wasmTensor.log() as WT[DTpe],
+      undefined,
+      this.dtype
+    );
   }
 
   sqrt(): Tensor<DTpe> {
@@ -178,7 +186,11 @@ export class WASMTensor<
     ) {
       throw new Error('Sqrt can only be called on float tensors');
     }
-    return new WASMTensor(this.wasmTensor.sqrt() as WT[DTpe]);
+    return new WASMTensor(
+      this.wasmTensor.sqrt() as WT[DTpe],
+      undefined,
+      this.dtype
+    );
   }
 
   abs(): Tensor<DTpe> {
@@ -191,7 +203,11 @@ export class WASMTensor<
     ) {
       throw new Error('Abs can only be called on signed tensors');
     }
-    return new WASMTensor(this.wasmTensor.abs() as WT[DTpe]);
+    return new WASMTensor(
+      this.wasmTensor.abs() as WT[DTpe],
+      undefined,
+      this.dtype
+    );
   }
 
   sin(): Tensor<DTpe> {
@@ -201,7 +217,11 @@ export class WASMTensor<
     ) {
       throw new Error('Sin can only be called on float tensors');
     }
-    return new WASMTensor(this.wasmTensor.sin() as WT[DTpe]);
+    return new WASMTensor(
+      this.wasmTensor.sin() as WT[DTpe],
+      undefined,
+      this.dtype
+    );
   }
 
   cos(): Tensor<DTpe> {
@@ -211,7 +231,11 @@ export class WASMTensor<
     ) {
       throw new Error('Cos can only be called on float tensors');
     }
-    return new WASMTensor(this.wasmTensor.cos() as WT[DTpe]);
+    return new WASMTensor(
+      this.wasmTensor.cos() as WT[DTpe],
+      undefined,
+      this.dtype
+    );
   }
 
   tan(): Tensor<DTpe> {
@@ -221,7 +245,11 @@ export class WASMTensor<
     ) {
       throw new Error('Tan can only be called on float tensors');
     }
-    return new WASMTensor(this.wasmTensor.tan() as WT[DTpe]);
+    return new WASMTensor(
+      this.wasmTensor.tan() as WT[DTpe],
+      undefined,
+      this.dtype
+    );
   }
 
   asin(): Tensor<DTpe> {
@@ -231,7 +259,11 @@ export class WASMTensor<
     ) {
       throw new Error('Asin can only be called on float tensors');
     }
-    return new WASMTensor(this.wasmTensor.asin() as WT[DTpe]);
+    return new WASMTensor(
+      this.wasmTensor.asin() as WT[DTpe],
+      undefined,
+      this.dtype
+    );
   }
 
   acos(): Tensor<DTpe> {
@@ -241,7 +273,11 @@ export class WASMTensor<
     ) {
       throw new Error('Acos can only be called on float tensors');
     }
-    return new WASMTensor(this.wasmTensor.acos() as WT[DTpe]);
+    return new WASMTensor(
+      this.wasmTensor.acos() as WT[DTpe],
+      undefined,
+      this.dtype
+    );
   }
 
   atan(): Tensor<DTpe> {
@@ -251,7 +287,11 @@ export class WASMTensor<
     ) {
       throw new Error('Atan can only be called on float tensors');
     }
-    return new WASMTensor(this.wasmTensor.atan() as WT[DTpe]);
+    return new WASMTensor(
+      this.wasmTensor.atan() as WT[DTpe],
+      undefined,
+      this.dtype
+    );
   }
 
   sinh(): Tensor<DTpe> {
@@ -261,7 +301,11 @@ export class WASMTensor<
     ) {
       throw new Error('Sinh can only be called on float tensors');
     }
-    return new WASMTensor(this.wasmTensor.sinh() as WT[DTpe]);
+    return new WASMTensor(
+      this.wasmTensor.sinh() as WT[DTpe],
+      undefined,
+      this.dtype
+    );
   }
 
   cosh(): Tensor<DTpe> {
@@ -271,7 +315,11 @@ export class WASMTensor<
     ) {
       throw new Error('Cosh can only be called on float tensors');
     }
-    return new WASMTensor(this.wasmTensor.cosh() as WT[DTpe]);
+    return new WASMTensor(
+      this.wasmTensor.cosh() as WT[DTpe],
+      undefined,
+      this.dtype
+    );
   }
 
   tanh(): Tensor<DTpe> {
@@ -281,7 +329,11 @@ export class WASMTensor<
     ) {
       throw new Error('Tanh can only be called on float tensors');
     }
-    return new WASMTensor(this.wasmTensor.tanh() as WT[DTpe]);
+    return new WASMTensor(
+      this.wasmTensor.tanh() as WT[DTpe],
+      undefined,
+      this.dtype
+    );
   }
 
   asinh(): Tensor<DTpe> {
@@ -291,7 +343,11 @@ export class WASMTensor<
     ) {
       throw new Error('Asinh can only be called on float tensors');
     }
-    return new WASMTensor(this.wasmTensor.asinh() as WT[DTpe]);
+    return new WASMTensor(
+      this.wasmTensor.asinh() as WT[DTpe],
+      undefined,
+      this.dtype
+    );
   }
 
   acosh(): Tensor<DTpe> {
@@ -301,7 +357,11 @@ export class WASMTensor<
     ) {
       throw new Error('Acosh can only be called on float tensors');
     }
-    return new WASMTensor(this.wasmTensor.acosh() as WT[DTpe]);
+    return new WASMTensor(
+      this.wasmTensor.acosh() as WT[DTpe],
+      undefined,
+      this.dtype
+    );
   }
 
   atanh(): Tensor<DTpe> {
@@ -311,7 +371,11 @@ export class WASMTensor<
     ) {
       throw new Error('Atanh can only be called on float tensors');
     }
-    return new WASMTensor(this.wasmTensor.atanh() as WT[DTpe]);
+    return new WASMTensor(
+      this.wasmTensor.atanh() as WT[DTpe],
+      undefined,
+      this.dtype
+    );
   }
 
   sigmoid(): Tensor<DTpe> {
@@ -321,7 +385,11 @@ export class WASMTensor<
     ) {
       throw new Error('Sigmoid can only be called on float tensors');
     }
-    return new WASMTensor(this.wasmTensor.sigmoid() as WT[DTpe]);
+    return new WASMTensor(
+      this.wasmTensor.sigmoid() as WT[DTpe],
+      undefined,
+      this.dtype
+    );
   }
 
   hardSigmoid(alpha: number, beta: number): Tensor<DTpe> {
@@ -332,7 +400,9 @@ export class WASMTensor<
       throw new Error('HardSigmoid can only be called on float tensors');
     }
     return new WASMTensor(
-      this.wasmTensor.hard_sigmoid(alpha, beta) as WT[DTpe]
+      this.wasmTensor.hard_sigmoid(alpha, beta) as WT[DTpe],
+      undefined,
+      this.dtype
     );
   }
 
@@ -346,18 +416,26 @@ export class WASMTensor<
     ) {
       throw new Error('Negate can only be called on signed tensors');
     }
-    return new WASMTensor(this.wasmTensor.negate() as WT[DTpe]);
+    return new WASMTensor(
+      this.wasmTensor.negate() as WT[DTpe],
+      undefined,
+      this.dtype
+    );
   }
 
   powerScalar(power: number, factor: number): Tensor<DTpe> {
     return new WASMTensor(
-      this.wasmTensor.power_scalar(power, factor) as WT[DTpe]
+      this.wasmTensor.power_scalar(power, factor) as WT[DTpe],
+      undefined,
+      this.dtype
     );
   }
 
   addMultiplyScalar(factor: number, add: number): Tensor<DTpe> {
     return new WASMTensor(
-      this.wasmTensor.add_multiply_scalar(factor, add) as WT[DTpe]
+      this.wasmTensor.add_multiply_scalar(factor, add) as WT[DTpe],
+      undefined,
+      this.dtype
     );
   }
 
@@ -371,7 +449,11 @@ export class WASMTensor<
     ) {
       throw new Error('Sign can only be called on signed tensors');
     }
-    return new WASMTensor(this.wasmTensor.sign() as WT[DTpe]);
+    return new WASMTensor(
+      this.wasmTensor.sign() as WT[DTpe],
+      undefined,
+      this.dtype
+    );
   }
 
   setValues(values: Tensor<DTpe>, starts: number[]): Tensor<DTpe> {
@@ -382,7 +464,9 @@ export class WASMTensor<
       this.wasmTensor.set_values(
         values.wasmTensor,
         new Uint32Array(starts)
-      ) as WT[DTpe]
+      ) as WT[DTpe],
+      undefined,
+      this.dtype
     );
   }
 
@@ -399,7 +483,9 @@ export class WASMTensor<
     }
 
     return new WASMTensor(
-      th.wasmTensor.addition(tensor.wasmTensor, alpha, beta)
+      th.wasmTensor.addition(tensor.wasmTensor, alpha, beta),
+      undefined,
+      this.dtype
     );
   }
 
@@ -415,7 +501,9 @@ export class WASMTensor<
       throw new Error('Can only subtract WASM tensor from WASM tensor');
     }
     return new WASMTensor(
-      th.wasmTensor.subtraction(tensor.wasmTensor, alpha, beta)
+      th.wasmTensor.subtraction(tensor.wasmTensor, alpha, beta),
+      undefined,
+      this.dtype
     );
   }
 
@@ -429,7 +517,11 @@ export class WASMTensor<
     if (!(tensor instanceof WASMTensor) || !(th instanceof WASMTensor)) {
       throw new Error('Can only multiply WASM tensor with WASM tensor');
     }
-    return new WASMTensor(th.wasmTensor.multiply(tensor.wasmTensor, alpha));
+    return new WASMTensor(
+      th.wasmTensor.multiply(tensor.wasmTensor, alpha),
+      undefined,
+      this.dtype
+    );
   }
 
   divide_impl(
@@ -442,7 +534,11 @@ export class WASMTensor<
     if (!(tensor instanceof WASMTensor) || !(th instanceof WASMTensor)) {
       throw new Error('Can only divide WASM tensor by WASM tensor');
     }
-    return new WASMTensor(th.wasmTensor.divide(tensor.wasmTensor, alpha));
+    return new WASMTensor(
+      th.wasmTensor.divide(tensor.wasmTensor, alpha),
+      undefined,
+      this.dtype
+    );
   }
 
   power_impl(
@@ -454,7 +550,11 @@ export class WASMTensor<
     if (!(tensor instanceof WASMTensor) || !(th instanceof WASMTensor)) {
       throw new Error('Can only take WASM tensor to power of WASM tensor');
     }
-    return new WASMTensor(th.wasmTensor.power(tensor.wasmTensor));
+    return new WASMTensor(
+      th.wasmTensor.power(tensor.wasmTensor),
+      undefined,
+      this.dtype
+    );
   }
 
   matMul(tensor: Tensor<DTpe>): Tensor<DTpe> {
@@ -462,7 +562,9 @@ export class WASMTensor<
       throw new Error('Can only add WASM tensor to WASM tensor');
     }
     return new WASMTensor(
-      this.wasmTensor.matmul(tensor.wasmTensor) as WT[DTpe]
+      this.wasmTensor.matmul(tensor.wasmTensor) as WT[DTpe],
+      undefined,
+      this.dtype
     );
   }
 
@@ -488,7 +590,9 @@ export class WASMTensor<
           alpha,
           (c as WASMTensor<DTpe>).wasmTensor as any,
           beta
-        ) as WT[DTpe]
+        ) as WT[DTpe],
+        undefined,
+        this.dtype
       );
     } else {
       return new WASMTensor(
@@ -497,50 +601,66 @@ export class WASMTensor<
           aTranspose,
           bTranspose,
           alpha
-        ) as WT[DTpe]
+        ) as WT[DTpe],
+        undefined,
+        this.dtype
       );
     }
   }
 
   sum_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
     return new WASMTensor(
-      this.wasmTensor.sum(new Uint32Array(axes), keepDims) as WT[DTpe]
+      this.wasmTensor.sum(new Uint32Array(axes), keepDims) as WT[DTpe],
+      undefined,
+      this.dtype
     );
   }
 
   sumSquare_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
     return new WASMTensor(
-      this.wasmTensor.sum_square(new Uint32Array(axes), keepDims) as WT[DTpe]
+      this.wasmTensor.sum_square(new Uint32Array(axes), keepDims) as WT[DTpe],
+      undefined,
+      this.dtype
     );
   }
 
   product_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
     return new WASMTensor(
-      this.wasmTensor.product(new Uint32Array(axes), keepDims) as WT[DTpe]
+      this.wasmTensor.product(new Uint32Array(axes), keepDims) as WT[DTpe],
+      undefined,
+      this.dtype
     );
   }
 
   max_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
     return new WASMTensor(
-      this.wasmTensor.max(new Uint32Array(axes), keepDims) as WT[DTpe]
+      this.wasmTensor.max(new Uint32Array(axes), keepDims) as WT[DTpe],
+      undefined,
+      this.dtype
     );
   }
 
   protected argMax_impl(axes: number[], selectLast: boolean): Tensor<'uint32'> {
     return new WASMTensor(
-      this.wasmTensor.arg_max(new Uint32Array(axes), selectLast)
+      this.wasmTensor.arg_max(new Uint32Array(axes), selectLast),
+      undefined,
+      'uint32'
     );
   }
 
   min_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
     return new WASMTensor(
-      this.wasmTensor.min(new Uint32Array(axes), keepDims) as WT[DTpe]
+      this.wasmTensor.min(new Uint32Array(axes), keepDims) as WT[DTpe],
+      undefined,
+      this.dtype
     );
   }
 
   reduceMean_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
     return new WASMTensor(
-      this.wasmTensor.reduce_mean(new Uint32Array(axes), keepDims) as WT[DTpe]
+      this.wasmTensor.reduce_mean(new Uint32Array(axes), keepDims) as WT[DTpe],
+      undefined,
+      this.dtype
     );
   }
 
@@ -549,7 +669,9 @@ export class WASMTensor<
       this.wasmTensor.reduce_mean_square(
         new Uint32Array(axes),
         keepDims
-      ) as WT[DTpe]
+      ) as WT[DTpe],
+      undefined,
+      this.dtype
     );
   }
 
@@ -564,7 +686,9 @@ export class WASMTensor<
       this.wasmTensor.reduce_log_sum(
         new Uint32Array(axes),
         keepDims
-      ) as WT[DTpe]
+      ) as WT[DTpe],
+      undefined,
+      this.dtype
     );
   }
 
@@ -582,7 +706,9 @@ export class WASMTensor<
       this.wasmTensor.reduce_log_sum_exp(
         new Uint32Array(axes),
         keepDims
-      ) as WT[DTpe]
+      ) as WT[DTpe],
+      undefined,
+      this.dtype
     );
   }
 
@@ -626,7 +752,9 @@ export class WASMTensor<
           new Uint32Array(pads),
           new Uint32Array(strides),
           activationFlag
-        ) as WT[DTpe]
+        ) as WT[DTpe],
+        undefined,
+        this.dtype
       );
     } else {
       return new WASMTensor(
@@ -637,7 +765,9 @@ export class WASMTensor<
           new Uint32Array(pads),
           new Uint32Array(strides),
           activationFlag
-        ) as WT[DTpe]
+        ) as WT[DTpe],
+        undefined,
+        this.dtype
       );
     }
   }
@@ -662,7 +792,9 @@ export class WASMTensor<
         group,
         new Uint32Array(pads),
         new Uint32Array(strides)
-      ) as WT[DTpe]
+      ) as WT[DTpe],
+      undefined,
+      this.dtype
     );
   }
 
@@ -678,13 +810,19 @@ export class WASMTensor<
         new Uint32Array(pads),
         new Uint32Array(strides),
         includePad
-      ) as WT[DTpe]
+      ) as WT[DTpe],
+      undefined,
+      this.dtype
     );
   }
 
   reshape_impl(shape: number[]): Tensor<DTpe> {
     const sh = new Uint32Array(shape);
-    return new WASMTensor(this.wasmTensor.reshape(sh) as WT[DTpe], sh);
+    return new WASMTensor(
+      this.wasmTensor.reshape(sh) as WT[DTpe],
+      sh,
+      this.dtype
+    );
   }
 
   concat(tensor: Tensor<DTpe>, axis: number): Tensor<DTpe> {
@@ -695,23 +833,39 @@ export class WASMTensor<
       axis += this.getShape().length;
     }
     return new WASMTensor(
-      this.wasmTensor.concat(tensor.wasmTensor, axis) as WT[DTpe]
+      this.wasmTensor.concat(tensor.wasmTensor, axis) as WT[DTpe],
+      undefined,
+      this.dtype
     );
   }
 
   transpose_impl(permutation: number[]): Tensor<DTpe> {
     return new WASMTensor(
-      this.wasmTensor.transpose(new Uint32Array(permutation)) as WT[DTpe]
+      this.wasmTensor.transpose(new Uint32Array(permutation)) as WT[DTpe],
+      undefined,
+      this.dtype
     );
   }
 
   clip(min?: number, max?: number): Tensor<DTpe> {
     if (min !== undefined && max !== undefined) {
-      return new WASMTensor(this.wasmTensor.clip(min, max) as WT[DTpe]);
+      return new WASMTensor(
+        this.wasmTensor.clip(min, max) as WT[DTpe],
+        undefined,
+        this.dtype
+      );
     } else if (min !== undefined) {
-      return new WASMTensor(this.wasmTensor.clip_min(min) as WT[DTpe]);
+      return new WASMTensor(
+        this.wasmTensor.clip_min(min) as WT[DTpe],
+        undefined,
+        this.dtype
+      );
     } else if (max !== undefined) {
-      return new WASMTensor(this.wasmTensor.clip_max(max) as WT[DTpe]);
+      return new WASMTensor(
+        this.wasmTensor.clip_max(max) as WT[DTpe],
+        undefined,
+        this.dtype
+      );
     }
     return this.copy();
   }
@@ -722,15 +876,21 @@ export class WASMTensor<
     }
     if (min !== undefined && max !== undefined) {
       return new WASMTensor(
-        this.wasmTensor.clip_backward(min, max, grad.wasmTensor) as WT[DTpe]
+        this.wasmTensor.clip_backward(min, max, grad.wasmTensor) as WT[DTpe],
+        undefined,
+        this.dtype
       );
     } else if (min !== undefined) {
       return new WASMTensor(
-        this.wasmTensor.clip_min_backward(min, grad.wasmTensor) as WT[DTpe]
+        this.wasmTensor.clip_min_backward(min, grad.wasmTensor) as WT[DTpe],
+        undefined,
+        this.dtype
       );
     } else if (max !== undefined) {
       return new WASMTensor(
-        this.wasmTensor.clip_max_backward(max, grad.wasmTensor) as WT[DTpe]
+        this.wasmTensor.clip_max_backward(max, grad.wasmTensor) as WT[DTpe],
+        undefined,
+        this.dtype
       );
     }
     return this.copy();
@@ -738,7 +898,9 @@ export class WASMTensor<
 
   repeat(repeats: number[]): Tensor<DTpe> {
     return new WASMTensor(
-      this.wasmTensor.repeat(new Uint32Array(repeats)) as WT[DTpe]
+      this.wasmTensor.repeat(new Uint32Array(repeats)) as WT[DTpe],
+      undefined,
+      this.dtype
     );
   }
 
@@ -754,7 +916,9 @@ export class WASMTensor<
     const reshaped = this.reshape(_shape, false) as WASMTensor<DTpe>;
 
     return new WASMTensor(
-      reshaped.wasmTensor.expand(new Uint32Array(resultShape)) as WT[DTpe]
+      reshaped.wasmTensor.expand(new Uint32Array(resultShape)) as WT[DTpe],
+      undefined,
+      this.dtype
     );
   }
 
@@ -770,7 +934,9 @@ export class WASMTensor<
         new Uint32Array(pads),
         WASMTensor.padModeToInt[mode],
         value
-      ) as WT[DTpe]
+      ) as WT[DTpe],
+      undefined,
+      this.dtype
     );
   }
 
@@ -780,7 +946,9 @@ export class WASMTensor<
         axis,
         indices.values as Uint32Array,
         new Uint32Array(indices.shape)
-      ) as WT[DTpe]
+      ) as WT[DTpe],
+      undefined,
+      this.dtype
     );
   }
 
@@ -791,7 +959,11 @@ export class WASMTensor<
     ) {
       throw new Error('Floor can only be called on float tensors');
     }
-    return new WASMTensor(this.wasmTensor.floor() as WT[DTpe]);
+    return new WASMTensor(
+      this.wasmTensor.floor() as WT[DTpe],
+      undefined,
+      this.dtype
+    );
   }
 
   ceil(): Tensor<DTpe> {
@@ -801,7 +973,11 @@ export class WASMTensor<
     ) {
       throw new Error('Ceil can only be called on float tensors');
     }
-    return new WASMTensor(this.wasmTensor.ceil() as WT[DTpe]);
+    return new WASMTensor(
+      this.wasmTensor.ceil() as WT[DTpe],
+      undefined,
+      this.dtype
+    );
   }
 
   round(): Tensor<DTpe> {
@@ -811,7 +987,11 @@ export class WASMTensor<
     ) {
       throw new Error('Round can only be called on float tensors');
     }
-    return new WASMTensor(this.wasmTensor.round() as WT[DTpe]);
+    return new WASMTensor(
+      this.wasmTensor.round() as WT[DTpe],
+      undefined,
+      this.dtype
+    );
   }
 
   slice_impl(
@@ -826,13 +1006,17 @@ export class WASMTensor<
         new Uint32Array(ends),
         new Uint32Array(axes),
         new Int32Array(steps)
-      ) as WT[DTpe]
+      ) as WT[DTpe],
+      undefined,
+      this.dtype
     );
   }
 
   upsample(scales: number[]): Tensor<DTpe> {
     return new WASMTensor(
-      this.wasmTensor.upsample(new Float32Array(scales)) as WT[DTpe]
+      this.wasmTensor.upsample(new Float32Array(scales)) as WT[DTpe],
+      undefined,
+      this.dtype
     );
   }
 
@@ -864,7 +1048,9 @@ export class WASMTensor<
         epsilon,
         scale.wasmTensor,
         bias.wasmTensor
-      )
+      ),
+      undefined,
+      this.dtype
     );
   }
 }
