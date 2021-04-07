@@ -564,3 +564,39 @@ where
         return self._reduce_log_sum_exp(&ax, keep_dims);
     }
 }
+
+pub fn pool_result(
+    in_shape: &Vec<usize>,
+    axes: &Vec<usize>,
+    keep_dims: bool,
+) -> (Vec<usize>, Vec<usize>) {
+    let mut result_rank = in_shape.len() - axes.len() as usize;
+
+    if keep_dims {
+        result_rank = in_shape.len();
+    }
+    if result_rank == 0 {
+        result_rank = 1
+    }
+
+    let mut result_shape = vec![0; result_rank];
+    let mut axes_ix = 0;
+    let mut result_ix = 0;
+    let mut res_ix_map = vec![0; result_rank];
+    for i in 0..in_shape.len() {
+        if axes_ix < axes.len() && axes[axes_ix] as usize == i {
+            axes_ix += 1;
+            if keep_dims {
+                result_shape[result_ix] = 1;
+                res_ix_map[result_ix] = i;
+                result_ix += 1;
+            }
+        } else {
+            result_shape[result_ix] = in_shape[i];
+            res_ix_map[result_ix] = i;
+            result_ix += 1;
+        }
+    }
+
+    (result_shape, res_ix_map)
+}

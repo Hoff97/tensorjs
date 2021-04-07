@@ -16,6 +16,7 @@ pub mod dtype {
 
 pub mod ops {
     pub mod aggregate;
+    pub mod backward;
     pub mod binary;
     pub mod conv;
     pub mod matmul;

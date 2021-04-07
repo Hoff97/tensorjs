@@ -176,6 +176,12 @@ impl TensorU8 {
         }
     }
 
+    pub fn max_backward(&self, value: &Sel, axes: Uint32Array) -> Self {
+        Self {
+            tensor: self.tensor.max_backward(&value.tensor, axes),
+        }
+    }
+
     pub fn arg_max(&self, axes: Uint32Array, select_last_index: bool) -> TensorU32 {
         TensorU32::create_u32(self.tensor.arg_max(axes, select_last_index))
     }
