@@ -6,16 +6,16 @@ impl Tensor<u32> {
     pub fn _reshape_sparse_indices(
         &self,
         old_sparse_shape: &Vec<usize>,
-        new_shape: &Vec<usize>,
+        new_shape: &[usize],
     ) -> Tensor<u32> {
         let old_sparse_size = get_size(old_sparse_shape);
 
         let mut sparse_shape = vec![0; 0];
         let mut sparse_size = 1;
-        for i in 0..new_shape.len() {
+        for item in new_shape {
             if sparse_size < old_sparse_size {
-                sparse_size *= new_shape[i];
-                sparse_shape.push(new_shape[i]);
+                sparse_size *= item;
+                sparse_shape.push(*item);
             } else {
                 break;
             }
@@ -27,7 +27,7 @@ impl Tensor<u32> {
         let nnz_fraction = sparse_size / old_sparse_size;
         let nnz = self.get_dim_size(0) * nnz_fraction;
 
-        let mut indice_values = vec![0 as u32; nnz * sparse_shape.len()];
+        let mut indice_values = vec![0_u32; nnz * sparse_shape.len()];
 
         for i in 0..nnz {
             let old_nnz_ix = i / nnz_fraction;

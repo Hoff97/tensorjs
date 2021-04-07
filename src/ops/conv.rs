@@ -483,7 +483,7 @@ where
             _strides[i as usize] = strides.get_index(i) as usize;
         }
 
-        return self._conv(
+        self._conv(
             kernel,
             Some(bias),
             &_dilations,
@@ -491,7 +491,7 @@ where
             &_pads,
             &_strides,
             activation,
-        );
+        )
     }
 
     pub fn conv_transpose(
@@ -513,7 +513,7 @@ where
             _strides[i as usize] = strides.get_index(i) as usize;
         }
 
-        return self._conv_transpose(kernel, &_dilations, group as usize, &_pads, &_strides);
+        self._conv_transpose(kernel, &_dilations, group as usize, &_pads, &_strides)
     }
 
     pub fn average_pool(
@@ -534,7 +534,7 @@ where
             _strides[i as usize] = strides.get_index(i) as usize;
         }
 
-        return self._average_pool(&_kernel_shape, &_pads, &_strides, include_pad);
+        self._average_pool(&_kernel_shape, &_pads, &_strides, include_pad)
     }
 
     // Mode: 0 == constant, 1 == reflect, 2 == edge
@@ -543,7 +543,7 @@ where
         for i in 0..pads.length() {
             _pads[i as usize] = pads.get_index(i) as usize;
         }
-        return self._pad(&_pads, mode, value);
+        self._pad(&_pads, mode, value)
     }
 
     pub fn upsample(&self, scales: Float32Array) -> Tensor<DType> {
@@ -552,7 +552,7 @@ where
             _scales[i as usize] = scales.get_index(i) as f32;
         }
 
-        return self._upsample(&_scales);
+        self._upsample(&_scales)
     }
 }
 

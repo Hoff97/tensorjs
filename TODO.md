@@ -1,0 +1,51 @@
+- Losses
+  - CE for multiple categories (in log space)
+- Optimizers
+  - Momentum
+  - Nesterov (or whatever the name is)
+- More onnx operators
+  - Recurrent models
+  - Easy
+    - max
+    - min
+    - Erf
+    - Shrink
+  - Adapt for new opsets
+    - Clip
+    - Pad
+    - Unsqueeze
+  - More complex but doable
+    - CumSum
+    - Det
+    - Einsum
+    - Split
+    - EyeLike
+    - Hardmax
+    - LogSoftmax
+    - SoftmaxCrossEntropyLoss
+  - Hard
+    - TopK
+    - Unique
+- Examples for recurrent models
+  - Some voice stuff??
+- Sparse tensors
+  - Reduction on WebGL?
+- Backward passes
+  - setValues
+  - gather
+  - upsample
+  - normalize
+  - max_impl
+  - min_impl
+- Get rid of regl?
+- WebGPU backend?
+- Releases on GitHub
+  - Needs release notes?
+- Proper performance tests
+  - Also compare to tensorflow.js?
+- WASM:
+  - Performance
+    - Cache efficiency
+      - Convolution would be better with NWHC layout...
+    - Parallelization with rayon?
+- Fix model tests
