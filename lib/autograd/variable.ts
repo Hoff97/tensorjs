@@ -43,6 +43,7 @@ import {LogSumBack} from './ops/reduce/logSumBack';
 import {LogSumExpBack} from './ops/reduce/logSumExpBack';
 import {PowerScalarBack} from './ops/unary/powerScalarBack';
 import {MaxBack} from './ops/reduce/max/maxBack';
+import {MinBack} from './ops/reduce/min/minBack';
 
 export interface VariableOptions<DTpe extends DType> {
   /**
@@ -665,7 +666,10 @@ export class Variable<DTpe extends DType = 'float32'>
   }
 
   protected min_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
-    throw new Error('Method not implemented.');
+    return new Variable(this.value.min(axes, keepDims), {
+      backEdge: this.noGrad ? undefined : new MinBack(this, axes),
+      noGrad: this.noGrad,
+    });
   }
 
   protected reduceMean_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {

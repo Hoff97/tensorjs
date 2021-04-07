@@ -211,7 +211,7 @@ export class MaxBackOperation<GPUTensor extends GPUTensorI> extends Operation<
   }
 }
 
-const defaultMaxBackD = new Dispatcher(
+export const defaultMaxBackD = new Dispatcher(
   (dtype: DTypeGpu) => new MaxBackOperation(gpuConstructor, dtype)
 );
 

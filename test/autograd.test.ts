@@ -25,14 +25,14 @@ const backends: Backend[] = [
     constructor: (shape: ReadonlyArray<number>, values: number[]) =>
       new CPUTensor(shape, values, 'float32'),
     toBackend: (tensor: Tensor<'float32'>) => toCPU(tensor),
-  } /*,
+  },
   {
     name: 'WASM',
     constructor: (shape: ReadonlyArray<number>, values: number[]) =>
       new WASMTensor(values, new Uint32Array(shape), 'float32'),
     toBackend: (tensor: Tensor<'float32'>) => toWASM(tensor),
     wait: wasmLoaded,
-  },
+  } /*,
   {
     name: 'GPU',
     constructor: (shape: ReadonlyArray<number>, values: number[]) =>
@@ -43,7 +43,7 @@ const backends: Backend[] = [
 
 for (const backend of backends) {
   describe(`Autograd on ${backend.name}`, () => {
-    /*it('should work with exp', async () => {
+    it('should work with exp', async () => {
       if (backend.wait !== undefined) {
         await backend.wait;
       }
@@ -2255,7 +2255,7 @@ for (const backend of backends) {
       );
 
       expect(await vX.grad?.compare(numericalGradX, 0.01)).toBeTrue();
-    });*/
+    });
 
     it('should work with max axis 1', async () => {
       if (backend.wait !== undefined) {
@@ -2320,6 +2320,75 @@ for (const backend of backends) {
         numericalGradient(
           aCPU,
           (a: CPUTensor<'float32'>) => a.max() as CPUTensor<'float32'>
+        )
+      );
+
+      expect(await vA.grad?.compare(numericalGradA, 0.01)).toBeTrue();
+    });
+
+    it('should work with min axis 1', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 3], [1, 2, 3, 4, 5, 6]);
+      const ones = backend.constructor([2], new Array(2).fill(1));
+      const vA = new Variable(a);
+      const aCPU = (await toCPU(a)) as CPUTensor<'float32'>;
+
+      const res = vA.min(1) as Variable<'float32'>;
+      res.backward(ones);
+
+      const numericalGradA = await backend.toBackend(
+        numericalGradient(
+          aCPU,
+          (a: CPUTensor<'float32'>) => a.min(1) as CPUTensor<'float32'>
+        )
+      );
+
+      expect(await vA.grad?.compare(numericalGradA, 0.01)).toBeTrue();
+    });
+
+    it('should work with min axis 0', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 3], [1, 2, 3, 4, 5, 6]);
+      const ones = backend.constructor([3], new Array(3).fill(1));
+      const vA = new Variable(a);
+      const aCPU = (await toCPU(a)) as CPUTensor<'float32'>;
+
+      const res = vA.min(0) as Variable<'float32'>;
+      res.backward(ones);
+
+      const numericalGradA = await backend.toBackend(
+        numericalGradient(
+          aCPU,
+          (a: CPUTensor<'float32'>) => a.min(0) as CPUTensor<'float32'>
+        )
+      );
+
+      expect(await vA.grad?.compare(numericalGradA, 0.01)).toBeTrue();
+    });
+
+    it('should work with min across all axes', async () => {
+      if (backend.wait !== undefined) {
+        await backend.wait;
+      }
+
+      const a = backend.constructor([2, 3], [1, 2, 3, 4, 5, 6]);
+      const ones = backend.constructor([1], new Array(1).fill(1));
+      const vA = new Variable(a);
+      const aCPU = (await toCPU(a)) as CPUTensor<'float32'>;
+
+      const res = vA.min() as Variable<'float32'>;
+      res.backward(ones);
+
+      const numericalGradA = await backend.toBackend(
+        numericalGradient(
+          aCPU,
+          (a: CPUTensor<'float32'>) => a.min() as CPUTensor<'float32'>
         )
       );
 
