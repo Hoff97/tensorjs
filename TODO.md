@@ -35,8 +35,7 @@
   - gather
   - upsample
   - normalize
-  - max_impl
-  - min_impl
+  - max/min_impl: Make WASM more efficient
 - Get rid of regl?
 - WebGPU backend?
 - Releases on GitHub
