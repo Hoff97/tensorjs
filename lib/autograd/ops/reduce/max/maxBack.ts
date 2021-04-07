@@ -1,8 +1,10 @@
 import {DType, Tensor} from '../../../../library';
 import {CPUTensor} from '../../../../tensor/cpu/tensor';
+import {GPUTensor} from '../../../../tensor/gpu/tensor';
 import {WASMTensor} from '../../../../tensor/wasm/tensor';
 import {BackwardOp, VariableI} from '../../../types';
 import {maxBackCPU} from './cpu';
+import {maxBackGPU} from './gpu';
 import {maxBackWASM} from './wasm';
 
 export class MaxBack<DTpe extends DType> implements BackwardOp<DTpe> {
@@ -32,6 +34,8 @@ export function maxBack<DTpe extends DType>(
     return maxBackCPU(value, gradient as CPUTensor<DTpe>, axes);
   } else if (value instanceof WASMTensor) {
     return maxBackWASM(value, gradient as any, axes);
+  } else if (value instanceof GPUTensor) {
+    return maxBackGPU(value, gradient as any, axes);
   }
-  throw new Error('Backward pass of max not implemented for WebGL yet');
+  throw new Error('Backward pass of max not implemented tensor:' + value);
 }
