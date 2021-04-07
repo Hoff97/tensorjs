@@ -42,6 +42,7 @@ import {ATanBack, ATanHBack, TanBack, TanHBack} from './ops/unary/tanBack';
 import {LogSumBack} from './ops/reduce/logSumBack';
 import {LogSumExpBack} from './ops/reduce/logSumExpBack';
 import {PowerScalarBack} from './ops/unary/powerScalarBack';
+import {MaxBack} from './ops/reduce/max/maxBack';
 
 export interface VariableOptions<DTpe extends DType> {
   /**
@@ -649,7 +650,10 @@ export class Variable<DTpe extends DType = 'float32'>
   }
 
   protected max_impl(axes: number[], keepDims: boolean): Tensor<DTpe> {
-    throw new Error('Method not implemented.');
+    return new Variable(this.value.max(axes, keepDims), {
+      backEdge: this.noGrad ? undefined : new MaxBack(this, axes),
+      noGrad: this.noGrad,
+    });
   }
 
   protected argMax_impl(axes: number[], selectLast: boolean): Tensor<'uint32'> {
